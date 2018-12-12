@@ -5,7 +5,7 @@
 #ifndef SAXION_Y2Q1_RENDERING_GLHELPERS_H
 #define SAXION_Y2Q1_RENDERING_GLHELPERS_H
 
-#include "glew.h"
+#include <GL/glew.h>
 #include <iostream>
 #include <string>
 

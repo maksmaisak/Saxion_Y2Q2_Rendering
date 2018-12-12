@@ -1,4 +1,6 @@
 # Debug builds
+[Bb]uild
+[Bb]uilds
 cmake-build*/
 
 # IDE Stuff

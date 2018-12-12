@@ -7,6 +7,7 @@
 
 #include <vector>
 #include <limits>
+#include <cassert>
 #include "Entity.h"
 #include "Messaging.h"
 #include "EntityEvents.h"

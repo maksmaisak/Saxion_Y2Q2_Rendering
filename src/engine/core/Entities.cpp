@@ -4,6 +4,7 @@
 
 #include "Entities.h"
 #include <iostream>
+#include <cassert>
 
 namespace en {
 

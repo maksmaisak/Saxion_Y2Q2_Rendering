@@ -14,8 +14,8 @@ namespace en {
     struct EntityInfo {
         static const unsigned int NumIdBits = 32;
         static const unsigned int NumVersionBits = 64 - NumIdBits;
-        static const std::uint64_t IdMask      = ~0u >> NumVersionBits;
-        static const std::uint64_t VersionMask = ~0u << NumIdBits;
+        static const std::uint64_t IdMask      = ~(0ull) >> NumVersionBits;
+        static const std::uint64_t VersionMask = ~(0ull) << NumIdBits;
 
         using entity_type  = std::uint64_t;
         using id_type      = std::uint32_t;

@@ -25,17 +25,26 @@ add_compile_definitions(GLM_ENABLE_EXPERIMENTAL)
 ## If you want to link SFML statically
 #set(SFML_STATIC_LIBRARIES TRUE)
 
-## In most cases better set in the CMake cache
-#set(SFML_DIR "<sfml root prefix>/lib/cmake/SFML")
+#set(SFML_DIR "C:/dev/SFML/lib/cmake/SFML")
 
 find_package(OpenGL REQUIRED)
 include_directories(${OpenGL_INCLUDE_DIRS})
-if (APPLE)
+if(APPLE)
     find_library(OpenGL_LIBRARY OpenGL)
-endif (APPLE)
+endif()
 
 find_package(GLEW REQUIRED)
 include_directories(${GLEW_INCLUDE_DIRS})
+link_directories(${GLEW_LINK_DIRS})
 
-find_package(SFML 2.5 COMPONENTS graphics audio REQUIRED)
+if(WIN32)
+    link_directories(GLOB_RECURSE "C:/dev/lib")
+    link_directories(GLOB_RECURSE "C:/dev/lib/SFML")
+    include_directories(GLOB_RECURSE "C:/dev/include")
+    include_directories(GLOB_RECURSE "C:/dev/include/GL")
+    include_directories(GLOB_RECURSE "C:/dev/include/SFML")
+else()
+    find_package(SFML COMPONENTS graphics audio REQUIRED)
+endif()
+
 target_link_libraries(Saxion_Y2Q1_Rendering ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} sfml-graphics sfml-audio)

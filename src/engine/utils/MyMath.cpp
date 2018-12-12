@@ -5,17 +5,18 @@
 #include "MyMath.h"
 #include <cmath>
 #include <random>
+#include <functional>
 
 namespace en {
 
     float angleDegrees(sf::Vector2f vec) {
 
-        return std::atan2f(vec.y, vec.x) * RAD2DEG;
+        return atan2f(vec.y, vec.x) * RAD2DEG;
     }
 
     bool isZero(float value) {
 
-        return abs(value) < EPSILON;
+        return std::abs(value) < EPSILON;
     }
 
     bool isZero(const sf::Vector2f& vec) {
@@ -33,7 +34,7 @@ namespace en {
 
     sf::Vector2f& normalize(sf::Vector2f& vec) {
 
-        float magnitude = hypot(vec.x, vec.y);
+        float magnitude = std::hypot(vec.x, vec.y);
         vec.x /= magnitude;
         vec.y /= magnitude;
         return vec;

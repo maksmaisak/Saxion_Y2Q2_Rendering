@@ -13,6 +13,8 @@ cmake_minimum_required(VERSION 3.12)
 project(Saxion_Y2Q1_Rendering)
 
 set(CMAKE_CXX_STANDARD 17)
+add_compile_definitions(GLM_ENABLE_EXPERIMENTAL)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 file(GLOB_RECURSE SOURCES "src/*.cpp")
 header_directories(INCLUDES)
@@ -20,12 +22,8 @@ header_directories(INCLUDES)
 include_directories(${INCLUDES})
 add_executable(Saxion_Y2Q1_Rendering ${SOURCES} ${INCLUDES})
 
-add_compile_definitions(GLM_ENABLE_EXPERIMENTAL)
-
 ## If you want to link SFML statically
 #set(SFML_STATIC_LIBRARIES TRUE)
-
-#set(SFML_DIR "C:/dev/SFML/lib/cmake/SFML")
 
 find_package(OpenGL REQUIRED)
 include_directories(${OpenGL_INCLUDE_DIRS})
@@ -34,17 +32,6 @@ if(APPLE)
 endif()
 
 find_package(GLEW REQUIRED)
-include_directories(${GLEW_INCLUDE_DIRS})
-link_directories(${GLEW_LINK_DIRS})
-
-if(WIN32)
-    link_directories(GLOB_RECURSE "C:/dev/lib")
-    link_directories(GLOB_RECURSE "C:/dev/lib/SFML")
-    include_directories(GLOB_RECURSE "C:/dev/include")
-    include_directories(GLOB_RECURSE "C:/dev/include/GL")
-    include_directories(GLOB_RECURSE "C:/dev/include/SFML")
-else()
-    find_package(SFML COMPONENTS graphics audio REQUIRED)
-endif()
+find_package(SFML 2.5 COMPONENTS graphics audio REQUIRED)
 
 target_link_libraries(Saxion_Y2Q1_Rendering ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} sfml-graphics sfml-audio)

@@ -22,6 +22,7 @@ class TextureMaterial : public AbstractMaterial
         void setDiffuseTexture (Texture* pDiffuseTexture);
 
     protected:
+
     private:
         static ShaderProgram* _shader;
         static void _lazyInitializeShader();
@@ -30,15 +31,14 @@ class TextureMaterial : public AbstractMaterial
         static GLint _uMVPMatrix;
         static GLint _uDiffuseTexture;
 
-        static GLint _aVertex ;
+        static GLint _aVertex;
         static GLint _aNormal;
-        static GLint _aUV ;
+        static GLint _aUV;
 
         Texture* _diffuseTexture;
 
         TextureMaterial(const TextureMaterial&);
         TextureMaterial& operator=(const TextureMaterial&);
-
 };
 
 #endif // TEXTUREMATERIAL_HPP

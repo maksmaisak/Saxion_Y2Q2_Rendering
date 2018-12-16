@@ -22,11 +22,9 @@ int main() {
 
     std::cout << "Starting Game" << std::endl;
 
-    AbstractGame* game = new MGEDemo();
+	std::unique_ptr<AbstractGame> game = std::make_unique<MGEDemo>();
     game->initialize();
     game->run();
-
-	delete game;
 
     return 0;
 }

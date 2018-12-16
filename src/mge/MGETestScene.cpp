@@ -34,7 +34,12 @@ void MGETestScene::_initializeScene() {
     //MATERIALS
 
     AbstractMaterial* runicStoneMaterial = new TextureMaterial(
-        Texture::load(config::MGE_TEXTURE_PATH + "runicfloor.png"));
+        Texture::load(config::MGE_TEXTURE_PATH + "runicfloor.png")
+    );
+
+    AbstractMaterial* floorMaterial = new TextureMaterial(
+        Texture::load(config::MGE_TEXTURE_PATH + "land.jpg")
+    );
 
     //SCENE SETUP
 
@@ -44,12 +49,12 @@ void MGETestScene::_initializeScene() {
     _world->add(camera);
     _world->setMainCamera(camera);
 
-    /*//add the floor
-    GameObject* plane = new GameObject("plane", glm::vec3(0, 0, 0));
+    //add the floor
+    GameObject* plane = new GameObject("plane", glm::vec3(0, -4, 0));
     plane->scale(glm::vec3(5, 5, 5));
     plane->setMesh(planeMeshDefault);
-    plane->setMaterial(runicStoneMaterial);
-    _world->add(plane);*/
+    plane->setMaterial(floorMaterial);
+    _world->add(plane);
 
     //add a spinning sphere
     GameObject* sphere = new GameObject("sphere", glm::vec3(0, 0, 0));

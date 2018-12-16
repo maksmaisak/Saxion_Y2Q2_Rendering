@@ -16,7 +16,7 @@ class Mesh;
 class GameObject
 {
 	public:
-		GameObject(const std::string& pName = nullptr, const glm::vec3& pPosition = glm::vec3( 0.0f, 0.0f, 0.0f ));
+		explicit GameObject(const std::string& pName = nullptr, const glm::vec3& pPosition = glm::vec3(0.0f, 0.0f, 0.0f));
 		virtual ~GameObject();
 
         void setName (const std::string& pName);
@@ -44,7 +44,7 @@ class GameObject
 		Mesh* getMesh() const;
 
         //mesh and material should be shared as much as possible
-		void setMaterial (AbstractMaterial* pMaterial);
+		void setMaterial(AbstractMaterial* pMaterial);
 		AbstractMaterial* getMaterial() const;
 
         //behaviour is expected to be unique per game object, in general do NOT share them between objects

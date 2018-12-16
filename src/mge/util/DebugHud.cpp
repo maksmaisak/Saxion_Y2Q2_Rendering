@@ -38,7 +38,11 @@ void DebugHud::setDebugInfo(std::string pInfo) {
 void DebugHud::draw()
 {
     // Prevent non core-profile code running in a core-profile context.
-	if ((_window->getSettings().attributeFlags & sf::ContextSettings::Core) != 0) return;
+	if ((_window->getSettings().attributeFlags & sf::ContextSettings::Core) != 0) {
+
+	    //std::cout << _debugText.getString().toAnsiString();
+	    return;
+	}
 
     //glDisable( GL_CULL_FACE );
 	glActiveTexture(GL_TEXTURE0);

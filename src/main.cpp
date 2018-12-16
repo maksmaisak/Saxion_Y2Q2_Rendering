@@ -2,6 +2,7 @@
 
 #include "mge/core/AbstractGame.hpp"
 #include "mge/MGEDemo.hpp"
+#include "mge/MGETestScene.h"
 
 /**
  * Main entry point for the Micro Engine.
@@ -22,7 +23,7 @@ int main() {
 
     std::cout << "Starting Game" << std::endl;
 
-	std::unique_ptr<AbstractGame> game = std::make_unique<MGEDemo>();
+	std::unique_ptr<AbstractGame> game = std::make_unique<MGETestScene>();
     game->initialize();
     game->run();
 

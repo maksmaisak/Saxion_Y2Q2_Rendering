@@ -61,7 +61,6 @@ void MGEDemo::_initializeScene()
 
     //SCENE SETUP
 
-
     //add camera first (it will be updated last)
     Camera* camera = new Camera ("camera", glm::vec3(0,6,7));
     camera->rotate(glm::radians(-40.0f), glm::vec3(1,0,0));

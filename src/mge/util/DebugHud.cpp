@@ -37,15 +37,12 @@ void DebugHud::setDebugInfo(std::string pInfo) {
 
 void DebugHud::draw()
 {
-	// WARNING: THIS IS NOT CORE-PROFILE COMPLIANT. WON'T WORK ON MACOS
+    // Prevent non core-profile code running in a core-profile context.
+	if ((_window->getSettings().attributeFlags & sf::ContextSettings::Core) != 0) return;
 
-#ifndef __APPLE__
-
-	//glDisable( GL_CULL_FACE );
+    //glDisable( GL_CULL_FACE );
 	glActiveTexture(GL_TEXTURE0);
     _window->pushGLStates();
     _window->draw(_debugText);
 	_window->popGLStates();
-
-#endif
 }

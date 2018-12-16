@@ -10,28 +10,29 @@ class GameObject;
  *
  * The concept is similar to MonoBehaviours in Unity.
  */
-class AbstractBehaviour
-{
-	public:
+class AbstractBehaviour {
+public:
 
-		AbstractBehaviour();
-		virtual ~AbstractBehaviour() = 0;
+    AbstractBehaviour();
 
-        //for internal administration, do not use directly
-        virtual void setOwner (GameObject* pGameObject);
+    virtual ~AbstractBehaviour() = 0;
 
-        //behaviour should be able to update itself every step and MUST be implemented
-		virtual void update(float pStep) = 0;
+    //for internal administration, do not use directly
+    virtual void setOwner(GameObject* pGameObject);
 
-    protected:
+    //behaviour should be able to update itself every step and MUST be implemented
+    virtual void update(float pStep) = 0;
 
-		GameObject* _owner;
+protected:
 
-    private:
+    GameObject* _owner;
 
-        //disallow copy and assignment
-        AbstractBehaviour(const AbstractBehaviour&);
-        AbstractBehaviour& operator=(const AbstractBehaviour&);
+private:
+
+    //disallow copy and assignment
+    AbstractBehaviour(const AbstractBehaviour&);
+
+    AbstractBehaviour& operator=(const AbstractBehaviour&);
 
 };
 

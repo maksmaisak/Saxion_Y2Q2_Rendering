@@ -89,7 +89,7 @@ class GameObject
 
     private:
         GameObject (const GameObject&);
-		GameObject& operator= (const GameObject&);
+		GameObject& operator = (const GameObject&);
 };
 
 #endif // GAMEOBJECT_HPP

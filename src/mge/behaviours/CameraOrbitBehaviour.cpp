@@ -18,11 +18,18 @@ CameraOrbitBehaviour::CameraOrbitBehaviour(
     m_distance(distance),
     m_minTilt(minTilt),
     m_maxTilt(maxTilt),
-    m_rotationSpeed(rotationSpeed) {}
+    m_rotationSpeed(rotationSpeed)
+{
+    m_previousMousePosition = sf::Mouse::getPosition();
+}
 
 void CameraOrbitBehaviour::update(float dt) {
 
     if (!m_target) return;
+
+    sf::Vector2i currentMousePosition = sf::Mouse::getPosition();
+    sf::Vector2i deltaMousePosition = currentMousePosition - m_previousMousePosition;
+    m_previousMousePosition = currentMousePosition;
 
     glm::vec3 targetPosition = m_target->getWorldPosition();
     glm::vec3 offset = _owner->getLocalPosition() - targetPosition;
@@ -31,25 +38,11 @@ void CameraOrbitBehaviour::update(float dt) {
     if (glm::any(glm::isnan(targetToSelf))) targetToSelf = glm::vec3(0, 0, 1);
     offset = targetToSelf * m_distance;
 
-    float inputX = 0.0f;
-    float inputY = 0.0f;
+    float inputX = deltaMousePosition.x;
+    float inputY = deltaMousePosition.y;
 
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
-        inputX += m_rotationSpeed;
-    }
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
-        inputX -= m_rotationSpeed;
-    }
-
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
-        inputY += m_rotationSpeed;
-    }
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
-        inputY -= m_rotationSpeed;
-    }
-
-    offset = glm::rotate(offset, inputX * dt, glm::vec3(0, 1, 0));
-    offset = glm::rotate(offset, inputY * dt, glm::normalize(glm::cross(glm::vec3(0, 1, 0), offset)));
+    offset = glm::rotate(offset, -inputX * m_rotationSpeed * dt, glm::vec3(0, 1, 0));
+    offset = glm::rotate(offset, -inputY * m_rotationSpeed * dt, glm::normalize(glm::cross(glm::vec3(0, 1, 0), offset)));
 
     auto forward = glm::normalize(offset);
     auto right = glm::normalize(glm::cross(glm::vec3(0, 1, 0), forward));

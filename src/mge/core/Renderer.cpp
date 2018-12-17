@@ -6,7 +6,7 @@
 #include "mge/materials/AbstractMaterial.hpp"
 #include "GLHelpers.h"
 
-Renderer::Renderer() :debug(false) {
+Renderer::Renderer() : debug(false) {
 	//make sure we test the depthbuffer
 	glEnable(GL_DEPTH_TEST);
 

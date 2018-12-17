@@ -25,23 +25,24 @@ TextureMaterial::TextureMaterial(Texture * pDiffuseTexture):_diffuseTexture(pDif
 TextureMaterial::~TextureMaterial() {}
 
 void TextureMaterial::_lazyInitializeShader() {
-    if (!_shader) {
-        _shader = new ShaderProgram();
-        _shader->addShader(GL_VERTEX_SHADER, config::MGE_SHADER_PATH+"texture.vs");
-        _shader->addShader(GL_FRAGMENT_SHADER, config::MGE_SHADER_PATH+"texture.fs");
-        _shader->finalize();
 
-        //cache all the uniform and attribute indexes
-        _uMVPMatrix = _shader->getUniformLocation("mvpMatrix");
-        _uDiffuseTexture = _shader->getUniformLocation("diffuseTexture");
+    if (_shader) return;
 
-        _aVertex = _shader->getAttribLocation("vertex");
-        _aNormal = _shader->getAttribLocation("normal");
-        _aUV =     _shader->getAttribLocation("uv");
-    }
+    _shader = new ShaderProgram();
+    _shader->addShader(GL_VERTEX_SHADER, config::MGE_SHADER_PATH+"texture.vs");
+    _shader->addShader(GL_FRAGMENT_SHADER, config::MGE_SHADER_PATH+"texture.fs");
+    _shader->finalize();
+
+    //cache all the uniform and attribute indexes
+    _uMVPMatrix = _shader->getUniformLocation("mvpMatrix");
+    _uDiffuseTexture = _shader->getUniformLocation("diffuseTexture");
+
+    _aVertex = _shader->getAttribLocation("vertex");
+    _aNormal = _shader->getAttribLocation("normal");
+    _aUV =     _shader->getAttribLocation("uv");
 }
 
-void TextureMaterial::setDiffuseTexture (Texture* pDiffuseTexture) {
+void TextureMaterial::setDiffuseTexture(Texture* pDiffuseTexture) {
     _diffuseTexture = pDiffuseTexture;
 }
 

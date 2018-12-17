@@ -183,6 +183,7 @@ Mesh* Mesh::load(std::string pFilename) {
 }
 
 void Mesh::_buffer() {
+
 	glGenBuffers(1, &_indexBufferId);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _indexBufferId);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, _indices.size() * sizeof(unsigned int), &_indices[0], GL_STATIC_DRAW);
@@ -206,33 +207,28 @@ void Mesh::_buffer() {
 
 void Mesh::streamToOpenGL(GLint pVerticesAttrib, GLint pNormalsAttrib, GLint pUVsAttrib) {
 
-	// This is VAO setup code. Would normally be called once per every mesh/shader combination.
-	{
-		glBindVertexArray(_vao);
+	glBindVertexArray(_vao);
 
-		if (pVerticesAttrib != -1) {
-			glBindBuffer(GL_ARRAY_BUFFER, _vertexBufferId);
-			glEnableVertexAttribArray(pVerticesAttrib);
-			glVertexAttribPointer(pVerticesAttrib, 3, GL_FLOAT, GL_FALSE, 0, 0);
-		}
-
-		if (pNormalsAttrib != -1) {
-			glBindBuffer(GL_ARRAY_BUFFER, _normalBufferId);
-			glEnableVertexAttribArray(pNormalsAttrib);
-			glVertexAttribPointer(pNormalsAttrib, 3, GL_FLOAT, GL_TRUE, 0, 0);
-		}
-
-		if (pUVsAttrib != -1) {
-			glBindBuffer(GL_ARRAY_BUFFER, _uvBufferId);
-			glEnableVertexAttribArray(pUVsAttrib);
-			glVertexAttribPointer(pUVsAttrib, 2, GL_FLOAT, GL_FALSE, 0, 0);
-		}
-
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _indexBufferId);
-		glBindVertexArray(0);
+	if (pVerticesAttrib != -1) {
+		glBindBuffer(GL_ARRAY_BUFFER, _vertexBufferId);
+		glEnableVertexAttribArray(pVerticesAttrib);
+		glVertexAttribPointer(pVerticesAttrib, 3, GL_FLOAT, GL_FALSE, 0, 0);
 	}
 
-	glBindVertexArray(_vao);
+	if (pNormalsAttrib != -1) {
+		glBindBuffer(GL_ARRAY_BUFFER, _normalBufferId);
+		glEnableVertexAttribArray(pNormalsAttrib);
+		glVertexAttribPointer(pNormalsAttrib, 3, GL_FLOAT, GL_TRUE, 0, 0);
+	}
+
+	if (pUVsAttrib != -1) {
+		glBindBuffer(GL_ARRAY_BUFFER, _uvBufferId);
+		glEnableVertexAttribArray(pUVsAttrib);
+		glVertexAttribPointer(pUVsAttrib, 2, GL_FLOAT, GL_FALSE, 0, 0);
+	}
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _indexBufferId);
+
 	glDrawElements(GL_TRIANGLES, _indices.size(), GL_UNSIGNED_INT, (GLvoid*)0);
 	glBindVertexArray(0);
 

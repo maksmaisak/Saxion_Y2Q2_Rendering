@@ -11,9 +11,12 @@
 #include "mge/core/Camera.hpp"
 #include "mge/core/GameObject.hpp"
 #include "mge/config.hpp"
+
 #include "mge/materials/AbstractMaterial.hpp"
 #include "mge/materials/ColorMaterial.hpp"
 #include "mge/materials/TextureMaterial.hpp"
+#include "mge/materials/WobblingMaterial.h"
+
 #include "mge/behaviours/RotatingBehaviour.hpp"
 #include "mge/behaviours/KeysBehaviour.hpp"
 #include "mge/behaviours/CameraOrbitBehaviour.h"
@@ -31,16 +34,16 @@ void MGETestScene::_initializeScene() {
     Mesh* planeMeshDefault = Mesh::load(config::MGE_MODEL_PATH + "plane.obj");
     Mesh* cubeMeshF = Mesh::load(config::MGE_MODEL_PATH + "cube_flat.obj");
     Mesh* sphereMeshS = Mesh::load(config::MGE_MODEL_PATH + "sphere_smooth.obj");
+    Mesh* testObjectMeshS = Mesh::load(config::MGE_MODEL_PATH + "sphere2.obj");
 
     //MATERIALS
 
-    AbstractMaterial* runicStoneMaterial = new TextureMaterial(
-        Texture::load(config::MGE_TEXTURE_PATH + "runicfloor.png")
-    );
+    AbstractMaterial* runicStoneMaterial = new TextureMaterial(Texture::load(config::MGE_TEXTURE_PATH + "runicfloor.png"));
 
     AbstractMaterial* floorMaterial = new TextureMaterial(
-        Texture::load(config::MGE_TEXTURE_PATH + "land.jpg")
-    );
+        Texture::load(config::MGE_TEXTURE_PATH + "land.jpg"));
+
+    AbstractMaterial* wobblingMaterial = new WobblingMaterial(Texture::load(config::MGE_TEXTURE_PATH + "runicfloor.png"));
 
     //SCENE SETUP
 
@@ -60,8 +63,8 @@ void MGETestScene::_initializeScene() {
     //add a spinning sphere
     GameObject* sphere = new GameObject("sphere", glm::vec3(0, 0, 0));
     sphere->scale(glm::vec3(2.5, 2.5, 2.5));
-    sphere->setMesh(sphereMeshS);
-    sphere->setMaterial(runicStoneMaterial);
+    sphere->setMesh(testObjectMeshS);
+    sphere->setMaterial(wobblingMaterial);
     sphere->setBehaviour(new RotatingBehaviour());
     _world->add(sphere);
     camera->setBehaviour(new CameraOrbitBehaviour(sphere, 10, -15.f, 60.f));

@@ -1,4 +1,4 @@
-#version 330 // for glsl version (12 is for older versions , say opengl 2.1
+#version 330
 
 in vec3 vertex;
 in vec3 normal;
@@ -11,10 +11,13 @@ uniform float timeScale;
 uniform float phaseOffsetPerUnitDistance;
 
 out vec2 fUV;
+out float wobbleFactor; // from -1 to 1. 0 is no wobble.
 
 void main() {
 
-    vec3 position = vertex * (1 + 0.2 * sin(time * timeScale + vertex.y * phaseOffsetPerUnitDistance));
+    wobbleFactor = sin(time * timeScale + vertex.y * phaseOffsetPerUnitDistance);
+
+    vec3 position = vertex * (1 + 0.2 * wobbleFactor);
     gl_Position = mvpMatrix * vec4(position, 1);
     fUV = uv;
 }

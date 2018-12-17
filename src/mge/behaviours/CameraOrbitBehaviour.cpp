@@ -29,7 +29,6 @@ void CameraOrbitBehaviour::update(float dt) {
 
     auto targetToSelf = glm::normalize(offset);
     if (glm::any(glm::isnan(targetToSelf))) targetToSelf = glm::vec3(0, 0, 1);
-
     offset = targetToSelf * m_distance;
 
     float inputX = 0.0f;
@@ -49,21 +48,17 @@ void CameraOrbitBehaviour::update(float dt) {
         inputY -= m_rotationSpeed;
     }
 
-    auto forward = -targetToSelf;
-    auto up = glm::vec3(0, 1, 0);
-    auto right = glm::normalize(glm::cross(forward, up));
-    up = glm::cross(right, forward);
-
     offset = glm::rotate(offset, inputX * dt, glm::vec3(0, 1, 0));
-    offset = glm::rotate(offset, inputY * dt, right);
+    offset = glm::rotate(offset, inputY * dt, glm::normalize(glm::cross(glm::vec3(0, 1, 0), offset)));
 
-    right = glm::normalize(glm::cross(forward, up));
-    up = glm::cross(right, forward);
+    auto forward = glm::normalize(offset);
+    auto right = glm::normalize(glm::cross(glm::vec3(0, 1, 0), forward));
+    auto up = glm::cross(forward, right);
 
     _owner->setTransform(glm::mat4(
         glm::vec4(right, 0),
         glm::vec4(up, 0),
-        glm::vec4(-forward, 0), // why the - though?
+        glm::vec4(forward, 0),
         glm::vec4(targetPosition + offset, 1)
     ));
 }

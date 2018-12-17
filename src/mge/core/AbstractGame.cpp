@@ -4,6 +4,8 @@
 #include "mge/core/Renderer.hpp"
 #include "mge/core/World.hpp"
 
+#include "Messaging.h"
+
 AbstractGame::AbstractGame():_window(NULL),_renderer(NULL),_world(NULL), _fps(0)
 {
     //ctor
@@ -170,6 +172,8 @@ void AbstractGame::_processEvents()
             default:
                 break;
         }
+
+        en::Receiver<sf::Event>::broadcast(event);
 	}
 
 	if (exit) {

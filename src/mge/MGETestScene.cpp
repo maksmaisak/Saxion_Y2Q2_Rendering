@@ -46,7 +46,7 @@ void MGETestScene::_initializeScene() {
 
     //add camera first (it will be updated last)
     Camera* camera = new Camera("camera", glm::vec3(0, 0, 0));
-    //camera->rotate(glm::radians(-40.0f), glm::vec3(1, 0, 0));
+    camera->rotate(glm::radians(-40.0f), glm::vec3(1, 0, 0));
     _world->add(camera);
     _world->setMainCamera(camera);
 
@@ -64,7 +64,7 @@ void MGETestScene::_initializeScene() {
     sphere->setMaterial(runicStoneMaterial);
     sphere->setBehaviour(new RotatingBehaviour());
     _world->add(sphere);
-    camera->setBehaviour(new CameraOrbitBehaviour(sphere));
+    camera->setBehaviour(new CameraOrbitBehaviour(sphere, 10, -15.f, 60.f));
 
     GameObject* ring = new GameObject("ring", glm::vec3(0, 0, 0));
     ring->setBehaviour(new RotatingBehaviour());

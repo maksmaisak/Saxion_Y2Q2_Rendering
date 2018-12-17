@@ -40,7 +40,7 @@ void PlayerDeathSystem::receive(const en::Collision& collision) {
 
     m_engine->getScheduler().delay(sf::seconds(4.f), [this](){
         m_registry->destroyAll();
-        en::Receiver<Restart>::accept({});
+        en::Receiver<Restart>::broadcast({});
         game::makeMainLevel(*m_engine);
         m_isAtGameOverScreen = false;
     });

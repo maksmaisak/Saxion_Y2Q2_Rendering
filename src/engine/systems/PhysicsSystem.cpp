@@ -45,7 +45,7 @@ namespace en {
                     tf.move(movement * hit->timeOfImpact);
                     didCollide = true;
 
-                    en::Receiver<en::Collision>::accept({*hit, entity, other});
+                    en::Receiver<en::Collision>::broadcast({*hit, entity, other});
 
                     break;
                 }

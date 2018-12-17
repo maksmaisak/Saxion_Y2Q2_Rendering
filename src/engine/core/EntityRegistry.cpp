@@ -11,7 +11,7 @@ namespace en {
     Entity EntityRegistry::makeEntity() {
 
         const en::Entity entity = m_entities.add();
-        Receiver<EntityCreated>::accept({entity});
+        Receiver<EntityCreated>::broadcast({entity});
         return entity;
     }
 
@@ -19,7 +19,7 @@ namespace en {
 
         if (!m_entities.contains(entity)) return;
 
-        Receiver<EntityWillBeDestroyed>::accept({entity});
+        Receiver<EntityWillBeDestroyed>::broadcast({entity});
 
         m_entities.remove(entity);
 
@@ -33,7 +33,7 @@ namespace en {
 
     void EntityRegistry::destroyAll() {
 
-        for (Entity e : m_entities) Receiver<EntityWillBeDestroyed>::accept({e});
+        for (Entity e : m_entities) Receiver<EntityWillBeDestroyed>::broadcast({e});
         m_entities.clear();
 
         for (const auto& poolPtr : m_componentPools) {

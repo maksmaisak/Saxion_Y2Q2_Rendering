@@ -78,7 +78,7 @@ namespace en {
         ComponentPool<TComponent>& pool = getPool<TComponent>();
 
         auto [index, componentReference] = pool.insert(entity, std::forward<Args>(args)...);
-        Receiver<ComponentAdded<TComponent>>::accept({entity, componentReference});
+        Receiver<ComponentAdded<TComponent>>::broadcast({entity, componentReference});
 
         return componentReference;
     }

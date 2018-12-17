@@ -89,7 +89,7 @@ namespace en {
             m_indexToComponent.emplace_back(std::forward<Args>(args)...);
         }
 
-        Receiver<ComponentAdded<TComponent>>::accept({entity, m_indexToComponent.back()});
+        Receiver<ComponentAdded<TComponent>>::broadcast({entity, m_indexToComponent.back()});
 
         return std::make_tuple(index, std::ref(m_indexToComponent.back()));
     }
@@ -100,7 +100,7 @@ namespace en {
         const index_type index = ComponentPoolBase::insert(entity);
         m_indexToComponent.push_back(component);
 
-        Receiver<ComponentAdded<TComponent>>::accept({entity, m_indexToComponent.back()});
+        Receiver<ComponentAdded<TComponent>>::broadcast({entity, m_indexToComponent.back()});
 
         return std::make_tuple(index, std::ref(m_indexToComponent.back()));
     }
@@ -132,7 +132,7 @@ namespace en {
         const index_type index = ComponentPoolBase::removeInternal(entity);
         if (index == nullIndex) return nullIndex;
 
-        Receiver<ComponentWillBeRemoved<TComponent>>::accept({entity, m_indexToComponent[index]});
+        Receiver<ComponentWillBeRemoved<TComponent>>::broadcast({entity, m_indexToComponent[index]});
 
         // Move and pop to keep the storage contiguous.
         if constexpr (std::is_move_assignable_v<TComponent>) {

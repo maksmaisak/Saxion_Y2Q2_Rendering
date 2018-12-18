@@ -37,7 +37,7 @@ void WobblingMaterial::render(World* pWorld, Mesh* pMesh, const glm::mat4& pMode
     glUniform1f(_shader->getUniformLocation("timeScale"), 10);
     glUniform1f(_shader->getUniformLocation("phaseOffsetPerUnitDistance"), 6);
     glUniform1f(_shader->getUniformLocation("wobbleMultiplierMin"), 0.8f);
-    glUniform1f(_shader->getUniformLocation("wobbleMultiplierMax"), 1.2f);
+    glUniform1f(_shader->getUniformLocation("wobbleMultiplierMax"), 1.2);
     glUniform1f(_shader->getUniformLocation("transitionWobbleFactorMin"), 0.f);
     glUniform1f(_shader->getUniformLocation("transitionWobbleFactorMax"), 1.f);
     glUniform4f(_shader->getUniformLocation("transitionColor"), 0.01f, 0.5f, 1.f, 1.f);

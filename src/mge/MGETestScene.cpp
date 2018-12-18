@@ -74,7 +74,7 @@ void MGETestScene::_initializeScene() {
     _world->add(ring);
 
     const std::size_t numCubes = 10;
-    const float radius = 3;
+    const float radius = 3.5f;
     for (std::size_t i = 0; i < numCubes; ++i) {
 
         const float angle = glm::two_pi<float>() * (float)i / numCubes;

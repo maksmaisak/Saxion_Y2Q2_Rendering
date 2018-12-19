@@ -24,16 +24,15 @@ class TextureMaterial : public AbstractMaterial
         void setDiffuseTexture(std::shared_ptr<Texture> pDiffuseTexture);
 
     private:
-        static ShaderProgram* _shader;
+        inline static ShaderProgram* _shader = nullptr;
         static void _lazyInitializeShader();
 
         //in this example we cache all identifiers for uniforms & attributes
-        static GLint _uMVPMatrix;
-        static GLint _uDiffuseTexture;
-
-        static GLint _aVertex;
-        static GLint _aNormal;
-        static GLint _aUV;
+        inline static GLint _uMVPMatrix = 0;
+        inline static GLint _uDiffuseTexture = 0;
+        inline static GLint _aVertex = 0;
+        inline static GLint _aNormal = 0;
+        inline static GLint _aUV = 0;
 
         std::shared_ptr<Texture> _diffuseTexture;
 };

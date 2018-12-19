@@ -13,15 +13,6 @@
 
 #include "Resources.h"
 
-ShaderProgram* TextureMaterial::_shader = nullptr;
-
-GLint TextureMaterial::_uMVPMatrix = 0;
-GLint TextureMaterial::_uDiffuseTexture = 0;
-
-GLint TextureMaterial::_aVertex = 0;
-GLint TextureMaterial::_aNormal = 0;
-GLint TextureMaterial::_aUV = 0;
-
 TextureMaterial::TextureMaterial(std::shared_ptr<Texture> pDiffuseTexture) : _diffuseTexture(std::move(pDiffuseTexture)) {
     _lazyInitializeShader();
 }

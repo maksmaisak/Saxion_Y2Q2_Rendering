@@ -6,8 +6,8 @@
 #include <string>
 #include <cstdint>
 #include "State.h"
-#include "Resource.h"
-#include "Resources.h"
+#include "StaticResource.h"
+#include "StaticResources.h"
 
 void setOriginNormalized(sf::Text& text, sf::Vector2f coords = {0.5f, 0.5f}) {
 

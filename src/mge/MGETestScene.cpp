@@ -24,17 +24,21 @@
 #include <glm/gtx/polar_coordinates.hpp>
 #include <glm/gtc/random.hpp>
 
+#include "Resources.h"
+
 void MGETestScene::_initializeScene() {
 
     //MESHES
 
+    static_assert(!en::isLoaderCallableWithNoParameters<en::ResourceLoader<Mesh>, Mesh>);
+
     //load a bunch of meshes we will be using throughout this demo
     //each mesh only has to be loaded once, but can be used multiple times:
     //F is flat shaded, S is smooth shaded (normals aligned or not), check the models folder!
-    Mesh* planeMeshDefault = Mesh::load(config::MGE_MODEL_PATH + "plane.obj");
-    Mesh* cubeMeshF = Mesh::load(config::MGE_MODEL_PATH + "cube_flat.obj");
-    Mesh* sphereMeshS = Mesh::load(config::MGE_MODEL_PATH + "sphere_smooth.obj");
-    Mesh* testObjectMeshS = Mesh::load(config::MGE_MODEL_PATH + "sphere2.obj");
+    std::shared_ptr<Mesh> planeMeshDefault = en::Resources<Mesh>::get(config::MGE_MODEL_PATH + "plane.obj");
+    std::shared_ptr<Mesh> cubeMeshF = en::Resources<Mesh>::get(config::MGE_MODEL_PATH + "cube_flat.obj");
+    std::shared_ptr<Mesh> sphereMeshS = en::Resources<Mesh>::get(config::MGE_MODEL_PATH + "sphere_smooth.obj");
+    std::shared_ptr<Mesh> testObjectMeshS = en::Resources<Mesh>::get(config::MGE_MODEL_PATH + "sphere2.obj");
 
     //MATERIALS
 
@@ -56,14 +60,14 @@ void MGETestScene::_initializeScene() {
     //add the floor
     GameObject* plane = new GameObject("plane", glm::vec3(0, -4, 0));
     plane->scale(glm::vec3(5, 5, 5));
-    plane->setMesh(planeMeshDefault);
+    plane->setMesh(planeMeshDefault.get());
     plane->setMaterial(floorMaterial);
     _world->add(plane);
 
     //add a spinning sphere
     GameObject* sphere = new GameObject("sphere", glm::vec3(0, 0, 0));
     sphere->scale(glm::vec3(2.5, 2.5, 2.5));
-    sphere->setMesh(testObjectMeshS);
+    sphere->setMesh(testObjectMeshS.get());
     sphere->setMaterial(wobblingMaterial);
     sphere->setBehaviour(new RotatingBehaviour());
     _world->add(sphere);
@@ -87,11 +91,11 @@ void MGETestScene::_initializeScene() {
         GameObject* object = nullptr;
         if (i % 2 == 0) {
             object = new Light("light", offset);
-            object->setMesh(cubeMeshF);
+            object->setMesh(cubeMeshF.get());
             object->setMaterial(new ColorMaterial(glm::abs(glm::sphericalRand(1.f))));
         } else {
             object = new GameObject("smallSphere", offset);
-            object->setMesh(sphereMeshS);
+            object->setMesh(sphereMeshS.get());
             object->setMaterial(runicStoneMaterial);
         }
 

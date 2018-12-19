@@ -5,8 +5,8 @@
 #include "DiagnosticsSystem.h"
 #include "GameTime.h"
 #include "Engine.h"
-#include "Resource.h"
-#include "Resources.h"
+#include "StaticResource.h"
+#include "StaticResources.h"
 
 void DiagnosticsSystem::start() {
 

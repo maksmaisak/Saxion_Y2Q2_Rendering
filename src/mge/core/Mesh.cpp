@@ -9,10 +9,6 @@ Mesh::Mesh() : _indexBufferId(0), _vertexBufferId(0), _normalBufferId(0), _uvBuf
 	//ctor
 }
 
-Mesh::~Mesh() {
-	//dtor
-}
-
 /**
  * Load reads the obj data into a new mesh using C++ combined with c style coding.
  * The result is an indexed mesh for use with glDrawElements.

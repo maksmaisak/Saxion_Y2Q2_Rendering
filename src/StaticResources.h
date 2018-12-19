@@ -6,18 +6,7 @@
 #define SAXION_Y2Q1_CPP_IDS_H
 
 #include "HashedString.h"
-#include "Resource.h"
-
-template<>
-struct en::Loader<sf::Font> {
-
-    static std::shared_ptr<sf::Font> load(const std::string& filename) {
-        auto fontPtr = std::make_shared<sf::Font>();
-        bool didLoadFont = fontPtr->loadFromFile(filename);
-        assert(didLoadFont);
-        return fontPtr;
-    }
-};
+#include "StaticResource.h"
 
 /// Some definitions of in one place.
 namespace fonts {
@@ -27,8 +16,8 @@ namespace fonts {
         inline constexpr auto Diagnostics = "FontDiagnostics"_hs;
     }
 
-    using Main = en::Resource<sf::Font, ids::Main>;
-    using Diagnostics = en::Resource<sf::Font, ids::Diagnostics>;
+    using Main = en::StaticResource<sf::Font, ids::Main>;
+    using Diagnostics = en::StaticResource<sf::Font, ids::Diagnostics>;
 
     namespace paths {
         inline constexpr auto Main = "assets/hyperspace/Hyperspace.otf";

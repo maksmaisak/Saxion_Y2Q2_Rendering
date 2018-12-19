@@ -1,5 +1,4 @@
 //
-// Created by Maksym Maisak on 4/11/18.
 // Adapted from https://github.com/skypjack/entt/blob/6010f5b7a68fbe5444afa7b0c431780727f62e93/src/entt/core/hashed_string.hpp
 // by Michele Caini
 //

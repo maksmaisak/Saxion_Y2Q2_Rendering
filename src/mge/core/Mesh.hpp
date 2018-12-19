@@ -5,6 +5,8 @@
 #include <GL/glew.h>
 #include "glm.hpp"
 
+#include "ResourceLoader.h"
+
 class World;
 
 /**
@@ -33,7 +35,6 @@ class Mesh
 
 	protected:
 		Mesh();
-		virtual ~Mesh();
 
         //OpenGL id's for the different buffers created for this mesh
 		GLuint _indexBufferId;
@@ -77,7 +78,13 @@ class Mesh
 					return memcmp((void*)this, (void*)&other, sizeof(FaceIndexTriplet))>0;
 				}
 		};
+};
 
+template<>
+struct en::ResourceLoader<Mesh> {
+    inline static std::shared_ptr<Mesh> load(const std::string& filename) {
+        return std::shared_ptr<Mesh>(Mesh::load(filename));
+    }
 };
 
 #endif // MESH_HPP

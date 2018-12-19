@@ -1,5 +1,5 @@
 macro(header_directories return_list)
-    file(GLOB_RECURSE new_list "*.h")
+    file(GLOB_RECURSE new_list "*.h" "*.hpp")
     set(dir_list "")
     foreach(file_path ${new_list})
         get_filename_component(dir_path ${file_path} PATH)

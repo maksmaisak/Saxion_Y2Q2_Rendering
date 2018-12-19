@@ -7,6 +7,7 @@
 
 #include "SFML/Graphics.hpp"
 #include <exception>
+#include "CallableTraits.h"
 
 namespace en {
 

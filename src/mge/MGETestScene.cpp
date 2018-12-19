@@ -30,8 +30,6 @@ void MGETestScene::_initializeScene() {
 
     //MESHES
 
-    static_assert(!en::isLoaderCallableWithNoParameters<en::ResourceLoader<Mesh>, Mesh>);
-
     //load a bunch of meshes we will be using throughout this demo
     //each mesh only has to be loaded once, but can be used multiple times:
     //F is flat shaded, S is smooth shaded (normals aligned or not), check the models folder!

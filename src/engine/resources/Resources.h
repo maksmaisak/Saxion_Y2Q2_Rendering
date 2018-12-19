@@ -12,18 +12,6 @@
 
 namespace en {
 
-    template<typename TLoader, typename TResource>
-    inline constexpr bool isLoaderCallableWithNoParameters = std::is_convertible_v<
-        decltype(&TLoader::load),
-        std::function<std::shared_ptr<TResource>()>
-    >;
-
-    template<typename TCallable, typename... Args>
-    inline constexpr bool isCallable = std::is_convertible_v<
-        TCallable,
-        std::function<void(Args...)>
-    >;
-
     template<typename TResource>
     class Resources {
 
@@ -40,7 +28,7 @@ namespace en {
 
             bool didEmplace = false;
 
-            if constexpr(sizeof...(Args) > 0 || isLoaderCallableWithNoParameters<TLoader, TResource>)
+            if constexpr (sizeof...(Args) > 0 || isCallableParameterless<decltype(&TLoader::load)>)
                 std::tie(it, didEmplace) = m_resources.emplace(key, TLoader::load(std::forward<Args>(args)...));
             else if constexpr (isCallable<decltype(&TLoader::load), decltype(key)>)
                 std::tie(it, didEmplace) = m_resources.emplace(key, TLoader::load(key));

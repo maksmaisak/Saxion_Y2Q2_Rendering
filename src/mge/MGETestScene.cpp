@@ -34,18 +34,15 @@ void MGETestScene::_initializeScene() {
     //each mesh only has to be loaded once, but can be used multiple times:
     //F is flat shaded, S is smooth shaded (normals aligned or not), check the models folder!
     std::shared_ptr<Mesh> planeMeshDefault = en::Resources<Mesh>::get(config::MGE_MODEL_PATH + "plane.obj");
-    std::shared_ptr<Mesh> cubeMeshF = en::Resources<Mesh>::get(config::MGE_MODEL_PATH + "cube_flat.obj");
-    std::shared_ptr<Mesh> sphereMeshS = en::Resources<Mesh>::get(config::MGE_MODEL_PATH + "sphere_smooth.obj");
-    std::shared_ptr<Mesh> testObjectMeshS = en::Resources<Mesh>::get(config::MGE_MODEL_PATH + "sphere2.obj");
+    std::shared_ptr<Mesh> cubeMeshF        = en::Resources<Mesh>::get(config::MGE_MODEL_PATH + "cube_flat.obj");
+    std::shared_ptr<Mesh> sphereMeshS      = en::Resources<Mesh>::get(config::MGE_MODEL_PATH + "sphere_smooth.obj");
+    std::shared_ptr<Mesh> testObjectMeshS  = en::Resources<Mesh>::get(config::MGE_MODEL_PATH + "sphere2.obj");
 
     //MATERIALS
 
-    AbstractMaterial* runicStoneMaterial = new TextureMaterial(en::Resources<Texture>::get(config::MGE_TEXTURE_PATH + "runicfloor.png").get());
-
-    AbstractMaterial* floorMaterial = new TextureMaterial(
-        Texture::load(config::MGE_TEXTURE_PATH + "land.jpg"));
-
-    AbstractMaterial* wobblingMaterial = new WobblingMaterial(Texture::load(config::MGE_TEXTURE_PATH + "runicfloor.png"));
+    AbstractMaterial* runicStoneMaterial = new TextureMaterial(config::MGE_TEXTURE_PATH + "runicfloor.png");
+    AbstractMaterial* floorMaterial      = new TextureMaterial(config::MGE_TEXTURE_PATH + "land.jpg");
+    AbstractMaterial* wobblingMaterial   = new WobblingMaterial(config::MGE_TEXTURE_PATH + "runicfloor.png");
 
     //SCENE SETUP
 

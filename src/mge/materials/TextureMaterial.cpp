@@ -1,3 +1,5 @@
+#include <utility>
+
 #include "glm.hpp"
 
 #include "TextureMaterial.hpp"
@@ -9,7 +11,9 @@
 #include "mge/core/ShaderProgram.hpp"
 #include "mge/config.hpp"
 
-ShaderProgram* TextureMaterial::_shader = NULL;
+#include "Resources.h"
+
+ShaderProgram* TextureMaterial::_shader = nullptr;
 
 GLint TextureMaterial::_uMVPMatrix = 0;
 GLint TextureMaterial::_uDiffuseTexture = 0;
@@ -18,19 +22,19 @@ GLint TextureMaterial::_aVertex = 0;
 GLint TextureMaterial::_aNormal = 0;
 GLint TextureMaterial::_aUV = 0;
 
-TextureMaterial::TextureMaterial(Texture * pDiffuseTexture):_diffuseTexture(pDiffuseTexture) {
+TextureMaterial::TextureMaterial(std::shared_ptr<Texture> pDiffuseTexture) : _diffuseTexture(std::move(pDiffuseTexture)) {
     _lazyInitializeShader();
 }
 
-TextureMaterial::~TextureMaterial() {}
+TextureMaterial::TextureMaterial(const std::string& filename) : TextureMaterial(en::Resources<Texture>::get(filename)) {}
 
 void TextureMaterial::_lazyInitializeShader() {
 
     if (_shader) return;
 
     _shader = new ShaderProgram();
-    _shader->addShader(GL_VERTEX_SHADER, config::MGE_SHADER_PATH+"texture.vs");
-    _shader->addShader(GL_FRAGMENT_SHADER, config::MGE_SHADER_PATH+"texture.fs");
+    _shader->addShader(GL_VERTEX_SHADER, config::MGE_SHADER_PATH + "texture.vs");
+    _shader->addShader(GL_FRAGMENT_SHADER, config::MGE_SHADER_PATH + "texture.fs");
     _shader->finalize();
 
     //cache all the uniform and attribute indexes
@@ -42,7 +46,7 @@ void TextureMaterial::_lazyInitializeShader() {
     _aUV =     _shader->getAttribLocation("uv");
 }
 
-void TextureMaterial::setDiffuseTexture(Texture* pDiffuseTexture) {
+void TextureMaterial::setDiffuseTexture(std::shared_ptr<Texture> pDiffuseTexture) {
     _diffuseTexture = pDiffuseTexture;
 }
 

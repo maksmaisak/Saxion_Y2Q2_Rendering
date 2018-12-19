@@ -11,9 +11,13 @@
 #include "mge/core/Mesh.hpp"
 #include "mge/core/ShaderProgram.hpp"
 
-WobblingMaterial::WobblingMaterial(Texture* pDiffuseTexture) : _diffuseTexture(pDiffuseTexture) {
+#include "Resources.h"
+
+WobblingMaterial::WobblingMaterial(std::shared_ptr<Texture> pDiffuseTexture) : _diffuseTexture(std::move(pDiffuseTexture)) {
     _lazyInitializeShader();
 }
+
+WobblingMaterial::WobblingMaterial(const std::string& filename) : WobblingMaterial(en::Resources<Texture>::get(filename)) {}
 
 void WobblingMaterial::_lazyInitializeShader() {
 
@@ -25,7 +29,7 @@ void WobblingMaterial::_lazyInitializeShader() {
     _shader->finalize();
 }
 
-void WobblingMaterial::setDiffuseTexture(Texture* pDiffuseTexture) {
+void WobblingMaterial::setDiffuseTexture(std::shared_ptr<Texture> pDiffuseTexture) {
     _diffuseTexture = pDiffuseTexture;
 }
 

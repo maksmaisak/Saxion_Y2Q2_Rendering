@@ -5,6 +5,7 @@
 #ifndef SAXION_Y2Q2_RENDERING_WOBBLINGMATERIAL_H
 #define SAXION_Y2Q2_RENDERING_WOBBLINGMATERIAL_H
 
+#include <memory>
 #include "GL/glew.h"
 #include "mge/materials/AbstractMaterial.hpp"
 #include "mge/core/Texture.hpp"
@@ -14,17 +15,18 @@ class ShaderProgram;
 class WobblingMaterial : public AbstractMaterial
 {
 public:
-    explicit WobblingMaterial(Texture* pDiffuseTexture);
+    explicit WobblingMaterial(std::shared_ptr<Texture> _diffuseTexture);
+    explicit WobblingMaterial(const std::string& filename);
     virtual ~WobblingMaterial() = default;
 
     void render(World* pWorld, Mesh* pMesh, const glm::mat4& pModelMatrix, const glm::mat4& pViewMatrix, const glm::mat4& pProjectionMatrix) override;
-    void setDiffuseTexture (Texture* pDiffuseTexture);
+    void setDiffuseTexture(std::shared_ptr<Texture> pDiffuseTexture);
 
 private:
     inline static ShaderProgram* _shader = nullptr;
     static void _lazyInitializeShader();
 
-    Texture* _diffuseTexture;
+    std::shared_ptr<Texture> _diffuseTexture;
 };
 
 

@@ -2,6 +2,7 @@
 #define ABSTRACTMATERIAL_HPP
 
 #include "glm.hpp"
+
 class GameObject;
 class Mesh;
 class World;
@@ -20,8 +21,12 @@ class World;
 class AbstractMaterial
 {
     public:
-        AbstractMaterial();
-        virtual ~AbstractMaterial();
+        AbstractMaterial() = default;
+        virtual ~AbstractMaterial() = default;
+        AbstractMaterial(const AbstractMaterial&) = delete;
+        AbstractMaterial& operator=(const AbstractMaterial&) = delete;
+        AbstractMaterial(const AbstractMaterial&&) = delete;
+        AbstractMaterial& operator=(const AbstractMaterial&&) = delete;
 
         /**
          * Render the given mesh in the given world using the given mvp matrices. Implement in subclass.

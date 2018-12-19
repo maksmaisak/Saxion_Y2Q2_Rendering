@@ -3,6 +3,7 @@
 
 #include "mge/materials/AbstractMaterial.hpp"
 #include "GL/glew.h"
+#include <memory>
 
 class ShaderProgram;
 class Texture;
@@ -14,14 +15,13 @@ class Texture;
 class TextureMaterial : public AbstractMaterial
 {
     public:
-        TextureMaterial (Texture* pDiffuseTexture);
-        virtual ~TextureMaterial ();
+        explicit TextureMaterial(const std::string& filename);
+        explicit TextureMaterial(std::shared_ptr<Texture> pDiffuseTexture);
+        virtual ~TextureMaterial() = default;
 
         virtual void render(World* pWorld, Mesh* pMesh, const glm::mat4& pModelMatrix, const glm::mat4& pViewMatrix, const glm::mat4& pProjectionMatrix) override;
 
-        void setDiffuseTexture (Texture* pDiffuseTexture);
-
-    protected:
+        void setDiffuseTexture(std::shared_ptr<Texture> pDiffuseTexture);
 
     private:
         static ShaderProgram* _shader;
@@ -35,10 +35,7 @@ class TextureMaterial : public AbstractMaterial
         static GLint _aNormal;
         static GLint _aUV;
 
-        Texture* _diffuseTexture;
-
-        TextureMaterial(const TextureMaterial&);
-        TextureMaterial& operator=(const TextureMaterial&);
+        std::shared_ptr<Texture> _diffuseTexture;
 };
 
 #endif // TEXTUREMATERIAL_HPP

@@ -9,6 +9,7 @@
 #include <memory>
 #include <map>
 #include <type_traits>
+#include <algorithm>
 
 namespace en {
 
@@ -37,6 +38,22 @@ namespace en {
 
             assert(didEmplace);
             return it->second;
+        }
+
+        /// Removes all resources not referenced elsewhere.
+        inline static std::size_t removeUnused() {
+
+            std::size_t numRemoved = 0;
+            for (auto it = m_resources.begin(); it != m_resources.end();) {
+                if (it->second.unique()) {
+                    it = m_resources.erase(it);
+                    ++numRemoved;
+                } else {
+                    ++it;
+                }
+            }
+
+            return numRemoved;
         }
 
     private:

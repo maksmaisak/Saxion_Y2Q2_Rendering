@@ -40,9 +40,12 @@ void MGETestScene::_initializeScene() {
 
     //MATERIALS
 
-    AbstractMaterial* runicStoneMaterial = new TextureMaterial(config::MGE_TEXTURE_PATH  + "runicfloor.png");
-    AbstractMaterial* floorMaterial      = new TextureMaterial(config::MGE_TEXTURE_PATH  + "land.jpg");
-    AbstractMaterial* wobblingMaterial   = new WobblingMaterial(config::MGE_TEXTURE_PATH + "runicfloor.png");
+    AbstractMaterial* runicStoneMaterial = new TextureMaterial (config::MGE_TEXTURE_PATH  + "runicfloor.png");
+    AbstractMaterial* floorMaterial      = new TextureMaterial (config::MGE_TEXTURE_PATH  + "land.jpg");
+    AbstractMaterial* wobblingMaterial   = new WobblingMaterial(config::MGE_TEXTURE_PATH  + "runicfloor.png");
+
+    //en::Resources<Mesh>::get(config::MGE_MODEL_PATH + "sphere3.obj");
+    //en::Resources<Mesh>::removeUnused();
 
     //SCENE SETUP
 

@@ -29,9 +29,9 @@ namespace en {
 
             bool didEmplace = false;
 
-            if constexpr (sizeof...(Args) > 0 || isCallableParameterless<decltype(&TLoader::load)>)
+            if constexpr (sizeof...(Args) > 0 || std::is_invocable_v<decltype(&TLoader::load)>)
                 std::tie(it, didEmplace) = m_resources.emplace(key, TLoader::load(std::forward<Args>(args)...));
-            else if constexpr (isCallable<decltype(&TLoader::load), decltype(key)>)
+            else if constexpr (std::is_invocable_v<decltype(&TLoader::load), decltype(key)>)
                 std::tie(it, didEmplace) = m_resources.emplace(key, TLoader::load(key));
             else
                 throw "Invalid parameters for resource loader.";

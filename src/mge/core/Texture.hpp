@@ -10,6 +10,10 @@ class Texture
 	public:
 		static Texture* load(const std::string& pTexturePath);
 		virtual ~Texture();
+        Texture(const Texture&) = delete;
+        Texture(const Texture&&) = delete;
+        Texture& operator=(const Texture&) = delete;
+        Texture& operator=(const Texture&&) = delete;
 
 		GLuint getId();
 

@@ -24,8 +24,8 @@ class AbstractMaterial
         AbstractMaterial() = default;
         virtual ~AbstractMaterial() = default;
         AbstractMaterial(const AbstractMaterial&) = delete;
-        AbstractMaterial& operator=(const AbstractMaterial&) = delete;
         AbstractMaterial(const AbstractMaterial&&) = delete;
+        AbstractMaterial& operator=(const AbstractMaterial&) = delete;
         AbstractMaterial& operator=(const AbstractMaterial&&) = delete;
 
         /**

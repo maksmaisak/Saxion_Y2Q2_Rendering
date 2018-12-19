@@ -40,7 +40,7 @@ void MGETestScene::_initializeScene() {
 
     //MATERIALS
 
-    AbstractMaterial* runicStoneMaterial = new TextureMaterial(Texture::load(config::MGE_TEXTURE_PATH + "runicfloor.png"));
+    AbstractMaterial* runicStoneMaterial = new TextureMaterial(en::Resources<Texture>::get(config::MGE_TEXTURE_PATH + "runicfloor.png").get());
 
     AbstractMaterial* floorMaterial = new TextureMaterial(
         Texture::load(config::MGE_TEXTURE_PATH + "land.jpg"));

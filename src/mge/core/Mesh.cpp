@@ -180,6 +180,8 @@ Mesh* Mesh::load(std::string pFilename) {
 
 void Mesh::_buffer() {
 
+	// TODO free these buffers in the destructor.
+
 	glGenBuffers(1, &_indexBufferId);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _indexBufferId);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, _indices.size() * sizeof(unsigned int), &_indices[0], GL_STATIC_DRAW);

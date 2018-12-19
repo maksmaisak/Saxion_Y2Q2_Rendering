@@ -43,7 +43,6 @@ namespace en {
         static std::map<std::string, std::shared_ptr<TResource>> m_resources;
     };
 
-
     // Using inline static to avoid defining this out of the class body causes clang to segfault :(
     template<typename TResource>
     std::map<std::string, std::shared_ptr<TResource>> Resources<TResource>::m_resources;

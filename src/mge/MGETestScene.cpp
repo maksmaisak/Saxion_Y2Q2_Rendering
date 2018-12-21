@@ -40,9 +40,9 @@ void MGETestScene::_initializeScene() {
 
     //MATERIALS
 
-    AbstractMaterial* runicStoneMaterial = new TextureMaterial (config::MGE_TEXTURE_PATH  + "runicfloor.png");
-    AbstractMaterial* floorMaterial      = new TextureMaterial (config::MGE_TEXTURE_PATH  + "land.jpg");
-    AbstractMaterial* wobblingMaterial   = new WobblingMaterial(config::MGE_TEXTURE_PATH  + "runicfloor.png");
+    std::shared_ptr<AbstractMaterial> runicStoneMaterial = en::Resources<TextureMaterial>::get(config::MGE_TEXTURE_PATH + "runicfloor.png");
+    std::shared_ptr<AbstractMaterial> floorMaterial      = en::Resources<TextureMaterial>::get(config::MGE_TEXTURE_PATH + "land.jpg");
+    std::shared_ptr<AbstractMaterial> wobblingMaterial   = en::Resources<WobblingMaterial>::get(config::MGE_TEXTURE_PATH + "runicfloor.png");
 
     //en::Resources<Mesh>::get(config::MGE_MODEL_PATH + "sphere3.obj");
     //en::Resources<Mesh>::removeUnused();
@@ -59,14 +59,14 @@ void MGETestScene::_initializeScene() {
     GameObject* plane = new GameObject("plane", glm::vec3(0, -4, 0));
     plane->scale(glm::vec3(5, 5, 5));
     plane->setMesh(planeMeshDefault.get());
-    plane->setMaterial(floorMaterial);
+    plane->setMaterial(floorMaterial.get());
     _world->add(plane);
 
     //add a spinning sphere
     GameObject* sphere = new GameObject("sphere", glm::vec3(0, 0, 0));
     sphere->scale(glm::vec3(2.5, 2.5, 2.5));
     sphere->setMesh(testObjectMeshS.get());
-    sphere->setMaterial(wobblingMaterial);
+    sphere->setMaterial(wobblingMaterial.get());
     sphere->setBehaviour(new RotatingBehaviour());
     _world->add(sphere);
     camera->setBehaviour(new CameraOrbitBehaviour(sphere, 10, -15.f, 60.f));
@@ -94,7 +94,7 @@ void MGETestScene::_initializeScene() {
         } else {
             object = new GameObject("smallSphere", offset);
             object->setMesh(sphereMeshS.get());
-            object->setMaterial(runicStoneMaterial);
+            object->setMaterial(runicStoneMaterial.get());
         }
 
         object->scale(glm::vec3(0.2f));

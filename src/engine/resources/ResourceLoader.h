@@ -11,18 +11,11 @@
 
 namespace en {
 
-    struct InvalidResourceLoader {};
+    struct NoLoader {};
 
-    // Base template. No usable loader.
+    // Base template
     template<typename TResource, typename SFINAEDummy = void>
-    struct ResourceLoader : InvalidResourceLoader {
-
-        template<typename... Args>
-        inline static std::shared_ptr<TResource> load(Args&&...) {
-
-            throw "No resource loader is defined for this resource type";
-        }
-    };
+    struct ResourceLoader : NoLoader {};
 
     using filename_t = const std::string&;
 
@@ -34,7 +27,7 @@ namespace en {
 
             if constexpr (std::is_convertible_v<std::invoke_result_t<decltype(&TResource::load), filename_t>, std::shared_ptr<TResource>>)
                 return TResource::load(filename);
-			else
+            else
                 return std::shared_ptr<TResource>(TResource::load(filename));
         }
     };

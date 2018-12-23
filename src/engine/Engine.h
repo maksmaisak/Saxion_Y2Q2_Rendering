@@ -26,8 +26,14 @@ namespace en {
     class Engine {
 
     public:
-        Engine(unsigned int width, unsigned int height, bool enableVsync = false);
+        Engine() = default;
+        virtual ~Engine() = default;
+        Engine(const Engine& other) = delete;
+        Engine& operator=(const Engine& other) = delete;
+        Engine(Engine&& other) = delete;
+        Engine& operator=(Engine&& other) = delete;
 
+        void initialize();
         void run();
 
         inline EntityRegistry& getRegistry() { return m_registry; }
@@ -47,6 +53,9 @@ namespace en {
         // TODO Move this to en::TransformableSFML
         void setParent(Entity child, std::optional<Entity> newParent);
 
+    protected:
+        virtual void initializeWindow(sf::RenderWindow& window);
+
     private:
 
         EntityRegistry m_registry;
@@ -56,8 +65,12 @@ namespace en {
         std::vector<std::unique_ptr<System>> m_systems;
         std::set<std::type_index> m_behaviorSystemPresence;
 
+        void printGLContextVersionInfo();
+        void initializeGlew();
+
         void update(float dt);
         void draw();
+        void processWindowEvents();
     };
 
     template<typename TSystem, typename... Args>

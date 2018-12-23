@@ -100,6 +100,11 @@ namespace en {
         makeDirty();
     }
 
+    void Transformable::rotate(float angle, const glm::vec3& axis) {
+
+        rotate(glm::angleAxis(angle, axis));
+    }
+
     void Transformable::scale(const glm::vec3& scale) {
 
         m_scale *= scale;

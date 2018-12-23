@@ -6,7 +6,7 @@
 
 World::World():GameObject("root"), _mainCamera(0)
 {
-	_world = this;
+    _world = this;
 }
 
 void World::setMainCamera (Camera* pCamera) {

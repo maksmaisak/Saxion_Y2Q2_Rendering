@@ -39,6 +39,7 @@ namespace en {
 
         void move  (const glm::vec3& offset);
         void rotate(const glm::quat& offset);
+        void rotate(float angle, const glm::vec3& axis);
         void scale (const glm::vec3& scale);
 
     private:

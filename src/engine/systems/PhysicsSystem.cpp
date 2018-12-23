@@ -4,7 +4,7 @@
 
 #include <SFML/Graphics.hpp>
 #include "PhysicsSystem.h"
-#include "Transformable.h"
+#include "TransformableSFML.h"
 #include "Rigidbody.h"
 #include "PhysicsUtils.h"
 #include "Messaging.h"
@@ -14,11 +14,11 @@ namespace en {
 
     void PhysicsSystem::update(float dt) {
 
-        auto view = m_registry->with<en::Rigidbody, en::Transformable>();
+        auto view = m_registry->with<en::Rigidbody, en::TransformableSFML>();
         for (en::Entity entity : view) {
 
             auto& rb = m_registry->get<en::Rigidbody>(entity);
-            auto& tf = m_registry->get<en::Transformable>(entity);
+            auto& tf = m_registry->get<en::TransformableSFML>(entity);
 
             sf::Vector2f movement = rb.velocity * dt;
 
@@ -28,7 +28,7 @@ namespace en {
                 if (entity == other) continue;
 
                 auto& otherRb = m_registry->get<en::Rigidbody>(other);
-                auto& otherTf = m_registry->get<en::Transformable>(other);
+                auto& otherTf = m_registry->get<en::TransformableSFML>(other);
 
                 std::optional<en::Hit> hit = en::circleVsCircleContinuous(
                     tf.getPosition(), rb.radius, movement,

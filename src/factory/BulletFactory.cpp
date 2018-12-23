@@ -25,7 +25,7 @@ namespace game {
         en::EntityRegistry& registry = engine.getRegistry();
         en::Entity e = registry.makeEntity();
 
-        registry.add<en::Transformable>(e).setPosition(position);
+        registry.add<en::TransformableSFML>(e).setPosition(position);
         {
             auto& rb = registry.add<en::Rigidbody>(e);
             rb.velocity = velocity;

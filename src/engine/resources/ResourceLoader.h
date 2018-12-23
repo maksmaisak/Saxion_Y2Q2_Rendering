@@ -25,6 +25,8 @@ namespace en {
 
         inline static std::shared_ptr<TResource> load(filename_t filename) {
 
+            // If calling TResource::load(filename) returns a shared_ptr, return that.
+            // If it returns a regular pointer, wrap that in a shared_ptr and return it.
             if constexpr (std::is_convertible_v<std::invoke_result_t<decltype(&TResource::load), filename_t>, std::shared_ptr<TResource>>)
                 return TResource::load(filename);
             else

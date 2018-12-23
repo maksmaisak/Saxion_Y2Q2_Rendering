@@ -1,8 +1,10 @@
 #include <iostream>
+#include <engine/components/Transformable.h>
 
 #include "mge/core/AbstractGame.hpp"
 #include "mge/MGEDemo.hpp"
 #include "mge/MGETestScene.h"
+#include "Transformable.h"
 
 /**
  * Main entry point for the Micro Engine.
@@ -22,6 +24,9 @@
 int main() {
 
     std::cout << "Starting Game" << std::endl;
+
+    auto test = en::Transformable();
+    std::cout << test.getLocalTransform() << std::endl;
 
 	std::unique_ptr<AbstractGame> game = std::make_unique<MGETestScene>();
     game->initialize();

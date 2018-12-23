@@ -16,7 +16,7 @@ inline bool accelerateButtonPressed() {
     return sf::Keyboard::isKeyPressed(sf::Keyboard::Space);
 }
 
-inline void rotate(en::Transformable& tf, float rotationSpeed, float dt) {
+inline void rotate(en::TransformableSFML& tf, float rotationSpeed, float dt) {
 
     float currentRotation = tf.getRotation();
     float input = en::getAxisHorizontal();
@@ -26,7 +26,7 @@ inline void rotate(en::Transformable& tf, float rotationSpeed, float dt) {
     }
 }
 
-inline void accelerate(en::Rigidbody& rb, en::Transformable& tf, float acceleration, float dt) {
+inline void accelerate(en::Rigidbody& rb, en::TransformableSFML& tf, float acceleration, float dt) {
     rb.velocity += en::getForward(tf.getGlobalTransform()) * acceleration * dt;
 }
 
@@ -40,10 +40,10 @@ void PlayerControlsSystem::update(float dt) {
 
     bool enginesOn = accelerateButtonPressed();
 
-    for (Entity e : m_registry->with<Player, en::Transformable, en::Rigidbody>()) {
+    for (Entity e : m_registry->with<Player, en::TransformableSFML, en::Rigidbody>()) {
 
         auto& player = m_registry->get<Player>(e);
-        auto& tf = m_registry->get<en::Transformable>(e);
+        auto& tf = m_registry->get<en::TransformableSFML>(e);
         auto& rb = m_registry->get<en::Rigidbody>(e);
 
         rotate(tf, player.rotationSpeed, dt);

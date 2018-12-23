@@ -18,7 +18,7 @@ void destroyPlayer(en::Engine& engine, Entity player) {
     auto& registry = engine.getRegistry();
     registry.add<en::Destroy>(player);
     registry.get<Player>(player).exhaustParticleSystem->setIsEmissionActive(false);
-    for (Entity child : registry.get<en::Transformable>(player).getChildren()) {
+    for (Entity child : registry.get<en::TransformableSFML>(player).getChildren()) {
         engine.setParent(child, std::nullopt);
     }
 }

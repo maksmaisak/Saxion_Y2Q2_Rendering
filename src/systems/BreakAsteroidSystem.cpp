@@ -18,7 +18,7 @@ void split(en::Engine& engine, en::EntityRegistry& registry, en::Entity asteroid
     const auto piecesSize = (Asteroid::Size)((std::size_t)asteroid.size - 1);
     const Asteroid::Config& piecesConfig = Asteroid::getConfig(piecesSize);
 
-    const auto& transform = registry.get<en::Transformable>(asteroidEntity).getGlobalTransform();
+    const auto& transform = registry.get<en::TransformableSFML>(asteroidEntity).getGlobalTransform();
     sf::Vector2f position = en::getPosition(transform);
     sf::Vector2f velocity = registry.get<en::Rigidbody>(asteroidEntity).velocity;
 

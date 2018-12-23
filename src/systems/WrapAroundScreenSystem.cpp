@@ -5,10 +5,10 @@
 #include "WrapAroundScreenSystem.h"
 #include "Engine.h"
 #include "EntityRegistry.h"
-#include "Transformable.h"
+#include "TransformableSFML.h"
 #include "WrapAroundScreen.h"
 
-void wrap(en::Transformable& tf, const sf::Vector2f& viewSize) {
+void wrap(en::TransformableSFML& tf, const sf::Vector2f& viewSize) {
 
     sf::Vector2f position = tf.getPosition();
     while (position.x < 0) position.x += viewSize.x;
@@ -22,9 +22,9 @@ void WrapAroundScreenSystem::update(float dt) {
 
     sf::Vector2f viewSize = m_engine->getWindow().getView().getSize();
 
-    for (en::Entity e : m_registry->with<en::Transformable, WrapAroundScreen>()) {
+    for (en::Entity e : m_registry->with<en::TransformableSFML, WrapAroundScreen>()) {
 
-        auto& tf = m_registry->get<en::Transformable>(e);
+        auto& tf = m_registry->get<en::TransformableSFML>(e);
         if (tf.getParent().has_value()) continue;
 
         wrap(tf, viewSize);

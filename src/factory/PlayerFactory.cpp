@@ -7,7 +7,7 @@
 #include "DrawInfo.h"
 #include "Rigidbody.h"
 #include "ParticleSystem.h"
-#include "Transformable.h"
+#include "TransformableSFML.h"
 #include "Player.h"
 #include "Flicker.h"
 #include "WrapAroundScreen.h"
@@ -33,7 +33,7 @@ std::shared_ptr<sf::Shape> makePlayerShape() {
 void addTransformable(Engine& engine, Entity player) {
 
     sf::Vector2f size = engine.getWindow().getView().getSize();
-    auto& tf = engine.getRegistry().add<en::Transformable>(player);
+    auto& tf = engine.getRegistry().add<en::TransformableSFML>(player);
     tf.setPosition(size.x / 2.f, size.y * 3.f / 4.f);
     tf.setScale(0.75f, 0.75f);
 }
@@ -43,7 +43,7 @@ Entity addExhaust(Engine& engine, Entity player) {
     EntityRegistry& registry = engine.getRegistry();
 
     Actor exhaust = engine.makeActor();
-    auto& tf = registry.add<en::Transformable>(exhaust);
+    auto& tf = registry.add<en::TransformableSFML>(exhaust);
     tf.move(0, 30.f);
     engine.setParent(exhaust, player);
 

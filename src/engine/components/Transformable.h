@@ -1,81 +1,68 @@
 //
-// Created by Maksym Maisak on 22/10/18.
+// Created by Maksym Maisak on 22/12/18.
 //
 
-#ifndef SAXION_Y2Q1_CPP_TRANSFORM_H
-#define SAXION_Y2Q1_CPP_TRANSFORM_H
+#ifndef SAXION_Y2Q2_RENDERING_TRANSFORMABLE_H
+#define SAXION_Y2Q2_RENDERING_TRANSFORMABLE_H
 
 #include <vector>
-#include <optional>
-#include <SFML/Graphics.hpp>
+#include "glm.hpp"
+#include <glm/gtc/quaternion.hpp>
+
 #include "Entity.h"
+#include "Behavior.h"
 
 namespace en {
 
     class Engine;
     class EntityRegistry;
 
-    /// An exact copy of SFML's sf::Transformable, but with transform hierarchy support.
     class Transformable final {
-
-        friend class Engine;
-        friend class TransformableHierarchySystem;
 
     public:
 
-        Transformable();
+        Transformable() = default;
 
-        void setPosition(float x, float y);
-        void setPosition(const sf::Vector2f& position);
-        void setRotation(float angle);
-        void setScale(float factorX, float factorY);
-        void setScale(const sf::Vector2f& factors);
-        void setOrigin(float x, float y);
-        void setOrigin(const sf::Vector2f& origin);
+        const glm::mat4& getLocalTransform () const;
+        const glm::mat4& getGlobalTransform() const;
 
-        const sf::Vector2f& getPosition() const;
-        float getRotation() const;
-        const sf::Vector2f& getScale() const;
-        const sf::Vector2f& getOrigin() const;
-
-        void move(float offsetX, float offsetY);
-        void move(const sf::Vector2f& offset);
-        void rotate(float angle);
-        void scale(float factorX, float factorY);
-        void scale(const sf::Vector2f& factor);
-
-        const sf::Transform& getLocalTransform() const;
-        const sf::Transform& getInverseLocalTransform() const;
-        const sf::Transform& getGlobalTransform()  const;
-
-        inline const std::optional<Entity>& getParent() const {return m_parent;}
+        inline const glm::vec3& getLocalPosition() const {return m_position;}
+        inline const glm::quat& getLocalRotation() const {return m_rotation;}
+        inline const glm::vec3& getLocalScale   () const {return m_scale;}
+        inline       Entity     getParent       () const {return m_parent;}
         inline const std::vector<Entity>& getChildren() const {return m_children;}
 
+        void setLocalPosition(const glm::vec3& localPosition);
+        void setLocalRotation(const glm::quat& localRotation);
+        void setLocalScale   (const glm::vec3& localScale);
+        void setParent       (Entity newParent);
+
+        void move  (const glm::vec3& offset);
+        void rotate(const glm::quat& offset);
+        void scale (const glm::vec3& scale);
+
     private:
-
-        sf::Vector2f          m_origin;                          ///< Origin of translation/rotation/scaling of the object
-        sf::Vector2f          m_position;                        ///< Position of the object in the 2D world
-        float                 m_rotation;                        ///< Orientation of the object, in degrees
-        sf::Vector2f          m_scale;                           ///< Scale of the object
-
-        mutable sf::Transform m_transform;                       ///< Combined transformation of the object
-        mutable bool          m_localTransformNeedUpdate;        ///< Does the transform need to be recomputed?
-
-        mutable sf::Transform m_inverseTransform;                ///< Combined transformation of the object
-        mutable bool          m_localInverseTransformNeedUpdate; ///< Does the transform need to be recomputed?
-
-        mutable sf::Transform m_globalTransform;
-        mutable bool m_globalTransformNeedUpdate = false;
-
-        EntityRegistry* m_registry;
-        mutable std::optional<Entity> m_parent;
-        mutable std::vector<Entity> m_children;
 
         void addChild(Entity child);
         void removeChild(Entity child);
 
-        void localTransformChanged();
+        EntityRegistry* m_registry = nullptr;
+        Entity m_entity = en::nullEntity;
+        Entity m_parent = en::nullEntity;
+        std::vector<Entity> m_children;
+
+        glm::vec3 m_position = {0, 0, 0};
+        glm::quat m_rotation = {};
+        glm::vec3 m_scale    = {1, 1, 1};
+
+        mutable glm::mat4 m_matrixLocal = glm::mat4(1.f);
+        mutable bool m_matrixLocalDirty = true;
+
+        mutable glm::mat4 m_matrixGlobal = glm::mat4(1.f);
+        mutable bool m_matrixGlobalDirty = true;
+
+        void makeDirty();
     };
 }
 
-#endif //SAXION_Y2Q1_CPP_TRANSFORM_H
+#endif //SAXION_Y2Q2_RENDERING_TRANSFORMABLE_H

@@ -41,6 +41,10 @@ namespace en {
     inline Entity setVersion(const Entity entity, EntityInfo::version_type version) noexcept {
         return (static_cast<Entity>(version) << EntityInfo::NumIdBits) | getId(entity);
     }
+
+    inline bool isNullEntity(const Entity entity) {
+        return getId(entity) == nullEntity;
+    }
 }
 
 #endif //SAXION_Y2Q1_CPP_ENTITY_H

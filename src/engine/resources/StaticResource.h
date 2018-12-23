@@ -22,8 +22,6 @@ namespace en {
         template<typename TLoader = TDefaultLoader, typename... Args>
         static std::shared_ptr<TResource> get(Args&&... args) {
 
-            static_assert(!std::is_base_of_v<InvalidResourceLoader, TLoader>, "There is no resource loader for this type of resource!");
-
             if (m_resource) return m_resource;
             return m_resource = TLoader::load(std::forward<Args>(args)...);
         }

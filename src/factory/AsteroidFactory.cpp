@@ -77,7 +77,7 @@ namespace game {
             rb.radius = config.averageRadius;
         }
 
-        registry.add<en::Transformable>(e).setPosition(position);
+        registry.add<en::TransformableSFML>(e).setPosition(position);
         registry.add<WrapAroundScreen>(e);
 
         return e;

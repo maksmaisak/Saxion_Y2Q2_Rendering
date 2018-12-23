@@ -44,7 +44,7 @@ namespace en {
         template<typename TBehavior>
         bool ensureBehaviorSystem();
 
-        // TODO Move this to en::Transformable
+        // TODO Move this to en::TransformableSFML
         void setParent(Entity child, std::optional<Entity> newParent);
 
     private:

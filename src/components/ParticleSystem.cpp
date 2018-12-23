@@ -83,7 +83,7 @@ ParticleSystem::ParticleIndex ParticleSystem::emitParticle() {
 
     Particle& particle = m_particles.at(m_numActiveParticles);
 
-    particle.transform = m_registry->get<en::Transformable>(m_actor).getGlobalTransform();
+    particle.transform = m_registry->get<en::TransformableSFML>(m_actor).getGlobalTransform();
     particle.transform.translate(en::randomInCircle(m_settings.emissionRadius));
     particle.timeToDestroy = GameTime::now() + m_settings.particleLifetime;
 

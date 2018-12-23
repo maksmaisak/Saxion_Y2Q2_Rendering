@@ -11,7 +11,7 @@
 #include "GameTime.h"
 #include "DestroyTimer.h"
 
-#include "Transformable.h"
+#include "TransformableSFML.h"
 #include "Rigidbody.h"
 #include "Player.h"
 #include "Bullet.h"
@@ -24,14 +24,14 @@ void ShootSystem::update(float dt) {
 
     sf::Time now = GameTime::now();
 
-    for (Entity e : m_registry->with<Player, en::Transformable>()) {
+    for (Entity e : m_registry->with<Player, en::TransformableSFML>()) {
 
         auto& player = m_registry->get<Player>(e);
         if (player.timeWhenCanShootAgain > now) continue;
 
         player.timeWhenCanShootAgain = now + player.shootInterval;
 
-        auto& tf = m_registry->get<en::Transformable>(e);
+        auto& tf = m_registry->get<en::TransformableSFML>(e);
         const sf::Transform& playerTransform = tf.getGlobalTransform();
 
         sf::Vector2f forward  = en::getForward(playerTransform);

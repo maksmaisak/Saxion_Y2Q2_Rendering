@@ -15,7 +15,7 @@
 #include "Messaging.h"
 #include "EntityEvents.h"
 #include "Entities.h"
-#include "Transformable.h"
+#include "TransformableSFML.h"
 #include "CustomTypeIndex.h"
 
 namespace en {

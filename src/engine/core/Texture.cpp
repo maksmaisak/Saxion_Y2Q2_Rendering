@@ -2,7 +2,7 @@
 #include <string>
 
 #include <SFML/Graphics.hpp>
-#include "mge/core/Texture.hpp"
+#include "engine/core/Texture.hpp"
 
 Texture::Texture(): _id() {
     glGenTextures (1, &_id);

@@ -3,7 +3,7 @@
 #include <string>
 #include <fstream>
 
-#include "mge/core/Mesh.hpp"
+#include "engine/core/Mesh.hpp"
 
 Mesh::Mesh() : _indexBufferId(0), _vertexBufferId(0), _normalBufferId(0), _uvBufferId(0), _vertices(), _normals(), _uvs(), _indices() {
 	//ctor

@@ -3,7 +3,7 @@
 #include "Camera.hpp"
 #include "Mesh.hpp"
 #include "World.hpp"
-#include "mge/materials/AbstractMaterial.hpp"
+#include "materials/AbstractMaterial.hpp"
 #include "GLHelpers.h"
 
 Renderer::Renderer() : debug(false) {

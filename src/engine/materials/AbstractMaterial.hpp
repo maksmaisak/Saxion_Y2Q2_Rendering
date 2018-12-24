@@ -1,12 +1,11 @@
 #ifndef ABSTRACTMATERIAL_HPP
 #define ABSTRACTMATERIAL_HPP
 
-#include "Engine.h"
 #include "glm.hpp"
+#include "Engine.h"
+#include "ShaderProgram.hpp"
 
-class GameObject;
 class Mesh;
-class World;
 
 /**
  * AbstractMaterial should be subclassed for all materials, for example ColorMaterial, TextureMaterial.
@@ -25,16 +24,18 @@ class AbstractMaterial
         AbstractMaterial() = default;
         virtual ~AbstractMaterial() = default;
         AbstractMaterial(const AbstractMaterial&) = delete;
-        AbstractMaterial(const AbstractMaterial&&) = delete;
         AbstractMaterial& operator=(const AbstractMaterial&) = delete;
-        AbstractMaterial& operator=(const AbstractMaterial&&) = delete;
+        AbstractMaterial(AbstractMaterial&&) = default;
+        AbstractMaterial& operator=(AbstractMaterial&&) = default;
 
         /**
-         * Render the given mesh in the given world using the given mvp matrices. Implement in subclass.
+         * Render the given mesh in the given engine using the given mvp matrices. Implement in subclass.
          */
-        virtual void render(en::Engine* pEngine, Mesh* pMesh, const glm::mat4& pModelMatrix,
-                            const glm::mat4& pViewMatrix,
-                            const glm::mat4& pPerspectiveMatrix) = 0;
+        virtual void render(en::Engine* pEngine, Mesh* pMesh,
+            const glm::mat4& pModelMatrix,
+            const glm::mat4& pViewMatrix,
+            const glm::mat4& pPerspectiveMatrix
+        ) = 0;
 };
 
 #endif // ABSTRACTMATERIAL_HPP

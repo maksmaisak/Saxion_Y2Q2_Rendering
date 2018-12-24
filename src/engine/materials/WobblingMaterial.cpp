@@ -8,8 +8,8 @@
 #include "WobblingMaterial.h"
 #include "mge/config.hpp"
 #include "mge/core/GameObject.hpp"
-#include "mge/core/Mesh.hpp"
-#include "mge/core/ShaderProgram.hpp"
+#include "engine/core/Mesh.hpp"
+#include "engine/core/ShaderProgram.hpp"
 
 #include "Resources.h"
 
@@ -23,7 +23,7 @@ void WobblingMaterial::_lazyInitializeShader() {
 
     if (_shader) return;
 
-    _shader = new ShaderProgram();
+    _shader = new en::ShaderProgram();
     _shader->addShader(GL_VERTEX_SHADER, config::MGE_SHADER_PATH + "wobble.vs");
     _shader->addShader(GL_FRAGMENT_SHADER, config::MGE_SHADER_PATH + "wobble.fs");
     _shader->finalize();
@@ -33,8 +33,7 @@ void WobblingMaterial::setDiffuseTexture(std::shared_ptr<Texture> pDiffuseTextur
     _diffuseTexture = pDiffuseTexture;
 }
 
-void WobblingMaterial::render(en::Engine* pEngine, Mesh* pMesh, const glm::mat4& pModelMatrix, const glm::mat4& pViewMatrix,
-                              const glm::mat4& pProjectionMatrix) {
+void WobblingMaterial::render(en::Engine* pEngine, Mesh* pMesh, const glm::mat4& pModelMatrix, const glm::mat4& pViewMatrix, const glm::mat4& pProjectionMatrix) {
 
     _shader->use();
 

@@ -4,18 +4,18 @@
 
 #include "MGETestScene.h"
 
-#include "mge/core/Mesh.hpp"
+#include "engine/core/Mesh.hpp"
 #include "mge/core/World.hpp"
-#include "mge/core/Texture.hpp"
+#include "engine/core/Texture.hpp"
 #include "mge/core/Light.hpp"
 #include "mge/core/Camera.hpp"
 #include "mge/core/GameObject.hpp"
 #include "mge/config.hpp"
 
-#include "mge/materials/AbstractMaterial.hpp"
-#include "mge/materials/ColorMaterial.hpp"
-#include "mge/materials/TextureMaterial.hpp"
-#include "mge/materials/WobblingMaterial.h"
+#include "materials/AbstractMaterial.hpp"
+#include "materials/ColorMaterial.hpp"
+#include "materials/TextureMaterial.hpp"
+#include "materials/WobblingMaterial.h"
 
 #include "mge/behaviours/RotatingBehavior.hpp"
 #include "mge/behaviours/KeysBehaviour.hpp"

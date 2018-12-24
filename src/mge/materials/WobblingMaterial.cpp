@@ -33,7 +33,8 @@ void WobblingMaterial::setDiffuseTexture(std::shared_ptr<Texture> pDiffuseTextur
     _diffuseTexture = pDiffuseTexture;
 }
 
-void WobblingMaterial::render(World* pWorld, Mesh* pMesh, const glm::mat4& pModelMatrix, const glm::mat4& pViewMatrix, const glm::mat4& pProjectionMatrix) {
+void WobblingMaterial::render(en::Engine* pEngine, Mesh* pMesh, const glm::mat4& pModelMatrix, const glm::mat4& pViewMatrix,
+                              const glm::mat4& pProjectionMatrix) {
 
     _shader->use();
 

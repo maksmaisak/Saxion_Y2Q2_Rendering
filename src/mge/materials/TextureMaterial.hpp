@@ -19,7 +19,8 @@ class TextureMaterial : public AbstractMaterial
         explicit TextureMaterial(std::shared_ptr<Texture> pDiffuseTexture);
         virtual ~TextureMaterial() = default;
 
-        virtual void render(World* pWorld, Mesh* pMesh, const glm::mat4& pModelMatrix, const glm::mat4& pViewMatrix, const glm::mat4& pProjectionMatrix) override;
+        virtual void render(en::Engine* pEngine, Mesh* pMesh, const glm::mat4& pModelMatrix, const glm::mat4& pViewMatrix,
+                            const glm::mat4& pProjectionMatrix) override;
 
         void setDiffuseTexture(std::shared_ptr<Texture> pDiffuseTexture);
 

@@ -6,11 +6,12 @@
 
 namespace en {
 
-    void TransformableHierarchySystem::receive(const ComponentAdded<TransformableSFML>& info) {
+    void TransformableHierarchySystem::receive(const ComponentAdded<Transformable>& info) {
         info.component.m_registry = m_registry;
+        info.component.m_entity = info.entity;
     }
 
-    void TransformableHierarchySystem::receive(const ComponentWillBeRemoved<TransformableSFML>& info) {
+    void TransformableHierarchySystem::receive(const ComponentWillBeRemoved<Transformable>& info) {
         for (Entity child : info.component.m_children) {
             m_registry->destroy(child);
         }

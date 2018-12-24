@@ -20,6 +20,7 @@ namespace en {
 
         initializeWindow(m_window);
         printGLContextVersionInfo();
+        initializeGlew();
     }
 
     void Engine::initializeWindow(sf::RenderWindow& window) {

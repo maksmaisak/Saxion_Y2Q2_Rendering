@@ -19,7 +19,8 @@ public:
     explicit WobblingMaterial(const std::string& filename);
     virtual ~WobblingMaterial() = default;
 
-    void render(World* pWorld, Mesh* pMesh, const glm::mat4& pModelMatrix, const glm::mat4& pViewMatrix, const glm::mat4& pProjectionMatrix) override;
+    void render(en::Engine* pEngine, Mesh* pMesh, const glm::mat4& pModelMatrix, const glm::mat4& pViewMatrix,
+                const glm::mat4& pProjectionMatrix) override;
     void setDiffuseTexture(std::shared_ptr<Texture> pDiffuseTexture);
 
 private:

@@ -24,16 +24,11 @@ void ColorMaterial::_lazyInitializeShader() {
     }
 }
 
-ColorMaterial::~ColorMaterial()
-{
-    //dtor
-}
-
 void ColorMaterial::setDiffuseColor(glm::vec3 pDiffuseColor) {
     _diffuseColor = pDiffuseColor;
 }
 
-void ColorMaterial::render(World* pWorld, Mesh* pMesh, const glm::mat4& pModelMatrix, const glm::mat4& pViewMatrix, const glm::mat4& pProjectionMatrix) {
+void ColorMaterial::render(en::Engine* pEngine, Mesh* pMesh, const glm::mat4& pModelMatrix, const glm::mat4& pViewMatrix, const glm::mat4& pProjectionMatrix) {
     _shader->use();
 
     //set the material color

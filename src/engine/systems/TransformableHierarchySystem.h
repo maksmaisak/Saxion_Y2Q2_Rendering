@@ -8,17 +8,17 @@
 #include "Engine.h"
 #include "Messaging.h"
 #include "EntityEvents.h"
-#include "TransformableSFML.h"
+#include "Transformable.h"
 
 namespace en {
 
     /// Keeps the hierarchy of en::Transformable|s in order.
     class TransformableHierarchySystem : public System,
-        Receiver<ComponentAdded<TransformableSFML>>,
-        Receiver<ComponentWillBeRemoved<TransformableSFML>>
+        Receiver<ComponentAdded<Transformable>>,
+        Receiver<ComponentWillBeRemoved<Transformable>>
     {
-        void receive(const ComponentAdded<TransformableSFML>& info) override;
-        void receive(const ComponentWillBeRemoved<TransformableSFML>& info) override;
+        void receive(const ComponentAdded<Transformable>& info) override;
+        void receive(const ComponentWillBeRemoved<Transformable>& info) override;
     };
 }
 

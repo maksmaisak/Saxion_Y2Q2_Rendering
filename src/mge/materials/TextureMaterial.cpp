@@ -41,7 +41,8 @@ void TextureMaterial::setDiffuseTexture(std::shared_ptr<Texture> pDiffuseTexture
     _diffuseTexture = pDiffuseTexture;
 }
 
-void TextureMaterial::render(World* pWorld, Mesh* pMesh, const glm::mat4& pModelMatrix, const glm::mat4& pViewMatrix, const glm::mat4& pProjectionMatrix) {
+void TextureMaterial::render(en::Engine* pEngine, Mesh* pMesh, const glm::mat4& pModelMatrix, const glm::mat4& pViewMatrix,
+                             const glm::mat4& pProjectionMatrix) {
     if (!_diffuseTexture) return;
 
     _shader->use();

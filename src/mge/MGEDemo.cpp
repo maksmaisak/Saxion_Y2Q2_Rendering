@@ -16,7 +16,7 @@
 #include "mge/materials/ColorMaterial.hpp"
 #include "mge/materials/TextureMaterial.hpp"
 
-#include "mge/behaviours/RotatingBehaviour.hpp"
+#include "mge/behaviours/RotatingBehavior.hpp"
 #include "mge/behaviours/KeysBehaviour.hpp"
 
 #include "mge/util/DebugHud.hpp"
@@ -76,7 +76,7 @@ void MGEDemo::_initializeScene() {
     sphere->scale(glm::vec3(2.5, 2.5, 2.5));
     sphere->setMesh(sphereMeshS);
     sphere->setMaterial(runicStoneMaterial);
-    sphere->setBehaviour(new RotatingBehaviour());
+    //sphere->setBehaviour(new RotatingBehavior());
     _world->add(sphere);
 
     //add a light. Note that the light does ABSOLUTELY ZIP! NADA ! NOTHING !

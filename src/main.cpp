@@ -1,9 +1,6 @@
 #include <iostream>
 #include <memory>
 
-#include "mge/core/AbstractGame.hpp"
-#include "mge/MGEDemo.hpp"
-#include "mge/MGETestScene.h"
 #include "Engine.h"
 #include "Actor.h"
 #include "EntityRegistry.h"
@@ -12,8 +9,6 @@
 #include "DestroyByTimerSystem.h"
 #include "RenderSystem.h"
 
-#include "Transformable.h"
-
 #include "Mesh.hpp"
 #include "Texture.hpp"
 #include "Resources.h"
@@ -21,9 +16,12 @@
 #include "WobblingMaterial.h"
 #include "ColorMaterial.hpp"
 #include "mge/config.hpp"
+#include "components/Transformable.h"
 #include "components/Camera.h"
 #include "components/Light.h"
 #include "components/RenderInfo.h"
+#include "CameraOrbitBehavior.h"
+#include "RotatingBehavior.hpp"
 
 void buildScene(en::Engine& engine) {
 
@@ -52,43 +50,33 @@ void buildScene(en::Engine& engine) {
     // a thin wrapper around en::Engine and en::Entity
     // Using it to add components also ensures that components
     // inheriting from en::Behavior actually have their update functions called.
-    // TODO have Engine auto-add BehaviorSystems for all Behavior types used by the project using CustomTypeIndex or something similar.
+    // TODO have make behaviors work when added from registry too.
     en::Actor camera = engine.makeActor();
     camera.add<en::Camera>();
-    camera.add<en::Transformable>().rotate(glm::radians(-40.0f), glm::vec3(1, 0, 0));
+    auto& t = camera.add<en::Transformable>();
+    t.rotate(glm::radians(-40.0f), glm::vec3(1, 0, 0));
+    t.move({0, 0, 10});
 
     // Add the floor
     // Use en::Registry this time,
     // this is more representative of what's actually happening under the hood.
     en::EntityRegistry& registry = engine.getRegistry();
     en::Entity plane = registry.makeEntity();
-    registry.add<en::Transformable>(plane).setLocalPosition({0, -4, 0});
-    //registry.add<en::RenderInfo>(plane, planeMeshDefault, floorMaterial);
+    auto& planeTransform = registry.add<en::Transformable>(plane);
+    planeTransform.setLocalPosition({0, -4, 0});
+    planeTransform.setLocalScale({5, 5, 5});
+    registry.add<en::RenderInfo>(plane, planeMeshDefault, floorMaterial);
 
+    //add a spinning sphere
     en::Actor sphere = engine.makeActor();
     sphere.add<en::Transformable>().setLocalScale({2.5f, 2.5f, 2.5f});
-    //sphere.add<RenderInfo>(testObjectMeshS, wobblingMaterial);
-    //sphere.add<RotatingBehavior>();
-    //camera.add<CameraOrbitBehavior>(sphere, 10, -15.f, 60.f);
-
-    /*
-    //add a spinning sphere
-    GameObject* sphere = new GameObject("sphere", glm::vec3(0, 0, 0));
-    sphere->scale(glm::vec3(2.5, 2.5, 2.5));
-    sphere->setMesh(testObjectMeshS.get());
-    sphere->setMaterial(wobblingMaterial.get());
-    sphere->setBehaviour(new RotatingBehaviour());
-    _world->add(sphere);
-    camera->setBehaviour(new CameraOrbitBehaviour(sphere, 10, -15.f, 60.f));
-     */
+    sphere.add<en::RenderInfo>(testObjectMeshS, wobblingMaterial);
+    sphere.add<RotatingBehavior>();
+    camera.add<CameraOrbitBehavior>(sphere, 10, -15.f, 60.f);
 
     en::Actor ring = engine.makeActor();
     ring.add<en::Transformable>();
-    //ring.add<RotatingBehavior>();
-
-    /*GameObject* ring = new GameObject("ring", glm::vec3(0, 0, 0));
-    ring->setBehaviour(new RotatingBehaviour());
-    _world->add(ring);*/
+    ring.add<RotatingBehavior>();
 
     const std::size_t numCubes = 10;
     const float radius = 3.5f;
@@ -106,7 +94,7 @@ void buildScene(en::Engine& engine) {
         transform.setParent(ring);
         transform.setLocalPosition(offset);
         transform.scale(glm::vec3(0.2f));
-        //object.add<RotatingBehavior>();
+        object.add<RotatingBehavior>();
         if (i % 2 == 0) {
             object.add<en::Light>();
             auto material = std::make_shared<ColorMaterial>(glm::abs(glm::sphericalRand(1.f)));

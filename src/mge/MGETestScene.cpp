@@ -17,9 +17,9 @@
 #include "mge/materials/TextureMaterial.hpp"
 #include "mge/materials/WobblingMaterial.h"
 
-#include "mge/behaviours/RotatingBehaviour.hpp"
+#include "mge/behaviours/RotatingBehavior.hpp"
 #include "mge/behaviours/KeysBehaviour.hpp"
-#include "mge/behaviours/CameraOrbitBehaviour.h"
+#include "mge/behaviours/CameraOrbitBehavior.h"
 
 #include <glm/gtx/polar_coordinates.hpp>
 #include <glm/gtc/random.hpp>
@@ -67,12 +67,12 @@ void MGETestScene::_initializeScene() {
     sphere->scale(glm::vec3(2.5, 2.5, 2.5));
     sphere->setMesh(testObjectMeshS.get());
     sphere->setMaterial(wobblingMaterial.get());
-    sphere->setBehaviour(new RotatingBehaviour());
+    //sphere->setBehaviour(new RotatingBehavior());
     _world->add(sphere);
-    camera->setBehaviour(new CameraOrbitBehaviour(sphere, 10, -15.f, 60.f));
+    //camera->setBehaviour(new CameraOrbitBehavior(sphere, 10, -15.f, 60.f));
 
     GameObject* ring = new GameObject("ring", glm::vec3(0, 0, 0));
-    ring->setBehaviour(new RotatingBehaviour());
+    //ring->setBehaviour(new RotatingBehavior());
     _world->add(ring);
 
     const std::size_t numCubes = 10;
@@ -98,7 +98,7 @@ void MGETestScene::_initializeScene() {
         }
 
         object->scale(glm::vec3(0.2f));
-        object->setBehaviour(new RotatingBehaviour());
+        //object->setBehaviour(new RotatingBehavior());
         ring->add(object);
     }
 }

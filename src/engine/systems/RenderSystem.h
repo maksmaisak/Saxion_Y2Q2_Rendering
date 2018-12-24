@@ -10,8 +10,13 @@
 
 namespace en {
     class RenderSystem : public System {
+
     public:
+        void start() override;
         void draw() override;
+
+    private:
+        Actor getMainCamera();
     };
 }
 

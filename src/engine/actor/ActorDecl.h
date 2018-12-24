@@ -23,20 +23,8 @@ namespace en {
     public:
         Actor(Engine& engine, Entity entity);
 
-        /// Adds a non-behavior component
         template<typename TComponent, typename... Args>
-        std::enable_if_t<!isBehavior<TComponent>, TComponent&>
-        add(Args&&... args);
-
-        /// Adds a behavior component.
-        template<typename TBehavior, typename... Args>
-        std::enable_if_t<isBehavior<TBehavior>, TBehavior&>
-        add(Actor& actor, Args&&... args);
-
-        /// Adds a behavior component with the first parameter (actor) omitted.
-        template<typename TBehavior, typename... Args>
-        std::enable_if_t<isBehavior<TBehavior>, TBehavior&>
-        add(Args&&... args);
+        TComponent& add(Args&&... args);
 
         template<typename TComponent>
         inline TComponent& get() {return m_registry->get<TComponent>(m_entity);}

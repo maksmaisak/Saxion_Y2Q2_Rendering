@@ -129,7 +129,7 @@ int main() {
 
     {
         engine.addSystem<en::TransformableHierarchySystem>();
-        engine.addSystem<en::RenderSystem>();
+        engine.addSystem<en::RenderSystem>(false);
 
         engine.addSystem<en::DestroyByTimerSystem>();
         engine.addSystem<en::DestroySystem>();

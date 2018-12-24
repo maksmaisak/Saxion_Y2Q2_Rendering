@@ -10,6 +10,9 @@
 
 namespace en {
 
+    RenderSystem::RenderSystem(bool displayMeshDebugInfo) :
+        m_displayMeshDebugInfo(displayMeshDebugInfo) {}
+
     void RenderSystem::start() {
 
         glEnable(GL_DEPTH_TEST);
@@ -30,6 +33,8 @@ namespace en {
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         glClearColor((float)0x2d / 0xff, (float)0x6b / 0xff, (float)0xce / 0xff, 1.0f);
+
+        m_debugHud = std::make_unique<DebugHud>(&m_engine->getWindow());
     }
 
     void RenderSystem::draw() {
@@ -45,7 +50,13 @@ namespace en {
 
             glm::mat4 matrixModel = m_registry->get<Transformable>(e).getWorldTransform();
             renderInfo.material->render(m_engine, renderInfo.mesh.get(), matrixModel, matrixView, matrixProjection);
+
+            if (m_displayMeshDebugInfo) {
+                renderInfo.mesh->drawDebugInfo(matrixModel, matrixView, matrixProjection);
+            }
         }
+
+        m_debugHud->draw();
     }
 
     Actor RenderSystem::getMainCamera() {

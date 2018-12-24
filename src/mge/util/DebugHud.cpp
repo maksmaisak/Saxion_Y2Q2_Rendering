@@ -6,11 +6,11 @@
 #include "mge/util/DebugHud.hpp"
 #include "mge/config.hpp"
 
-DebugHud::DebugHud( sf::RenderWindow * aWindow ): _window( aWindow ), _debugInfo(), _font(), _debugText()
+DebugHud::DebugHud(sf::RenderWindow* aWindow): _window(aWindow), _debugInfo(), _font(), _debugText()
 {
-	assert ( _window != NULL );
+	assert (_window);
 
-    if (!_font.loadFromFile(config::MGE_FONT_PATH+ "arial.ttf")) {
+    if (!_font.loadFromFile(config::MGE_FONT_PATH + "arial.ttf")) {
         std::cout << "Could not load font, exiting..." << std::endl;
         return;
     }

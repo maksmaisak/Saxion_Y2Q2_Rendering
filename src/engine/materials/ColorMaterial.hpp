@@ -25,8 +25,6 @@ class ColorMaterial : public AbstractMaterial
         void setDiffuseColor(glm::vec3 pDiffuseColor);
 
     private:
-        //all the static properties are shared between instances of ColorMaterial
-        //note that they are all PRIVATE, we do not expose this static info to the outside world
         inline static std::shared_ptr<en::ShaderProgram> m_shader = nullptr;
 
         //this one is unique per instance of color material

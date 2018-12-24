@@ -21,10 +21,9 @@ public:
     void setDiffuseTexture(std::shared_ptr<Texture> pDiffuseTexture);
 
 private:
-    inline static en::ShaderProgram* _shader = nullptr;
-    static void _lazyInitializeShader();
+    inline static std::shared_ptr<en::ShaderProgram> m_shader = nullptr;
 
-    std::shared_ptr<Texture> _diffuseTexture;
+    std::shared_ptr<Texture> m_diffuseTexture;
 };
 
 

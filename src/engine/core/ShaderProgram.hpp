@@ -6,6 +6,7 @@
 #include <string>
 #include <memory>
 #include "Resources.h"
+#include "mge/config.hpp"
 
 namespace en {
 
@@ -67,7 +68,10 @@ namespace en {
 
         static std::shared_ptr<ShaderProgram> load(const std::string& name) {
 
-            return nullptr;
+            return load(
+                config::MGE_SHADER_PATH + name + ".vs",
+                config::MGE_SHADER_PATH + name + ".fs"
+            );
         }
     };
 }

@@ -13,50 +13,41 @@
 
 #include "Resources.h"
 
-WobblingMaterial::WobblingMaterial(std::shared_ptr<Texture> pDiffuseTexture) : _diffuseTexture(std::move(pDiffuseTexture)) {
-    _lazyInitializeShader();
+WobblingMaterial::WobblingMaterial(std::shared_ptr<Texture> pDiffuseTexture) : m_diffuseTexture(std::move(pDiffuseTexture)) {
+
+    if (!m_shader) m_shader = en::Resources<en::ShaderProgram>::get("wobble");
 }
 
 WobblingMaterial::WobblingMaterial(const std::string& filename) : WobblingMaterial(en::Resources<Texture>::get(filename)) {}
 
-void WobblingMaterial::_lazyInitializeShader() {
-
-    if (_shader) return;
-
-    _shader = new en::ShaderProgram();
-    _shader->addShader(GL_VERTEX_SHADER, config::MGE_SHADER_PATH + "wobble.vs");
-    _shader->addShader(GL_FRAGMENT_SHADER, config::MGE_SHADER_PATH + "wobble.fs");
-    _shader->finalize();
-}
-
 void WobblingMaterial::setDiffuseTexture(std::shared_ptr<Texture> pDiffuseTexture) {
-    _diffuseTexture = pDiffuseTexture;
+    m_diffuseTexture = pDiffuseTexture;
 }
 
 void WobblingMaterial::render(en::Engine* pEngine, Mesh* pMesh, const glm::mat4& pModelMatrix, const glm::mat4& pViewMatrix, const glm::mat4& pProjectionMatrix) {
 
-    _shader->use();
+    m_shader->use();
 
-    glUniform1f(_shader->getUniformLocation("time"), GameTime::now().asSeconds());
-    glUniform1f(_shader->getUniformLocation("timeScale"), 10);
-    glUniform1f(_shader->getUniformLocation("phaseOffsetPerUnitDistance"), 6);
-    glUniform1f(_shader->getUniformLocation("wobbleMultiplierMin"), 0.8f);
-    glUniform1f(_shader->getUniformLocation("wobbleMultiplierMax"), 1.2);
-    glUniform1f(_shader->getUniformLocation("transitionWobbleFactorMin"), 0.f);
-    glUniform1f(_shader->getUniformLocation("transitionWobbleFactorMax"), 1.f);
-    glUniform4f(_shader->getUniformLocation("transitionColor"), 0.01f, 0.5f, 1.f, 1.f);
+    glUniform1f(m_shader->getUniformLocation("time"), GameTime::now().asSeconds());
+    glUniform1f(m_shader->getUniformLocation("timeScale"), 10);
+    glUniform1f(m_shader->getUniformLocation("phaseOffsetPerUnitDistance"), 6);
+    glUniform1f(m_shader->getUniformLocation("wobbleMultiplierMin"), 0.8f);
+    glUniform1f(m_shader->getUniformLocation("wobbleMultiplierMax"), 1.2);
+    glUniform1f(m_shader->getUniformLocation("transitionWobbleFactorMin"), 0.f);
+    glUniform1f(m_shader->getUniformLocation("transitionWobbleFactorMax"), 1.f);
+    glUniform4f(m_shader->getUniformLocation("transitionColor"), 0.01f, 0.5f, 1.f, 1.f);
 
     glm::mat4 mvpMatrix = pProjectionMatrix * pViewMatrix * pModelMatrix;
-    glUniformMatrix4fv(_shader->getUniformLocation("mvpMatrix"), 1, GL_FALSE, glm::value_ptr(mvpMatrix));
+    glUniformMatrix4fv(m_shader->getUniformLocation("mvpMatrix"), 1, GL_FALSE, glm::value_ptr(mvpMatrix));
 
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, _diffuseTexture->getId());
-    glUniform1i(_shader->getUniformLocation("diffuseTexture"), 0);
+    glBindTexture(GL_TEXTURE_2D, m_diffuseTexture->getId());
+    glUniform1i(m_shader->getUniformLocation("diffuseTexture"), 0);
 
     //now inform mesh of where to stream its data
     pMesh->streamToOpenGL(
-        _shader->getAttribLocation("vertex"),
-        _shader->getAttribLocation("normal"),
-        _shader->getAttribLocation("uv")
+        m_shader->getAttribLocation("vertex"),
+        m_shader->getAttribLocation("normal"),
+        m_shader->getAttribLocation("uv")
     );
 }

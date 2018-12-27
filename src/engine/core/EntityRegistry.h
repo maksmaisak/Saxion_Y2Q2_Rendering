@@ -47,6 +47,8 @@ namespace en {
         template<typename... TComponent>
         inline EntitiesView<TComponent...> with();
 
+        inline bool isAlive(Entity e) {return m_entities.contains(e);}
+
     private:
 
         Entities m_entities;

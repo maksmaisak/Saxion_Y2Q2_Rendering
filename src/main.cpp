@@ -1,10 +1,16 @@
 #include <iostream>
-#include <engine/components/Transformable.h>
+#include <memory>
 
-#include "mge/core/AbstractGame.hpp"
-#include "mge/MGEDemo.hpp"
-#include "mge/MGETestScene.h"
-#include "Transformable.h"
+#include "Engine.h"
+#include "Actor.h"
+#include "EntityRegistry.h"
+#include "TransformableHierarchySystem.h"
+#include "DestroySystem.h"
+#include "DestroyByTimerSystem.h"
+#include "RenderSystem.h"
+#include "RenderInfo.h"
+
+#include "TestScene.h"
 
 /**
  * Main entry point for the Micro Engine.
@@ -25,12 +31,18 @@ int main() {
 
     std::cout << "Starting Game" << std::endl;
 
-    auto test = en::Transformable();
-    std::cout << test.getLocalTransform() << std::endl;
+    en::Engine engine;
+    engine.initialize();
+    {
+        engine.addSystem<en::TransformableHierarchySystem>();
+        engine.addSystem<en::RenderSystem>(false);
 
-	std::unique_ptr<AbstractGame> game = std::make_unique<MGETestScene>();
-    game->initialize();
-    game->run();
+        engine.addSystem<en::DestroyByTimerSystem>();
+        engine.addSystem<en::DestroySystem>();
+    }
+
+    engine.getSceneManager().setCurrentScene<TestScene>();
+    engine.run();
 
     return 0;
 }

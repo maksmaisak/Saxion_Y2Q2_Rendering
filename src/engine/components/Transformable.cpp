@@ -5,6 +5,7 @@
 #include "Transformable.h"
 #include <glm/gtx/quaternion.hpp>
 #include <glm/gtx/vector_query.hpp>
+#include <glm/gtx/matrix_decompose.hpp>
 
 namespace en {
 
@@ -18,20 +19,20 @@ namespace en {
         return m_matrixLocal;
     }
 
-    const glm::mat4& Transformable::getGlobalTransform() const {
+    const glm::mat4& Transformable::getWorldTransform() const {
 
-        if (m_matrixGlobalDirty) {
+        if (m_matrixWorldDirty) {
 
             if (!en::isNullEntity(m_parent)) {
-                m_matrixGlobal = m_registry->get<Transformable>(m_parent).getLocalTransform() * getLocalTransform();
+                m_matrixWorld = m_registry->get<Transformable>(m_parent).getLocalTransform() * getLocalTransform();
             } else {
-                m_matrixGlobal = getLocalTransform();
+                m_matrixWorld = getLocalTransform();
             }
 
-            m_matrixGlobalDirty = false;
+            m_matrixWorldDirty = false;
         }
 
-        return m_matrixGlobal;
+        return m_matrixWorld;
     }
 
     void Transformable::setLocalPosition(const glm::vec3& localPosition) {
@@ -66,13 +67,13 @@ namespace en {
         }
 
         m_parent = newParent;
-        m_matrixGlobalDirty = true;
+        m_matrixWorldDirty = true;
     }
 
     void Transformable::makeDirty() {
 
         m_matrixLocalDirty = true;
-        m_matrixGlobalDirty = true;
+        m_matrixWorldDirty = true;
     }
 
     void Transformable::addChild(Entity child) {
@@ -100,9 +101,30 @@ namespace en {
         makeDirty();
     }
 
+    void Transformable::rotate(float angle, const glm::vec3& axis) {
+
+        rotate(glm::angleAxis(angle, glm::normalize(axis)));
+    }
+
     void Transformable::scale(const glm::vec3& scale) {
 
         m_scale *= scale;
         makeDirty();
+    }
+
+    glm::vec3 Transformable::getWorldPosition() const {
+        return glm::vec3(getWorldTransform()[3]);
+    }
+
+    glm::quat Transformable::getWorldRotation() const {
+
+        glm::vec3 scale;
+        glm::quat orientation;
+        glm::vec3 translation;
+        glm::vec3 skew;
+        glm::vec4 perspective;
+        glm::decompose(getWorldTransform(), scale, orientation, translation, skew, perspective);
+
+        return orientation;
     }
 }

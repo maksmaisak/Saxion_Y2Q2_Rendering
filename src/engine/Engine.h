@@ -12,11 +12,13 @@
 #include <typeindex>
 #include <type_traits>
 #include <iostream>
+#include <engine/core/SceneManager.h>
 #include "EntityRegistry.h"
 #include "Entity.h"
 #include "System.h"
 #include "BehaviorSystem.h"
 #include "Scheduler.h"
+#include "SceneManager.h"
 
 namespace en {
 
@@ -26,13 +28,20 @@ namespace en {
     class Engine {
 
     public:
-        Engine(unsigned int width, unsigned int height, bool enableVsync = false);
+        Engine();
+        virtual ~Engine() = default;
+        Engine(const Engine& other) = delete;
+        Engine& operator=(const Engine& other) = delete;
+        Engine(Engine&& other) = delete;
+        Engine& operator=(Engine&& other) = delete;
 
+        void initialize();
         void run();
 
         inline EntityRegistry& getRegistry() { return m_registry; }
         inline Scheduler& getScheduler() { return m_scheduler; }
         inline sf::RenderWindow& getWindow() { return m_window; }
+        inline SceneManager& getSceneManager() { return m_sceneManager; }
 
         Actor actor(Entity entity);
         Actor makeActor();
@@ -47,17 +56,25 @@ namespace en {
         // TODO Move this to en::TransformableSFML
         void setParent(Entity child, std::optional<Entity> newParent);
 
+    protected:
+        virtual void initializeWindow(sf::RenderWindow& window);
+
     private:
 
         EntityRegistry m_registry;
         Scheduler m_scheduler;
         sf::RenderWindow m_window;
+        SceneManager m_sceneManager;
 
         std::vector<std::unique_ptr<System>> m_systems;
         std::set<std::type_index> m_behaviorSystemPresence;
 
+        void printGLContextVersionInfo();
+        void initializeGlew();
+
         void update(float dt);
         void draw();
+        void processWindowEvents();
     };
 
     template<typename TSystem, typename... Args>

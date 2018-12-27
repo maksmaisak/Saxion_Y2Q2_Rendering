@@ -19,18 +19,23 @@ namespace en {
 
     class Transformable final {
 
+        friend class TransformableHierarchySystem;
+
     public:
 
         Transformable() = default;
 
-        const glm::mat4& getLocalTransform () const;
-        const glm::mat4& getGlobalTransform() const;
+        const glm::mat4& getLocalTransform() const;
+        const glm::mat4& getWorldTransform() const;
 
         inline const glm::vec3& getLocalPosition() const {return m_position;}
         inline const glm::quat& getLocalRotation() const {return m_rotation;}
         inline const glm::vec3& getLocalScale   () const {return m_scale;}
         inline       Entity     getParent       () const {return m_parent;}
         inline const std::vector<Entity>& getChildren() const {return m_children;}
+
+        glm::vec3 getWorldPosition() const;
+        glm::quat getWorldRotation() const;
 
         void setLocalPosition(const glm::vec3& localPosition);
         void setLocalRotation(const glm::quat& localRotation);
@@ -39,6 +44,7 @@ namespace en {
 
         void move  (const glm::vec3& offset);
         void rotate(const glm::quat& offset);
+        void rotate(float angle, const glm::vec3& axis);
         void scale (const glm::vec3& scale);
 
     private:
@@ -52,14 +58,14 @@ namespace en {
         std::vector<Entity> m_children;
 
         glm::vec3 m_position = {0, 0, 0};
-        glm::quat m_rotation = {};
+        glm::quat m_rotation = {1, 0, 0, 0};
         glm::vec3 m_scale    = {1, 1, 1};
 
         mutable glm::mat4 m_matrixLocal = glm::mat4(1.f);
         mutable bool m_matrixLocalDirty = true;
 
-        mutable glm::mat4 m_matrixGlobal = glm::mat4(1.f);
-        mutable bool m_matrixGlobalDirty = true;
+        mutable glm::mat4 m_matrixWorld = glm::mat4(1.f);
+        mutable bool m_matrixWorldDirty = true;
 
         void makeDirty();
     };

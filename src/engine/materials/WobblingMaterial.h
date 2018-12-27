@@ -7,10 +7,8 @@
 
 #include <memory>
 #include "GL/glew.h"
-#include "mge/materials/AbstractMaterial.hpp"
-#include "mge/core/Texture.hpp"
-
-class ShaderProgram;
+#include "materials/AbstractMaterial.hpp"
+#include "engine/core/Texture.hpp"
 
 class WobblingMaterial : public AbstractMaterial
 {
@@ -19,14 +17,13 @@ public:
     explicit WobblingMaterial(const std::string& filename);
     virtual ~WobblingMaterial() = default;
 
-    void render(World* pWorld, Mesh* pMesh, const glm::mat4& pModelMatrix, const glm::mat4& pViewMatrix, const glm::mat4& pProjectionMatrix) override;
+    void render(en::Engine* pEngine, Mesh* pMesh, const glm::mat4& pModelMatrix, const glm::mat4& pViewMatrix, const glm::mat4& pProjectionMatrix) override;
     void setDiffuseTexture(std::shared_ptr<Texture> pDiffuseTexture);
 
 private:
-    inline static ShaderProgram* _shader = nullptr;
-    static void _lazyInitializeShader();
+    inline static std::shared_ptr<en::ShaderProgram> m_shader = nullptr;
 
-    std::shared_ptr<Texture> _diffuseTexture;
+    std::shared_ptr<Texture> m_diffuseTexture;
 };
 
 

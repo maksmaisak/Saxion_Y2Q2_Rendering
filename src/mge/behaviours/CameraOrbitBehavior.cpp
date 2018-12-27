@@ -2,20 +2,23 @@
 // Created by Maksym Maisak on 16/12/18.
 //
 
-#include "CameraOrbitBehaviour.h"
+#include "CameraOrbitBehavior.h"
 #include <SFML/Window.hpp>
 #include "glm.hpp"
-#include "glm/gtc/epsilon.hpp"
-#include "glm/gtx/vector_angle.hpp"
-#include "mge/core/GameObject.hpp"
+#include <glm/gtc/epsilon.hpp>
+#include <glm/gtx/vector_angle.hpp>
+#include <glm/gtx/quaternion.hpp>
+#include "components/Transformable.h"
 
-CameraOrbitBehaviour::CameraOrbitBehaviour(
-    GameObject* target,
+CameraOrbitBehavior::CameraOrbitBehavior(
+    en::Actor actor,
+    en::Actor target,
     float distance,
     float minTilt,
     float maxTilt,
     float rotationSpeed
 ) :
+    Behavior(actor),
     m_target(target),
     m_distance(distance),
     m_minTilt(minTilt),
@@ -25,14 +28,17 @@ CameraOrbitBehaviour::CameraOrbitBehaviour(
     m_previousMousePosition = sf::Mouse::getPosition();
 }
 
-void CameraOrbitBehaviour::update(float dt) {
+void CameraOrbitBehavior::update(float dt) {
 
     if (!m_target) return;
 
     sf::Vector2i input = updateMouseInput();
 
-    glm::vec3 targetPosition = m_target->getWorldPosition();
-    glm::vec3 offsetDirection = glm::normalize(_owner->getLocalPosition() - targetPosition);
+    const auto& targetTransform = m_target.get<en::Transformable>();
+    auto& ownTransform = m_actor.get<en::Transformable>();
+
+    glm::vec3 targetPosition = targetTransform.getWorldPosition();
+    glm::vec3 offsetDirection = glm::normalize(ownTransform.getLocalPosition() - targetPosition);
     if (glm::any(glm::isnan(offsetDirection))) offsetDirection = glm::vec3(0, 0, 1);
     offsetDirection = glm::rotate(offsetDirection, -input.x * m_rotationSpeed * dt, glm::vec3(0, 1, 0));
 
@@ -47,15 +53,19 @@ void CameraOrbitBehaviour::update(float dt) {
 
     glm::vec3 forward = offsetDirection;
     glm::vec3 up = glm::cross(forward, right);
-    _owner->setTransform(glm::mat4(
+
+    /*ownTransform.setLocalTransform(glm::mat4(
         glm::vec4(right, 0),
         glm::vec4(up, 0),
         glm::vec4(offsetDirection, 0),
         glm::vec4(targetPosition + offsetDirection * m_distance, 1)
-    ));
+    ));*/
+
+    ownTransform.setLocalPosition(targetPosition + offsetDirection * m_distance);
+    ownTransform.setLocalRotation(glm::quatLookAt(-forward, up));
 }
 
-sf::Vector2i CameraOrbitBehaviour::updateMouseInput() {
+sf::Vector2i CameraOrbitBehavior::updateMouseInput() {
 
     sf::Vector2i currentMousePosition = sf::Mouse::getPosition();
     sf::Vector2i deltaMousePosition = currentMousePosition - m_previousMousePosition;

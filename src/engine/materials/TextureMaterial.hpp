@@ -1,11 +1,10 @@
 #ifndef TEXTUREMATERIAL_HPP
 #define TEXTUREMATERIAL_HPP
 
-#include "mge/materials/AbstractMaterial.hpp"
+#include "materials/AbstractMaterial.hpp"
 #include "GL/glew.h"
 #include <memory>
 
-class ShaderProgram;
 class Texture;
 
 /**
@@ -19,12 +18,13 @@ class TextureMaterial : public AbstractMaterial
         explicit TextureMaterial(std::shared_ptr<Texture> pDiffuseTexture);
         virtual ~TextureMaterial() = default;
 
-        virtual void render(World* pWorld, Mesh* pMesh, const glm::mat4& pModelMatrix, const glm::mat4& pViewMatrix, const glm::mat4& pProjectionMatrix) override;
+        virtual void render(en::Engine* pEngine, Mesh* pMesh, const glm::mat4& pModelMatrix, const glm::mat4& pViewMatrix,
+                            const glm::mat4& pProjectionMatrix) override;
 
         void setDiffuseTexture(std::shared_ptr<Texture> pDiffuseTexture);
 
     private:
-        inline static ShaderProgram* _shader = nullptr;
+        inline static en::ShaderProgram* _shader = nullptr;
         static void _lazyInitializeShader();
 
         //in this example we cache all identifiers for uniforms & attributes

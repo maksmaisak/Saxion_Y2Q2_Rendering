@@ -17,29 +17,17 @@
 
 namespace en {
 
-    template<typename TBehavior, typename... Args>
-    std::enable_if_t<isBehavior<TBehavior>, TBehavior&>
-    Actor::add(Actor& actor, Args&& ... args) {
-
-        assert(&actor == this);
-
-        m_engine->ensureBehaviorSystem<TBehavior>();
-        auto& behavior = m_registry->add<TBehavior>(m_entity, actor, std::forward<Args>(args)...);
-        behavior.start();
-
-        return behavior;
-    }
-
-    template<typename TBehavior, typename... Args>
-    std::enable_if_t<isBehavior<TBehavior>, TBehavior&>
-    Actor::add(Args&& ... args) {
-        return add<TBehavior>(*this, std::forward<Args>(args)...);
-    }
-
     template<typename TComponent, typename... Args>
-    std::enable_if_t<!isBehavior<TComponent>, TComponent&>
-    Actor::add(Args&& ... args) {
-        return m_registry->add<TComponent>(m_entity, std::forward<Args>(args)...);
+    TComponent& Actor::add(Args&&... args) {
+
+        if constexpr (!isBehavior<TComponent>) {
+            return m_registry->add<TComponent>(m_entity, std::forward<Args>(args)...);
+        } else {
+            m_engine->ensureBehaviorSystem<TComponent>();
+            auto& behavior = m_registry->add<TComponent>(m_entity, *this, std::forward<Args>(args)...);
+            behavior.start();
+            return behavior;
+        }
     }
 }
 

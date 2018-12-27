@@ -5,21 +5,22 @@
 #ifndef SAXION_Y2Q2_RENDERING_CAMERAORBITBEHAVIOUR_H
 #define SAXION_Y2Q2_RENDERING_CAMERAORBITBEHAVIOUR_H
 
-#include "AbstractBehaviour.hpp"
 #include <SFML/Window.hpp>
+#include "Behavior.h"
+#include "Actor.h"
 #include "glm.hpp"
 
-class CameraOrbitBehaviour : public AbstractBehaviour {
+class CameraOrbitBehavior : public en::Behavior {
 
 public:
-    explicit CameraOrbitBehaviour(GameObject* target, float distance = 10.f, float minTilt = -45.f, float maxTilt = 45.f, float rotationSpeed = 0.1f);
+    CameraOrbitBehavior(en::Actor actor, en::Actor target, float distance = 10.f, float minTilt = -45.f, float maxTilt = 45.f, float rotationSpeed = 0.1f);
     void update(float dt) override;
 
 private:
 
     sf::Vector2i updateMouseInput();
 
-    GameObject* m_target;
+    en::Actor m_target;
 
     float m_distance;
     float m_minTilt;

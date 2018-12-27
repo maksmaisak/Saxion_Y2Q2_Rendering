@@ -3,12 +3,12 @@
 #include "glm.hpp"
 
 #include "TextureMaterial.hpp"
-#include "mge/core/Texture.hpp"
+#include "engine/core/Texture.hpp"
 #include "mge/core/Light.hpp"
 #include "mge/core/World.hpp"
-#include "mge/core/Mesh.hpp"
+#include "engine/core/Mesh.hpp"
 #include "mge/core/GameObject.hpp"
-#include "mge/core/ShaderProgram.hpp"
+#include "engine/core/ShaderProgram.hpp"
 #include "mge/config.hpp"
 
 #include "Resources.h"
@@ -23,7 +23,7 @@ void TextureMaterial::_lazyInitializeShader() {
 
     if (_shader) return;
 
-    _shader = new ShaderProgram();
+    _shader = new en::ShaderProgram();
     _shader->addShader(GL_VERTEX_SHADER, config::MGE_SHADER_PATH + "texture.vs");
     _shader->addShader(GL_FRAGMENT_SHADER, config::MGE_SHADER_PATH + "texture.fs");
     _shader->finalize();
@@ -41,7 +41,8 @@ void TextureMaterial::setDiffuseTexture(std::shared_ptr<Texture> pDiffuseTexture
     _diffuseTexture = pDiffuseTexture;
 }
 
-void TextureMaterial::render(World* pWorld, Mesh* pMesh, const glm::mat4& pModelMatrix, const glm::mat4& pViewMatrix, const glm::mat4& pProjectionMatrix) {
+void TextureMaterial::render(en::Engine* pEngine, Mesh* pMesh, const glm::mat4& pModelMatrix, const glm::mat4& pViewMatrix,
+                             const glm::mat4& pProjectionMatrix) {
     if (!_diffuseTexture) return;
 
     _shader->use();

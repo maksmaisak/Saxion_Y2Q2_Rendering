@@ -5,18 +5,18 @@
 
 #include "mge/core/Renderer.hpp"
 
-#include "mge/core/Mesh.hpp"
+#include "engine/core/Mesh.hpp"
 #include "mge/core/World.hpp"
-#include "mge/core/Texture.hpp"
+#include "engine/core/Texture.hpp"
 #include "mge/core/Light.hpp"
 #include "mge/core/Camera.hpp"
 #include "mge/core/GameObject.hpp"
 
-#include "mge/materials/AbstractMaterial.hpp"
-#include "mge/materials/ColorMaterial.hpp"
-#include "mge/materials/TextureMaterial.hpp"
+#include "materials/AbstractMaterial.hpp"
+#include "materials/ColorMaterial.hpp"
+#include "materials/TextureMaterial.hpp"
 
-#include "mge/behaviours/RotatingBehaviour.hpp"
+#include "mge/behaviours/RotatingBehavior.hpp"
 #include "mge/behaviours/KeysBehaviour.hpp"
 
 #include "mge/util/DebugHud.hpp"
@@ -76,7 +76,7 @@ void MGEDemo::_initializeScene() {
     sphere->scale(glm::vec3(2.5, 2.5, 2.5));
     sphere->setMesh(sphereMeshS);
     sphere->setMaterial(runicStoneMaterial);
-    sphere->setBehaviour(new RotatingBehaviour());
+    //sphere->setBehaviour(new RotatingBehavior());
     _world->add(sphere);
 
     //add a light. Note that the light does ABSOLUTELY ZIP! NADA ! NOTHING !

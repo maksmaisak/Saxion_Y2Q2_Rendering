@@ -13,6 +13,15 @@
 
 namespace en {
 
+    template<typename TLoader, typename SFINAEDummy = void>
+    struct can_load_with_no_args : std::false_type {};
+
+    template<typename TLoader>
+    struct can_load_with_no_args<TLoader, decltype(TLoader::load())> : std::true_type {};
+
+    template<typename TLoader>
+    inline constexpr bool can_load_with_no_args_v = can_load_with_no_args<TLoader>::value;
+
     template<typename TResource>
     class Resources {
 
@@ -39,19 +48,15 @@ namespace en {
 
                 if constexpr (sizeof...(Args) > 0 || std::is_constructible_v<TResource>)
                     std::tie(it, didAdd) = m_resources.emplace(key, std::make_shared<TResource>(std::forward<Args>(args)...));
-                else if constexpr (std::is_constructible_v<TResource, decltype(key)>)
-                    std::tie(it, didAdd) = m_resources.emplace(key, std::make_shared<TResource>(key));
                 else
-                    throw "Invalid parameters for resource constructor.";
+                    std::tie(it, didAdd) = m_resources.emplace(key, std::make_shared<TResource>(key));
 
             } else {
 
-                if constexpr (sizeof...(Args) > 0 || std::is_invocable_v<decltype(&TLoader::load)>)
+                if constexpr(sizeof...(Args) > 0 || can_load_with_no_args_v<TLoader>)
                     std::tie(it, didAdd) = m_resources.emplace(key, TLoader::load(std::forward<Args>(args)...));
-                else if constexpr (std::is_invocable_v<decltype(&TLoader::load), decltype(key)>)
-                    std::tie(it, didAdd) = m_resources.emplace(key, TLoader::load(key));
                 else
-                    throw "Invalid parameters for resource loader.";
+                    std::tie(it, didAdd) = m_resources.emplace(key, TLoader::load(key));
             }
 
             assert(didAdd);

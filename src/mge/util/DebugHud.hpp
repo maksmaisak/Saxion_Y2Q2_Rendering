@@ -10,7 +10,7 @@
 class DebugHud
 {
 	public:
-		DebugHud( sf::RenderWindow * aWindow );
+		DebugHud(sf::RenderWindow* aWindow);
 		virtual ~DebugHud();
 		void draw();
 

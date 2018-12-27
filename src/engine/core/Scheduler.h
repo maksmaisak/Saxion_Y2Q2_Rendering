@@ -33,7 +33,7 @@ private:
 
     struct ScheduleItemCompare {
         bool operator()(const ScheduleItem& lhs, const ScheduleItem& rhs) {
-            return lhs.time < rhs.time;
+            return lhs.time > rhs.time;
         }
     };
 

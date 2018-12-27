@@ -3,7 +3,7 @@
 #include "Camera.hpp"
 #include "Mesh.hpp"
 #include "World.hpp"
-#include "mge/materials/AbstractMaterial.hpp"
+#include "materials/AbstractMaterial.hpp"
 #include "GLHelpers.h"
 
 Renderer::Renderer() : debug(false) {
@@ -65,7 +65,7 @@ void Renderer::renderChildren(World* pWorld, GameObject* pGameObject, AbstractMa
 }
 
 void Renderer::render(World* pWorld, Mesh* pMesh, AbstractMaterial* pMaterial, const glm::mat4& pModelMatrix, const glm::mat4& pViewMatrix, const glm::mat4& pProjectionMatrix) {
-	if (pMesh != nullptr && pMaterial != nullptr) pMaterial->render(pWorld, pMesh, pModelMatrix, pViewMatrix, pProjectionMatrix);
+	if (pMesh != nullptr && pMaterial != nullptr) pMaterial->render(nullptr, pMesh, pModelMatrix, pViewMatrix, pProjectionMatrix);
 }
 
 void Renderer::renderMeshDebugInfo(Mesh* pMesh, const glm::mat4& pModelMatrix, const glm::mat4& pViewMatrix, const glm::mat4& pProjectionMatrix) {

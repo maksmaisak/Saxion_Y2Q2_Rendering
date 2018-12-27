@@ -64,7 +64,7 @@ namespace en {
 
     Actor RenderSystem::getMainCamera() {
 
-        Entity entity = *m_registry->with<Transformable, Camera>().begin();
+        Entity entity = m_registry->with<Transformable, Camera>().tryGetOne();
         return m_engine->actor(entity);
     }
 }

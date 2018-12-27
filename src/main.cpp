@@ -8,6 +8,7 @@
 #include "DestroySystem.h"
 #include "DestroyByTimerSystem.h"
 #include "RenderSystem.h"
+#include "RenderInfo.h"
 
 #include "TestScene.h"
 
@@ -41,8 +42,6 @@ int main() {
     }
 
     engine.getSceneManager().setCurrentScene<TestScene>();
-    //engine.getScheduler().delay(sf::seconds(5.f), [&](){engine.getRegistry().destroyAll();});
-
     engine.run();
 
     return 0;

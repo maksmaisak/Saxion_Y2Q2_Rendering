@@ -16,6 +16,8 @@ namespace en {
     template<typename... TComponent>
     class EntitiesView {
 
+        static_assert(sizeof...(TComponent) > 0, "There must be at least one component type provided.");
+
         using underlying_collection_type = ComponentPoolBase;
         using underlying_iterator_type = underlying_collection_type::const_iterator;
 
@@ -83,15 +85,21 @@ namespace en {
             return (std::size_t)std::distance(begin(), end());
         }
 
+        inline Entity tryGetOne() const {
+            iterator first = begin();
+            return first != end() ? *first : en::nullEntity;
+        }
+
     private:
 
         std::tuple<ComponentPool<TComponent>*...> m_pools;
         const ComponentPoolBase* m_smallestPoolPtr;
 
         inline const ComponentPoolBase* getSmallestPoolPtr(ComponentPool<TComponent>&... pools) const {
+
             return std::min(
                 {static_cast<ComponentPoolBase*>(&pools)...},
-                [](const auto* poolA, const auto* poolB) {return poolA->size() < poolA->size();}
+                [](const auto* poolA, const auto* poolB) {return poolA->size() < poolB->size();}
             );
         }
     };

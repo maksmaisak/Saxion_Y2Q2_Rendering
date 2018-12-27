@@ -38,7 +38,7 @@ namespace en {
         inline Engine& getEngine() {return *m_engine;}
 
         inline operator Entity() {return m_entity;}
-        inline operator bool() {return !isNullEntity(m_entity);}
+        inline operator bool() {return !isNullEntity(m_entity) && m_registry->isAlive(m_entity);}
 
     private:
         Engine* m_engine;

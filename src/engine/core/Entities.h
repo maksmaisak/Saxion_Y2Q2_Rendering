@@ -10,7 +10,7 @@
 
 namespace en {
 
-    /// An efficient collection of entities with entity reuse.
+    /// An efficient collection of entities with entity id reuse.
     class Entities {
 
     public:

@@ -36,7 +36,9 @@ namespace en {
         inline TComponent& remove() {return m_registry->remove<TComponent>(m_entity);}
 
         inline Engine& getEngine() {return *m_engine;}
+
         inline operator Entity() {return m_entity;}
+        inline operator bool() {return !isNullEntity(m_entity);}
 
     private:
         Engine* m_engine;

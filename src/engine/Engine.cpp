@@ -16,6 +16,8 @@ namespace en {
     const sf::Time TimestepFixed = sf::seconds(0.01f);
     const unsigned int FramerateCap = 240;
 
+    Engine::Engine() : m_sceneManager(this) {}
+
     void Engine::initialize() {
 
         initializeWindow(m_window);

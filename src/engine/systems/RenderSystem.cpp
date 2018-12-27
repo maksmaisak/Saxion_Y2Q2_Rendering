@@ -40,19 +40,22 @@ namespace en {
     void RenderSystem::draw() {
 
         Actor mainCamera = getMainCamera();
-        glm::mat4 matrixView = glm::inverse(mainCamera.get<Transformable>().getWorldTransform());
-        glm::mat4 matrixProjection = mainCamera.get<Camera>().projectionMatrix;
+        if (mainCamera) {
 
-        for (Entity e : m_registry->with<Transformable, RenderInfo>()) {
+            glm::mat4 matrixView = glm::inverse(mainCamera.get<Transformable>().getWorldTransform());
+            glm::mat4 matrixProjection = mainCamera.get<Camera>().projectionMatrix;
 
-            auto& renderInfo = m_registry->get<RenderInfo>(e);
-            if (!renderInfo.material || !renderInfo.mesh) continue;
+            for (Entity e : m_registry->with<Transformable, RenderInfo>()) {
 
-            glm::mat4 matrixModel = m_registry->get<Transformable>(e).getWorldTransform();
-            renderInfo.material->render(m_engine, renderInfo.mesh.get(), matrixModel, matrixView, matrixProjection);
+                auto& renderInfo = m_registry->get<RenderInfo>(e);
+                if (!renderInfo.material || !renderInfo.mesh) continue;
 
-            if (m_displayMeshDebugInfo) {
-                renderInfo.mesh->drawDebugInfo(matrixModel, matrixView, matrixProjection);
+                glm::mat4 matrixModel = m_registry->get<Transformable>(e).getWorldTransform();
+                renderInfo.material->render(m_engine, renderInfo.mesh.get(), matrixModel, matrixView, matrixProjection);
+
+                if (m_displayMeshDebugInfo) {
+                    renderInfo.mesh->drawDebugInfo(matrixModel, matrixView, matrixProjection);
+                }
             }
         }
 

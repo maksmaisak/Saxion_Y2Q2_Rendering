@@ -56,8 +56,7 @@ namespace en {
 	template<>
 	struct ResourceLoader<ShaderProgram> {
 
-        static std::shared_ptr<ShaderProgram>
-        load(const std::string& vertexShaderPath, const std::string& fragmentShaderPath) {
+        inline static std::shared_ptr<ShaderProgram> load(const std::string& vertexShaderPath, const std::string& fragmentShaderPath) {
 
             auto shader = std::make_shared<ShaderProgram>();
             shader->addShader(GL_VERTEX_SHADER, vertexShaderPath);
@@ -66,7 +65,7 @@ namespace en {
             return shader;
         }
 
-        static std::shared_ptr<ShaderProgram> load(const std::string& name) {
+        inline static std::shared_ptr<ShaderProgram> load(const std::string& name) {
 
             return load(
                 config::MGE_SHADER_PATH + name + ".vs",

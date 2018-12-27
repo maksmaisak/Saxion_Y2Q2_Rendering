@@ -88,7 +88,7 @@ namespace en {
         return contents;
     }
 
-// compile the code, and detect errors.
+    // compile the code, and detect errors.
     GLuint ShaderProgram::compileShader(GLuint pShaderType, const std::string& pShaderSource) {
 
         std::cout << "Compiling shader... " << std::endl;

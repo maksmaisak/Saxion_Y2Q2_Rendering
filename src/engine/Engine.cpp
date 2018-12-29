@@ -5,10 +5,8 @@
 #include <cmath>
 #include <algorithm>
 #include "Engine.h"
-#include "TransformableSFML.h"
 #include "Actor.h"
 #include <Gl/glew.h>
-
 #include <SFML/Graphics.hpp>
 
 namespace en {
@@ -29,8 +27,18 @@ namespace en {
 
         std::cout << "Initializing window..." << std::endl;
 
+        luaL_dofile(m_lua, "assets/scripts/config.lua");
+        /*if (luaL_loadfile(m_lua, "assets/scripts/config.lua") == LUA_OK) {
+            lua_newtable(m_lua);
+            lua_setupvalue(m_lua, -2, 1);
+            luaL_dofile(m_lua);
+        }*/
+
+        unsigned int width  = m_lua.getGlobal<unsigned int>("width" ).value_or(800);
+        unsigned int height = m_lua.getGlobal<unsigned int>("height").value_or(600);
+
         auto contextSettings = sf::ContextSettings(24, 8, 8, 3, 3);
-        window.create(sf::VideoMode(1280, 800), "Game", sf::Style::Default, contextSettings);
+        window.create(sf::VideoMode(width, height), "Game", sf::Style::Default, contextSettings);
         window.setVerticalSyncEnabled(true);
         window.setActive(true);
 

@@ -19,6 +19,7 @@
 #include "BehaviorSystem.h"
 #include "Scheduler.h"
 #include "SceneManager.h"
+#include "LuaState.h"
 
 namespace en {
 
@@ -42,6 +43,7 @@ namespace en {
         inline Scheduler& getScheduler() { return m_scheduler; }
         inline sf::RenderWindow& getWindow() { return m_window; }
         inline SceneManager& getSceneManager() { return m_sceneManager; }
+        inline LuaState& getLuaState() { return m_lua; }
 
         Actor actor(Entity entity);
         Actor makeActor();
@@ -65,6 +67,7 @@ namespace en {
         Scheduler m_scheduler;
         sf::RenderWindow m_window;
         SceneManager m_sceneManager;
+        LuaState m_lua;
 
         std::vector<std::unique_ptr<System>> m_systems;
         std::set<std::type_index> m_behaviorSystemPresence;

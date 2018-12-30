@@ -50,16 +50,19 @@ bool LuaState::doFileInNewEnvironment(const std::string& filename) {
 
 void LuaState::makeEnvironment() {
 
-    // create environment
+    // create table
     lua_newtable(L);
     int tableIndex = lua_gettop(L);
 
+    // create metatable
     lua_newtable(L);
     int metatableIndex = lua_gettop(L);
 
+    // __index = _G
     lua_pushglobaltable(L);
     lua_setfield(L, metatableIndex, "__index");
 
+    // assign metatable
     lua_setmetatable(L, tableIndex);
 }
 

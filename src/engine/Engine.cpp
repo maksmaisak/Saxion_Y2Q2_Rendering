@@ -28,9 +28,9 @@ namespace en {
         std::cout << "Initializing window..." << std::endl;
 
         m_lua.doFileInNewEnvironment("assets/scripts/config.lua");
-        assert(lua_istable(m_lua, -1));
         unsigned int width  = m_lua.getField<unsigned int>("width" ).value_or(800);
         unsigned int height = m_lua.getField<unsigned int>("height").value_or(600);
+        lua_pop(m_lua, 1);
 
         auto contextSettings = sf::ContextSettings(24, 8, 8, 3, 3);
         window.create(sf::VideoMode(width, height), "Game", sf::Style::Default, contextSettings);

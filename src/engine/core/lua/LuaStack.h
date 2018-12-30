@@ -35,6 +35,9 @@ namespace lua {
         std::string operator()(lua_State* L, int index = -1) { return lua_tostring(L, index); }
     };
 
+    template<typename T, typename = void>
+    struct pushAdapter;
+
     class PopperOnDestruct {
 
     public:

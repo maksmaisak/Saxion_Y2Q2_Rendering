@@ -7,6 +7,8 @@
 
 #include <type_traits>
 #include <lua/lua.hpp>
+#include <string>
+#include <optional>
 
 namespace lua {
 
@@ -15,17 +17,22 @@ namespace lua {
 
     template<>
     struct toAdapter<bool> {
-        bool operator()(lua_State* L) { return lua_toboolean(L, -1); }
+        bool operator()(lua_State* L, int index = -1) { return lua_toboolean(L, index); }
     };
 
     template<typename T>
     struct toAdapter<T, std::enable_if_t<std::is_integral_v<T>>> {
-        T operator()(lua_State* L) { return lua_tointeger(L, -1); }
+        T operator()(lua_State* L, int index = -1) { return lua_tointeger(L, index); }
     };
 
     template<typename T>
     struct toAdapter<T, std::enable_if_t<std::is_floating_point_v<T>>> {
-        T operator()(lua_State* L) { return lua_tonumber(L, -1); }
+        T operator()(lua_State* L, int index = -1) { return lua_tonumber(L, index); }
+    };
+
+    template<>
+    struct toAdapter<std::string> {
+        std::string operator()(lua_State* L, int index = -1) { return lua_tostring(L, index); }
     };
 
     class PopperOnDestruct {

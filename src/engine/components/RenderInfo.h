@@ -11,6 +11,8 @@
 #include "Mesh.hpp"
 #include "AbstractMaterial.hpp"
 
+#include "ComponentsToLua.h"
+
 namespace en {
 
     struct RenderInfo {

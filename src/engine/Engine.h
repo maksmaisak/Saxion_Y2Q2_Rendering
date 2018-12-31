@@ -12,7 +12,6 @@
 #include <typeindex>
 #include <type_traits>
 #include <iostream>
-#include <engine/core/SceneManager.h>
 #include "EntityRegistry.h"
 #include "Entity.h"
 #include "System.h"

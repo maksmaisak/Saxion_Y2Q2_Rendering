@@ -17,13 +17,13 @@ namespace en {
     class Engine;
     class EntityRegistry;
 
-    class Transformable final {
+    class Transform final {
 
-        friend class TransformableHierarchySystem;
+        friend class TransformHierarchySystem;
 
     public:
 
-        Transformable() = default;
+        Transform() = default;
 
         const glm::mat4& getLocalTransform() const;
         const glm::mat4& getWorldTransform() const;

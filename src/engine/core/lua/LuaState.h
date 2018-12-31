@@ -31,6 +31,10 @@ namespace en {
         /// Pushes it onto the stack.
         void makeEnvironment();
 
+        /// Sets the environment of the closure on top of the stack to the value
+        /// at the given index.
+        void setEnvironment(int environmentIndex);
+
         /// Loads a file and runs it in a new environment (see makeEnvironment)
         /// Pushes the environment table onto the stack.
         bool doFileInNewEnvironment(const std::string& filename);
@@ -65,17 +69,21 @@ namespace en {
             return get<T>();
         }
 
+        /// Pops and returns the value on top of the stack.
         template<typename T>
         inline std::optional<T> get() {
 
             auto popper = PopperOnDestruct(L); // pop when the function returns
 
-            if (lua_isnil(L, -1)) return std::nullopt;
+            if (lua_isnil(L, -1) || !is<T>()) return std::nullopt;
             return to<T>();
         }
 
         template<typename T>
-        inline T to(int index = -1) {return lua::toAdapter<T>{}(L, index);}
+        inline bool is(int index = -1) const {return lua::typeAdapter<T>::is(L, index);}
+
+        template<typename T>
+        inline T    to(int index = -1) const {return lua::typeAdapter<T>::to(L, index);}
 
     private:
 

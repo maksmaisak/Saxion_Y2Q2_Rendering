@@ -5,7 +5,7 @@
 #include "RenderSystem.h"
 #include "components/DrawInfo.h"
 #include "components/RenderInfo.h"
-#include "components/Transformable.h"
+#include "components/Transform.h"
 #include "components/Camera.h"
 
 namespace en {
@@ -42,15 +42,15 @@ namespace en {
         Actor mainCamera = getMainCamera();
         if (mainCamera) {
 
-            glm::mat4 matrixView = glm::inverse(mainCamera.get<Transformable>().getWorldTransform());
+            glm::mat4 matrixView = glm::inverse(mainCamera.get<Transform>().getWorldTransform());
             glm::mat4 matrixProjection = mainCamera.get<Camera>().projectionMatrix;
 
-            for (Entity e : m_registry->with<Transformable, RenderInfo>()) {
+            for (Entity e : m_registry->with<Transform, RenderInfo>()) {
 
                 auto& renderInfo = m_registry->get<RenderInfo>(e);
                 if (!renderInfo.material || !renderInfo.mesh) continue;
 
-                glm::mat4 matrixModel = m_registry->get<Transformable>(e).getWorldTransform();
+                glm::mat4 matrixModel = m_registry->get<Transform>(e).getWorldTransform();
                 renderInfo.material->render(m_engine, renderInfo.mesh.get(), matrixModel, matrixView, matrixProjection);
 
                 if (m_displayMeshDebugInfo) {
@@ -64,7 +64,7 @@ namespace en {
 
     Actor RenderSystem::getMainCamera() {
 
-        Entity entity = m_registry->with<Transformable, Camera>().tryGetOne();
+        Entity entity = m_registry->with<Transform, Camera>().tryGetOne();
         return m_engine->actor(entity);
     }
 }

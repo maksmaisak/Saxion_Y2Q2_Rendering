@@ -9,7 +9,7 @@
 #include "mge/core/World.hpp"
 #include "engine/core/Texture.hpp"
 #include "mge/core/Light.hpp"
-#include "mge/core/Camera.hpp"
+#include "mge/core/CameraGameObject.hpp"
 #include "mge/core/GameObject.hpp"
 
 #include "materials/AbstractMaterial.hpp"
@@ -59,7 +59,7 @@ void MGEDemo::_initializeScene() {
     //SCENE SETUP
 
     //add camera first (it will be updated last)
-    Camera* camera = new Camera("camera", glm::vec3(0, 6, 7));
+    CameraGameObject* camera = new CameraGameObject("camera", glm::vec3(0, 6, 7));
     camera->rotate(glm::radians(-40.0f), glm::vec3(1, 0, 0));
     _world->add(camera);
     _world->setMainCamera(camera);

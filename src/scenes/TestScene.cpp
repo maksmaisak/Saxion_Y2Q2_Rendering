@@ -11,7 +11,7 @@
 #include "WobblingMaterial.h"
 #include "ColorMaterial.hpp"
 #include "mge/config.hpp"
-#include "components/Transformable.h"
+#include "components/Transform.h"
 #include "components/Camera.h"
 #include "components/Light.h"
 #include "components/RenderInfo.h"
@@ -48,8 +48,7 @@ void TestScene::open(en::Engine& engine) {
     // TODO have make behaviors work when added from registry too.
     en::Actor camera = engine.makeActor();
     camera.add<en::Camera>();
-    auto& t = camera.add<en::Transformable>();
-    t.rotate(glm::radians(-40.0f), glm::vec3(1, 0, 0));
+    auto& t = camera.add<en::Transform>();
     t.move({0, 0, 10});
 
     // Add the floor
@@ -57,20 +56,20 @@ void TestScene::open(en::Engine& engine) {
     // this is more representative of what's actually happening under the hood.
     en::EntityRegistry& registry = engine.getRegistry();
     en::Entity plane = registry.makeEntity();
-    auto& planeTransform = registry.add<en::Transformable>(plane);
+    auto& planeTransform = registry.add<en::Transform>(plane);
     planeTransform.setLocalPosition({0, -4, 0});
     planeTransform.setLocalScale({5, 5, 5});
     registry.add<en::RenderInfo>(plane, planeMeshDefault, floorMaterial);
 
     //add a spinning sphere
     en::Actor sphere = engine.makeActor();
-    sphere.add<en::Transformable>().setLocalScale({2.5f, 2.5f, 2.5f});
+    sphere.add<en::Transform>().setLocalScale({2.5f, 2.5f, 2.5f});
     sphere.add<en::RenderInfo>(testObjectMeshS, wobblingMaterial);
     sphere.add<RotatingBehavior>();
     camera.add<CameraOrbitBehavior>(sphere, 10, -15.f, 60.f);
 
     en::Actor ring = engine.makeActor();
-    ring.add<en::Transformable>();
+    ring.add<en::Transform>();
     ring.add<RotatingBehavior>();
 
     const std::size_t numCubes = 10;
@@ -85,7 +84,7 @@ void TestScene::open(en::Engine& engine) {
         };
 
         en::Actor object = engine.makeActor();
-        auto& transform = object.add<en::Transformable>();
+        auto& transform = object.add<en::Transform>();
         transform.setParent(ring);
         transform.setLocalPosition(offset);
         transform.scale(glm::vec3(0.2f));

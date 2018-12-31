@@ -19,7 +19,7 @@ namespace en {
     class TransformableSFML final {
 
         friend class Engine;
-        friend class TransformableHierarchySystem;
+        friend class TransformHierarchySystem;
 
     public:
 

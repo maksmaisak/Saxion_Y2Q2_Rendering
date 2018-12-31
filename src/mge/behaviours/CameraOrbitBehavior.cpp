@@ -8,7 +8,7 @@
 #include <glm/gtc/epsilon.hpp>
 #include <glm/gtx/vector_angle.hpp>
 #include <glm/gtx/quaternion.hpp>
-#include "components/Transformable.h"
+#include "components/Transform.h"
 
 CameraOrbitBehavior::CameraOrbitBehavior(
     en::Actor actor,
@@ -34,8 +34,8 @@ void CameraOrbitBehavior::update(float dt) {
 
     sf::Vector2i input = updateMouseInput();
 
-    const auto& targetTransform = m_target.get<en::Transformable>();
-    auto& ownTransform = m_actor.get<en::Transformable>();
+    const auto& targetTransform = m_target.get<en::Transform>();
+    auto& ownTransform = m_actor.get<en::Transform>();
 
     glm::vec3 targetPosition = targetTransform.getWorldPosition();
     glm::vec3 offsetDirection = glm::normalize(ownTransform.getLocalPosition() - targetPosition);

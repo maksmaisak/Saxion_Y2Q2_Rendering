@@ -41,10 +41,7 @@ bool LuaState::doFileInNewEnvironment(const std::string& filename) {
     makeEnvironment();
 
     if (!loadFile(filename)) return false;
-
-    lua_pushvalue(L, -2);
-    lua_setupvalue(L, -2, 1); // Set _ENV
-
+    setEnvironment(-2);
     return pCall();
 }
 
@@ -64,6 +61,12 @@ void LuaState::makeEnvironment() {
 
     // assign metatable
     lua_setmetatable(L, tableIndex);
+}
+
+void LuaState::setEnvironment(int environmentIndex) {
+
+    lua_pushvalue(L, environmentIndex);
+    lua_setupvalue(L, -2, 1);
 }
 
 void LuaState::printError() {

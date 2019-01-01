@@ -11,17 +11,23 @@
 
 #include "Entity.h"
 #include "Behavior.h"
+#include "ComponentsToLua.h"
 
 namespace en {
 
     class Engine;
     class EntityRegistry;
+    class LuaState;
 
     class Transform final {
+
+        REGISTER_LUA_COMPONENT_TYPE(Transform)
 
         friend class TransformHierarchySystem;
 
     public:
+
+        static Transform& addFromLua(Actor& actor, LuaState& lua);
 
         Transform() = default;
 

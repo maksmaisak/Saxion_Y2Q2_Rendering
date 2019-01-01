@@ -127,4 +127,18 @@ namespace en {
 
         return orientation;
     }
+
+    Transform& Transform::addFromLua(Actor& actor, LuaState& lua) {
+
+        auto& transform = actor.add<en::Transform>();
+
+        if (!lua_istable(lua, -1)) throw "Can't make Transform from non-table.";
+
+        {
+            auto popPosition = lua::PopperOnDestruct(lua);
+            lua_getfield(lua, -1, "position");
+        }
+
+        return transform;
+    }
 }

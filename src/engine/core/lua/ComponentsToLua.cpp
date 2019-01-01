@@ -3,6 +3,7 @@
 //
 
 #include "ComponentsToLua.h"
+#include <cassert>
 
 using namespace en;
 
@@ -16,5 +17,7 @@ void ComponentsToLua::makeComponent(Actor& actor, const std::string& componentTy
     if (it == m_nameToMakeFunction.end())
         throw "Unknown component type: " + componentTypeName;
 
+    int oldTop = lua_gettop(lua);
     it->second(actor, lua);
+    assert(oldTop == lua_gettop(lua));
 }

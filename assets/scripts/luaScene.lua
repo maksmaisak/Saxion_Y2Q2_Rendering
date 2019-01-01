@@ -8,25 +8,28 @@ return {
     {
         Name = "camera",
         Transform = {
-            position = {
-                x = 0,
-                y = 0,
-                z = 10
-            }
+            position = { x = 0, y = 0, z = 10 }
         },
         Camera = {},
         CameraOrbitBehavior = {
-            target = "left" -- maybe create all entities and assign names, and then add all these components.
+            target = "left"
+        }
+    },
+    {
+        Name = "plane",
+        Transform = {
+            position = { x = 0, y = -4, z = 0 },
+            scale = { x = 5, y = 5, z = 5 }
+        },
+        RenderInfo = {
+            mesh = "mge/models/plane.obj",
+            texture = "mge/textures/land.jpg" -- TODO add support for materials
         }
     },
     {
         Name = "left",
         Transform = {
-            position = {
-                x = 1,
-                y = 2,
-                z = 0
-            }
+            position = { x = 2, y = 2, z = 0 }
         },
         RenderInfo = {
             mesh = "mge/models/suzanna_flat.obj",
@@ -36,11 +39,7 @@ return {
     {
         Name = "right",
         Transform = {
-            position = {
-                x = -1,
-                y = 2,
-                z = 0
-            }
+            position = { x = -2, y = 2, z = 0 }
         },
         RenderInfo = {
             mesh = "mge/models/teapot_smooth.obj",

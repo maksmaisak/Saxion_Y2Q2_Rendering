@@ -8,6 +8,7 @@
 #include "Scene.h"
 #include <string>
 #include "engine/core/lua/LuaState.h"
+#include "engine/actor/Actor.h"
 
 class LuaScene : public en::Scene {
 
@@ -17,7 +18,9 @@ public:
 
 private:
 
-    void makeEntity(en::Engine& engine, int entityTableIndex = -1);
+    void makeEntities(en::Engine& engine, int sceneDefinitionIndex = -1);
+    en::Actor makeEntity(en::Engine& engine, int entityDefinitionIndex = -1);
+    void addComponents(en::Engine& engine, en::Actor& actor, int entityDefinitionIndex = -1);
 
     std::string m_filename;
 };

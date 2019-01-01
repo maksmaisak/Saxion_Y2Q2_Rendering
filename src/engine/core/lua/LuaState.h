@@ -41,7 +41,7 @@ namespace en {
 
         inline operator lua_State* () {return L;}
 
-        /* TODO Implement lua::pushAdapter
+        /* TODO Implement template pushing
         template<typename TResult, typename... TArgs>
         std::optional<TResult> protectedCall(TArgs&&... args) {
 

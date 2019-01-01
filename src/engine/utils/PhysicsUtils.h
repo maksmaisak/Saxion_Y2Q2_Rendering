@@ -5,39 +5,39 @@
 #ifndef SAXION_Y2Q1_CPP_PHYSICSUTILS_H
 #define SAXION_Y2Q1_CPP_PHYSICSUTILS_H
 
-#include <SFML/Graphics.hpp>
 #include <optional>
 #include "MyMath.h"
+#include "glm.hpp"
+#include <glm/gtc/epsilon.hpp>
 
 namespace en {
 
     struct Hit {
 
-        sf::Vector2f normal;
+        glm::vec3 normal;
         float timeOfImpact;
-        Hit(const sf::Vector2f& normal, float timeOfImpact) : normal(normal), timeOfImpact(timeOfImpact) {}
+        Hit(const glm::vec3& normal, float timeOfImpact) : normal(normal), timeOfImpact(timeOfImpact) {}
     };
 
     inline std::optional<Hit> circleVsCircleContinuous(
-        const sf::Vector2f& moverPosition, float moverRadius, const sf::Vector2f& movement,
-        const sf::Vector2f& otherPosition, float otherRadius
+        const glm::vec3& moverPosition, float moverRadius, const glm::vec3& movement,
+        const glm::vec3& otherPosition, float otherRadius
     ) {
 
-        if (en::isZero(movement)) return std::nullopt;
+        if (glm::all(glm::epsilonEqual(movement, glm::vec3(0.f), glm::epsilon<float>()))) return std::nullopt;
 
-        sf::Vector2f relativePosition = moverPosition - otherPosition;
+        glm::vec3 relativePosition = moverPosition - otherPosition;
 
-        float a = sqrMagnitude(movement);
+        float a = glm::length2(movement);
         float b = 2.f * dot(relativePosition, movement);
-        float c =
-            sqrMagnitude(relativePosition) -
+        float c = glm::length2(relativePosition) -
             (moverRadius + otherRadius) * (moverRadius + otherRadius);
 
         // If moving out
         if (b >= 0.f) return std::nullopt;
 
         // If already overlapping.
-        if (c < 0.f) return std::make_optional<Hit>(normalized(relativePosition), 0.f);
+        if (c < 0.f) return std::make_optional<Hit>(glm::normalize(relativePosition), 0.f);
 
         float d = b * b - 4.f * a * c;
         if (d < 0.f) return std::nullopt;
@@ -47,19 +47,19 @@ namespace en {
         if (t <  0.f) return std::nullopt;
         if (t >= 1.f) return std::nullopt;
 
-        return std::make_optional<Hit>(normalized(relativePosition + movement * t), t);
+        return std::make_optional<Hit>(glm::normalize(relativePosition + movement * t), t);
     }
 
     /// A helper for resolving collisions between physical bodies
     /// in a way which obeys conservation of momentum.
     /// Assumes `normal` is normalized.
     inline void resolve(
-        sf::Vector2f& aVelocity, float aInverseMass,
-        sf::Vector2f& bVelocity, float bInverseMass,
-        sf::Vector2f normal, float bounciness = 1.f
+        glm::vec3& aVelocity, float aInverseMass,
+        glm::vec3& bVelocity, float bInverseMass,
+        glm::vec3 normal, float bounciness = 1.f
     ) {
-        float aSpeedAlongNormal = en::dot(normal, aVelocity);
-        float bSpeedAlongNormal = en::dot(normal, bVelocity);
+        float aSpeedAlongNormal = glm::dot(normal, aVelocity);
+        float bSpeedAlongNormal = glm::dot(normal, bVelocity);
 
         if (aSpeedAlongNormal - bSpeedAlongNormal > 0.f) return;
 

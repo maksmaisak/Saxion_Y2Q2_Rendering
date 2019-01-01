@@ -5,6 +5,7 @@
 #include <cmath>
 #include <iostream>
 #include <algorithm>
+#include "Transform.h"
 #include "ParticleSystem.h"
 #include "MyMath.h"
 #include "GameTime.h"
@@ -13,7 +14,9 @@
 
 void ParticleSystem::draw() {
 
-    if (!m_pDrawable) return;
+    throw "Not implemented";
+
+    /*if (!m_pDrawable) return;
 
     auto& target = m_engine->getWindow();
     for (std::size_t i = 0; i < m_numActiveParticles; ++i) {
@@ -22,7 +25,7 @@ void ParticleSystem::draw() {
             *m_pDrawable,
             sf::RenderStates(sf::BlendAlpha, m_particles.at(i).transform, nullptr, nullptr)
         );
-    }
+    }*/
 }
 
 void ParticleSystem::update(float dt) {
@@ -83,11 +86,11 @@ ParticleSystem::ParticleIndex ParticleSystem::emitParticle() {
 
     Particle& particle = m_particles.at(m_numActiveParticles);
 
-    particle.transform = m_registry->get<en::TransformableSFML>(m_actor).getGlobalTransform();
-    particle.transform.translate(en::randomInCircle(m_settings.emissionRadius));
+    particle.transformMatrix = m_actor.get<en::Transform>().getWorldTransform();
+    particle.transformMatrix = glm::translate(particle.transformMatrix, glm::sphericalRand(m_settings.emissionRadius));
     particle.timeToDestroy = GameTime::now() + m_settings.particleLifetime;
 
-    particle.velocity = m_settings.startVelocity + en::randomInCircle(m_settings.startVelocityRandomness);
+    particle.velocity = m_settings.startVelocity + glm::sphericalRand(m_settings.startVelocityRandomness);
 
     return m_numActiveParticles++;
 }
@@ -101,17 +104,7 @@ void ParticleSystem::updateParticle(ParticleIndex i, float dt) {
         return;
     }
 
-    sf::Transform& transform = particle.transform;
-    transform.translate(particle.velocity * dt);
-
-//    sf::Vector2f viewSize = getEntity()->getEngine()->getWindow().getView().getSize();
-//    sf::Vector2f position = transform.transformPoint(0, 0);
-//
-//    if (position.y < 0) transform.translate(0, viewSize.y);
-//    else if (position.y > viewSize.y) transform.translate(0, -viewSize.y);
-//
-//    if (position.x < 0) transform.translate(viewSize.x, 0);
-//    else if (position.x > viewSize.x) transform.translate(-viewSize.x, 0);
+    particle.transformMatrix = glm::translate(particle.transformMatrix, particle.velocity * dt);
 }
 
 void ParticleSystem::destroyParticle(ParticleIndex i) {

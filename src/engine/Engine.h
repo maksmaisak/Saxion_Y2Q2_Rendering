@@ -56,9 +56,6 @@ namespace en {
         template<typename TBehavior>
         bool ensureBehaviorSystem();
 
-        // TODO Move this to en::TransformableSFML
-        void setParent(Entity child, std::optional<Entity> newParent);
-
     protected:
         virtual void initializeWindow(sf::RenderWindow& window);
 

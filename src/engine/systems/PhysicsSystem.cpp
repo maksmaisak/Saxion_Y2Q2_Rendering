@@ -4,7 +4,7 @@
 
 #include <SFML/Graphics.hpp>
 #include "PhysicsSystem.h"
-#include "TransformableSFML.h"
+#include "Transform.h"
 #include "Rigidbody.h"
 #include "PhysicsUtils.h"
 #include "Messaging.h"
@@ -14,13 +14,13 @@ namespace en {
 
     void PhysicsSystem::update(float dt) {
 
-        auto view = m_registry->with<en::Rigidbody, en::TransformableSFML>();
+        auto view = m_registry->with<en::Rigidbody, en::Transform>();
         for (en::Entity entity : view) {
 
             auto& rb = m_registry->get<en::Rigidbody>(entity);
-            auto& tf = m_registry->get<en::TransformableSFML>(entity);
+            auto& tf = m_registry->get<en::Transform>(entity);
 
-            sf::Vector2f movement = rb.velocity * dt;
+            glm::vec3 movement = rb.velocity * dt;
 
             bool didCollide = false;
             for (en::Entity other : view) {
@@ -28,11 +28,11 @@ namespace en {
                 if (entity == other) continue;
 
                 auto& otherRb = m_registry->get<en::Rigidbody>(other);
-                auto& otherTf = m_registry->get<en::TransformableSFML>(other);
+                auto& otherTf = m_registry->get<en::Transform>(other);
 
                 std::optional<en::Hit> hit = en::circleVsCircleContinuous(
-                    tf.getPosition(), rb.radius, movement,
-                    otherTf.getPosition(), otherRb.radius
+                    tf.getWorldPosition(), rb.radius, movement,
+                    otherTf.getWorldPosition(), otherRb.radius
                 );
 
                 if (hit.has_value()) {

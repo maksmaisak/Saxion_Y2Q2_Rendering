@@ -5,13 +5,13 @@
 #ifndef SAXION_Y2Q1_CPP_RIGIDBODY_H
 #define SAXION_Y2Q1_CPP_RIGIDBODY_H
 
-#include <SFML/Graphics.hpp>
+#include "glm.hpp"
 
 namespace en {
 
     struct Rigidbody {
 
-        sf::Vector2f velocity;
+        glm::vec3 velocity;
         float invMass = 1.f;
         float bounciness = 1.f;
 

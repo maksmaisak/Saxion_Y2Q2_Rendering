@@ -155,28 +155,6 @@ namespace en {
         }
     }
 
-    void Engine::setParent(Entity child, std::optional<Entity> newParent) {
-
-        auto& childTransformable = m_registry.get<en::TransformableSFML>(child);
-
-        std::optional<en::Entity> oldParent = childTransformable.m_parent;
-
-        if (oldParent.has_value()) {
-
-            if (*oldParent == newParent) return;
-            m_registry.get<en::TransformableSFML>(*oldParent).removeChild(child);
-        }
-
-        if (newParent.has_value()) {
-
-            auto& parentTransformable = m_registry.get<en::TransformableSFML>(*newParent);
-            parentTransformable.addChild(child);
-        }
-
-        childTransformable.m_parent = newParent;
-        childTransformable.m_globalTransformNeedUpdate = true;
-    }
-
     Actor Engine::actor(Entity entity) {
         return Actor(*this, entity);
     }

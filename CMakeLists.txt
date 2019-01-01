@@ -9,8 +9,8 @@ macro(header_directories return_list)
     set(${return_list} ${dir_list})
 endmacro()
 
-#Use these arguments to use vcpkg
-#-DCMAKE_TOOLCHAIN_FILE=C:/Users/Maks/vcpkg/scripts/buildsystems/vcpkg.cmake -DVCPKG_TARGET_TRIPLET=x86-windows
+# vcpkg arguments for my machine. Modify if needed.
+# -DCMAKE_TOOLCHAIN_FILE=C:/Users/Maks/vcpkg/scripts/buildsystems/vcpkg.cmake -DVCPKG_TARGET_TRIPLET=x86-windows
 
 cmake_minimum_required(VERSION 3.12)
 project(Saxion_Y2Q2_Rendering)
@@ -23,7 +23,7 @@ file(GLOB_RECURSE SOURCES "src/*.cpp")
 header_directories(INCLUDES)
 
 include_directories(${INCLUDES})
-add_executable(Saxion_Y2Q2_Rendering ${SOURCES} ${INCLUDES})
+add_executable(Saxion_Y2Q2_Rendering ${SOURCES})
 
 find_package(OpenGL REQUIRED)
 include_directories(${OpenGL_INCLUDE_DIRS})

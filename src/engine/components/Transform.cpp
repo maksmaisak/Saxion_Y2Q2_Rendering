@@ -128,6 +128,15 @@ namespace en {
         return orientation;
     }
 
+    glm::vec3 luaToVec3(LuaState& lua, glm::vec3 defaultValue = {0, 0, 0}) {
+
+        return {
+            lua.getField<float>("x").value_or(defaultValue.x),
+            lua.getField<float>("y").value_or(defaultValue.y),
+            lua.getField<float>("z").value_or(defaultValue.z)
+        };
+    }
+
     Transform& Transform::addFromLua(Actor& actor, LuaState& lua) {
 
         auto& transform = actor.add<en::Transform>();
@@ -135,8 +144,21 @@ namespace en {
         if (!lua_istable(lua, -1)) throw "Can't make Transform from non-table.";
 
         {
-            auto popPosition = lua::PopperOnDestruct(lua);
+            auto pop = lua::PopperOnDestruct(lua);
             lua_getfield(lua, -1, "position");
+            transform.setLocalPosition(luaToVec3(lua));
+        }
+
+        {
+            auto pop = lua::PopperOnDestruct(lua);
+            lua_getfield(lua, -1, "rotation");
+            transform.setLocalRotation(glm::quat(luaToVec3(lua)));
+        }
+
+        {
+            auto pop = lua::PopperOnDestruct(lua);
+            lua_getfield(lua, -1, "scale");
+            transform.setLocalScale(luaToVec3(lua, {1, 1, 1}));
         }
 
         return transform;

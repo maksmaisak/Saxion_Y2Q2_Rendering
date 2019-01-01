@@ -61,7 +61,8 @@ namespace en {
         template<typename T>
         inline std::optional<T> getField(const std::string& name, int tableIndex = -1) {
 
-            assert(lua_istable(L, tableIndex));
+            if (!lua_istable(L, tableIndex)) return std::nullopt;
+
             tableIndex = lua_absindex(L, tableIndex);
 
             lua_pushstring(L, name.c_str());

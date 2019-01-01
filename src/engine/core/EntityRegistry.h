@@ -9,6 +9,7 @@
 #include <utility>
 #include <set>
 #include <iostream>
+#include <string>
 #include "Entity.h"
 #include "ComponentPool.h"
 #include "EntitiesView.h"
@@ -29,8 +30,11 @@ namespace en {
     public:
 
         en::Entity makeEntity();
+        en::Entity makeEntity(const std::string& name);
         void destroy(Entity entity);
         void destroyAll();
+
+        en::Entity findByName(const std::string& name);
 
         template<class TComponent>
         inline TComponent& get(Entity entity) const;

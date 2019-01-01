@@ -9,8 +9,6 @@ using namespace en;
 void ComponentsToLua::makeComponent(Actor& actor, const std::string& componentTypeName, int componentValueIndex) {
 
     auto& lua = actor.getEngine().getLuaState();
-    assert(lua_istable(lua, componentValueIndex));
-
     auto popComponentValue = lua::PopperOnDestruct(lua);
     lua_pushvalue(lua, componentValueIndex);
 

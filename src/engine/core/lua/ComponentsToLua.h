@@ -10,6 +10,8 @@
 #include "engine/core/lua/LuaState.h"
 #include "engine/actor/Actor.h"
 
+// Calls en::ComponentsToLua::registerComponentType<T>(#T); at dynamic initialization
+// TODO Risky, may get called before statics of ComponentsToLua are initialized.
 #define REGISTER_LUA_COMPONENT_TYPE(T) inline static struct Registerer { Registerer() {en::ComponentsToLua::registerComponentType<T>(#T);}} registerer;
 
 namespace en {
@@ -40,7 +42,7 @@ namespace en {
 
         // If a custom `addFromLua(Actor&, LuaState&)` function exists, use it.
         template<typename TComponent>
-        struct Registerer<TComponent, std::enable_if_t<std::is_invocable_v<decltype(&TComponent::addFromLua), Actor&, LuaState&>>> {
+        struct Registerer<TComponent, std::enable_if_t<std::is_convertible_v<decltype(&TComponent::addFromLua), componentFactoryFunction>>> {
 
             inline static void registerComponentType(const std::string& name) {
                 m_nameToMakeFunction.emplace(name, TComponent::addFromLua);

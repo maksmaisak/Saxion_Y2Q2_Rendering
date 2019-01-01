@@ -182,6 +182,15 @@ namespace en {
     }
 
     Actor Engine::makeActor() {
-        return Actor(*this, m_registry.makeEntity());
+        return actor(m_registry.makeEntity());
+    }
+
+    Actor Engine::makeActor(const std::string& name) {
+        return actor(m_registry.makeEntity(name));
+    }
+
+    Actor Engine::findByName(const std::string& name) {
+
+        return actor(m_registry.findByName(name));
     }
 }

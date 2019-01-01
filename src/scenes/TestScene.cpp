@@ -46,29 +46,29 @@ void TestScene::open(en::Engine& engine) {
     // Using it to add components also ensures that components
     // inheriting from en::Behavior actually have their update functions called.
     // TODO have make behaviors work when added from registry too.
-    en::Actor camera = engine.makeActor();
+    en::Actor camera = engine.makeActor("Camera");
     camera.add<en::Camera>();
-    auto& t = camera.add<en::Transform>();
-    t.move({0, 0, 10});
+    camera.add<en::Transform>().move({0, 0, 10});
+    auto& cameraOrbitBehavior = camera.add<CameraOrbitBehavior>(10, -15.f, 60.f);
 
     // Add the floor
     // Use en::Registry this time,
     // this is more representative of what's actually happening under the hood.
     en::EntityRegistry& registry = engine.getRegistry();
-    en::Entity plane = registry.makeEntity();
+    en::Entity plane = registry.makeEntity("Plane");
     auto& planeTransform = registry.add<en::Transform>(plane);
     planeTransform.setLocalPosition({0, -4, 0});
     planeTransform.setLocalScale({5, 5, 5});
     registry.add<en::RenderInfo>(plane, planeMeshDefault, floorMaterial);
 
     //add a spinning sphere
-    en::Actor sphere = engine.makeActor();
+    en::Actor sphere = engine.makeActor("Main sphere");
     sphere.add<en::Transform>().setLocalScale({2.5f, 2.5f, 2.5f});
     sphere.add<en::RenderInfo>(testObjectMeshS, wobblingMaterial);
     sphere.add<RotatingBehavior>();
-    camera.add<CameraOrbitBehavior>(sphere, 10, -15.f, 60.f);
+    cameraOrbitBehavior.setTarget(sphere);
 
-    en::Actor ring = engine.makeActor();
+    en::Actor ring = engine.makeActor("Ring");
     ring.add<en::Transform>();
     ring.add<RotatingBehavior>();
 
@@ -83,7 +83,7 @@ void TestScene::open(en::Engine& engine) {
             glm::sin(angle) * radius
         };
 
-        en::Actor object = engine.makeActor();
+        en::Actor object = engine.makeActor("OribitingObject");
         auto& transform = object.add<en::Transform>();
         transform.setParent(ring);
         transform.setLocalPosition(offset);

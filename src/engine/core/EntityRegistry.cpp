@@ -3,8 +3,10 @@
 //
 
 #include "EntityRegistry.h"
+#include <algorithm>
 #include "Messaging.h"
 #include "EntityEvents.h"
+#include "Name.h"
 
 namespace en {
 
@@ -13,6 +15,22 @@ namespace en {
         const en::Entity entity = m_entities.add();
         Receiver<EntityCreated>::broadcast({entity});
         return entity;
+    }
+
+    Entity EntityRegistry::makeEntity(const std::string& name) {
+
+        const en::Entity entity = m_entities.add();
+        add<Name>(entity, name);
+        Receiver<EntityCreated>::broadcast({entity});
+        return entity;
+    }
+
+    Entity EntityRegistry::findByName(const std::string& name) {
+
+        auto range = with<Name>();
+        auto end = range.end();
+        auto it = std::find_if(range.begin(), end, [&](Entity e) {return get<Name>(e).value == name;});
+        return it != end ? *it : nullEntity;
     }
 
     void EntityRegistry::destroy(Entity entity) {

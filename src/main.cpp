@@ -45,11 +45,7 @@ int main() {
     }
 
     //engine->getSceneManager().setCurrentScene<TestScene>();
-
     engine->getSceneManager().setCurrentScene<LuaScene>("assets/scripts/luaScene.lua");
-    en::Actor actor = engine->makeActor();
-    actor.add<en::Transform>().move({0, 0, 10});
-    actor.add<en::Camera>();
 
     engine->run();
 

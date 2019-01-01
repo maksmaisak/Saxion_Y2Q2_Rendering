@@ -38,14 +38,16 @@ namespace en {
         void initialize();
         void run();
 
-        inline EntityRegistry& getRegistry() { return m_registry; }
-        inline Scheduler& getScheduler() { return m_scheduler; }
-        inline sf::RenderWindow& getWindow() { return m_window; }
+        inline EntityRegistry& getRegistry()   { return m_registry; }
+        inline Scheduler& getScheduler()       { return m_scheduler; }
+        inline sf::RenderWindow& getWindow()   { return m_window; }
         inline SceneManager& getSceneManager() { return m_sceneManager; }
-        inline LuaState& getLuaState() { return m_lua; }
+        inline LuaState& getLuaState()         { return m_lua; }
 
         Actor actor(Entity entity);
         Actor makeActor();
+        Actor makeActor(const std::string& name);
+        Actor findByName(const std::string& name);
 
         template<typename TSystem, typename... Args>
         TSystem& addSystem(Args&& ... args);

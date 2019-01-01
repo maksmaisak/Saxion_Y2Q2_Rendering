@@ -12,14 +12,12 @@
 
 CameraOrbitBehavior::CameraOrbitBehavior(
     en::Actor actor,
-    en::Actor target,
     float distance,
     float minTilt,
     float maxTilt,
     float rotationSpeed
 ) :
     Behavior(actor),
-    m_target(target),
     m_distance(distance),
     m_minTilt(minTilt),
     m_maxTilt(maxTilt),
@@ -72,4 +70,21 @@ sf::Vector2i CameraOrbitBehavior::updateMouseInput() {
     m_previousMousePosition = currentMousePosition;
 
     return deltaMousePosition;
+}
+
+CameraOrbitBehavior& CameraOrbitBehavior::addFromLua(en::Actor& actor, en::LuaState& lua) {
+
+    auto& behavior = actor.add<CameraOrbitBehavior>();
+
+    auto targetName = lua.getField<std::string>("target");
+    if (targetName) {
+        behavior.m_target = actor.getEngine().findByName(*targetName);
+    }
+
+    return behavior;
+}
+
+void CameraOrbitBehavior::setTarget(const en::Actor& target) {
+
+    m_target = target;
 }

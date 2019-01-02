@@ -3,7 +3,7 @@
 
 #include "mge/core/GameObject.hpp"
 
-class Camera;
+class CameraGameObject;
 class Light;
 
 class World : public GameObject
@@ -11,8 +11,8 @@ class World : public GameObject
 	public:
         World();
 
-		void setMainCamera (Camera* pCamera);
-		Camera* getMainCamera();
+		void setMainCamera (CameraGameObject* pCamera);
+		CameraGameObject* getMainCamera();
 
         //only used internally, do not use from outside
         void registerLight (Light* pLight);
@@ -22,7 +22,7 @@ class World : public GameObject
         int getLightCount();
 
 	private:
-	    Camera* _mainCamera;
+	    CameraGameObject* _mainCamera;
 	    std::vector<Light*> _lights;
 
         World(const World&);

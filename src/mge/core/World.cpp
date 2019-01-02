@@ -9,11 +9,11 @@ World::World():GameObject("root"), _mainCamera(0)
     _world = this;
 }
 
-void World::setMainCamera (Camera* pCamera) {
+void World::setMainCamera (CameraGameObject* pCamera) {
     if (pCamera != NULL) _mainCamera = pCamera;
 }
 
-Camera* World::getMainCamera () {
+CameraGameObject* World::getMainCamera () {
     return _mainCamera;
 }
 

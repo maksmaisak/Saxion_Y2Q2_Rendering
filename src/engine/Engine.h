@@ -12,13 +12,13 @@
 #include <typeindex>
 #include <type_traits>
 #include <iostream>
-#include <engine/core/SceneManager.h>
 #include "EntityRegistry.h"
 #include "Entity.h"
 #include "System.h"
 #include "BehaviorSystem.h"
 #include "Scheduler.h"
 #include "SceneManager.h"
+#include "LuaState.h"
 
 namespace en {
 
@@ -38,13 +38,16 @@ namespace en {
         void initialize();
         void run();
 
-        inline EntityRegistry& getRegistry() { return m_registry; }
-        inline Scheduler& getScheduler() { return m_scheduler; }
-        inline sf::RenderWindow& getWindow() { return m_window; }
+        inline EntityRegistry& getRegistry()   { return m_registry; }
+        inline Scheduler& getScheduler()       { return m_scheduler; }
+        inline sf::RenderWindow& getWindow()   { return m_window; }
         inline SceneManager& getSceneManager() { return m_sceneManager; }
+        inline LuaState& getLuaState()         { return m_lua; }
 
         Actor actor(Entity entity);
         Actor makeActor();
+        Actor makeActor(const std::string& name);
+        Actor findByName(const std::string& name);
 
         template<typename TSystem, typename... Args>
         TSystem& addSystem(Args&& ... args);
@@ -52,9 +55,6 @@ namespace en {
         /// Makes sure a system to handle a given behavior type is in place.
         template<typename TBehavior>
         bool ensureBehaviorSystem();
-
-        // TODO Move this to en::TransformableSFML
-        void setParent(Entity child, std::optional<Entity> newParent);
 
     protected:
         virtual void initializeWindow(sf::RenderWindow& window);
@@ -65,6 +65,7 @@ namespace en {
         Scheduler m_scheduler;
         sf::RenderWindow m_window;
         SceneManager m_sceneManager;
+        LuaState m_lua;
 
         std::vector<std::unique_ptr<System>> m_systems;
         std::set<std::type_index> m_behaviorSystemPresence;

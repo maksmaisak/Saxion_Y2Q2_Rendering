@@ -9,12 +9,20 @@
 #include "Behavior.h"
 #include "Actor.h"
 #include "glm.hpp"
+#include "ComponentsToLua.h"
 
 class CameraOrbitBehavior : public en::Behavior {
 
+    REGISTER_LUA_COMPONENT_TYPE(CameraOrbitBehavior)
+
 public:
-    CameraOrbitBehavior(en::Actor actor, en::Actor target, float distance = 10.f, float minTilt = -45.f, float maxTilt = 45.f, float rotationSpeed = 0.1f);
+
+    static CameraOrbitBehavior& addFromLua(en::Actor& actor, en::LuaState& lua);
+
+    explicit CameraOrbitBehavior(en::Actor actor, float distance = 10.f, float minTilt = -45.f, float maxTilt = 45.f, float rotationSpeed = 0.1f);
     void update(float dt) override;
+
+    void setTarget(const en::Actor& target);
 
 private:
 

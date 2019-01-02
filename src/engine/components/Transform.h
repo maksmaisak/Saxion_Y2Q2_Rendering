@@ -11,19 +11,25 @@
 
 #include "Entity.h"
 #include "Behavior.h"
+#include "ComponentsToLua.h"
 
 namespace en {
 
     class Engine;
     class EntityRegistry;
+    class LuaState;
 
-    class Transformable final {
+    class Transform final {
 
-        friend class TransformableHierarchySystem;
+        REGISTER_LUA_COMPONENT_TYPE(Transform)
+
+        friend class TransformHierarchySystem;
 
     public:
 
-        Transformable() = default;
+        static Transform& addFromLua(Actor& actor, LuaState& lua);
+
+        Transform() = default;
 
         const glm::mat4& getLocalTransform() const;
         const glm::mat4& getWorldTransform() const;

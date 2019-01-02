@@ -8,18 +8,38 @@
 #include <glm/gtc/epsilon.hpp>
 #include <glm/gtx/vector_angle.hpp>
 #include <glm/gtx/quaternion.hpp>
-#include "components/Transformable.h"
+#include "components/Transform.h"
+
+CameraOrbitBehavior& CameraOrbitBehavior::addFromLua(en::Actor& actor, en::LuaState& lua) {
+
+    auto& behavior = actor.add<CameraOrbitBehavior>();
+
+    auto targetName = lua.getField<std::string>("target");
+    if (targetName) behavior.m_target = actor.getEngine().findByName(*targetName);
+
+    auto distance = lua.getField<float>("distance");
+    if (distance) behavior.m_distance = *distance;
+
+    auto minTilt = lua.getField<float>("minTilt");
+    if (minTilt) behavior.m_minTilt = *minTilt;
+
+    auto maxTilt = lua.getField<float>("maxTilt");
+    if (maxTilt) behavior.m_maxTilt = *maxTilt;
+
+    auto rotationSpeed = lua.getField<float>("rotationSpeed");
+    if (rotationSpeed) behavior.m_rotationSpeed = *rotationSpeed;
+
+    return behavior;
+}
 
 CameraOrbitBehavior::CameraOrbitBehavior(
     en::Actor actor,
-    en::Actor target,
     float distance,
     float minTilt,
     float maxTilt,
     float rotationSpeed
 ) :
     Behavior(actor),
-    m_target(target),
     m_distance(distance),
     m_minTilt(minTilt),
     m_maxTilt(maxTilt),
@@ -34,8 +54,8 @@ void CameraOrbitBehavior::update(float dt) {
 
     sf::Vector2i input = updateMouseInput();
 
-    const auto& targetTransform = m_target.get<en::Transformable>();
-    auto& ownTransform = m_actor.get<en::Transformable>();
+    const auto& targetTransform = m_target.get<en::Transform>();
+    auto& ownTransform = m_actor.get<en::Transform>();
 
     glm::vec3 targetPosition = targetTransform.getWorldPosition();
     glm::vec3 offsetDirection = glm::normalize(ownTransform.getLocalPosition() - targetPosition);
@@ -72,4 +92,9 @@ sf::Vector2i CameraOrbitBehavior::updateMouseInput() {
     m_previousMousePosition = currentMousePosition;
 
     return deltaMousePosition;
+}
+
+void CameraOrbitBehavior::setTarget(const en::Actor& target) {
+
+    m_target = target;
 }

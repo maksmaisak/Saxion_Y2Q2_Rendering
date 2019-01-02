@@ -7,6 +7,9 @@
 
 #include "Engine.h"
 #include "Behavior.h"
+#include "glm.hpp"
+#include "Transform.h"
+#include <SFML/System.hpp>
 
 using namespace en;
 
@@ -21,7 +24,7 @@ public:
         float emissionRadius = 128.f;
         sf::Time emissionInterval = sf::milliseconds(1);
         sf::Time particleLifetime = sf::milliseconds(1000);
-        sf::Vector2f startVelocity = {-100, 0};
+        glm::vec3 startVelocity = {0, 100, 0};
         float startVelocityRandomness = 10.f;
     };
 
@@ -44,9 +47,9 @@ public:
 
 private:
     struct Particle {
-        sf::Transform transform;
-        sf::Time timeToDestroy;
-        sf::Vector2f velocity;
+        glm::mat4 transformMatrix;
+        sf::Time  timeToDestroy;
+        glm::vec3 velocity;
     };
 
     std::vector<Particle> m_particles;

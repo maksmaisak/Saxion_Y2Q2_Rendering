@@ -4,13 +4,16 @@
 #include "Engine.h"
 #include "Actor.h"
 #include "EntityRegistry.h"
-#include "TransformableHierarchySystem.h"
+#include "TransformHierarchySystem.h"
 #include "DestroySystem.h"
 #include "DestroyByTimerSystem.h"
 #include "RenderSystem.h"
 #include "RenderInfo.h"
 
 #include "TestScene.h"
+#include "LuaScene.h"
+
+#include "Camera.h"
 
 /**
  * Main entry point for the Micro Engine.
@@ -31,18 +34,20 @@ int main() {
 
     std::cout << "Starting Game" << std::endl;
 
-    en::Engine engine;
-    engine.initialize();
+    auto engine = std::make_unique<en::Engine>();
+    engine->initialize();
     {
-        engine.addSystem<en::TransformableHierarchySystem>();
-        engine.addSystem<en::RenderSystem>(false);
+        engine->addSystem<en::TransformHierarchySystem>();
+        engine->addSystem<en::RenderSystem>(false);
 
-        engine.addSystem<en::DestroyByTimerSystem>();
-        engine.addSystem<en::DestroySystem>();
+        engine->addSystem<en::DestroyByTimerSystem>();
+        engine->addSystem<en::DestroySystem>();
     }
 
-    engine.getSceneManager().setCurrentScene<TestScene>();
-    engine.run();
+    //engine->getSceneManager().setCurrentScene<TestScene>();
+    engine->getSceneManager().setCurrentScene<LuaScene>("assets/scripts/luaScene.lua");
+
+    engine->run();
 
     return 0;
 }

@@ -5,10 +5,8 @@
 #include <cmath>
 #include <algorithm>
 #include "Engine.h"
-#include "TransformableSFML.h"
 #include "Actor.h"
 #include <Gl/glew.h>
-
 #include <SFML/Graphics.hpp>
 
 namespace en {
@@ -29,8 +27,13 @@ namespace en {
 
         std::cout << "Initializing window..." << std::endl;
 
+        m_lua.doFileInNewEnvironment("assets/scripts/config.lua");
+        unsigned int width  = m_lua.getField<unsigned int>("width" ).value_or(800);
+        unsigned int height = m_lua.getField<unsigned int>("height").value_or(600);
+        lua_pop(m_lua, 1);
+
         auto contextSettings = sf::ContextSettings(24, 8, 8, 3, 3);
-        window.create(sf::VideoMode(1280, 800), "Game", sf::Style::Default, contextSettings);
+        window.create(sf::VideoMode(width, height), "Game", sf::Style::Default, contextSettings);
         window.setVerticalSyncEnabled(true);
         window.setActive(true);
 
@@ -152,33 +155,20 @@ namespace en {
         }
     }
 
-    void Engine::setParent(Entity child, std::optional<Entity> newParent) {
-
-        auto& childTransformable = m_registry.get<en::TransformableSFML>(child);
-
-        std::optional<en::Entity> oldParent = childTransformable.m_parent;
-
-        if (oldParent.has_value()) {
-
-            if (*oldParent == newParent) return;
-            m_registry.get<en::TransformableSFML>(*oldParent).removeChild(child);
-        }
-
-        if (newParent.has_value()) {
-
-            auto& parentTransformable = m_registry.get<en::TransformableSFML>(*newParent);
-            parentTransformable.addChild(child);
-        }
-
-        childTransformable.m_parent = newParent;
-        childTransformable.m_globalTransformNeedUpdate = true;
-    }
-
     Actor Engine::actor(Entity entity) {
         return Actor(*this, entity);
     }
 
     Actor Engine::makeActor() {
-        return Actor(*this, m_registry.makeEntity());
+        return actor(m_registry.makeEntity());
+    }
+
+    Actor Engine::makeActor(const std::string& name) {
+        return actor(m_registry.makeEntity(name));
+    }
+
+    Actor Engine::findByName(const std::string& name) {
+
+        return actor(m_registry.findByName(name));
     }
 }

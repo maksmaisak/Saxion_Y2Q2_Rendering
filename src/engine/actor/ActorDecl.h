@@ -21,6 +21,7 @@ namespace en {
     class Actor final {
 
     public:
+        Actor() = default;
         Actor(Engine& engine, Entity entity);
 
         template<typename TComponent, typename... Args>
@@ -36,14 +37,15 @@ namespace en {
         inline TComponent& remove() {return m_registry->remove<TComponent>(m_entity);}
 
         inline Engine& getEngine() {return *m_engine;}
+        inline bool isValid() {return m_engine;}
 
         inline operator Entity() {return m_entity;}
-        inline operator bool() {return !isNullEntity(m_entity) && m_registry->isAlive(m_entity);}
+        inline operator bool() {return isValid() && !isNullEntity(m_entity) && m_registry->isAlive(m_entity);}
 
     private:
-        Engine* m_engine;
-        EntityRegistry* m_registry;
-        Entity m_entity;
+        Engine* m_engine = nullptr;
+        EntityRegistry* m_registry = nullptr;
+        Entity m_entity = en::nullEntity;
     };
 }
 

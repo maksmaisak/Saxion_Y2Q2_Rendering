@@ -9,8 +9,8 @@ macro(header_directories return_list)
     set(${return_list} ${dir_list})
 endmacro()
 
-#Use these arguments to use vcpkg
-#-DCMAKE_TOOLCHAIN_FILE=C:/Users/Maks/vcpkg/scripts/buildsystems/vcpkg.cmake -DVCPKG_TARGET_TRIPLET=x86-windows
+# vcpkg arguments for my machine. Modify if needed.
+# -DCMAKE_TOOLCHAIN_FILE=C:/Users/Maks/vcpkg/scripts/buildsystems/vcpkg.cmake -DVCPKG_TARGET_TRIPLET=x86-windows
 
 cmake_minimum_required(VERSION 3.12)
 project(Saxion_Y2Q2_Rendering)
@@ -23,7 +23,7 @@ file(GLOB_RECURSE SOURCES "src/*.cpp")
 header_directories(INCLUDES)
 
 include_directories(${INCLUDES})
-add_executable(Saxion_Y2Q2_Rendering ${SOURCES} ${INCLUDES})
+add_executable(Saxion_Y2Q2_Rendering ${SOURCES})
 
 find_package(OpenGL REQUIRED)
 include_directories(${OpenGL_INCLUDE_DIRS})
@@ -35,9 +35,10 @@ endif()
 #    set(SFML_ROOT C:/dev/SFML-2.5.1-windows-gcc-7.3.0-mingw-32-bit/SFML-2.5.1/lib/cmake/SFML)
 #endif()
 
+find_package(lua)
 find_package(glm REQUIRED)
 find_package(GLEW REQUIRED)
 find_package(SFML 2.5 COMPONENTS audio graphics window system REQUIRED)
 link_directories(${SFML_LIBRARY_DIRS})
 
-target_link_libraries(Saxion_Y2Q2_Rendering glm ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} sfml-graphics sfml-audio sfml-window sfml-system)
+target_link_libraries(Saxion_Y2Q2_Rendering lua glm ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} sfml-graphics sfml-audio sfml-window sfml-system)

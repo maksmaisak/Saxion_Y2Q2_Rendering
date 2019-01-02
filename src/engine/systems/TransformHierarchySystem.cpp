@@ -2,16 +2,16 @@
 // Created by Maksym Maisak on 4/11/18.
 //
 
-#include "TransformableHierarchySystem.h"
+#include "TransformHierarchySystem.h"
 
 namespace en {
 
-    void TransformableHierarchySystem::receive(const ComponentAdded<Transformable>& info) {
+    void TransformHierarchySystem::receive(const ComponentAdded<Transform>& info) {
         info.component.m_registry = m_registry;
         info.component.m_entity = info.entity;
     }
 
-    void TransformableHierarchySystem::receive(const ComponentWillBeRemoved<Transformable>& info) {
+    void TransformHierarchySystem::receive(const ComponentWillBeRemoved<Transform>& info) {
         for (Entity child : info.component.m_children) {
             m_registry->destroy(child);
         }

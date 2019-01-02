@@ -14,8 +14,10 @@ void ComponentsToLua::makeComponent(Actor& actor, const std::string& componentTy
     lua_pushvalue(lua, componentValueIndex);
 
     auto it = m_nameToMakeFunction.find(componentTypeName);
-    if (it == m_nameToMakeFunction.end())
-        throw "Unknown component type: " + componentTypeName;
+    if (it == m_nameToMakeFunction.end()) {
+        std::cout << "Unknown component type: " << componentTypeName << std::endl;
+        return;
+    }
 
     int oldTop = lua_gettop(lua);
     it->second(actor, lua);

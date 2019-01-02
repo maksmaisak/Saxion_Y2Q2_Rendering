@@ -72,6 +72,7 @@ namespace en {
 
         void printGLContextVersionInfo();
         void initializeGlew();
+        void initializeLua();
 
         void update(float dt);
         void draw();

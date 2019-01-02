@@ -17,6 +17,7 @@ namespace en {
 
     using namespace lua;
 
+    /// A wrapper around a lua_State*. Can be implicitly cast to that.
     class LuaState final {
 
     public:

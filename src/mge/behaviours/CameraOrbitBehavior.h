@@ -19,7 +19,7 @@ public:
 
     static CameraOrbitBehavior& addFromLua(en::Actor& actor, en::LuaState& lua);
 
-    CameraOrbitBehavior(en::Actor actor, float distance = 10.f, float minTilt = -45.f, float maxTilt = 45.f, float rotationSpeed = 0.1f);
+    explicit CameraOrbitBehavior(en::Actor actor, float distance = 10.f, float minTilt = -45.f, float maxTilt = 45.f, float rotationSpeed = 0.1f);
     void update(float dt) override;
 
     void setTarget(const en::Actor& target);

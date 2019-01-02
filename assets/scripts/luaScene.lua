@@ -12,7 +12,10 @@ return {
         },
         Camera = {},
         CameraOrbitBehavior = {
-            target = "left"
+            target   = "head",
+            distance =  10,
+            minTilt  = -15,
+            maxTilt  =  60,
         }
     },
     {
@@ -27,9 +30,9 @@ return {
         }
     },
     {
-        Name = "left",
+        Name = "head",
         Transform = {
-            position = { x = 2, y = 2, z = 0 }
+            position = { x = 0, y = 2, z = 0 }
         },
         RenderInfo = {
             mesh = "mge/models/suzanna_flat.obj",
@@ -37,9 +40,9 @@ return {
         }
     },
     {
-        Name = "right",
+        Name = "teapot",
         Transform = {
-            position = { x = -2, y = 2, z = 0 }
+            position = { x = 0, y = 4, z = 0 }
         },
         RenderInfo = {
             mesh = "mge/models/teapot_smooth.obj",

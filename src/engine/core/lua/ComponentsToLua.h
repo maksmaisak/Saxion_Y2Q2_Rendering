@@ -53,7 +53,7 @@ namespace en {
     template<typename TComponent>
     inline void ComponentsToLua::registerComponentType(const std::string& name) {
 
-        std::cout << name << std::endl;
+        std::cout << "Registered component type for Lua: " << name << std::endl;
         ComponentsToLua::Registerer<TComponent>::registerComponentType(name);
     }
 }

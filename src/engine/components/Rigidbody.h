@@ -11,11 +11,12 @@ namespace en {
 
     struct Rigidbody {
 
+        bool isKinematic = false;
         glm::vec3 velocity;
         float invMass = 1.f;
         float bounciness = 1.f;
 
-        float radius = 10.f;
+        float radius = 1.f;
     };
 }
 

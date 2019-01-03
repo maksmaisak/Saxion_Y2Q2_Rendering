@@ -11,12 +11,45 @@
 #include "WobblingMaterial.h"
 #include "ColorMaterial.hpp"
 #include "mge/config.hpp"
+
 #include "components/Transform.h"
 #include "components/Camera.h"
 #include "components/Light.h"
 #include "components/RenderInfo.h"
+#include "components/Rigidbody.h"
+
 #include "CameraOrbitBehavior.h"
 #include "RotatingBehavior.hpp"
+
+void makeSphereFloor(en::Engine& engine, float sideLength, int numSpheresPerSide) {
+
+    const float diameter = sideLength / numSpheresPerSide;
+    const float radius = diameter * 0.5f;
+
+    auto material = en::Resources<TextureMaterial>::get(config::MGE_TEXTURE_PATH + "bricks.jpg");
+    auto mesh = en::Resources<Mesh>::get(config::MGE_MODEL_PATH + "sphere2.obj");
+
+    for (int y = 0; y < numSpheresPerSide; ++y) {
+        for (int x = 0; x < numSpheresPerSide; ++x) {
+
+            en::Actor actor = engine.makeActor("Floor_" + std::to_string(x) + "_" + std::to_string(y));
+
+            auto& tf =actor.add<en::Transform>();
+            tf.setLocalPosition({
+                sideLength * ((float)x / (numSpheresPerSide - 1) - 0.5f),
+                -4 + glm::linearRand(-1, 1),
+                sideLength * ((float)y / (numSpheresPerSide - 1) - 0.5f)
+            });
+            tf.setLocalScale({radius, radius, radius});
+
+            auto& rb = actor.add<en::Rigidbody>();
+            rb.isKinematic = true;
+            rb.radius = radius;
+
+            actor.add<en::RenderInfo>(mesh, material);
+        }
+    }
+}
 
 void TestScene::open(en::Engine& engine) {
 
@@ -61,16 +94,21 @@ void TestScene::open(en::Engine& engine) {
     planeTransform.setLocalScale({5, 5, 5});
     registry.add<en::RenderInfo>(plane, planeMeshDefault, floorMaterial);
 
-    //add a spinning sphere
-    en::Actor sphere = engine.makeActor("Main sphere");
-    sphere.add<en::Transform>().setLocalScale({2.5f, 2.5f, 2.5f});
-    sphere.add<en::RenderInfo>(testObjectMeshS, wobblingMaterial);
-    sphere.add<RotatingBehavior>();
-    cameraOrbitBehavior.setTarget(sphere);
+    //makeSphereFloor(engine, 20, 4);
 
     en::Actor ring = engine.makeActor("Ring");
     ring.add<en::Transform>();
+    //ring.add<en::Rigidbody>().radius = 2.5f;
     ring.add<RotatingBehavior>();
+
+    //add a spinning sphere
+    en::Actor sphere = engine.makeActor("Main sphere");
+    auto& tf = sphere.add<en::Transform>();
+    tf.setLocalScale({2.5f, 2.5f, 2.5f});
+    tf.setParent(ring);
+    sphere.add<en::RenderInfo>(testObjectMeshS, wobblingMaterial);
+    sphere.add<RotatingBehavior>();
+    cameraOrbitBehavior.setTarget(sphere);
 
     const std::size_t numCubes = 10;
     const float radius = 3.5f;

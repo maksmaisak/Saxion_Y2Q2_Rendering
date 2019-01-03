@@ -12,14 +12,25 @@
 
 namespace en {
 
+    PhysicsSystem& PhysicsSystem::setGravity(const glm::vec3& gravity) {
+
+        m_gravity = gravity;
+        return *this;
+    }
+
     void PhysicsSystem::update(float dt) {
+
+        glm::vec3 gravityDeltaV = m_gravity * dt;
 
         auto view = m_registry->with<en::Rigidbody, en::Transform>();
         for (en::Entity entity : view) {
 
             auto& rb = m_registry->get<en::Rigidbody>(entity);
+            if (rb.isKinematic) continue;
+
             auto& tf = m_registry->get<en::Transform>(entity);
 
+            rb.velocity += gravityDeltaV;
             glm::vec3 movement = rb.velocity * dt;
 
             bool didCollide = false;
@@ -31,14 +42,14 @@ namespace en {
                 auto& otherTf = m_registry->get<en::Transform>(other);
 
                 std::optional<en::Hit> hit = en::circleVsCircleContinuous(
-                    tf.getWorldPosition(), rb.radius, movement,
+                         tf.getWorldPosition(),      rb.radius, movement,
                     otherTf.getWorldPosition(), otherRb.radius
                 );
 
                 if (hit.has_value()) {
 
                     en::resolve(
-                        rb.velocity, rb.invMass,
+                             rb.velocity,      rb.invMass,
                         otherRb.velocity, otherRb.invMass,
                         hit->normal, std::min(rb.bounciness, otherRb.bounciness)
                     );
@@ -46,7 +57,6 @@ namespace en {
                     didCollide = true;
 
                     en::Receiver<en::Collision>::broadcast({*hit, entity, other});
-
                     break;
                 }
             }

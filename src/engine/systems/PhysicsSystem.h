@@ -7,6 +7,7 @@
 
 #include "System.h"
 #include "Engine.h"
+#include "glm.hpp"
 
 namespace en {
 
@@ -14,6 +15,10 @@ namespace en {
 
     public:
         void update(float dt) override;
+        PhysicsSystem& setGravity(const glm::vec3& gravity);
+
+    private:
+        glm::vec3 m_gravity;
     };
 }
 

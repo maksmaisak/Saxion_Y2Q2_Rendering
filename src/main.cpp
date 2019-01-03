@@ -3,12 +3,13 @@
 
 #include "Engine.h"
 #include "Actor.h"
-#include "EntityRegistry.h"
-#include "TransformHierarchySystem.h"
-#include "DestroySystem.h"
-#include "DestroyByTimerSystem.h"
-#include "RenderSystem.h"
-#include "RenderInfo.h"
+#include "systems/TransformHierarchySystem.h"
+#include "systems/DestroySystem.h"
+#include "systems/DestroyByTimerSystem.h"
+#include "systems/RenderSystem.h"
+#include "systems/PhysicsSystem.h"
+
+#include "components/RenderInfo.h"
 
 #include "TestScene.h"
 #include "LuaScene.h"
@@ -36,16 +37,19 @@ int main() {
 
     auto engine = std::make_unique<en::Engine>();
     engine->initialize();
+
     {
         engine->addSystem<en::TransformHierarchySystem>();
         engine->addSystem<en::RenderSystem>(false);
+
+        engine->addSystem<en::PhysicsSystem>().setGravity({0, -9.8, 0});
 
         engine->addSystem<en::DestroyByTimerSystem>();
         engine->addSystem<en::DestroySystem>();
     }
 
-    //engine->getSceneManager().setCurrentScene<TestScene>();
-    engine->getSceneManager().setCurrentScene<LuaScene>("assets/scripts/luaScene.lua");
+    engine->getSceneManager().setCurrentScene<TestScene>();
+    //engine->getSceneManager().setCurrentScene<LuaScene>("assets/scripts/luaScene.lua");
 
     engine->run();
 

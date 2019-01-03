@@ -18,6 +18,8 @@ namespace en {
 
         virtual void open(en::Engine& engine) = 0;
         virtual void close(en::Engine& engine) {};
+
+        virtual void update(float dt) {}
     };
 }
 

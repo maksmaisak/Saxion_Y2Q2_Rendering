@@ -9,6 +9,8 @@
 #include <Gl/glew.h>
 #include <SFML/Graphics.hpp>
 
+#include <type_traits>
+
 namespace en {
 
     const sf::Time TimestepFixed = sf::seconds(0.01f);
@@ -16,11 +18,43 @@ namespace en {
 
     Engine::Engine() : m_sceneManager(this) {}
 
+    void Engine::run() {
+
+        sf::Clock fixedUpdateClock;
+        sf::Time fixedUpdateLag = sf::Time::Zero;
+
+        sf::Clock drawClock;
+        sf::Time timeSinceLastDraw = sf::Time::Zero;
+
+        const float timestepFixedSeconds = TimestepFixed.asSeconds();
+        const sf::Time timestepDraw = sf::seconds(1.f / FramerateCap);
+
+        while (m_window.isOpen()) {
+
+            fixedUpdateLag += fixedUpdateClock.restart();
+            while (fixedUpdateLag >= TimestepFixed) {
+                update(timestepFixedSeconds);
+                fixedUpdateLag -= TimestepFixed;
+            }
+
+            if (drawClock.getElapsedTime() >= timestepDraw) {
+                draw();
+                drawClock.restart();
+            } else {
+                do sf::sleep(sf::microseconds(1));
+                while (drawClock.getElapsedTime() < timestepDraw && fixedUpdateLag + fixedUpdateClock.getElapsedTime() < TimestepFixed);
+            }
+
+            processWindowEvents();
+        }
+    }
+
     void Engine::initialize() {
 
         initializeWindow(m_window);
         printGLContextVersionInfo();
         initializeGlew();
+        initializeLua();
     }
 
     void Engine::initializeWindow(sf::RenderWindow& window) {
@@ -30,11 +64,12 @@ namespace en {
         m_lua.doFileInNewEnvironment("assets/scripts/config.lua");
         unsigned int width  = m_lua.getField<unsigned int>("width" ).value_or(800);
         unsigned int height = m_lua.getField<unsigned int>("height").value_or(600);
+        bool useVSync = m_lua.getField<bool>("vSync").value_or(true);
         lua_pop(m_lua, 1);
 
         auto contextSettings = sf::ContextSettings(24, 8, 8, 3, 3);
         window.create(sf::VideoMode(width, height), "Game", sf::Style::Default, contextSettings);
-        window.setVerticalSyncEnabled(true);
+        window.setVerticalSyncEnabled(useVSync);
         window.setActive(true);
 
         std::cout << "Window initialized." << std::endl << std::endl;
@@ -75,40 +110,40 @@ namespace en {
         }
     }
 
-    void Engine::run() {
+    std::string testFreeFunction() {
 
-        sf::Clock fixedUpdateClock;
-        sf::Time fixedUpdateLag = sf::Time::Zero;
+        std::cout << "Free function called from lua" << std::endl;
+        return "Result returned from free function";
+    }
 
-        sf::Clock drawClock;
-        sf::Time timeSinceLastDraw = sf::Time::Zero;
+    void Engine::initializeLua() {
 
-        const float timestepFixedSeconds = TimestepFixed.asSeconds();
-        const sf::Time timestepDraw = sf::seconds(1.f / FramerateCap);
+        lua_newtable(m_lua);
 
-        while (m_window.isOpen()) {
+        ClosureHelper::makeClosure(m_lua, &Engine::findByName, this);
+        lua_setfield(m_lua, -2, "findByName");
 
-            fixedUpdateLag += fixedUpdateClock.restart();
-            while (fixedUpdateLag >= TimestepFixed) {
-                update(timestepFixedSeconds);
-                fixedUpdateLag -= TimestepFixed;
-            }
+        ClosureHelper::makeClosure(m_lua, &Engine::testMemberFunction, this);
+        lua_setfield(m_lua, -2, "testMemberFunction");
 
-            if (drawClock.getElapsedTime() >= timestepDraw) {
-                draw();
-                drawClock.restart();
-            } else {
-                do sf::sleep(sf::microseconds(1));
-                while (drawClock.getElapsedTime() < timestepDraw && fixedUpdateLag + fixedUpdateClock.getElapsedTime() < TimestepFixed);
-            }
+        ClosureHelper::makeClosure(m_lua, &testFreeFunction);
+        lua_setfield(m_lua, -2, "testFreeFunction");
 
-            processWindowEvents();
-        }
+        lua_setglobal(m_lua, "Game");
+    }
+
+    void Engine::testMemberFunction() {
+
+        std::cout << "Member function called from lua" << std::endl;
     }
 
     void Engine::update(float dt) {
 
+        auto* currentScene = m_sceneManager.getCurrentScene();
+        if (currentScene) currentScene->update(dt);
+
         for (auto& pSystem : m_systems) pSystem->update(dt);
+
         m_scheduler.update(dt);
     }
 

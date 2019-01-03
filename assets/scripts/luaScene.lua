@@ -4,7 +4,7 @@
 -- Time: 20:15
 --
 
-return {
+local scene = {
     {
         Name = "camera",
         Transform = {
@@ -22,12 +22,12 @@ return {
         Name = "plane",
         Transform = {
             position = { x = 0, y = -4, z = 0 },
-            scale = { x = 5, y = 5, z = 5 }
+            scale    = { x = 5, y =  5, z = 5 }
         },
         RenderInfo = {
             mesh = "mge/models/plane.obj",
             texture = "mge/textures/land.jpg" -- TODO add support for materials
-        }
+        },
     },
     {
         Name = "head",
@@ -37,7 +37,8 @@ return {
         RenderInfo = {
             mesh = "mge/models/suzanna_flat.obj",
             texture = "mge/textures/bricks.jpg" -- TODO add support for materials
-        }
+        },
+        Scripts = { "mover" }
     },
     {
         Name = "teapot",
@@ -50,3 +51,16 @@ return {
         }
     }
 }
+
+function scene.update(dt)
+
+    print(Game.testFreeFunction())
+    Game.testMemberFunction()
+
+--    local floor = Game.find("Floor")
+--    if (floor) then
+--        floor.getComponent("Transform").move(0, dt, 0)
+--    end
+end
+
+return scene

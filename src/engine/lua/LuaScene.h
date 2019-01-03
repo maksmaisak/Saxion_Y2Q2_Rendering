@@ -14,16 +14,22 @@ class LuaScene : public en::Scene {
 
 public:
     LuaScene(const std::string& filename);
+    virtual ~LuaScene();
+
     void open(en::Engine& engine) override;
+    void update(float dt) override;
 
 private:
 
-    void makeEntities(en::Engine& engine, int sceneDefinitionIndex = -1);
-    en::Actor makeEntity(en::Engine& engine, int entityDefinitionIndex = -1);
-    void addComponents(en::Engine& engine, en::Actor& actor, int entityDefinitionIndex = -1);
+    void makeEntities(int sceneDefinitionIndex = -1);
+    en::Actor makeEntity(int entityDefinitionIndex = -1);
+    void addComponents(en::Actor& actor, int entityDefinitionIndex = -1);
 
     std::string m_filename;
-};
 
+    en::Engine* m_engine = nullptr;
+
+    int m_luaUpdateFunctionRef = LUA_NOREF;
+};
 
 #endif //SAXION_Y2Q2_RENDERING_LUASCENE_H

@@ -25,9 +25,17 @@ using namespace en;
 
 LuaScene::LuaScene(const std::string& filename) : m_filename(filename) {}
 
+LuaScene::~LuaScene() {
+
+    luaL_unref(m_engine->getLuaState(), LUA_REGISTRYINDEX, m_luaUpdateFunctionRef);
+}
+
 void LuaScene::open(en::Engine& engine) {
 
-    en::LuaState& lua = engine.getLuaState();
+    m_engine = &engine;
+    en::LuaState& lua = m_engine->getLuaState();
+
+    std::cout << "Loading lua-defined scene " + m_filename + "..." << std::endl;
 
     lua.makeEnvironment();
     auto popEnvironment = lua::PopperOnDestruct(lua);
@@ -37,16 +45,17 @@ void LuaScene::open(en::Engine& engine) {
     auto popFunction = lua::PopperOnDestruct(lua);
     if (!lua.pCall(0, 1)) return;
 
-    makeEntities(engine);
+    makeEntities(-1);
+    std::cout << "Finished loading lua-defined scene." << std::endl;
 }
 
 /// Goes through the table at the given index, and makes entities out of its fields.
 /// First creates all the entities and assigns their names, if provided.
 /// Then adds all other components to them.
 /// This is necessary to make sure findByName works during component initialization.
-void LuaScene::makeEntities(en::Engine& engine, int sceneDefinitionIndex) {
+void LuaScene::makeEntities(int sceneDefinitionIndex) {
 
-    en::LuaState& lua = engine.getLuaState();
+    en::LuaState& lua = m_engine->getLuaState();
     sceneDefinitionIndex = lua_absindex(lua, sceneDefinitionIndex);
 
     std::vector<std::tuple<int, en::Actor>> entities;
@@ -56,10 +65,22 @@ void LuaScene::makeEntities(en::Engine& engine, int sceneDefinitionIndex) {
     while (lua_next(lua, sceneDefinitionIndex)) {
 
         auto popValue = lua::PopperOnDestruct(lua);
-        en::Actor actor = makeEntity(engine, -1);
 
-        lua_pushvalue(lua, -1);
-        entities.emplace_back(luaL_ref(lua, LUA_REGISTRYINDEX), actor);
+        if (lua_istable(lua, -1)) {
+
+            en::Actor actor = makeEntity(-1);
+
+            // Save a ref to the entity definition and the actor for adding components later.
+            lua_pushvalue(lua, -1);
+            entities.emplace_back(luaL_ref(lua, LUA_REGISTRYINDEX), actor);
+
+        } else if (lua_isfunction(lua, -1)) {
+
+            if (lua.is<std::string>(-2) && lua.to<std::string>(-2) == "update") {
+                lua_pushvalue(lua, -1);
+                m_luaUpdateFunctionRef = luaL_ref(lua, LUA_REGISTRYINDEX);
+            }
+        }
     }
 
     // Add all other components to the entities.
@@ -69,7 +90,7 @@ void LuaScene::makeEntities(en::Engine& engine, int sceneDefinitionIndex) {
         lua_rawgeti(lua, LUA_REGISTRYINDEX, ref);
 
         int oldTop = lua_gettop(lua);
-        addComponents(engine, actor, -1);
+        addComponents(actor, -1);
         int newTop = lua_gettop(lua);
         assert(oldTop == newTop);
     }
@@ -77,13 +98,14 @@ void LuaScene::makeEntities(en::Engine& engine, int sceneDefinitionIndex) {
     for (auto[ref, actor] : entities) luaL_unref(lua, LUA_REGISTRYINDEX, ref);
 }
 
-en::Actor LuaScene::makeEntity(en::Engine& engine, int entityDefinitionIndex) {
+en::Actor LuaScene::makeEntity(int entityDefinitionIndex) {
 
-    en::LuaState& lua = engine.getLuaState();
+    en::LuaState& lua = m_engine->getLuaState();
+
     entityDefinitionIndex = lua_absindex(lua, entityDefinitionIndex);
     assert(lua_istable(lua, entityDefinitionIndex));
 
-    en::Actor actor = engine.makeActor();
+    en::Actor actor = m_engine->makeActor();
 
     // Get and assign the name
     auto pop = lua::PopperOnDestruct(lua);
@@ -93,9 +115,9 @@ en::Actor LuaScene::makeEntity(en::Engine& engine, int entityDefinitionIndex) {
     return actor;
 }
 
-void LuaScene::addComponents(en::Engine& engine, en::Actor& actor, int entityDefinitionIndex) {
+void LuaScene::addComponents( en::Actor& actor, int entityDefinitionIndex) {
 
-    en::LuaState& lua = engine.getLuaState();
+    en::LuaState& lua = m_engine->getLuaState();
     entityDefinitionIndex = lua_absindex(lua, entityDefinitionIndex);
 
     // Iterate over the entity definition.
@@ -111,4 +133,20 @@ void LuaScene::addComponents(en::Engine& engine, en::Actor& actor, int entityDef
             ComponentsToLua::makeComponent(actor, componentTypeName, -1);
         }
     }
+}
+
+void LuaScene::update(float dt) {
+
+    if (m_luaUpdateFunctionRef == LUA_NOREF) return;
+
+    auto& lua = m_engine->getLuaState();
+
+    lua_rawgeti(lua, LUA_REGISTRYINDEX, m_luaUpdateFunctionRef);
+    if (lua_isnil(lua, -1)) {
+        lua_pop(lua, -1);
+        return;
+    }
+
+    lua_pushnumber(lua, dt);
+    lua.pCall(1, 0);
 }

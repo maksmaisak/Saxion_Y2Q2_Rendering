@@ -19,6 +19,7 @@
 #include "Scheduler.h"
 #include "SceneManager.h"
 #include "LuaState.h"
+#include "ClosureHelper.h"
 
 namespace en {
 
@@ -56,6 +57,8 @@ namespace en {
         template<typename TBehavior>
         bool ensureBehaviorSystem();
 
+        void testMemberFunction();
+
     protected:
         virtual void initializeWindow(sf::RenderWindow& window);
 
@@ -80,7 +83,7 @@ namespace en {
     };
 
     template<typename TSystem, typename... Args>
-    TSystem& Engine::addSystem(Args&& ... args) {
+    TSystem& Engine::addSystem(Args&&... args) {
 
         auto ptr = std::make_unique<TSystem>(std::forward<Args>(args)...);
         TSystem& system = *ptr;

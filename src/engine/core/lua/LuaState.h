@@ -82,10 +82,10 @@ namespace en {
         }
 
         template<typename T>
-        inline bool is(int index = -1) const {return lua::typeAdapter<T>::is(L, index);}
+        inline bool is(int index = -1) const {return lua::TypeAdapter<T>::is(L, index);}
 
         template<typename T>
-        inline T    to(int index = -1) const {return lua::typeAdapter<T>::to(L, index);}
+        inline T    to(int index = -1) const {return lua::TypeAdapter<T>::to(L, index);}
 
     private:
 

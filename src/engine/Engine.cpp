@@ -9,6 +9,8 @@
 #include <Gl/glew.h>
 #include <SFML/Graphics.hpp>
 
+#include <type_traits>
+
 namespace en {
 
     const sf::Time TimestepFixed = sf::seconds(0.01f);
@@ -108,10 +110,31 @@ namespace en {
         }
     }
 
+    std::string testFreeFunction() {
+
+        std::cout << "Free function called from lua" << std::endl;
+        return "Result returned from free function";
+    }
+
     void Engine::initializeLua() {
 
-        // TODO
+        lua_newtable(m_lua);
 
+        ClosureHelper::makeClosure(m_lua, &Engine::findByName, this);
+        lua_setfield(m_lua, -2, "findByName");
+
+        ClosureHelper::makeClosure(m_lua, &Engine::testMemberFunction, this);
+        lua_setfield(m_lua, -2, "testMemberFunction");
+
+        ClosureHelper::makeClosure(m_lua, &testFreeFunction);
+        lua_setfield(m_lua, -2, "testFreeFunction");
+
+        lua_setglobal(m_lua, "Game");
+    }
+
+    void Engine::testMemberFunction() {
+
+        std::cout << "Member function called from lua" << std::endl;
     }
 
     void Engine::update(float dt) {

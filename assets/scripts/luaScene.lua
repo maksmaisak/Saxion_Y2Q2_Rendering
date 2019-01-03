@@ -54,7 +54,8 @@ local scene = {
 
 function scene.update(dt)
 
-    print("lua: update")
+    print(Game.testFreeFunction())
+    Game.testMemberFunction()
 
 --    local floor = Game.find("Floor")
 --    if (floor) then

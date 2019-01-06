@@ -38,25 +38,25 @@ namespace en {
     void Transform::setLocalPosition(const glm::vec3& localPosition) {
 
         m_position = localPosition;
-        makeDirty();
+        markDirty();
     }
 
     void Transform::setLocalRotation(const glm::quat& localRotation) {
 
         m_rotation = localRotation;
-        makeDirty();
+        markDirty();
     }
 
     void Transform::setLocalScale(const glm::vec3& localScale) {
 
         m_scale = localScale;
-        makeDirty();
+        markDirty();
     }
 
     void Transform::setParent(Entity newParent) {
 
         Entity oldParent = m_parent;
-        if (!en::isNullEntity(oldParent)) {
+        if (!isNullEntity(oldParent)) {
             if (oldParent == newParent) return;
             m_registry->get<Transform>(oldParent).removeChild(m_entity);
         }
@@ -70,10 +70,22 @@ namespace en {
         m_matrixWorldDirty = true;
     }
 
-    void Transform::makeDirty() {
+    void Transform::markDirty() {
 
         m_matrixLocalDirty = true;
+        markWorldDirty();
+    }
+
+    void Transform::markWorldDirty() {
+
         m_matrixWorldDirty = true;
+
+        for (Entity child : m_children) {
+
+            auto* childTf = m_registry->tryGet<Transform>(child);
+            if (childTf) childTf->markWorldDirty();
+            // TODO remove children with no transform from the list of children
+        }
     }
 
     void Transform::addChild(Entity child) {
@@ -92,13 +104,13 @@ namespace en {
     void Transform::move(const glm::vec3& offset) {
 
         m_position += offset;
-        makeDirty();
+        markDirty();
     }
 
     void Transform::rotate(const glm::quat& offset) {
 
         m_rotation = offset * m_rotation;
-        makeDirty();
+        markDirty();
     }
 
     void Transform::rotate(float angle, const glm::vec3& axis) {
@@ -109,7 +121,7 @@ namespace en {
     void Transform::scale(const glm::vec3& scale) {
 
         m_scale *= scale;
-        makeDirty();
+        markDirty();
     }
 
     glm::vec3 Transform::getWorldPosition() const {

@@ -42,7 +42,7 @@ namespace en {
         return (static_cast<Entity>(version) << EntityInfo::NumIdBits) | getId(entity);
     }
 
-    inline bool isNullEntity(const Entity entity) {
+    inline bool isNullEntity(const Entity entity) noexcept {
         return getId(entity) == nullEntity;
     }
 }

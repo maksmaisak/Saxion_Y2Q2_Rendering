@@ -73,7 +73,8 @@ namespace en {
         mutable glm::mat4 m_matrixWorld = glm::mat4(1.f);
         mutable bool m_matrixWorldDirty = true;
 
-        void makeDirty();
+        void markDirty();
+        void markWorldDirty();
     };
 }
 

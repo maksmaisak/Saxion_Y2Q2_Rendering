@@ -18,6 +18,14 @@ namespace en {
 
     Engine::Engine() : m_sceneManager(this) {}
 
+    void Engine::initialize() {
+
+        initializeWindow(m_window);
+        printGLContextVersionInfo();
+        initializeGlew();
+        initializeLua();
+    }
+
     void Engine::run() {
 
         sf::Clock fixedUpdateClock;
@@ -47,14 +55,6 @@ namespace en {
 
             processWindowEvents();
         }
-    }
-
-    void Engine::initialize() {
-
-        initializeWindow(m_window);
-        printGLContextVersionInfo();
-        initializeGlew();
-        initializeLua();
     }
 
     void Engine::initializeWindow(sf::RenderWindow& window) {

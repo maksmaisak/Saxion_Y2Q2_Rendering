@@ -104,10 +104,9 @@ void TestScene::open(en::Engine& engine) {
     //add a spinning sphere
     en::Actor sphere = engine.makeActor("Main sphere");
     auto& tf = sphere.add<en::Transform>();
-    tf.setLocalScale({2.5f, 2.5f, 2.5f});
     tf.setParent(ring);
+    tf.setLocalScale({2.5f, 2.5f, 2.5f});
     sphere.add<en::RenderInfo>(testObjectMeshS, wobblingMaterial);
-    sphere.add<RotatingBehavior>();
     cameraOrbitBehavior.setTarget(sphere);
 
     const std::size_t numCubes = 10;
@@ -121,7 +120,7 @@ void TestScene::open(en::Engine& engine) {
             glm::sin(angle) * radius
         };
 
-        en::Actor object = engine.makeActor("OribitingObject");
+        en::Actor object = engine.makeActor("OrbitingObject");
         auto& transform = object.add<en::Transform>();
         transform.setParent(ring);
         transform.setLocalPosition(offset);
@@ -130,7 +129,7 @@ void TestScene::open(en::Engine& engine) {
         if (i % 2 == 0) {
             object.add<en::Light>();
             auto material = std::make_shared<ColorMaterial>(glm::abs(glm::sphericalRand(1.f)));
-            object.add<en::RenderInfo>(cubeMeshF, material);
+            object.add<en::RenderInfo>(cubeMeshF, std::move(material));
         } else {
             object.add<en::RenderInfo>(sphereMeshS, runicStoneMaterial);
         }

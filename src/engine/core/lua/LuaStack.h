@@ -19,9 +19,10 @@ namespace lua {
         static void push(lua_State* L, const T& value) {
             // TODO set __gc in the metatable to the destructor
             void* ptr = lua_newuserdata(L, sizeof(T));
-            // Don't just assign because the copy assignment operator might be doing something
-            // with the data of the object being copied to.
-            std::memcpy(ptr, &value, sizeof(T));
+            *static_cast<T*>(ptr) = value;
+            // TODO What if the copy assignment operator is doing something with the object being assigned to?
+            // Make it use the copy/move constructor instead of copy/move assignment.
+            // Maybe some way to custom-allocate with a given address?
         }
         static T& to(lua_State* L, int index = -1) {
             void* ptr = lua_touserdata(L, index);

@@ -7,6 +7,7 @@
 
 #include <vector>
 #include <cassert>
+#include <memory>
 #include "Scene.h"
 
 namespace en {

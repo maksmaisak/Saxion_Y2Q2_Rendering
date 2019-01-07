@@ -8,6 +8,7 @@
 #include "SFML/Graphics.hpp"
 #include <exception>
 #include <type_traits>
+#include <cassert>
 
 namespace en {
 

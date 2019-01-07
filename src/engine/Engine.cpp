@@ -4,12 +4,13 @@
 #include <iostream>
 #include <cmath>
 #include <algorithm>
-#include "Engine.h"
-#include "Actor.h"
 #include <Gl/glew.h>
 #include <SFML/Graphics.hpp>
-
 #include <type_traits>
+
+#include "Engine.h"
+#include "Actor.h"
+#include "ComponentsToLua.h"
 
 namespace en {
 
@@ -55,6 +56,24 @@ namespace en {
 
             processWindowEvents();
         }
+    }
+
+    void Engine::update(float dt) {
+
+        auto* currentScene = m_sceneManager.getCurrentScene();
+        if (currentScene) currentScene->update(dt);
+
+        for (auto& pSystem : m_systems) pSystem->update(dt);
+
+        m_scheduler.update(dt);
+    }
+
+    void Engine::draw() {
+
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        m_window.clear();
+        for (auto& pSystem : m_systems) pSystem->draw();
+        m_window.display();
     }
 
     void Engine::initializeWindow(sf::RenderWindow& window) {
@@ -130,29 +149,13 @@ namespace en {
         lua_setfield(m_lua, -2, "testFreeFunction");
 
         lua_setglobal(m_lua, "Game");
+
+        ComponentsToLua::printDebugInfo();
     }
 
     void Engine::testMemberFunction() {
 
         std::cout << "Member function called from lua" << std::endl;
-    }
-
-    void Engine::update(float dt) {
-
-        auto* currentScene = m_sceneManager.getCurrentScene();
-        if (currentScene) currentScene->update(dt);
-
-        for (auto& pSystem : m_systems) pSystem->update(dt);
-
-        m_scheduler.update(dt);
-    }
-
-    void Engine::draw() {
-
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        m_window.clear();
-        for (auto& pSystem : m_systems) pSystem->draw();
-        m_window.display();
     }
 
     void Engine::processWindowEvents() {
@@ -203,7 +206,6 @@ namespace en {
     }
 
     Actor Engine::findByName(const std::string& name) {
-
         return actor(m_registry.findByName(name));
     }
 }

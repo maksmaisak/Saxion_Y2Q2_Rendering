@@ -13,7 +13,7 @@
 
 class CameraOrbitBehavior : public en::Behavior {
 
-    REGISTER_LUA_COMPONENT_TYPE(CameraOrbitBehavior)
+    LUA_COMPONENT_TYPE(CameraOrbitBehavior)
 
 public:
 

@@ -7,12 +7,15 @@
 
 #include <map>
 #include <type_traits>
+#include <cassert>
 #include "engine/core/lua/LuaState.h"
 #include "engine/actor/Actor.h"
 
 // Calls en::ComponentsToLua::registerComponentType<T>(#T); at dynamic initialization
-// TODO Risky, may get called before statics of ComponentsToLua are initialized.
-#define REGISTER_LUA_COMPONENT_TYPE(T) inline static struct Registerer { Registerer() {en::ComponentsToLua::registerComponentType<T>(#T);}} registerer;
+// Put this in a class definition
+#define LUA_COMPONENT_TYPE(T) inline static const auto __componentTypeRequirement = en::ComponentTypeRequirement<T>(#T);
+
+#define LUA_REGISTER_COMPONENT_TYPE(T) en::ComponentsToLua::registerComponentType<T>(#T);
 
 namespace en {
 
@@ -25,10 +28,18 @@ namespace en {
         template<typename TComponent>
         static void registerComponentType(const std::string& name);
 
+        /// Adds a component of a given type from a value at the given index in the lua stack
         static void makeComponent(en::Actor& actor, const std::string& componentTypeName, int componentValueIndex = -1);
 
+        static void printDebugInfo();
+
     private:
-        inline static std::map<std::string, componentFactoryFunction> m_nameToMakeFunction;
+
+        // Doing it this way instead of just having a static field makes sure the map is initialized whenever it's needed.
+        inline static std::map<std::string, componentFactoryFunction>& getNameToMakeFunctionMap() {
+            static std::map<std::string, componentFactoryFunction> nameToMakeFunctionMap;
+            return nameToMakeFunctionMap;
+        }
 
         // If no custom `addFromLua(Actor&, LuaState&)` function provided, just add the component when needed.
         template<typename TComponent, typename = void>
@@ -36,7 +47,7 @@ namespace en {
 
             inline static void registerComponentType(const std::string& name) {
                 static auto make = [](Actor& actor, LuaState& luaState){return actor.add<TComponent>();};
-                m_nameToMakeFunction.emplace(name, make);
+                getNameToMakeFunctionMap().emplace(name, make);
             }
         };
 
@@ -45,15 +56,25 @@ namespace en {
         struct Registerer<TComponent, std::enable_if_t<std::is_convertible_v<decltype(&TComponent::addFromLua), componentFactoryFunction>>> {
 
             inline static void registerComponentType(const std::string& name) {
-                m_nameToMakeFunction.emplace(name, TComponent::addFromLua);
+                getNameToMakeFunctionMap().emplace(name, TComponent::addFromLua);
             }
         };
     };
 
     template<typename TComponent>
-    inline void ComponentsToLua::registerComponentType(const std::string& name) {
+    struct ComponentTypeRequirement {
 
-        std::cout << "Registered component type for Lua: " << name << std::endl;
+        explicit ComponentTypeRequirement(const std::string& name) {
+            if (isRegistered) return;
+            ComponentsToLua::registerComponentType<TComponent>(name);
+            isRegistered = true;
+        }
+
+        inline static bool isRegistered = false;
+    };
+
+    template<typename TComponent>
+    inline void ComponentsToLua::registerComponentType(const std::string& name) {
         ComponentsToLua::Registerer<TComponent>::registerComponentType(name);
     }
 }

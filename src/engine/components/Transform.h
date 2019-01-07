@@ -21,7 +21,7 @@ namespace en {
 
     class Transform final {
 
-        REGISTER_LUA_COMPONENT_TYPE(Transform)
+        LUA_COMPONENT_TYPE(Transform)
 
         friend class TransformHierarchySystem;
 

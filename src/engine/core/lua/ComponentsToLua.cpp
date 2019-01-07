@@ -4,6 +4,7 @@
 
 #include "ComponentsToLua.h"
 #include <cassert>
+#include <iostream>
 
 using namespace en;
 
@@ -13,8 +14,9 @@ void ComponentsToLua::makeComponent(Actor& actor, const std::string& componentTy
     auto popComponentValue = lua::PopperOnDestruct(lua);
     lua_pushvalue(lua, componentValueIndex);
 
-    auto it = m_nameToMakeFunction.find(componentTypeName);
-    if (it == m_nameToMakeFunction.end()) {
+    auto& map = getNameToMakeFunctionMap();
+    auto it = map.find(componentTypeName);
+    if (it == map.end()) {
         std::cout << "Unknown component type: " << componentTypeName << std::endl;
         return;
     }
@@ -22,4 +24,15 @@ void ComponentsToLua::makeComponent(Actor& actor, const std::string& componentTy
     int oldTop = lua_gettop(lua);
     it->second(actor, lua);
     assert(oldTop == lua_gettop(lua));
+}
+
+void ComponentsToLua::printDebugInfo() {
+
+    std::cout << std::endl << "Registered component types:" << std::endl;
+
+    for (auto& pair : getNameToMakeFunctionMap()) {
+        std::cout << pair.first << std::endl;
+    }
+
+    std::cout << std::endl;
 }

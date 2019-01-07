@@ -65,10 +65,10 @@ namespace en {
     private:
 
         EntityRegistry m_registry;
+        LuaState m_lua;
         Scheduler m_scheduler;
         sf::RenderWindow m_window;
         SceneManager m_sceneManager;
-        LuaState m_lua;
 
         std::vector<std::unique_ptr<System>> m_systems;
         std::set<std::type_index> m_behaviorSystemPresence;

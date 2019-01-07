@@ -3,7 +3,7 @@
 //
 
 #include "LuaState.h"
-#include <lua/lua.hpp>
+#include <lua.hpp>
 #include <iostream>
 
 using namespace en;

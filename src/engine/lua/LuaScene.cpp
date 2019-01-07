@@ -4,7 +4,7 @@
 
 #include "LuaScene.h"
 #include <iostream>
-#include <lua/lua.hpp>
+#include <lua.hpp>
 #include <cassert>
 #include <map>
 #include <vector>

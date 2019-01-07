@@ -5,7 +5,7 @@
 #ifndef SAXION_Y2Q2_RENDERING_LUASTATE_H
 #define SAXION_Y2Q2_RENDERING_LUASTATE_H
 
-#include <lua/lua.hpp>
+#include <lua.hpp>
 #include <memory>
 #include <cassert>
 #include <string>

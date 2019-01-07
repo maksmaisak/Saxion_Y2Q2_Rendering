@@ -6,7 +6,7 @@
 #define SAXION_Y2Q2_RENDERING_LUASTACK_H
 
 #include <type_traits>
-#include <lua/lua.hpp>
+#include <lua.hpp>
 #include <string>
 #include <cstring>
 #include <optional>

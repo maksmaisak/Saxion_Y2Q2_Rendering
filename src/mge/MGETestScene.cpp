@@ -33,18 +33,18 @@ void MGETestScene::_initializeScene() {
     //load a bunch of meshes we will be using throughout this demo
     //each mesh only has to be loaded once, but can be used multiple times:
     //F is flat shaded, S is smooth shaded (normals aligned or not), check the models folder!
-    std::shared_ptr<Mesh> planeMeshDefault = en::Resources<Mesh>::get(config::MGE_MODEL_PATH + "plane.obj");
-    std::shared_ptr<Mesh> cubeMeshF        = en::Resources<Mesh>::get(config::MGE_MODEL_PATH + "cube_flat.obj");
-    std::shared_ptr<Mesh> sphereMeshS      = en::Resources<Mesh>::get(config::MGE_MODEL_PATH + "sphere_smooth.obj");
-    std::shared_ptr<Mesh> testObjectMeshS  = en::Resources<Mesh>::get(config::MGE_MODEL_PATH + "sphere2.obj");
+    std::shared_ptr<Mesh> planeMeshDefault = en::Resources<Mesh>::get(config::MODEL_PATH + "plane.obj");
+    std::shared_ptr<Mesh> cubeMeshF        = en::Resources<Mesh>::get(config::MODEL_PATH + "cube_flat.obj");
+    std::shared_ptr<Mesh> sphereMeshS      = en::Resources<Mesh>::get(config::MODEL_PATH + "sphere_smooth.obj");
+    std::shared_ptr<Mesh> testObjectMeshS  = en::Resources<Mesh>::get(config::MODEL_PATH + "sphere2.obj");
 
     //MATERIALS
 
-    std::shared_ptr<AbstractMaterial> runicStoneMaterial = en::Resources<TextureMaterial>::get(config::MGE_TEXTURE_PATH + "runicfloor.png");
-    std::shared_ptr<AbstractMaterial> floorMaterial      = en::Resources<TextureMaterial>::get(config::MGE_TEXTURE_PATH + "land.jpg");
-    std::shared_ptr<AbstractMaterial> wobblingMaterial   = en::Resources<WobblingMaterial>::get(config::MGE_TEXTURE_PATH + "runicfloor.png");
+    std::shared_ptr<AbstractMaterial> runicStoneMaterial = en::Resources<TextureMaterial>::get(config::TEXTURE_PATH + "runicfloor.png");
+    std::shared_ptr<AbstractMaterial> floorMaterial      = en::Resources<TextureMaterial>::get(config::TEXTURE_PATH + "land.jpg");
+    std::shared_ptr<AbstractMaterial> wobblingMaterial   = en::Resources<WobblingMaterial>::get(config::TEXTURE_PATH + "runicfloor.png");
 
-    //en::Resources<Mesh>::get(config::MGE_MODEL_PATH + "sphere3.obj");
+    //en::Resources<Mesh>::get(config::MODEL_PATH + "sphere3.obj");
     //en::Resources<Mesh>::removeUnused();
 
     //SCENE SETUP

@@ -21,13 +21,15 @@
 #include "CameraOrbitBehavior.h"
 #include "RotatingBehavior.hpp"
 
+#include "Material.h"
+
 void makeFloorFromSpheres(en::Engine& engine, float sideLength, int numSpheresPerSide) {
 
     const float diameter = 2.f * sideLength / numSpheresPerSide;
     const float radius = diameter * 0.5f;
 
-    auto material = en::Resources<TextureMaterial>::get(config::MGE_TEXTURE_PATH + "bricks.jpg");
-    auto mesh = en::Resources<Mesh>::get(config::MGE_MODEL_PATH + "sphere_smooth.obj");
+    auto material = en::Resources<TextureMaterial>::get(config::TEXTURE_PATH + "bricks.jpg");
+    auto mesh = en::Resources<Mesh>::get(config::MODEL_PATH + "sphere_smooth.obj");
 
     for (int y = 0; y < numSpheresPerSide; ++y) {
         for (int x = 0; x < numSpheresPerSide; ++x) {
@@ -59,9 +61,9 @@ void makeFloorFromSpheres(en::Engine& engine, float sideLength, int numSpheresPe
 
 void addRingItems(en::Engine& engine, en::Entity parent, std::size_t numItems = 10, float radius = 3.5f) {
 
-    auto cubeMesh       = en::Resources<Mesh>::get(config::MGE_MODEL_PATH + "cube_flat.obj");
-    auto sphereMesh     = en::Resources<Mesh>::get(config::MGE_MODEL_PATH + "sphere_smooth.obj");
-    auto sphereMaterial = en::Resources<TextureMaterial>::get(config::MGE_TEXTURE_PATH + "runicfloor.png");
+    auto cubeMesh       = en::Resources<Mesh>::get(config::MODEL_PATH + "cube_flat.obj");
+    auto sphereMesh     = en::Resources<Mesh>::get(config::MODEL_PATH + "sphere_smooth.obj");
+    auto sphereMaterial = en::Resources<TextureMaterial>::get(config::TEXTURE_PATH + "runicfloor.png");
 
     for (std::size_t i = 0; i < numItems; ++i) {
 
@@ -99,18 +101,21 @@ void TestScene::open(en::Engine& engine) {
     //load a bunch of meshes we will be using throughout this demo
     //each mesh only has to be loaded once, but can be used multiple times:
     //F is flat shaded, S is smooth shaded (normals aligned or not), check the models folder!
-    std::shared_ptr<Mesh> planeMeshDefault = en::Resources<Mesh>::get(config::MGE_MODEL_PATH + "plane.obj");
-    std::shared_ptr<Mesh> cubeMeshF        = en::Resources<Mesh>::get(config::MGE_MODEL_PATH + "cube_flat.obj");
-    std::shared_ptr<Mesh> sphereMeshS      = en::Resources<Mesh>::get(config::MGE_MODEL_PATH + "sphere_smooth.obj");
-    std::shared_ptr<Mesh> testObjectMeshS  = en::Resources<Mesh>::get(config::MGE_MODEL_PATH + "sphere2.obj");
+    std::shared_ptr<Mesh> planeMeshDefault = en::Resources<Mesh>::get(config::MODEL_PATH + "plane.obj");
+    std::shared_ptr<Mesh> cubeMeshF        = en::Resources<Mesh>::get(config::MODEL_PATH + "cube_flat.obj");
+    std::shared_ptr<Mesh> sphereMeshS      = en::Resources<Mesh>::get(config::MODEL_PATH + "sphere_smooth.obj");
+    std::shared_ptr<Mesh> testObjectMeshS  = en::Resources<Mesh>::get(config::MODEL_PATH + "sphere2.obj");
 
     //MATERIALS
 
-    std::shared_ptr<AbstractMaterial> runicStoneMaterial = en::Resources<TextureMaterial>::get(config::MGE_TEXTURE_PATH + "runicfloor.png");
-    std::shared_ptr<AbstractMaterial> floorMaterial      = en::Resources<TextureMaterial>::get(config::MGE_TEXTURE_PATH + "land.jpg");
-    std::shared_ptr<AbstractMaterial> wobblingMaterial   = en::Resources<WobblingMaterial>::get(config::MGE_TEXTURE_PATH + "runicfloor.png");
+    std::shared_ptr<AbstractMaterial> runicStoneMaterial = en::Resources<TextureMaterial>::get(config::TEXTURE_PATH + "runicfloor.png");
+    std::shared_ptr<AbstractMaterial> floorMaterial      = en::Resources<TextureMaterial>::get(config::TEXTURE_PATH + "land.jpg");
+    std::shared_ptr<AbstractMaterial> wobblingMaterial   = en::Resources<WobblingMaterial>::get(config::TEXTURE_PATH + "runicfloor.png");
 
-    //en::Resources<Mesh>::get(config::MGE_MODEL_PATH + "sphere3.obj");
+    auto genericMaterial = en::Resources<en::Material>::get("color");
+    genericMaterial->setUniformVec3("diffuseColor", {1, 0, 0});
+
+    //en::Resources<Mesh>::get(config::MODEL_PATH + "sphere3.obj");
     //en::Resources<Mesh>::removeUnused();
 
     //SCENE SETUP
@@ -133,7 +138,7 @@ void TestScene::open(en::Engine& engine) {
     auto& planeTransform = registry.add<en::Transform>(plane);
     planeTransform.setLocalPosition({0, -4, 0});
     planeTransform.setLocalScale({5, 5, 5});
-    registry.add<en::RenderInfo>(plane, planeMeshDefault, floorMaterial);
+    registry.add<en::RenderInfo>(plane, planeMeshDefault, genericMaterial);
 
     makeFloorFromSpheres(engine, 30, 20);
 

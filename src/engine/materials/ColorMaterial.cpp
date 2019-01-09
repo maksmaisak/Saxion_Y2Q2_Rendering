@@ -12,8 +12,8 @@ ColorMaterial::ColorMaterial(glm::vec3 pDiffuseColor) : diffuseColor(pDiffuseCol
     if (m_shader) return;
 
     m_shader = en::Resources<en::ShaderProgram>::get("color",
-        config::MGE_SHADER_PATH + "color.vs",
-        config::MGE_SHADER_PATH + "color.fs"
+        config::SHADER_PATH + "color.vs",
+        config::SHADER_PATH + "color.fs"
     );
 }
 
@@ -34,9 +34,9 @@ void ColorMaterial::render(en::Engine* pEngine, Mesh* pMesh,
     glUniform3fv(m_shader->getUniformLocation("diffuseColor"), 1, glm::value_ptr(diffuseColor));
 
     //pass in all MVP matrices separately
-    glUniformMatrix4fv(m_shader->getUniformLocation("projectionMatrix"), 1, GL_FALSE, glm::value_ptr(pProjectionMatrix));
-    glUniformMatrix4fv(m_shader->getUniformLocation("viewMatrix")      , 1, GL_FALSE, glm::value_ptr(pViewMatrix));
-    glUniformMatrix4fv(m_shader->getUniformLocation("modelMatrix")     , 1, GL_FALSE, glm::value_ptr(pModelMatrix));
+    glUniformMatrix4fv(m_shader->getUniformLocation("matrixProjection"), 1, GL_FALSE, glm::value_ptr(pProjectionMatrix));
+    glUniformMatrix4fv(m_shader->getUniformLocation("matrixView")      , 1, GL_FALSE, glm::value_ptr(pViewMatrix));
+    glUniformMatrix4fv(m_shader->getUniformLocation("matrixModel")     , 1, GL_FALSE, glm::value_ptr(pModelMatrix));
 
     //now inform mesh of where to stream its data
     pMesh->streamToOpenGL(

@@ -89,6 +89,18 @@ sf::Vector2i CameraOrbitBehavior::updateMouseInput() {
 
     sf::Vector2i currentMousePosition = sf::Mouse::getPosition();
     sf::Vector2i deltaMousePosition = currentMousePosition - m_previousMousePosition;
+
+    // Wrap around screen
+    // Doesn't seem to work on macOS, setPosition moves mouse out of screen bounds.
+    /*
+    auto desktop = sf::VideoMode::getDesktopMode();
+    if (currentMousePosition.x > desktop.width) currentMousePosition.x -= desktop.width;
+    if (currentMousePosition.x < 0) currentMousePosition.x += desktop.width;
+    if (currentMousePosition.y > desktop.height) currentMousePosition.y -= desktop.height;
+    if (currentMousePosition.y < 0) currentMousePosition.y += desktop.height;
+    sf::Mouse::setPosition(currentMousePosition);
+     */
+
     m_previousMousePosition = currentMousePosition;
 
     return deltaMousePosition;

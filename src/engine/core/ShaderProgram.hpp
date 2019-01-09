@@ -5,10 +5,17 @@
 #include <vector>
 #include <string>
 #include <memory>
+#include <vector>
 #include "Resources.h"
 #include "mge/config.hpp"
 
 namespace en {
+
+	struct UniformInfo {
+
+		GLint location = -1;
+		std::string name;
+	};
 
     /**
      * Generic shader program to which you can add separate shaders.
@@ -23,7 +30,9 @@ namespace en {
      * See the example material classes for a demo.
      */
 	class ShaderProgram {
+
 	public:
+
 		ShaderProgram();
 
 		virtual ~ShaderProgram();
@@ -38,14 +47,16 @@ namespace en {
 		void use();
 
 		//get access to uniforms within the shader
-		GLuint getUniformLocation(const std::string& pName);
+		GLint getUniformLocation(const std::string& pName);
 
 		//get access to attributes within the shader
-		GLuint getAttribLocation(const std::string& pName);
+		GLint getAttribLocation(const std::string& pName);
+
+		std::vector<UniformInfo> getAllUniforms();
 
 	private:
 
-		GLint m_programId = 0;
+		GLuint m_programId = 0;
 		std::vector<GLuint> m_shaderIds;
 
 		std::string readFile(const std::string& pShaderPath);
@@ -68,8 +79,8 @@ namespace en {
         inline static std::shared_ptr<ShaderProgram> load(const std::string& name) {
 
             return load(
-                config::MGE_SHADER_PATH + name + ".vs",
-                config::MGE_SHADER_PATH + name + ".fs"
+                config::SHADER_PATH + name + ".vs",
+                config::SHADER_PATH + name + ".fs"
             );
         }
     };

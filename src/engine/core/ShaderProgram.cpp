@@ -1,6 +1,8 @@
 #include <iostream>
 #include <fstream>
 #include "engine/core/ShaderProgram.hpp"
+#include "ShaderProgram.hpp"
+
 
 namespace en {
 
@@ -62,12 +64,12 @@ namespace en {
         glUseProgram(m_programId);
     }
 
-    GLuint ShaderProgram::getUniformLocation(const std::string& pName) {
+    GLint ShaderProgram::getUniformLocation(const std::string& pName) {
 
         return glGetUniformLocation(m_programId, pName.c_str());
     }
 
-    GLuint ShaderProgram::getAttribLocation(const std::string& pName) {
+    GLint ShaderProgram::getAttribLocation(const std::string& pName) {
 
         return glGetAttribLocation(m_programId, pName.c_str());
     }
@@ -113,5 +115,30 @@ namespace en {
             delete[] errorMessage;
             return 0;
         }
+    }
+
+    std::vector<UniformInfo> ShaderProgram::getAllUniforms() {
+
+        std::vector<UniformInfo> vector;
+
+        GLint count;
+
+        GLint size;
+        GLenum uniformType;
+
+        const GLsizei nameBufferSize = 32;
+        GLchar nameBuffer[nameBufferSize];
+        GLsizei nameLength;
+
+        glGetProgramiv(m_programId, GL_ACTIVE_UNIFORMS, &count);
+        for (GLint i = 0; i < count; ++i) {
+
+            glGetActiveUniform(m_programId, (GLuint)i, nameBufferSize, &nameLength, &size, &uniformType, nameBuffer);
+
+            auto name = std::string(nameBuffer, static_cast<std::size_t>(nameLength));
+            vector.push_back({getUniformLocation(name), name});
+        }
+
+        return vector;
     }
 }

@@ -11,6 +11,7 @@
 #include "Resources.h"
 #include "Mesh.hpp"
 #include "GLSetUniform.h"
+#include "TupleUtils.h"
 
 using namespace en;
 
@@ -21,7 +22,7 @@ Material::Material(std::shared_ptr<ShaderProgram> shader) : m_shader(std::move(s
 
     assert(m_shader);
 
-    m_uniformLocations   = cacheUniformLocations();
+    m_builtinUniformLocations = cacheBuiltinUniformLocations();
     m_attributeLocations = cacheAttributeLocations();
     detectAllUniforms();
 }
@@ -44,7 +45,7 @@ inline bool valid(GLint location) {return location != -1;}
 
 void Material::setSupportedUniforms(const glm::mat4& modelMatrix, const glm::mat4& viewMatrix, const glm::mat4& perspectiveMatrix) {
 
-    const auto& u = m_uniformLocations;
+    const auto& u = m_builtinUniformLocations;
 
     if (valid(u.model      )) gl::setUniform(u.model      , modelMatrix      );
     if (valid(u.view       )) gl::setUniform(u.view       , viewMatrix       );
@@ -88,9 +89,9 @@ void Material::setCustomUniforms() {
     std::apply([this](auto&&... args){(setCustomUniformsOfType(args), ...);}, m_uniformValues);
 }
 
-Material::UniformLocations Material::cacheUniformLocations() {
+Material::BuiltinUniformLocations Material::cacheBuiltinUniformLocations() {
 
-    UniformLocations u;
+    BuiltinUniformLocations u;
     u.model       = m_shader->getUniformLocation("matrixModel");
     u.view        = m_shader->getUniformLocation("matrixView");
     u.perspective = m_shader->getUniformLocation("matrixPerspective");
@@ -102,7 +103,6 @@ Material::UniformLocations Material::cacheUniformLocations() {
 Material::AttributeLocations Material::cacheAttributeLocations() {
 
     AttributeLocations a;
-
     a.vertex = m_shader->getAttribLocation("vertex");
     a.normal = m_shader->getAttribLocation("normal");
     a.uv     = m_shader->getAttribLocation("uv");

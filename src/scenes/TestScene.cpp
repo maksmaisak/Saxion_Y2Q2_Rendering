@@ -96,29 +96,29 @@ void addRingItems(en::Engine& engine, en::Entity parent, std::size_t numItems = 
 
 void TestScene::open(en::Engine& engine) {
 
-    //MESHES
+    // MESHES
 
-    //load a bunch of meshes we will be using throughout this demo
-    //each mesh only has to be loaded once, but can be used multiple times:
-    //F is flat shaded, S is smooth shaded (normals aligned or not), check the models folder!
+    // load a bunch of meshes we will be using throughout this demo
+    // F is flat shaded, S is smooth shaded (normals aligned or not), check the models folder!
     std::shared_ptr<Mesh> planeMeshDefault = en::Resources<Mesh>::get(config::MODEL_PATH + "plane.obj");
     std::shared_ptr<Mesh> cubeMeshF        = en::Resources<Mesh>::get(config::MODEL_PATH + "cube_flat.obj");
     std::shared_ptr<Mesh> sphereMeshS      = en::Resources<Mesh>::get(config::MODEL_PATH + "sphere_smooth.obj");
     std::shared_ptr<Mesh> testObjectMeshS  = en::Resources<Mesh>::get(config::MODEL_PATH + "sphere2.obj");
 
-    //MATERIALS
+    // MATERIALS
 
-    std::shared_ptr<AbstractMaterial> runicStoneMaterial = en::Resources<TextureMaterial>::get(config::TEXTURE_PATH + "runicfloor.png");
-    std::shared_ptr<AbstractMaterial> floorMaterial      = en::Resources<TextureMaterial>::get(config::TEXTURE_PATH + "land.jpg");
-    std::shared_ptr<AbstractMaterial> wobblingMaterial   = en::Resources<WobblingMaterial>::get(config::TEXTURE_PATH + "runicfloor.png");
+    auto runicStoneMaterial = en::Resources<en::Material>::get("texture");
+    runicStoneMaterial->setUniformValue("diffuseTexture", en::Resources<Texture>::get(config::TEXTURE_PATH + "runicfloor.png"));
 
-    auto genericMaterial = en::Resources<en::Material>::get("color");
-    genericMaterial->setUniformValue<glm::vec3>("diffuseColor", {0, 1, 0});
+    auto floorMaterial = en::Resources<en::Material>::get("texture");
+    floorMaterial->setUniformValue("diffuseTexture", en::Resources<Texture>::get(config::TEXTURE_PATH + "land.jpg"));
+
+    auto wobblingMaterial = en::Resources<WobblingMaterial>::get(config::TEXTURE_PATH + "runicfloor.png");
 
     //en::Resources<Mesh>::get(config::MODEL_PATH + "sphere3.obj");
     //en::Resources<Mesh>::removeUnused();
 
-    //SCENE SETUP
+    // SCENE SETUP
 
     // Add the camera using en::Actor,
     // a thin wrapper around en::Engine and en::Entity
@@ -138,7 +138,7 @@ void TestScene::open(en::Engine& engine) {
     auto& planeTransform = registry.add<en::Transform>(plane);
     planeTransform.setLocalPosition({0, -4, 0});
     planeTransform.setLocalScale({5, 5, 5});
-    registry.add<en::RenderInfo>(plane, planeMeshDefault, genericMaterial);
+    registry.add<en::RenderInfo>(plane, planeMeshDefault, floorMaterial);
 
     makeFloorFromSpheres(engine, 30, 20);
 

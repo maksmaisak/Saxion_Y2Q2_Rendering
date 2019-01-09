@@ -28,21 +28,21 @@ void TextureMaterial::_lazyInitializeShader() {
     _shader->addShader(GL_FRAGMENT_SHADER, config::SHADER_PATH + "texture.fs");
     _shader->finalize();
 
-    //cache all the uniform and attribute indexes
-    _uMVPMatrix = _shader->getUniformLocation("mvpMatrix");
+    // Cache all the uniform and attribute indexes
+    _uMVPMatrix = _shader->getUniformLocation("matrixPVM");
     _uDiffuseTexture = _shader->getUniformLocation("diffuseTexture");
 
     _aVertex = _shader->getAttribLocation("vertex");
     _aNormal = _shader->getAttribLocation("normal");
-    _aUV =     _shader->getAttribLocation("uv");
+    _aUV     = _shader->getAttribLocation("uv");
 }
 
 void TextureMaterial::setDiffuseTexture(std::shared_ptr<Texture> pDiffuseTexture) {
     _diffuseTexture = pDiffuseTexture;
 }
 
-void TextureMaterial::render(en::Engine* pEngine, Mesh* pMesh, const glm::mat4& pModelMatrix, const glm::mat4& pViewMatrix,
-                             const glm::mat4& pProjectionMatrix) {
+void TextureMaterial::render(en::Engine* pEngine, Mesh* pMesh, const glm::mat4& pModelMatrix, const glm::mat4& pViewMatrix, const glm::mat4& pProjectionMatrix) {
+
     if (!_diffuseTexture) return;
 
     _shader->use();

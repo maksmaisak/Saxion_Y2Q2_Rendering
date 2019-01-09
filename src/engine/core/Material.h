@@ -12,19 +12,20 @@
 #include "AbstractMaterial.hpp"
 #include "ShaderProgram.hpp"
 #include "Texture.hpp"
+#include "TupleUtils.h"
 
 namespace en {
 
     /// A generic material that works with a given shader.
-    /// Automatically sets `built-in` uniforms like transformation matricies, time and lighing data.
+    /// Automatically sets `built-in` uniforms like transformation matrices, time and lighting data.
     /// Use material.setUniformValue to set material-specific values for uniforms other than the built-in ones.
     /// The material will set those when it's time to render.
     class Material : public AbstractMaterial {
 
     public:
 
-        Material(const std::string& shaderFilename);
-        Material(std::shared_ptr<ShaderProgram> shader);
+        explicit Material(const std::string& shaderFilename);
+        explicit Material(std::shared_ptr<ShaderProgram> shader);
 
         void render(Engine* engine, Mesh* mesh,
             const glm::mat4& modelMatrix,
@@ -53,7 +54,7 @@ namespace en {
 
         std::shared_ptr<ShaderProgram> m_shader;
 
-        struct UniformLocations {
+        struct BuiltinUniformLocations {
 
             GLint model       = -1;
             GLint view        = -1;
@@ -62,7 +63,7 @@ namespace en {
 
             GLint time = -1;
 
-        } m_uniformLocations;
+        } m_builtinUniformLocations;
 
         struct AttributeLocations {
 
@@ -83,7 +84,7 @@ namespace en {
         > m_uniformValues;
 
         void detectAllUniforms();
-        UniformLocations   cacheUniformLocations();
+        BuiltinUniformLocations cacheBuiltinUniformLocations();
         AttributeLocations cacheAttributeLocations();
 
         void setSupportedUniforms(const glm::mat4& modelMatrix, const glm::mat4& viewMatrix, const glm::mat4& perspectiveMatrix);
@@ -100,6 +101,11 @@ namespace en {
         if (it == m_uniforms.end()) {
             throw "No such uniform: " + name;
         }
+
+        static_assert(
+            has_type_v<NameToLocationValuePair<T>, decltype(m_uniformValues)>,
+            "This type is unsupported for custom uniforms."
+        );
 
         auto& values = std::get<NameToLocationValuePair<T>>(m_uniformValues);
         values[name] = {it->second.location, value};

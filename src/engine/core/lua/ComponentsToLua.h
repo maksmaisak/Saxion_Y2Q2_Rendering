@@ -19,6 +19,10 @@
 
 namespace en {
 
+
+    /// Handles reading component definitions out of lua values.
+    /// See makeComponent
+    /// Use registerComponentType<T>(name) to map a type name to a component type
     class ComponentsToLua {
 
         using componentFactoryFunction = std::function<void(Actor&, LuaState&)>;
@@ -62,13 +66,17 @@ namespace en {
     };
 
     template<typename TComponent>
-    struct ComponentTypeRequirement {
+    class ComponentTypeRequirement {
 
-        explicit ComponentTypeRequirement(const std::string& name) {
+    public:
+
+        explicit inline ComponentTypeRequirement(const std::string& name) {
             if (isRegistered) return;
             ComponentsToLua::registerComponentType<TComponent>(name);
             isRegistered = true;
         }
+
+    private:
 
         inline static bool isRegistered = false;
     };

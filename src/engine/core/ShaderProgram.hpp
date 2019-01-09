@@ -10,18 +10,18 @@
 
 namespace en {
 
-/**
- * Generic shader program to which you can add separate shaders.
- * Nice exercise for the reader: make it possible to add shaders by passing in the code as a string instead of through a file.
- *
- * Usage:
- *  -create shader program
- *  -add shaders
- *  -finalize shader program
- *  -use shader program
- *
- * See the example material classes for a demo.
- */
+    /**
+     * Generic shader program to which you can add separate shaders.
+     * Nice exercise for the reader: make it possible to add shaders by passing in the code as a string instead of through a file.
+     *
+     * Usage:
+     *  -create shader program
+     *  -add shaders
+     *  -finalize shader program
+     *  -use shader program
+     *
+     * See the example material classes for a demo.
+     */
 	class ShaderProgram {
 	public:
 		ShaderProgram();

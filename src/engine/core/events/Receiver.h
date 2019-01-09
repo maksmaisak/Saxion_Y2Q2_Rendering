@@ -20,7 +20,7 @@ namespace en {
         Receiver()  { m_receivers.insert(this); }
         ~Receiver() { m_receivers.erase(this);  }
 
-        static void broadcast(const TMessage& info) {
+        inline static void broadcast(const TMessage& info) {
             for (Receiver<TMessage>* receiver : m_receivers) {
                 receiver->receive(info);
             }

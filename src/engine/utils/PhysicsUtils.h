@@ -19,19 +19,18 @@ namespace en {
         Hit(const glm::vec3& normal, float timeOfImpact) : normal(normal), timeOfImpact(timeOfImpact) {}
     };
 
-    inline std::optional<Hit> circleVsCircleContinuous(
+    inline std::optional<Hit> sphereVsSphereContinuous(
         const glm::vec3& moverPosition, float moverRadius, const glm::vec3& movement,
         const glm::vec3& otherPosition, float otherRadius
     ) {
 
-        if (glm::all(glm::epsilonEqual(movement, glm::vec3(0.f), glm::epsilon<float>()))) return std::nullopt;
-
         glm::vec3 relativePosition = moverPosition - otherPosition;
 
         float a = glm::length2(movement);
+        if (a <= glm::epsilon<float>()) return std::nullopt;
+
         float b = 2.f * dot(relativePosition, movement);
-        float c = glm::length2(relativePosition) -
-            (moverRadius + otherRadius) * (moverRadius + otherRadius);
+        float c = glm::length2(relativePosition) - glm::length2(moverRadius + otherRadius);
 
         // If moving out
         if (b >= 0.f) return std::nullopt;
@@ -42,7 +41,7 @@ namespace en {
         float d = b * b - 4.f * a * c;
         if (d < 0.f) return std::nullopt;
 
-        float t = (-b - sqrtf(d)) / (2.f * a);
+        float t = (-b - glm::sqrt(d)) / (2.f * a);
 
         if (t <  0.f) return std::nullopt;
         if (t >= 1.f) return std::nullopt;

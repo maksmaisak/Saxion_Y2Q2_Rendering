@@ -28,13 +28,13 @@ namespace en {
     public:
 
         /// Gets a resource by given key.
-        /// If not present, tries to load the resource with given loader arguments.
-        /// If no loader arguments given and loader can't be called with no arguments, tries to pass the key to the loader.
-        /// The default loader does one of these, in order of priority:
-        /// - Uses a custom ResourceLoader<TResource> template specialization, if exists.
-        /// - Uses TResource::load(args), if exists.
-        /// - Uses TResource::TResource(args), if exists.
-        /// - Otherwise a compile error.
+        /// If not already present, tries create one using a load function.
+        /// The load function is one of these, in order of priority:
+        /// - load in ResourceLoader<TResource> template specialization.
+        /// - static TResource::load, returning a shared_ptr or a raw pointer to TResource.
+        /// - the constructor of TResource, if exists.
+        /// If no valid load function could be determined, you get a compile error.
+        /// If no extra arguments given and the load function can't be called with no arguments, calls it with the key.
         template<typename TLoader = ResourceLoader<TResource>, typename... Args>
         inline static std::shared_ptr<TResource> get(const std::string& key, Args&&... args) {
 
@@ -46,7 +46,7 @@ namespace en {
             // Fall back to constructor if there is no valid loader.
             if constexpr (std::is_base_of_v<NoLoader, TLoader>) {
 
-                if constexpr (sizeof...(Args) > 0 || std::is_constructible_v<TResource>)
+                if constexpr(sizeof...(Args) > 0 || std::is_constructible_v<TResource>)
                     std::tie(it, didAdd) = m_resources.emplace(key, std::make_shared<TResource>(std::forward<Args>(args)...));
                 else
                     std::tie(it, didAdd) = m_resources.emplace(key, std::make_shared<TResource>(key));

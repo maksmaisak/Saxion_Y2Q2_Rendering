@@ -18,17 +18,15 @@ namespace en {
     template<typename TResource, typename SFINAEDummy = void>
     struct ResourceLoader : NoLoader {};
 
-    using filename_t = const std::string&;
-
     // If TResource::load(const std::string&) exists
     template<typename TResource>
-    struct ResourceLoader<TResource, std::enable_if_t<std::is_invocable_v<decltype(&TResource::load), filename_t>>> {
+    struct ResourceLoader<TResource, std::enable_if_t<std::is_invocable_v<decltype(&TResource::load), const std::string&>>> {
 
-        inline static std::shared_ptr<TResource> load(filename_t filename) {
+        inline static std::shared_ptr<TResource> load(const std::string& filename) {
 
             // If calling TResource::load(filename) returns a shared_ptr, return that.
             // If it returns a regular pointer, wrap that in a shared_ptr and return it.
-            if constexpr (std::is_convertible_v<std::invoke_result_t<decltype(&TResource::load), filename_t>, std::shared_ptr<TResource>>)
+            if constexpr (std::is_convertible_v<std::invoke_result_t<decltype(&TResource::load), const std::string&>, std::shared_ptr<TResource>>)
                 return TResource::load(filename);
             else
                 return std::shared_ptr<TResource>(TResource::load(filename));

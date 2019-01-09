@@ -21,24 +21,30 @@
 #include "CameraOrbitBehavior.h"
 #include "RotatingBehavior.hpp"
 
-void makeSphereFloor(en::Engine& engine, float sideLength, int numSpheresPerSide) {
+void makeFloorFromSpheres(en::Engine& engine, float sideLength, int numSpheresPerSide) {
 
-    const float diameter = sideLength / numSpheresPerSide;
+    const float diameter = 2.f * sideLength / numSpheresPerSide;
     const float radius = diameter * 0.5f;
 
     auto material = en::Resources<TextureMaterial>::get(config::MGE_TEXTURE_PATH + "bricks.jpg");
-    auto mesh = en::Resources<Mesh>::get(config::MGE_MODEL_PATH + "sphere2.obj");
+    auto mesh = en::Resources<Mesh>::get(config::MGE_MODEL_PATH + "sphere_smooth.obj");
 
     for (int y = 0; y < numSpheresPerSide; ++y) {
         for (int x = 0; x < numSpheresPerSide; ++x) {
 
             en::Actor actor = engine.makeActor("Floor_" + std::to_string(x) + "_" + std::to_string(y));
 
-            auto& tf =actor.add<en::Transform>();
+            auto& tf = actor.add<en::Transform>();
+
+            // from (-1, -1) to (1, 1) inclusive
+            glm::vec2 positionNormalized = {
+                ((float)x / (numSpheresPerSide - 1) - 0.5f) * 2.f,
+                ((float)y / (numSpheresPerSide - 1) - 0.5f) * 2.f
+            };
             tf.setLocalPosition({
-                sideLength * ((float)x / (numSpheresPerSide - 1) - 0.5f),
-                -4 + glm::linearRand(-1, 1),
-                sideLength * ((float)y / (numSpheresPerSide - 1) - 0.5f)
+                sideLength * positionNormalized.x * 0.5f,
+                -20 + 8 * glm::length2(positionNormalized),
+                sideLength * positionNormalized.y * 0.5f
             });
             tf.setLocalScale({radius, radius, radius});
 
@@ -47,6 +53,41 @@ void makeSphereFloor(en::Engine& engine, float sideLength, int numSpheresPerSide
             rb.radius = radius;
 
             actor.add<en::RenderInfo>(mesh, material);
+        }
+    }
+}
+
+void addRingItems(en::Engine& engine, en::Entity parent, std::size_t numItems = 10, float radius = 3.5f) {
+
+    auto cubeMesh       = en::Resources<Mesh>::get(config::MGE_MODEL_PATH + "cube_flat.obj");
+    auto sphereMesh     = en::Resources<Mesh>::get(config::MGE_MODEL_PATH + "sphere_smooth.obj");
+    auto sphereMaterial = en::Resources<TextureMaterial>::get(config::MGE_TEXTURE_PATH + "runicfloor.png");
+
+    for (std::size_t i = 0; i < numItems; ++i) {
+
+        const float angle = glm::two_pi<float>() * (float)i / numItems;
+        const glm::vec3 offset = {
+            glm::cos(angle) * radius,
+            0,
+            glm::sin(angle) * radius
+        };
+
+        en::Actor object = engine.makeActor("RingItem");
+        auto& tf = object.add<en::Transform>();
+        //tf.setParent(parent);
+        tf.setLocalPosition(offset);
+        tf.scale(glm::vec3(0.2f));
+        //object.add<RotatingBehavior>();
+        auto& rb = object.add<en::Rigidbody>();
+        rb.radius = 0.2f;
+        rb.invMass = 1.f / 0.1f;
+
+        if (i % 2 == 0) {
+            object.add<en::Light>();
+            auto material = std::make_shared<ColorMaterial>(glm::abs(glm::sphericalRand(1.f)));
+            object.add<en::RenderInfo>(cubeMesh, std::move(material));
+        } else {
+            object.add<en::RenderInfo>(sphereMesh, sphereMaterial);
         }
     }
 }
@@ -78,7 +119,7 @@ void TestScene::open(en::Engine& engine) {
     // a thin wrapper around en::Engine and en::Entity
     // Using it to add components also ensures that components
     // inheriting from en::Behavior actually have their update functions called.
-    // TODO have make behaviors work when added from registry too.
+    // TODO have behaviors work when added via registry too.
     en::Actor camera = engine.makeActor("Camera");
     camera.add<en::Camera>();
     camera.add<en::Transform>().move({0, 0, 10});
@@ -94,11 +135,12 @@ void TestScene::open(en::Engine& engine) {
     planeTransform.setLocalScale({5, 5, 5});
     registry.add<en::RenderInfo>(plane, planeMeshDefault, floorMaterial);
 
-    //makeSphereFloor(engine, 20, 4);
+    makeFloorFromSpheres(engine, 30, 20);
 
+    // Add an empty rotating object.
     en::Actor ring = engine.makeActor("Ring");
     ring.add<en::Transform>();
-    //ring.add<en::Rigidbody>().radius = 2.5f;
+    ring.add<en::Rigidbody>().radius = 2.5f;
     ring.add<RotatingBehavior>();
 
     //add a spinning sphere
@@ -109,29 +151,5 @@ void TestScene::open(en::Engine& engine) {
     sphere.add<en::RenderInfo>(testObjectMeshS, wobblingMaterial);
     cameraOrbitBehavior.setTarget(sphere);
 
-    const std::size_t numCubes = 10;
-    const float radius = 3.5f;
-    for (std::size_t i = 0; i < numCubes; ++i) {
-
-        const float angle = glm::two_pi<float>() * (float)i / numCubes;
-        const glm::vec3 offset = {
-            glm::cos(angle) * radius,
-            0,
-            glm::sin(angle) * radius
-        };
-
-        en::Actor object = engine.makeActor("OrbitingObject");
-        auto& transform = object.add<en::Transform>();
-        transform.setParent(ring);
-        transform.setLocalPosition(offset);
-        transform.scale(glm::vec3(0.2f));
-        object.add<RotatingBehavior>();
-        if (i % 2 == 0) {
-            object.add<en::Light>();
-            auto material = std::make_shared<ColorMaterial>(glm::abs(glm::sphericalRand(1.f)));
-            object.add<en::RenderInfo>(cubeMeshF, std::move(material));
-        } else {
-            object.add<en::RenderInfo>(sphereMeshS, runicStoneMaterial);
-        }
-    }
+    addRingItems(engine, ring, 20);
 }

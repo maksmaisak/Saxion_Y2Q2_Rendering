@@ -53,6 +53,7 @@ namespace en {
         markDirty();
     }
 
+    // TODO Make this preserve world position
     void Transform::setParent(Entity newParent) {
 
         Entity oldParent = m_parent;

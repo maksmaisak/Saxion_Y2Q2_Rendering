@@ -78,6 +78,7 @@ void addRingItems(en::Engine& engine, en::Entity parent, std::size_t numItems = 
             };
 
             auto& tf = object.add<en::Transform>();
+
             tf.setParent(parent);
             tf.setLocalPosition(offset);
             tf.scale(glm::vec3(0.2f));

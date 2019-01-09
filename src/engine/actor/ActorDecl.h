@@ -28,19 +28,19 @@ namespace en {
         TComponent& add(Args&&... args);
 
         template<typename TComponent>
-        inline TComponent& get() {return m_registry->get<TComponent>(m_entity);}
+        inline TComponent& get() const {return m_registry->get<TComponent>(m_entity);}
 
         template<typename TComponent>
-        inline TComponent* tryGet() {return m_registry->tryGet<TComponent>(m_entity);}
+        inline TComponent* tryGet() const {return m_registry->tryGet<TComponent>(m_entity);}
 
         template<typename TComponent>
         inline TComponent& remove() {return m_registry->remove<TComponent>(m_entity);}
 
-        inline Engine& getEngine() {return *m_engine;}
-        inline bool isValid() {return m_engine;}
+        inline Engine& getEngine() const {return *m_engine;}
+        inline bool isValid() const {return m_engine;}
 
-        inline operator Entity() {return m_entity;}
-        inline operator bool() {return isValid() && !isNullEntity(m_entity) && m_registry->isAlive(m_entity);}
+        inline operator Entity() const {return m_entity;}
+        inline operator bool() const {return isValid() && !isNullEntity(m_entity) && m_registry->isAlive(m_entity);}
 
     private:
         Engine* m_engine = nullptr;

@@ -67,22 +67,30 @@ void addRingItems(en::Engine& engine, en::Entity parent, std::size_t numItems = 
 
     for (std::size_t i = 0; i < numItems; ++i) {
 
-        const float angle = glm::two_pi<float>() * (float)i / numItems;
-        const glm::vec3 offset = {
-            glm::cos(angle) * radius,
-            0,
-            glm::sin(angle) * radius
-        };
-
         en::Actor object = engine.makeActor("RingItem");
-        auto& tf = object.add<en::Transform>();
-        //tf.setParent(parent);
-        tf.setLocalPosition(offset);
-        tf.scale(glm::vec3(0.2f));
-        //object.add<RotatingBehavior>();
-        auto& rb = object.add<en::Rigidbody>();
-        rb.radius = 0.2f;
-        rb.invMass = 1.f / 0.1f;
+
+        {
+            const float angle = glm::two_pi<float>() * (float)i / numItems;
+            const glm::vec3 offset = {
+                glm::cos(angle) * radius,
+                0,
+                glm::sin(angle) * radius
+            };
+
+            auto& tf = object.add<en::Transform>();
+            tf.setParent(parent);
+            tf.setLocalPosition(offset);
+            tf.scale(glm::vec3(0.2f));
+        }
+
+        {
+            auto& rb = object.add<en::Rigidbody>();
+            rb.isKinematic = true;
+            rb.radius = 0.2f;
+            rb.invMass = 1.f / 0.1f;
+        }
+
+        object.add<RotatingBehavior>();
 
         if (i % 2 == 0) {
             object.add<en::Light>();
@@ -106,7 +114,6 @@ void TestScene::open(en::Engine& engine) {
     std::shared_ptr<Mesh> testObjectMeshS  = en::Resources<Mesh>::get(config::MODEL_PATH + "sphere2.obj");
 
     // MATERIALS
-
     auto runicStoneMaterial = en::Resources<en::Material>::get("texture");
     runicStoneMaterial->setUniformValue("diffuseTexture", en::Resources<Texture>::get(config::TEXTURE_PATH + "runicfloor.png"));
 
@@ -145,7 +152,11 @@ void TestScene::open(en::Engine& engine) {
     // Add an empty rotating object.
     en::Actor ring = engine.makeActor("Ring");
     ring.add<en::Transform>();
-    ring.add<en::Rigidbody>().radius = 2.5f;
+    {
+        auto& rb = ring.add<en::Rigidbody>();
+        rb.isKinematic = true;
+        rb.radius = 2.5f;
+    }
     ring.add<RotatingBehavior>();
 
     //add a spinning sphere

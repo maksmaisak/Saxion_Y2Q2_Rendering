@@ -7,8 +7,10 @@
 
 #include "Engine.h"
 #include "Scene.h"
+#include <vector>
 
 class TestScene : public en::Scene {
+
 public:
     void open(en::Engine& engine) override;
 };

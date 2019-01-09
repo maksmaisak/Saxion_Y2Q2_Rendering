@@ -2,7 +2,7 @@
 #define COLORMATERIAL_HPP
 
 #include "GL/glew.h"
-#include "materials/AbstractMaterial.hpp"
+#include "AbstractMaterial.hpp"
 #include "ShaderProgram.hpp"
 
 /**

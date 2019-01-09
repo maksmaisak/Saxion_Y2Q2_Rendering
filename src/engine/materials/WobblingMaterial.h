@@ -7,7 +7,7 @@
 
 #include <memory>
 #include "GL/glew.h"
-#include "materials/AbstractMaterial.hpp"
+#include "AbstractMaterial.hpp"
 #include "engine/core/Texture.hpp"
 
 class WobblingMaterial : public AbstractMaterial

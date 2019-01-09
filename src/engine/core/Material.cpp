@@ -10,10 +10,9 @@
 #include "Material.h"
 #include "Resources.h"
 #include "Mesh.hpp"
+#include "GLSetUniform.h"
 
 using namespace en;
-
-inline bool valid(GLint location) {return location != -1;}
 
 Material::Material(const std::string& shaderFilename) :
     Material(Resources<ShaderProgram>::get(shaderFilename)) {}
@@ -22,8 +21,8 @@ Material::Material(std::shared_ptr<ShaderProgram> shader) : m_shader(std::move(s
 
     assert(m_shader);
 
-    m_uniformLocations   = getUniformLocations();
-    m_attributeLocations = getAttributeLocations();
+    m_uniformLocations   = cacheUniformLocations();
+    m_attributeLocations = cacheAttributeLocations();
     detectAllUniforms();
 }
 
@@ -41,43 +40,38 @@ void Material::render(Engine* engine, Mesh* mesh,
     mesh->streamToOpenGL(a.vertex, a.normal, a.uv);
 }
 
-void Material::setSupportedUniforms(const glm::mat4& modelMatrix, const glm::mat4& viewMatrix, const glm::mat4& perspectiveMatrix) {
+inline bool valid(GLint location) {return location != -1;}
 
-    static auto setUniformMatrix = [](GLint location, const glm::mat4& matrix) {
-        glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
-    };
+void Material::setSupportedUniforms(const glm::mat4& modelMatrix, const glm::mat4& viewMatrix, const glm::mat4& perspectiveMatrix) {
 
     const auto& u = m_uniformLocations;
 
-    if (valid(u.model      )) setUniformMatrix(u.model, modelMatrix);
-    if (valid(u.view       )) setUniformMatrix(u.view , viewMatrix );
-    if (valid(u.perspective)) setUniformMatrix(u.perspective, perspectiveMatrix);
-    if (valid(u.pvm        )) setUniformMatrix(u.pvm, perspectiveMatrix * viewMatrix * modelMatrix);
+    if (valid(u.model      )) gl::setUniform(u.model      , modelMatrix      );
+    if (valid(u.view       )) gl::setUniform(u.view       , viewMatrix       );
+    if (valid(u.perspective)) gl::setUniform(u.perspective, perspectiveMatrix);
+    if (valid(u.pvm        )) gl::setUniform(u.pvm, perspectiveMatrix * viewMatrix * modelMatrix);
 }
 
-void Material::setCustomUniforms() {
+template<typename T>
+void Material::setCustomUniformsOfType(const Material::NameToLocationValuePair<T>& values) {
 
-    for (auto& [name, pair] : m_nameToUniformMat4) {
-        glUniformMatrix4fv(pair.location, 1, GL_FALSE, glm::value_ptr(pair.value));
+    for (auto& [name, locationValuePair] : values) {
+        gl::setUniform(locationValuePair.location, locationValuePair.value);
     }
+}
 
-    for (auto& [name, pair] : m_nameToUniformVec3) {
-        glUniform3fv(pair.location, 1, glm::value_ptr(pair.value));
-    }
-
-    for (auto& [name, pair] : m_nameToUniformVec4) {
-        glUniform3fv(pair.location, 1, glm::value_ptr(pair.value));
-    }
+template<>
+void Material::setCustomUniformsOfType<std::shared_ptr<Texture>>(const Material::NameToLocationValuePair<std::shared_ptr<Texture>>& values) {
 
     GLenum i = 0;
-    for (auto& [name, pair] : m_nameToUniformTexture) {
+    for (auto& [name, locationValuePair] : values) {
 
         // Activate texture slot i
         glActiveTexture(GL_TEXTURE0 + i);
         // Bind the texture to the current active slot
-        glBindTexture(GL_TEXTURE_2D, pair.value->getId());
+        glBindTexture(GL_TEXTURE_2D, locationValuePair.value->getId());
         // Tell the shader the texture slot for the diffuse texture is slot i
-        glUniform1i(pair.location, i);
+        glUniform1i(locationValuePair.location, i);
 
         i += 1;
         if (i > GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS) {
@@ -89,19 +83,12 @@ void Material::setCustomUniforms() {
     }
 }
 
-void Material::setUniformVec4(const std::string& name, const glm::vec4& value) {
-    m_nameToUniformVec4[name] = {m_uniforms[name].location, value};
+void Material::setCustomUniforms() {
+
+    std::apply([this](auto&&... args){(setCustomUniformsOfType(args), ...);}, m_uniformValues);
 }
 
-void Material::setUniformVec3(const std::string& name, const glm::vec3& value) {
-    m_nameToUniformVec3[name] = {m_uniforms[name].location, value};
-}
-
-void Material::setUniformMat4(const std::string& name, const glm::mat4& value) {
-    m_nameToUniformMat4[name] = {m_uniforms[name].location, value};
-}
-
-Material::UniformLocations Material::getUniformLocations() {
+Material::UniformLocations Material::cacheUniformLocations() {
 
     UniformLocations u;
     u.model       = m_shader->getUniformLocation("matrixModel");
@@ -112,7 +99,7 @@ Material::UniformLocations Material::getUniformLocations() {
     return u;
 }
 
-Material::AttributeLocations Material::getAttributeLocations() {
+Material::AttributeLocations Material::cacheAttributeLocations() {
 
     AttributeLocations a;
 
@@ -129,6 +116,7 @@ void Material::detectAllUniforms() {
 
     std::cout << "Uniforms: " << std::endl;
     for (auto& info : uniforms) {
+
         std::cout << info.location << " : " << info.name << std::endl;
         m_uniforms[info.name] = info;
     }

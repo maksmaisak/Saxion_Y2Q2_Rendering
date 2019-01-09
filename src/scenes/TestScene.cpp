@@ -113,7 +113,7 @@ void TestScene::open(en::Engine& engine) {
     std::shared_ptr<AbstractMaterial> wobblingMaterial   = en::Resources<WobblingMaterial>::get(config::TEXTURE_PATH + "runicfloor.png");
 
     auto genericMaterial = en::Resources<en::Material>::get("color");
-    genericMaterial->setUniformVec3("diffuseColor", {1, 0, 0});
+    genericMaterial->setUniformValue<glm::vec3>("diffuseColor", {0, 1, 0});
 
     //en::Resources<Mesh>::get(config::MODEL_PATH + "sphere3.obj");
     //en::Resources<Mesh>::removeUnused();

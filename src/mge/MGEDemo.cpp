@@ -12,7 +12,7 @@
 #include "mge/core/CameraGameObject.hpp"
 #include "mge/core/GameObject.hpp"
 
-#include "materials/AbstractMaterial.hpp"
+#include "AbstractMaterial.hpp"
 #include "materials/ColorMaterial.hpp"
 #include "materials/TextureMaterial.hpp"
 

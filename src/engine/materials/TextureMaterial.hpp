@@ -1,7 +1,7 @@
 #ifndef TEXTUREMATERIAL_HPP
 #define TEXTUREMATERIAL_HPP
 
-#include "materials/AbstractMaterial.hpp"
+#include "AbstractMaterial.hpp"
 #include "GL/glew.h"
 #include <memory>
 

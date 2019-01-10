@@ -12,6 +12,7 @@
 #include "Mesh.hpp"
 #include "GLSetUniform.h"
 #include "TupleUtils.h"
+#include "GameTime.h"
 
 using namespace en;
 
@@ -47,10 +48,14 @@ void Material::setSupportedUniforms(const glm::mat4& modelMatrix, const glm::mat
 
     const auto& u = m_builtinUniformLocations;
 
-    if (valid(u.model      )) gl::setUniform(u.model      , modelMatrix      );
-    if (valid(u.view       )) gl::setUniform(u.view       , viewMatrix       );
-    if (valid(u.perspective)) gl::setUniform(u.perspective, perspectiveMatrix);
-    if (valid(u.pvm        )) gl::setUniform(u.pvm, perspectiveMatrix * viewMatrix * modelMatrix);
+    // Matrices
+    gl::setUniform(u.model      , modelMatrix      );
+    gl::setUniform(u.view       , viewMatrix       );
+    gl::setUniform(u.perspective, perspectiveMatrix);
+    gl::setUniform(u.pvm, perspectiveMatrix * viewMatrix * modelMatrix);
+
+    // Time
+    glUniform1f(u.time, GameTime::now().asSeconds());
 }
 
 template<typename T>

@@ -115,10 +115,10 @@ void TestScene::open(en::Engine& engine) {
     std::shared_ptr<Mesh> testObjectMeshS  = en::Resources<Mesh>::get(config::MODEL_PATH + "sphere2.obj");
 
     // MATERIALS
-    auto runicStoneMaterial = en::Resources<en::Material>::get("texture");
+    auto runicStoneMaterial = en::Resources<en::Material>::get("runicStoneMaterial", "texture");
     runicStoneMaterial->setUniformValue("diffuseTexture", en::Resources<Texture>::get(config::TEXTURE_PATH + "runicfloor.png"));
 
-    auto floorMaterial = en::Resources<en::Material>::get("texture");
+    auto floorMaterial = en::Resources<en::Material>::get("floorMaterial", "texture");
     floorMaterial->setUniformValue("diffuseTexture", en::Resources<Texture>::get(config::TEXTURE_PATH + "land.jpg"));
 
     auto wobblingMaterial = en::Resources<WobblingMaterial>::get(config::TEXTURE_PATH + "runicfloor.png");

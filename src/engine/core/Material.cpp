@@ -35,7 +35,7 @@ void Material::render(Engine* engine, Mesh* mesh,
 ) {
     m_shader->use();
 
-    setSupportedUniforms(modelMatrix, viewMatrix, perspectiveMatrix);
+    setBuiltinUniforms(modelMatrix, viewMatrix, perspectiveMatrix);
     setCustomUniforms();
 
     const auto& a = m_attributeLocations;
@@ -44,7 +44,8 @@ void Material::render(Engine* engine, Mesh* mesh,
 
 inline bool valid(GLint location) {return location != -1;}
 
-void Material::setSupportedUniforms(const glm::mat4& modelMatrix, const glm::mat4& viewMatrix, const glm::mat4& perspectiveMatrix) {
+void Material::setBuiltinUniforms(const glm::mat4& modelMatrix, const glm::mat4& viewMatrix,
+                                  const glm::mat4& perspectiveMatrix) {
 
     const auto& u = m_builtinUniformLocations;
 

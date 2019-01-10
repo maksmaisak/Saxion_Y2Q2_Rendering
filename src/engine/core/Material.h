@@ -87,7 +87,7 @@ namespace en {
         BuiltinUniformLocations cacheBuiltinUniformLocations();
         AttributeLocations cacheAttributeLocations();
 
-        void setSupportedUniforms(const glm::mat4& modelMatrix, const glm::mat4& viewMatrix, const glm::mat4& perspectiveMatrix);
+        void setBuiltinUniforms(const glm::mat4& modelMatrix, const glm::mat4& viewMatrix, const glm::mat4& perspectiveMatrix);
         void setCustomUniforms();
 
         template<typename T>

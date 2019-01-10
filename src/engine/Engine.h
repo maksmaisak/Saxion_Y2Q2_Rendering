@@ -44,6 +44,7 @@ namespace en {
         inline sf::RenderWindow& getWindow()   { return m_window; }
         inline SceneManager& getSceneManager() { return m_sceneManager; }
         inline LuaState& getLuaState()         { return m_lua; }
+        inline float getFps()                  { return m_fps; }
 
         Actor actor(Entity entity);
         Actor makeActor();
@@ -72,6 +73,8 @@ namespace en {
 
         std::vector<std::unique_ptr<System>> m_systems;
         std::set<std::type_index> m_behaviorSystemPresence;
+
+        float m_fps = 0.f;
 
         void printGLContextVersionInfo();
         void initializeGlew();

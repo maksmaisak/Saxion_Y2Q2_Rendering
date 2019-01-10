@@ -3,6 +3,7 @@
 //
 
 #include "RenderSystem.h"
+#include <iostream>
 #include "components/DrawInfo.h"
 #include "components/RenderInfo.h"
 #include "components/Transform.h"
@@ -59,6 +60,9 @@ namespace en {
             }
         }
 
+        std::string debugInfo = std::string("FPS:") + std::to_string((int)m_engine->getFps()) + "\n";
+        //std::cout << debugInfo;
+        m_debugHud->setDebugInfo(debugInfo);
         m_debugHud->draw();
     }
 

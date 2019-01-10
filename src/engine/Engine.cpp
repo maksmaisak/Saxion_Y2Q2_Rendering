@@ -47,6 +47,7 @@ namespace en {
             }
 
             if (drawClock.getElapsedTime() >= timestepDraw) {
+                m_fps = 1.f / drawClock.getElapsedTime().asSeconds();
                 draw();
                 drawClock.restart();
             } else {

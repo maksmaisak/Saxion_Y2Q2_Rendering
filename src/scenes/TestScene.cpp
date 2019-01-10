@@ -63,7 +63,10 @@ void addRingItems(en::Engine& engine, en::Entity parent, std::size_t numItems = 
 
     auto cubeMesh       = en::Resources<Mesh>::get(config::MODEL_PATH + "cube_flat.obj");
     auto sphereMesh     = en::Resources<Mesh>::get(config::MODEL_PATH + "sphere_smooth.obj");
-    auto sphereMaterial = en::Resources<TextureMaterial>::get(config::TEXTURE_PATH + "runicfloor.png");
+    //auto sphereMaterial = en::Resources<TextureMaterial>::get(config::TEXTURE_PATH + "runicfloor.png");
+
+    auto sphereMaterial = std::make_shared<en::Material>("lit");
+    sphereMaterial->setUniformValue("diffuseColor", glm::vec3(1, 0, 1));
 
     for (std::size_t i = 0; i < numItems; ++i) {
 

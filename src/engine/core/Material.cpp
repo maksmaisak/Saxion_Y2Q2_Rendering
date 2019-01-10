@@ -50,7 +50,7 @@ void Material::setBuiltinUniforms(const glm::mat4& modelMatrix, const glm::mat4&
 
     if (valid(u.model      )) gl::setUniform(u.model      , modelMatrix      );
     if (valid(u.view       )) gl::setUniform(u.view       , viewMatrix       );
-    if (valid(u.perspective)) gl::setUniform(u.perspective, perspectiveMatrix);
+    if (valid(u.projection)) gl::setUniform(u.projection, perspectiveMatrix);
     if (valid(u.pvm        )) gl::setUniform(u.pvm, perspectiveMatrix * viewMatrix * modelMatrix);
 }
 
@@ -93,10 +93,10 @@ void Material::setCustomUniforms() {
 Material::BuiltinUniformLocations Material::cacheBuiltinUniformLocations() {
 
     BuiltinUniformLocations u;
-    u.model       = m_shader->getUniformLocation("matrixModel");
-    u.view        = m_shader->getUniformLocation("matrixView");
-    u.perspective = m_shader->getUniformLocation("matrixPerspective");
-    u.pvm         = m_shader->getUniformLocation("matrixPVM");
+    u.model      = m_shader->getUniformLocation("matrixModel");
+    u.view       = m_shader->getUniformLocation("matrixView");
+    u.projection = m_shader->getUniformLocation("matrixProjection");
+    u.pvm        = m_shader->getUniformLocation("matrixPVM");
 
     return u;
 }
@@ -121,4 +121,5 @@ void Material::detectAllUniforms() {
         std::cout << info.location << " : " << info.name << std::endl;
         m_uniforms[info.name] = info;
     }
+    std::cout << std::endl;
 }

@@ -58,7 +58,7 @@ namespace en {
 
             GLint model       = -1;
             GLint view        = -1;
-            GLint perspective = -1;
+            GLint projection = -1;
             GLint pvm         = -1;
 
             GLint time = -1;

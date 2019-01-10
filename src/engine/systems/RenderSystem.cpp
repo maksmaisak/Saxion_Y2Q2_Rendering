@@ -4,15 +4,18 @@
 
 #include "RenderSystem.h"
 #include <iostream>
-#include "components/DrawInfo.h"
 #include "components/RenderInfo.h"
 #include "components/Transform.h"
 #include "components/Camera.h"
+#include "components/Name.h"
+#include "GLHelpers.h"
 
 namespace en {
 
     RenderSystem::RenderSystem(bool displayMeshDebugInfo) :
         m_displayMeshDebugInfo(displayMeshDebugInfo) {}
+
+    void enableDebug();
 
     void RenderSystem::start() {
 
@@ -25,20 +28,21 @@ namespace en {
         glEnable(GL_CULL_FACE);
         glCullFace(GL_BACK);
 
-        //set the default blend mode aka dark magic:
-        //https://www.opengl.org/sdk/docs/man/html/glBlendFunc.xhtml
-        //https://www.opengl.org/wiki/Blending
-        //http://www.informit.com/articles/article.aspx?p=1616796&seqNum=5
-        //http://www.andersriggelsen.dk/glblendfunc.php
+        // Set the default blend mode
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-        glClearColor((float)0x2d / 0xff, (float)0x6b / 0xff, (float)0xce / 0xff, 1.0f);
+        //glClearColor((float)0x2d / 0xff, (float)0x6b / 0xff, (float)0xce / 0xff, 1.0f);
+        glClearColor(0, 0, 0, 1);
 
         m_debugHud = std::make_unique<DebugHud>(&m_engine->getWindow());
     }
 
     void RenderSystem::draw() {
+
+        if (glCheckError() != GL_NO_ERROR) {
+            std::cerr << "Uncaught openGL error(s) before rendering." << std::endl;
+        }
 
         Actor mainCamera = getMainCamera();
         if (mainCamera) {
@@ -54,21 +58,56 @@ namespace en {
                 glm::mat4 matrixModel = m_registry->get<Transform>(e).getWorldTransform();
                 renderInfo.material->render(m_engine, renderInfo.mesh.get(), matrixModel, matrixView, matrixProjection);
 
+                if (glCheckError() != GL_NO_ERROR) {
+
+                    auto* namePtr = m_registry->tryGet<en::Name>(e);
+                    std::string name = namePtr == nullptr ? namePtr->value : "unnamed";
+                    std::cerr << "Error while rendering " << name << std::endl;
+                }
+
                 if (m_displayMeshDebugInfo) {
                     renderInfo.mesh->drawDebugInfo(matrixModel, matrixView, matrixProjection);
                 }
             }
         }
 
-        std::string debugInfo = std::string("FPS:") + std::to_string((int)m_engine->getFps()) + "\n";
+        std::string debugInfo = std::string("FPS:") + std::to_string((int) m_engine->getFps()) + "\n";
         //std::cout << debugInfo;
-        m_debugHud->setDebugInfo(debugInfo);
-        m_debugHud->draw();
+        if ((m_engine->getWindow().getSettings().attributeFlags & sf::ContextSettings::Core) == 0) {
+            m_debugHud->setDebugInfo(debugInfo);
+            m_debugHud->draw();
+        }
     }
 
     Actor RenderSystem::getMainCamera() {
 
         Entity entity = m_registry->with<Transform, Camera>().tryGetOne();
         return m_engine->actor(entity);
+    }
+
+    void GLAPIENTRY
+    MessageCallback(
+        GLenum source,
+        GLenum type,
+        GLuint id,
+        GLenum severity,
+        GLsizei length,
+        const GLchar* message,
+        const void* userParam
+    )
+    {
+        fprintf(
+            stderr,
+            "GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n",
+            (type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""),
+            type, severity, message
+        );
+    }
+
+    void enableDebug() {
+
+        //glEnable(GL_DEBUG_OUTPUT);
+        //glCheckError();
+        //glDebugMessageCallback(MessageCallback, 0);
     }
 }

@@ -20,7 +20,6 @@ PhysicsSystem& PhysicsSystem::setGravity(const glm::vec3& gravity) {
 
 void PhysicsSystem::update(float dt) {
 
-
     auto entities = m_registry->with<Transform, Rigidbody>();
     for (Entity entity : entities) {
 

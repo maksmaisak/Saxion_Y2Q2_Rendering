@@ -11,6 +11,7 @@
 #include "Engine.h"
 #include "Actor.h"
 #include "ComponentsToLua.h"
+#include "GLHelpers.h"
 
 namespace en {
 
@@ -72,7 +73,6 @@ namespace en {
     void Engine::draw() {
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        m_window.clear();
         for (auto& pSystem : m_systems) pSystem->draw();
         m_window.display();
     }

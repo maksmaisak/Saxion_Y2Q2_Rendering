@@ -11,9 +11,12 @@
 
 inline GLenum glCheckError_(const char *file, int line)
 {
+    GLenum lastErrorCode = GL_NO_ERROR;
     GLenum errorCode;
     while ((errorCode = glGetError()) != GL_NO_ERROR)
     {
+        lastErrorCode = errorCode;
+
         std::string error;
         switch (errorCode)
         {
@@ -27,7 +30,7 @@ inline GLenum glCheckError_(const char *file, int line)
         }
         std::cerr << error << " | " << file << " (" << line << ")" << std::endl;
     }
-    return errorCode;
+    return lastErrorCode;
 }
 #define glCheckError() glCheckError_(__FILE__, __LINE__)
 

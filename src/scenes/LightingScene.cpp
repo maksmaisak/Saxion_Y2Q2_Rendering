@@ -36,7 +36,9 @@ void LightingScene::open(en::Engine& engine) {
     {
         auto mesh = en::Resources<Mesh>::get(config::MODEL_PATH + "sphere2.obj");
         auto material = std::make_shared<en::Material>("lit");
-        material->setUniformValue("diffuseColor", glm::vec3(1, 1, 1));
+        material->setUniformValue("diffuseColor" , glm::vec3(1, 1, 1));
+        material->setUniformValue("specularColor", glm::vec3(1, 1, 1));
+        material->setUniformValue("shininess", 10.f);
         sphere.add<en::RenderInfo>(mesh, std::move(material));
     }
     camera.get<CameraOrbitBehavior>().setTarget(sphere);
@@ -46,7 +48,9 @@ void LightingScene::open(en::Engine& engine) {
     {
         auto mesh = en::Resources<Mesh>::get(config::MODEL_PATH + "plane.obj");
         auto material = std::make_shared<en::Material>("lit");
-        material->setUniformValue("diffuseColor", glm::vec3(1, 1, 1));
+        material->setUniformValue("diffuseColor" , glm::vec3(1, 1, 1));
+        material->setUniformValue("specularColor", glm::vec3(1, 1, 1));
+        material->setUniformValue("shininess", 10.f);
         plane.add<en::RenderInfo>(mesh, std::move(material));
     }
 }

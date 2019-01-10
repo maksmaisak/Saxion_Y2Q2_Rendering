@@ -58,10 +58,12 @@ namespace en {
 
             GLint model       = -1;
             GLint view        = -1;
-            GLint projection = -1;
+            GLint projection  = -1;
             GLint pvm         = -1;
 
             GLint time = -1;
+
+            GLint viewPosition = -1;
 
         } m_builtinUniformLocations;
 
@@ -78,6 +80,7 @@ namespace en {
         // Only types listed here will be supported as custom uniform values,
         // i.e settable via material.setUniform
         UniformValues<
+            int, float,
             glm::vec2, glm::vec3, glm::vec4,
             glm::mat4,
             std::shared_ptr<Texture>

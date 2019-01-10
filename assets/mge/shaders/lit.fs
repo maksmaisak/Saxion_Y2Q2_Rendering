@@ -17,11 +17,15 @@ struct LightPoint {
     vec3 position;
 };
 
+uniform vec3 viewPosition;
+
 uniform vec3 diffuseColor;
+uniform vec3 specularColor;
+uniform float shininess;
 
 out vec4 fragmentColor;
 
-vec3 CalculatePointLight(LightPoint light, vec3 normal, vec3 position);
+vec3 CalculatePointLight(LightPoint light, vec3 normal);
 
 void main() {
 
@@ -35,13 +39,13 @@ void main() {
 
     vec3 color = vec3(0,0,0);
     for (int i = 0; i < 2; ++i) {
-        color += CalculatePointLight(lights[i], normal, worldPosition);
+        color += CalculatePointLight(lights[i], normal);
     }
 
 	fragmentColor = vec4(color, 1);
 }
 
-vec3 CalculatePointLight(LightPoint light, vec3 normal, vec3 position) {
+vec3 CalculatePointLight(LightPoint light, vec3 normal) {
 
     float ambientIntensity = 0.2;
     vec3 ambientColor = vec3(0,0,1);
@@ -54,5 +58,9 @@ vec3 CalculatePointLight(LightPoint light, vec3 normal, vec3 position) {
     vec3 diffuse = max(0, dot(normal, lightDirection)) * light.color * diffuseColor;
     diffuse /= (1 + distance * distance);
 
-    return ambient + diffuse;
+    vec3 viewDirection = normalize(viewPosition - worldPosition); // TODO avoid recomputing for each light
+    vec3 reflectedDirection = reflect(-lightDirection, normal);
+    vec3 specular = pow(max(0, dot(reflectedDirection, viewDirection)), shininess) * light.color * specularColor;
+
+    return ambient + diffuse + specular;
 }

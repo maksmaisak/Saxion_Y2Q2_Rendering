@@ -10,8 +10,10 @@
 #include "Material.h"
 #include "Resources.h"
 #include "Mesh.hpp"
+#include "GLHelpers.h"
 #include "GLSetUniform.h"
 #include "TupleUtils.h"
+#include "GameTime.h"
 
 using namespace en;
 
@@ -43,15 +45,21 @@ void Material::render(Engine* engine, Mesh* mesh,
 
 inline bool valid(GLint location) {return location != -1;}
 
-void Material::setBuiltinUniforms(const glm::mat4& modelMatrix, const glm::mat4& viewMatrix,
-                                  const glm::mat4& perspectiveMatrix) {
-
+void Material::setBuiltinUniforms(
+    const glm::mat4& modelMatrix,
+    const glm::mat4& viewMatrix,
+    const glm::mat4& perspectiveMatrix
+) {
     const auto& u = m_builtinUniformLocations;
 
-    if (valid(u.model      )) gl::setUniform(u.model      , modelMatrix      );
-    if (valid(u.view       )) gl::setUniform(u.view       , viewMatrix       );
+    if (valid(u.model     )) gl::setUniform(u.model     , modelMatrix     );
+    if (valid(u.view      )) gl::setUniform(u.view      , viewMatrix      );
     if (valid(u.projection)) gl::setUniform(u.projection, perspectiveMatrix);
-    if (valid(u.pvm        )) gl::setUniform(u.pvm, perspectiveMatrix * viewMatrix * modelMatrix);
+    if (valid(u.pvm       )) gl::setUniform(u.pvm, perspectiveMatrix * viewMatrix * modelMatrix);
+
+    if (valid(u.time)) gl::setUniform(u.time, GameTime::now().asSeconds());
+
+    if (valid(u.viewPosition)) gl::setUniform(u.viewPosition, glm::vec3(glm::inverse(viewMatrix)[3]));
 }
 
 template<typename T>
@@ -93,10 +101,15 @@ void Material::setCustomUniforms() {
 Material::BuiltinUniformLocations Material::cacheBuiltinUniformLocations() {
 
     BuiltinUniformLocations u;
+
     u.model      = m_shader->getUniformLocation("matrixModel");
     u.view       = m_shader->getUniformLocation("matrixView");
     u.projection = m_shader->getUniformLocation("matrixProjection");
     u.pvm        = m_shader->getUniformLocation("matrixPVM");
+
+    u.time = m_shader->getUniformLocation("time");
+
+    u.viewPosition = m_shader->getUniformLocation("viewPosition");
 
     return u;
 }

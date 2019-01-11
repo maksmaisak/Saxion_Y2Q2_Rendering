@@ -6,6 +6,7 @@
 #define SAXION_Y2Q2_RENDERING_LIGHT_H
 
 #include "ComponentsToLua.h"
+#include "glm.hpp"
 
 namespace en {
 
@@ -13,7 +14,13 @@ namespace en {
 
         LUA_COMPONENT_TYPE(Light);
 
-        // TODO light settings. Kind, intensity etc.
+        enum class Kind {
+            POINT,
+            DIRECTIONAL
+        };
+
+        Kind kind = Kind::POINT;
+        glm::vec3 color = {1, 1, 1};
     };
 }
 

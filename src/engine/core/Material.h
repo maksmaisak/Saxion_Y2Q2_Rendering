@@ -52,7 +52,11 @@ namespace en {
         template<typename... T>
         using UniformValues = std::tuple<NameToLocationValuePair<T>...>;
 
+        static constexpr int MAX_NUM_POINT_LIGHTS = 10;
+
         std::shared_ptr<ShaderProgram> m_shader;
+
+        int m_numSupportedPointLights = 0;
 
         struct BuiltinUniformLocations {
 
@@ -64,6 +68,14 @@ namespace en {
             GLint time = -1;
 
             GLint viewPosition = -1;
+
+            struct LightPointLocations {
+
+                GLint position = -1;
+                GLint color = -1;
+
+            } pointLights[MAX_NUM_POINT_LIGHTS];
+            int numPointLights = -1;
 
         } m_builtinUniformLocations;
 
@@ -80,7 +92,7 @@ namespace en {
         // Only types listed here will be supported as custom uniform values,
         // i.e settable via material.setUniform
         UniformValues<
-            int, float,
+            GLint, GLuint, GLfloat,
             glm::vec2, glm::vec3, glm::vec4,
             glm::mat4,
             std::shared_ptr<Texture>
@@ -90,7 +102,7 @@ namespace en {
         BuiltinUniformLocations cacheBuiltinUniformLocations();
         AttributeLocations cacheAttributeLocations();
 
-        void setBuiltinUniforms(const glm::mat4& modelMatrix, const glm::mat4& viewMatrix, const glm::mat4& perspectiveMatrix);
+        void setBuiltinUniforms(Engine* engine, const glm::mat4& modelMatrix, const glm::mat4& viewMatrix, const glm::mat4& perspectiveMatrix);
         void setCustomUniforms();
 
         template<typename T>

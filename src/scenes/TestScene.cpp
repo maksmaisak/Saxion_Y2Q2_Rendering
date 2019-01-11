@@ -66,7 +66,9 @@ void addRingItems(en::Engine& engine, en::Entity parent, std::size_t numItems = 
     //auto sphereMaterial = en::Resources<TextureMaterial>::get(config::TEXTURE_PATH + "runicfloor.png");
 
     auto sphereMaterial = std::make_shared<en::Material>("lit");
-    sphereMaterial->setUniformValue("diffuseColor", glm::vec3(1, 0, 1));
+    sphereMaterial->setUniformValue("diffuseColor", glm::vec3(1, 1, 1));
+    sphereMaterial->setUniformValue("specularColor", glm::vec3(1, 1, 1));
+    sphereMaterial->setUniformValue("shininess", 10.f);
 
     for (std::size_t i = 0; i < numItems; ++i) {
 
@@ -97,7 +99,9 @@ void addRingItems(en::Engine& engine, en::Entity parent, std::size_t numItems = 
         object.add<RotatingBehavior>();
 
         if (i % 2 == 0) {
+
             object.add<en::Light>();
+
             auto material = std::make_shared<ColorMaterial>(glm::abs(glm::sphericalRand(1.f)));
             object.add<en::RenderInfo>(cubeMesh, std::move(material));
         } else {

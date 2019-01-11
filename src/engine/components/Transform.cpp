@@ -24,7 +24,7 @@ namespace en {
         if (m_matrixWorldDirty) {
 
             if (!en::isNullEntity(m_parent)) {
-                m_matrixWorld = m_registry->get<Transform>(m_parent).getLocalTransform() * getLocalTransform();
+                m_matrixWorld = m_registry->get<Transform>(m_parent).getWorldTransform() * getLocalTransform();
             } else {
                 m_matrixWorld = getLocalTransform();
             }

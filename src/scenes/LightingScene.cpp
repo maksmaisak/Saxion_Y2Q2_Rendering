@@ -24,15 +24,34 @@ void LightingScene::open(en::Engine& engine) {
     auto camera = engine.makeActor("Camera");
     camera.add<en::Camera>();
     camera.add<en::Transform>().move({0, 0, 5});
-    camera.add<CameraOrbitBehavior>(5);
+    camera.add<CameraOrbitBehavior>(5, -45.f, 89.f);
 
-    auto light = engine.makeActor("Light");
-    light.add<en::Light>();
-    light.add<en::Transform>().move({-1, 1, 0});
+    auto lights = engine.makeActor("Lights");
+    lights.add<en::Transform>();
+    lights.add<RotatingBehavior>(glm::vec3(0,1,0));
+
+    auto lightMesh = en::Resources<Mesh>::get(config::MODEL_PATH + "cube_flat.obj");
+
+    constexpr int numLights = 6;
+    for (int i = 0; i < numLights; ++i) {
+
+        auto light = engine.makeActor("Light");
+        light.add<en::Transform>()
+            .setParent(lights)
+            .move(glm::rotate(glm::vec3(0,0,2), 2.f * glm::pi<float>() * (i + 1.f) / numLights, glm::vec3(0,1,0)))
+            .scale({0.1f, 0.1f, 0.1f});
+
+        glm::vec3 lightColor = glm::abs(glm::make_vec3(glm::circularRand(1.f)));
+
+        auto lightMaterial = std::make_shared<en::Material>("color");
+        lightMaterial->setUniformValue("diffuseColor", lightColor);
+
+        light.add<en::RenderInfo>(lightMesh, lightMaterial);
+        light.add<en::Light>().color = lightColor;
+    }
 
     auto sphere = engine.makeActor("Sphere");
     sphere.add<en::Transform>();
-    sphere.add<RotatingBehavior>();
     {
         auto mesh = en::Resources<Mesh>::get(config::MODEL_PATH + "sphere2.obj");
         auto material = std::make_shared<en::Material>("lit");
@@ -44,7 +63,7 @@ void LightingScene::open(en::Engine& engine) {
     camera.get<CameraOrbitBehavior>().setTarget(sphere);
 
     auto plane = engine.makeActor("Plane");
-    plane.add<en::Transform>().move({0, -1, 0}).setLocalScale({2, 2, 2});
+    plane.add<en::Transform>().move({0, -1, 0}).setLocalScale({3, 3, 3});
     {
         auto mesh = en::Resources<Mesh>::get(config::MODEL_PATH + "plane.obj");
         auto material = std::make_shared<en::Material>("lit");

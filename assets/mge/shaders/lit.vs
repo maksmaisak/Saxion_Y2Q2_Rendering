@@ -1,5 +1,3 @@
-//DIFFUSE COLOR VERTEX SHADER
-
 #version 330
 
 in vec3 vertex;
@@ -15,9 +13,8 @@ out vec3 worldNormal;
 
 void main(void) {
 
-    vec4 worldPosition4 = matrixModel * vec4(vertex, 1.f);
-    worldPosition = vec3(worldPosition4);
-    gl_Position = matrixProjection * matrixView * worldPosition4;
+    worldPosition = vec3(matrixModel * vec4(vertex, 1));
+    gl_Position = matrixProjection * matrixView * vec4(worldPosition, 1);
 
     worldNormal = mat3(transpose(inverse(matrixModel))) * normal;
 }

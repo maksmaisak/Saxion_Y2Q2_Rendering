@@ -6,7 +6,8 @@
 
 #include <cassert>
 #include <iostream>
-#include <any>
+#include "engine/components/Transform.h"
+#include "engine/components/Light.h"
 #include "Material.h"
 #include "Resources.h"
 #include "Mesh.hpp"
@@ -36,7 +37,7 @@ void Material::render(Engine* engine, Mesh* mesh,
 ) {
     m_shader->use();
 
-    setBuiltinUniforms(modelMatrix, viewMatrix, perspectiveMatrix);
+    setBuiltinUniforms(engine, modelMatrix, viewMatrix, perspectiveMatrix);
     setCustomUniforms();
 
     const auto& a = m_attributeLocations;
@@ -46,6 +47,7 @@ void Material::render(Engine* engine, Mesh* mesh,
 inline bool valid(GLint location) {return location != -1;}
 
 void Material::setBuiltinUniforms(
+    Engine* engine,
     const glm::mat4& modelMatrix,
     const glm::mat4& viewMatrix,
     const glm::mat4& perspectiveMatrix
@@ -60,6 +62,27 @@ void Material::setBuiltinUniforms(
     if (valid(u.time)) gl::setUniform(u.time, GameTime::now().asSeconds());
 
     if (valid(u.viewPosition)) gl::setUniform(u.viewPosition, glm::vec3(glm::inverse(viewMatrix)[3]));
+
+    auto& registry = engine->getRegistry();
+
+    // Add point lights
+    int numPointLights = 0;
+    for (Entity e : registry.with<en::Transform, en::Light>()) { // TODO sort lights by proximity.
+
+        if (numPointLights >= m_numSupportedPointLights)
+            break;
+
+        auto& light = registry.get<en::Light>(e);
+        if (light.kind != en::Light::Kind::POINT) // TODO Add support for directional lights
+            continue;
+
+        auto& tf = registry.get<en::Transform>(e);
+        gl::setUniform(u.pointLights[numPointLights].color   , light.color);
+        gl::setUniform(u.pointLights[numPointLights].position, tf.getWorldPosition());
+
+        numPointLights += 1;
+    }
+    gl::setUniform(u.numPointLights, numPointLights);
 }
 
 template<typename T>
@@ -110,6 +133,19 @@ Material::BuiltinUniformLocations Material::cacheBuiltinUniformLocations() {
     u.time = m_shader->getUniformLocation("time");
 
     u.viewPosition = m_shader->getUniformLocation("viewPosition");
+
+    u.numPointLights = m_shader->getUniformLocation("numPointLights");
+    for (int i = 0; i < MAX_NUM_POINT_LIGHTS; ++i) {
+
+        std::string prefix = "pointLights[" + std::to_string(i) + "].";
+        u.pointLights[i].color    = m_shader->getUniformLocation(prefix + "color");
+        u.pointLights[i].position = m_shader->getUniformLocation(prefix + "position");
+
+        if (u.pointLights[i].color == -1)
+            break;
+
+        m_numSupportedPointLights = i + 1;
+    }
 
     return u;
 }

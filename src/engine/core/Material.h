@@ -69,13 +69,19 @@ namespace en {
 
             GLint viewPosition = -1;
 
-            struct LightPointLocations {
+            int numPointLights = -1;
+            struct PointLightLocations {
 
                 GLint position = -1;
-                GLint color = -1;
+
+                GLint color        = -1;
+                GLint colorAmbient = -1;
+
+                GLint falloffConstant  = -1;
+                GLint falloffLinear    = -1;
+                GLint falloffQuadratic = -1;
 
             } pointLights[MAX_NUM_POINT_LIGHTS];
-            int numPointLights = -1;
 
         } m_builtinUniformLocations;
 

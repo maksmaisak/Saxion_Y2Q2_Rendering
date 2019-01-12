@@ -12,7 +12,13 @@ struct LightDirectinal {
 struct LightPoint {
 
     vec3 color;
+    vec3 colorAmbient;
+
     vec3 position;
+
+    float falloffConstant;
+    float falloffLinear;
+    float falloffQuadratic;
 };
 
 uniform LightPoint pointLights[10];
@@ -43,19 +49,18 @@ void main() {
 
 vec3 CalculatePointLightContribution(LightPoint light, vec3 normal, vec3 viewDirection) {
 
-    float ambientIntensity = 0.2;
-    vec3 ambientColor = vec3(0,0,1);
-    vec3 ambient = ambientIntensity * ambientColor * diffuseColor;
+    vec3 ambient = light.colorAmbient * diffuseColor;
 
     vec3 delta = light.position - worldPosition;
     float distance = length(delta);
     vec3 lightDirection = delta / distance;
 
     vec3 diffuse = max(0, dot(normal, lightDirection)) * light.color * diffuseColor;
-    diffuse /= (1 + distance * distance);
 
     vec3 reflectedDirection = reflect(-lightDirection, normal);
     vec3 specular = pow(max(0, dot(reflectedDirection, viewDirection)), shininess) * light.color * specularColor;
 
-    return ambient + diffuse + specular;
+    float attenuation = 1.f / (light.falloffConstant + light.falloffLinear * distance + light.falloffQuadratic * distance * distance);
+
+    return ambient + attenuation * (diffuse + specular);
 }

@@ -30,6 +30,14 @@ void LightingScene::open(en::Engine& engine) {
     lights.add<en::Transform>();
     lights.add<RotatingBehavior>(glm::vec3(0,1,0));
 
+    auto ambientLight = engine.makeActor("AmbientLight");
+    ambientLight.add<en::Transform>().setParent(lights);
+    {
+        auto& l = ambientLight.add<en::Light>();
+        l.color = {0,0,0};
+        l.colorAmbient = {0, 0, 0.2};
+    }
+
     auto lightMesh = en::Resources<Mesh>::get(config::MODEL_PATH + "cube_flat.obj");
 
     constexpr int numLights = 6;

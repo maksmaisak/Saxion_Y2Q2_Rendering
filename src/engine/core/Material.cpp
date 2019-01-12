@@ -1,11 +1,10 @@
-#include <utility>
-
 //
 // Created by Maksym Maisak on 2019-01-09.
 //
 
 #include <cassert>
 #include <iostream>
+#include <utility>
 #include "engine/components/Transform.h"
 #include "engine/components/Light.h"
 #include "Material.h"
@@ -54,31 +53,48 @@ void Material::setBuiltinUniforms(
 ) {
     const auto& u = m_builtinUniformLocations;
 
-    if (valid(u.model     )) gl::setUniform(u.model     , modelMatrix     );
-    if (valid(u.view      )) gl::setUniform(u.view      , viewMatrix      );
-    if (valid(u.projection)) gl::setUniform(u.projection, perspectiveMatrix);
-    if (valid(u.pvm       )) gl::setUniform(u.pvm, perspectiveMatrix * viewMatrix * modelMatrix);
+    // glUniform functions do nothing if location is -1, so checks are only necessary for avoiding calculations.
 
-    if (valid(u.time)) gl::setUniform(u.time, GameTime::now().asSeconds());
+    gl::setUniform(u.model     , modelMatrix     );
+    gl::setUniform(u.view      , viewMatrix      );
+    gl::setUniform(u.projection, perspectiveMatrix);
 
-    if (valid(u.viewPosition)) gl::setUniform(u.viewPosition, glm::vec3(glm::inverse(viewMatrix)[3]));
+    if (valid(u.pvm))
+        gl::setUniform(u.pvm, perspectiveMatrix * viewMatrix * modelMatrix);
+
+    if (valid(u.time))
+        gl::setUniform(u.time, GameTime::now().asSeconds());
+
+    if (valid(u.viewPosition))
+        gl::setUniform(u.viewPosition, glm::vec3(glm::inverse(viewMatrix)[3]));
 
     auto& registry = engine->getRegistry();
 
     // Add point lights
     int numPointLights = 0;
-    for (Entity e : registry.with<en::Transform, en::Light>()) { // TODO sort lights by proximity.
+    for (Entity e : registry.with<en::Transform, en::Light>()) {
+
+        // TODO sort lights by proximity, pick the closest ones.
 
         if (numPointLights >= m_numSupportedPointLights)
             break;
 
         auto& light = registry.get<en::Light>(e);
+        auto& tf = registry.get<en::Transform>(e);
+
         if (light.kind != en::Light::Kind::POINT) // TODO Add support for directional lights
             continue;
 
-        auto& tf = registry.get<en::Transform>(e);
-        gl::setUniform(u.pointLights[numPointLights].color   , light.color);
-        gl::setUniform(u.pointLights[numPointLights].position, tf.getWorldPosition());
+        auto& locations = u.pointLights[numPointLights];
+
+        if (valid(locations.position))
+            gl::setUniform(locations.position, tf.getWorldPosition());
+
+        gl::setUniform(locations.color       , light.color);
+        gl::setUniform(locations.colorAmbient, light.colorAmbient);
+        gl::setUniform(locations.falloffConstant , light.falloff.constant);
+        gl::setUniform(locations.falloffLinear   , light.falloff.linear);
+        gl::setUniform(locations.falloffQuadratic, light.falloff.quadratic);
 
         numPointLights += 1;
     }
@@ -138,10 +154,16 @@ Material::BuiltinUniformLocations Material::cacheBuiltinUniformLocations() {
     for (int i = 0; i < MAX_NUM_POINT_LIGHTS; ++i) {
 
         std::string prefix = "pointLights[" + std::to_string(i) + "].";
-        u.pointLights[i].color    = m_shader->getUniformLocation(prefix + "color");
-        u.pointLights[i].position = m_shader->getUniformLocation(prefix + "position");
+        auto& locations = u.pointLights[i];
 
-        if (u.pointLights[i].color == -1)
+        locations.color        = m_shader->getUniformLocation(prefix + "color");
+        locations.colorAmbient = m_shader->getUniformLocation(prefix + "colorAmbient");
+        locations.position     = m_shader->getUniformLocation(prefix + "position");
+        locations.falloffConstant  = m_shader->getUniformLocation(prefix + "falloffConstant");
+        locations.falloffLinear    = m_shader->getUniformLocation(prefix + "falloffLinear");
+        locations.falloffQuadratic = m_shader->getUniformLocation(prefix + "falloffQuadratic");
+
+        if (locations.color == -1)
             break;
 
         m_numSupportedPointLights = i + 1;

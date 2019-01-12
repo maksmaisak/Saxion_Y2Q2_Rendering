@@ -24,7 +24,7 @@ void LightingScene::open(en::Engine& engine) {
 
     auto camera = engine.makeActor("Camera");
     camera.add<en::Camera>();
-    camera.add<en::Transform>().move({0, 0, 5});
+    camera.add<en::Transform>();
     camera.add<CameraOrbitBehavior>(5, -45.f, 89.f);
 
     auto ambientLight = engine.makeActor("AmbientLight");
@@ -73,8 +73,10 @@ void LightingScene::open(en::Engine& engine) {
     {
         auto mesh = en::Resources<Mesh>::get(config::MODEL_PATH + "sphere2.obj");
         auto material = std::make_shared<en::Material>("lit");
-        material->setUniformValue("diffuseColor" , glm::vec3(1, 1, 1));
-        material->setUniformValue("specularColor", glm::vec3(1, 1, 1));
+        material->setUniformValue("diffuseMap" , en::Textures::white());
+        material->setUniformValue("diffuseColor", glm::vec3(1));
+        material->setUniformValue("specularMap", en::Textures::white());
+        material->setUniformValue("specularColor", glm::vec3(1));
         material->setUniformValue("shininess", 10.f);
         sphere.add<en::RenderInfo>(mesh, std::move(material));
     }
@@ -85,8 +87,10 @@ void LightingScene::open(en::Engine& engine) {
     {
         auto mesh = en::Resources<Mesh>::get(config::MODEL_PATH + "plane.obj");
         auto material = std::make_shared<en::Material>("lit");
-        material->setUniformValue("diffuseColor" , glm::vec3(1, 1, 1));
-        material->setUniformValue("specularColor", glm::vec3(1, 1, 1));
+        material->setUniformValue("diffuseColor", glm::vec3(1));
+        material->setUniformValue("diffuseMap" , en::Textures::get(config::TEXTURE_PATH + "land.jpg"));
+        material->setUniformValue("specularColor", glm::vec3(0.04));
+        material->setUniformValue("specularMap", en::Textures::white());
         material->setUniformValue("shininess", 10.f);
         plane.add<en::RenderInfo>(mesh, std::move(material));
     }

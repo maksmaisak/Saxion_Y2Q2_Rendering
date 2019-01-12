@@ -10,6 +10,7 @@ uniform	mat4 matrixModel;
 
 out vec3 worldPosition;
 out vec3 worldNormal;
+out vec2 texCoords;
 
 void main(void) {
 
@@ -17,4 +18,5 @@ void main(void) {
     gl_Position = matrixProjection * matrixView * vec4(worldPosition, 1);
 
     worldNormal = mat3(transpose(inverse(matrixModel))) * normal;
+    texCoords = uv;
 }

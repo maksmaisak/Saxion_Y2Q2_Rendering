@@ -18,6 +18,7 @@
 #include "Material.h"
 #include "ColorMaterial.hpp"
 #include "glm.hpp"
+#include <glm/gtx/euler_angles.hpp>
 
 void LightingScene::open(en::Engine& engine) {
 
@@ -26,17 +27,26 @@ void LightingScene::open(en::Engine& engine) {
     camera.add<en::Transform>().move({0, 0, 5});
     camera.add<CameraOrbitBehavior>(5, -45.f, 89.f);
 
-    auto lights = engine.makeActor("Lights");
-    lights.add<en::Transform>();
-    lights.add<RotatingBehavior>(glm::vec3(0,1,0));
-
     auto ambientLight = engine.makeActor("AmbientLight");
-    ambientLight.add<en::Transform>().setParent(lights);
+    ambientLight.add<en::Transform>();
     {
         auto& l = ambientLight.add<en::Light>();
         l.color = {0,0,0};
         l.colorAmbient = {0, 0, 0.2};
     }
+
+    auto directionalLight = engine.makeActor("DirectionalLight");
+    directionalLight.add<en::Transform>()
+        .setLocalRotation(glm::toQuat(glm::orientate4(glm::radians(glm::vec3(-45,0,-90)))));
+    {
+        auto& l = directionalLight.add<en::Light>();
+        l.kind = en::Light::Kind::DIRECTIONAL;
+        l.intensity = 0.4f;
+    }
+
+    auto rotatingLights = engine.makeActor("RotatingLights");
+    rotatingLights.add<en::Transform>();
+    rotatingLights.add<RotatingBehavior>(glm::vec3(0,1,0));
 
     auto lightMesh = en::Resources<Mesh>::get(config::MODEL_PATH + "cube_flat.obj");
 
@@ -45,7 +55,7 @@ void LightingScene::open(en::Engine& engine) {
 
         auto light = engine.makeActor("Light");
         light.add<en::Transform>()
-            .setParent(lights)
+            .setParent(rotatingLights)
             .move(glm::rotate(glm::vec3(0,0,2), 2.f * glm::pi<float>() * (i + 1.f) / numLights, glm::vec3(0,1,0)))
             .scale({0.1f, 0.1f, 0.1f});
 

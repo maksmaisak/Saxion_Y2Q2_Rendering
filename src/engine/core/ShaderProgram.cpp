@@ -126,7 +126,7 @@ namespace en {
         GLint size;
         GLenum uniformType;
 
-        const GLsizei nameBufferSize = 32;
+        const GLsizei nameBufferSize = 128;
         GLchar nameBuffer[nameBufferSize];
         GLsizei nameLength;
 

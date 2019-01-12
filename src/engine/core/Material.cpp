@@ -70,35 +70,35 @@ void Material::setBuiltinUniforms(
 
     auto& registry = engine->getRegistry();
 
-    // Add point lights
+    // Add lights
     int numPointLights = 0;
-    for (Entity e : registry.with<en::Transform, en::Light>()) {
+    int numDirectionalLights = 0;
+    for (Entity e : registry.with<Transform, Light>()) {
 
         // TODO sort lights by proximity, pick the closest ones.
 
-        if (numPointLights >= m_numSupportedPointLights)
-            break;
+        auto& light = registry.get<Light>(e);
+        auto& tf = registry.get<Transform>(e);
 
-        auto& light = registry.get<en::Light>(e);
-        auto& tf = registry.get<en::Transform>(e);
-
-        if (light.kind != en::Light::Kind::POINT) // TODO Add support for directional lights
-            continue;
-
-        auto& locations = u.pointLights[numPointLights];
-
-        if (valid(locations.position))
-            gl::setUniform(locations.position, tf.getWorldPosition());
-
-        gl::setUniform(locations.color       , light.color);
-        gl::setUniform(locations.colorAmbient, light.colorAmbient);
-        gl::setUniform(locations.falloffConstant , light.falloff.constant);
-        gl::setUniform(locations.falloffLinear   , light.falloff.linear);
-        gl::setUniform(locations.falloffQuadratic, light.falloff.quadratic);
-
-        numPointLights += 1;
+        switch (light.kind) {
+            case Light::Kind::POINT:
+                if (numPointLights >= m_numSupportedPointLights)
+                    break;
+                setUniformsPointLight(u.pointLights[numPointLights], light, tf);
+                numPointLights += 1;
+                break;
+            case Light::Kind::DIRECTIONAL:
+                if (numDirectionalLights >= m_numSupportedDirectionalLights)
+                    break;
+                setUniformDirectionalLight(u.directionalLights[numDirectionalLights], light, tf);
+                numDirectionalLights += 1;
+                break;
+            default:
+                break;
+        }
     }
     gl::setUniform(u.numPointLights, numPointLights);
+    gl::setUniform(u.numDirectionalLights, numDirectionalLights);
 }
 
 template<typename T>
@@ -150,6 +150,7 @@ Material::BuiltinUniformLocations Material::cacheBuiltinUniformLocations() {
 
     u.viewPosition = m_shader->getUniformLocation("viewPosition");
 
+    // Point lights
     u.numPointLights = m_shader->getUniformLocation("numPointLights");
     for (int i = 0; i < MAX_NUM_POINT_LIGHTS; ++i) {
 
@@ -167,6 +168,26 @@ Material::BuiltinUniformLocations Material::cacheBuiltinUniformLocations() {
             break;
 
         m_numSupportedPointLights = i + 1;
+    }
+
+    // Directional lights
+    u.numDirectionalLights = m_shader->getUniformLocation("numDirectionalLights");
+    for (int i = 0; i < MAX_NUM_DIRECTIONAL_LIGHTS; ++i) {
+
+        std::string prefix = "directionalLights[" + std::to_string(i) + "].";
+        auto& locations = u.directionalLights[i];
+
+        locations.color        = m_shader->getUniformLocation(prefix + "color");
+        locations.colorAmbient = m_shader->getUniformLocation(prefix + "colorAmbient");
+        locations.direction    = m_shader->getUniformLocation(prefix + "direction");
+        locations.falloffConstant  = m_shader->getUniformLocation(prefix + "falloffConstant");
+        locations.falloffLinear    = m_shader->getUniformLocation(prefix + "falloffLinear");
+        locations.falloffQuadratic = m_shader->getUniformLocation(prefix + "falloffQuadratic");
+
+        if (locations.color == -1)
+            break;
+
+        m_numSupportedDirectionalLights = i + 1;
     }
 
     return u;
@@ -193,4 +214,34 @@ void Material::detectAllUniforms() {
         m_uniforms[info.name] = info;
     }
     std::cout << std::endl;
+}
+
+void Material::setUniformsPointLight(
+    const Material::BuiltinUniformLocations::PointLightLocations& locations,
+    const Light& light,
+    const Transform& tf
+) {
+    if (valid(locations.position))
+        gl::setUniform(locations.position, tf.getWorldPosition());
+
+    gl::setUniform(locations.color       , light.color * light.intensity);
+    gl::setUniform(locations.colorAmbient, light.colorAmbient * light.intensity);
+    gl::setUniform(locations.falloffConstant , light.falloff.constant);
+    gl::setUniform(locations.falloffLinear   , light.falloff.linear);
+    gl::setUniform(locations.falloffQuadratic, light.falloff.quadratic);
+}
+
+void Material::setUniformDirectionalLight(
+    const Material::BuiltinUniformLocations::DirectionalLightLocations& locations,
+    const Light& light,
+    const Transform& tf
+) {
+    if (valid(locations.direction))
+        gl::setUniform(locations.direction, glm::normalize(glm::vec3(tf.getWorldTransform()[2])));
+
+    gl::setUniform(locations.color       , light.color * light.intensity);
+    gl::setUniform(locations.colorAmbient, light.colorAmbient * light.intensity);
+    gl::setUniform(locations.falloffConstant , light.falloff.constant);
+    gl::setUniform(locations.falloffLinear   , light.falloff.linear);
+    gl::setUniform(locations.falloffQuadratic, light.falloff.quadratic);
 }

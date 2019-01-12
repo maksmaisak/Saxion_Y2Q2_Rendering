@@ -53,10 +53,13 @@ namespace en {
         using UniformValues = std::tuple<NameToLocationValuePair<T>...>;
 
         static constexpr int MAX_NUM_POINT_LIGHTS = 10;
+        static constexpr int MAX_NUM_DIRECTIONAL_LIGHTS = 10;
+        static constexpr int MAX_NUM_SPOT_LIGHTS = 10;
 
         std::shared_ptr<ShaderProgram> m_shader;
 
         int m_numSupportedPointLights = 0;
+        int m_numSupportedDirectionalLights = 0;
 
         struct BuiltinUniformLocations {
 
@@ -69,7 +72,7 @@ namespace en {
 
             GLint viewPosition = -1;
 
-            int numPointLights = -1;
+            GLint numPointLights = -1;
             struct PointLightLocations {
 
                 GLint position = -1;
@@ -83,6 +86,34 @@ namespace en {
 
             } pointLights[MAX_NUM_POINT_LIGHTS];
 
+            GLint numDirectionalLights = -1;
+            struct DirectionalLightLocations {
+
+                GLint direction = -1;
+
+                GLint color        = -1;
+                GLint colorAmbient = -1;
+
+                GLint falloffConstant  = -1;
+                GLint falloffLinear    = -1;
+                GLint falloffQuadratic = -1;
+
+            } directionalLights[MAX_NUM_DIRECTIONAL_LIGHTS];
+
+            GLint numSpotLights = -1;
+            struct SpotLightLocations {
+
+                GLint direction = -1;
+
+                GLint color        = -1;
+                GLint colorAmbient = -1;
+
+                GLint falloffConstant  = -1;
+                GLint falloffLinear    = -1;
+                GLint falloffQuadratic = -1;
+
+            } spotLights[MAX_NUM_SPOT_LIGHTS];;
+
         } m_builtinUniformLocations;
 
         struct AttributeLocations {
@@ -93,6 +124,7 @@ namespace en {
 
         } m_attributeLocations;
 
+        // All uniforms in the shader.
         std::unordered_map<std::string, UniformInfo> m_uniforms;
 
         // Only types listed here will be supported as custom uniform values,
@@ -113,6 +145,9 @@ namespace en {
 
         template<typename T>
         void setCustomUniformsOfType(const NameToLocationValuePair<T>& values);
+
+        void setUniformsPointLight(const BuiltinUniformLocations::PointLightLocations& locations, const Light& light, const Transform& tf);
+        void setUniformDirectionalLight(const BuiltinUniformLocations::DirectionalLightLocations& locations, const Light& light, const Transform& tf);
     };
 
     template<typename T>

@@ -4,12 +4,11 @@
 #include <SFML/Graphics.hpp>
 #include "engine/core/Texture.hpp"
 
-Texture::Texture(): _id() {
-    glGenTextures (1, &_id);
+Texture::Texture() : _id() {
+    glGenTextures(1, &_id);
 }
 
-Texture::~Texture()
-{
+Texture::~Texture() {
 	glDeleteTextures(1, &_id);
 }
 
@@ -18,8 +17,8 @@ GLuint Texture::getId() {
 }
 
 // importer for textures
-Texture* Texture::load(const std::string& pFilename)
-{
+Texture* Texture::load(const std::string& pFilename) {
+
     // load from file and store in cache
     sf::Image image;
     if (!image.loadFromFile(pFilename)) return nullptr;
@@ -30,8 +29,7 @@ Texture* Texture::load(const std::string& pFilename)
     //load corresponding data into opengl using this id
     auto* texture = new Texture();
     glBindTexture(GL_TEXTURE_2D, texture->getId());
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image.getSize().x, image.getSize().y, 0, GL_RGBA, GL_UNSIGNED_BYTE,
-                 image.getPixelsPtr());
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB_ALPHA, image.getSize().x, image.getSize().y, 0, GL_RGBA, GL_UNSIGNED_BYTE, image.getPixelsPtr());
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glBindTexture(GL_TEXTURE_2D, 0);

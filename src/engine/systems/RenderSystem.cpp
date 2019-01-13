@@ -35,6 +35,8 @@ namespace en {
         //glClearColor((float)0x2d / 0xff, (float)0x6b / 0xff, (float)0xce / 0xff, 1.0f);
         glClearColor(0, 0, 0, 1);
 
+        glEnable(GL_FRAMEBUFFER_SRGB);
+
         m_debugHud = std::make_unique<DebugHud>(&m_engine->getWindow());
     }
 
@@ -61,7 +63,7 @@ namespace en {
                 if (glCheckError() != GL_NO_ERROR) {
 
                     auto* namePtr = m_registry->tryGet<en::Name>(e);
-                    std::string name = namePtr == nullptr ? namePtr->value : "unnamed";
+                    std::string name = namePtr ? namePtr->value : "unnamed";
                     std::cerr << "Error while rendering " << name << std::endl;
                 }
 

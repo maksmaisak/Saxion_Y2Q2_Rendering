@@ -33,8 +33,8 @@ int main() {
         engine->addSystem<en::DestroySystem>();
     }
 
-    //engine->getSceneManager().setCurrentScene<TestScene>();
-    engine->getSceneManager().setCurrentScene<LightingScene>();
+    engine->getSceneManager().setCurrentScene<TestScene>();
+    //engine->getSceneManager().setCurrentScene<LightingScene>();
     //engine->getSceneManager().setCurrentScene<LuaScene>("assets/scripts/luaScene.lua");
 
     engine->run();

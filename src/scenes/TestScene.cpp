@@ -97,14 +97,14 @@ void addRingItems(en::Engine& engine, en::Entity parent, std::size_t numItems = 
 
             auto& tf = object.add<en::Transform>();
 
-            tf.setParent(parent);
+            //tf.setParent(parent);
             tf.setLocalPosition(offset);
             tf.scale(glm::vec3(0.2f));
         }
 
         {
             auto& rb = object.add<en::Rigidbody>();
-            rb.isKinematic = true;
+            //rb.isKinematic = true;
             rb.radius = 0.2f;
             rb.invMass = 1.f / 0.1f;
         }
@@ -113,13 +113,16 @@ void addRingItems(en::Engine& engine, en::Entity parent, std::size_t numItems = 
 
         if (i % 2 == 0) {
 
-            object.add<en::Light>().intensity = 4;
+            object.add<en::Light>().intensity = 2.f;
             object.add<en::RenderInfo>(sphereMesh, sphereMaterial);
 
         } else {
 
             object.add<en::RenderInfo>(cubeMesh, cubeMaterial);
             object.get<en::Transform>().scale(glm::vec3(2));
+            auto& rb = object.get<en::Rigidbody>();
+            rb.radius *= 2.f;
+            rb.invMass /= 2.f;
         }
     }
 }
@@ -181,7 +184,8 @@ void TestScene::open(en::Engine& engine) {
     {
         auto& l = directionalLight.add<en::Light>();
         l.kind = en::Light::Kind::DIRECTIONAL;
-        l.colorAmbient = {0.2, 0.2, 0.2};
+        l.colorAmbient = glm::vec3(0.1);
+        l.color = glm::vec3(0.2);
     }
 
     // Add an empty rotating object.

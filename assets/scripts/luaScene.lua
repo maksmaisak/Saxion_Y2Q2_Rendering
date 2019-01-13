@@ -25,8 +25,8 @@ local scene = {
             scale    = { x = 5, y =  5, z = 5 }
         },
         RenderInfo = {
-            mesh = "mge/models/plane.obj",
-            texture = "mge/textures/land.jpg" -- TODO add support for materials
+            mesh = "models/plane.obj",
+            texture = "textures/land.jpg" -- TODO add support for materials
         },
     },
     {
@@ -35,8 +35,8 @@ local scene = {
             position = { x = 0, y = 2, z = 0 }
         },
         RenderInfo = {
-            mesh = "mge/models/suzanna_flat.obj",
-            texture = "mge/textures/bricks.jpg" -- TODO add support for materials
+            mesh = "models/suzanna_flat.obj",
+            texture = "textures/bricks.jpg" -- TODO add support for materials
         },
         Scripts = { "mover" }
     },
@@ -46,8 +46,8 @@ local scene = {
             position = { x = 0, y = 4, z = 0 }
         },
         RenderInfo = {
-            mesh = "mge/models/teapot_smooth.obj",
-            texture = "mge/textures/bricks.jpg" -- TODO add support for materials
+            mesh = "models/teapot_smooth.obj",
+            texture = "textures/bricks.jpg" -- TODO add support for materials
         }
     }
 }

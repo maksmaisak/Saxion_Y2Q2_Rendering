@@ -10,6 +10,9 @@
 #include <map>
 #include <type_traits>
 #include <algorithm>
+#include "Texture.hpp"
+#include "Mesh.hpp"
+#include "config.hpp"
 
 namespace en {
 
@@ -86,6 +89,13 @@ namespace en {
     // Using inline static to avoid defining this out of the class body causes clang to segfault :(
     template<typename TResource>
     std::map<std::string, std::shared_ptr<TResource>> Resources<TResource>::m_resources;
+
+    using Meshes = Resources<Mesh>;
+    struct Textures : Resources<Texture> {
+
+        inline static std::shared_ptr<Texture> white() {return get(config::TEXTURE_PATH + "white.png");}
+        inline static std::shared_ptr<Texture> black() {return get(config::TEXTURE_PATH + "black.png");}
+    };
 }
 
 #endif //SAXION_Y2Q2_RENDERING_RESOURCES_H

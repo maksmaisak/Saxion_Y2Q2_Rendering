@@ -16,6 +16,20 @@ namespace gl {
     template<typename T>
     void setUniform(GLint location, const T& value);
 
+    template<>
+    void setUniform<GLint>(GLint location, const GLint& value) {
+        glUniform1i(location, value);
+    }
+
+    template<>
+    void setUniform<GLuint>(GLint location, const GLuint& value) {
+        glUniform1ui(location, value);
+    }
+
+    template<>
+    void setUniform<GLfloat>(GLint location, const GLfloat& value) {
+        glUniform1f(location, value);
+    }
 
     template<>
     void setUniform<glm::vec2>(GLint location, const glm::vec2& value) {

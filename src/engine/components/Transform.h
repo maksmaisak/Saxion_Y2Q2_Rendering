@@ -44,15 +44,15 @@ namespace en {
         glm::quat getWorldRotation() const;
 
         // TODO add setWorldPosition/Rotation
-        void setLocalPosition(const glm::vec3& localPosition);
-        void setLocalRotation(const glm::quat& localRotation);
-        void setLocalScale   (const glm::vec3& localScale);
-        void setParent       (Entity newParent);
+        Transform& setLocalPosition(const glm::vec3& localPosition);
+        Transform& setLocalRotation(const glm::quat& localRotation);
+        Transform& setLocalScale   (const glm::vec3& localScale);
+        Transform& setParent       (Entity newParent);
 
-        void move  (const glm::vec3& offset);
-        void rotate(const glm::quat& offset);
-        void rotate(float angle, const glm::vec3& axis);
-        void scale (const glm::vec3& scale);
+        Transform& move  (const glm::vec3& offset);
+        Transform& rotate(const glm::quat& offset);
+        Transform& rotate(float angle, const glm::vec3& axis);
+        Transform& scale (const glm::vec3& scale);
 
     private:
 

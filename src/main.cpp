@@ -13,6 +13,7 @@
 #include "components/Camera.h"
 
 #include "TestScene.h"
+#include "LightingScene.h"
 #include "LuaScene.h"
 
 int main() {
@@ -32,7 +33,8 @@ int main() {
         engine->addSystem<en::DestroySystem>();
     }
 
-    engine->getSceneManager().setCurrentScene<TestScene>();
+    //engine->getSceneManager().setCurrentScene<TestScene>();
+    engine->getSceneManager().setCurrentScene<LightingScene>();
     //engine->getSceneManager().setCurrentScene<LuaScene>("assets/scripts/luaScene.lua");
 
     engine->run();

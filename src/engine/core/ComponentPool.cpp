@@ -18,7 +18,7 @@ namespace en {
 
     ComponentPoolBase::index_type ComponentPoolBase::insert(en::Entity entity) {
 
-        assert(!contains(entity));
+        assert(!contains(entity) && "Entity already has a component of this type!");
 
         const auto id = getId(entity);
         if (id >= m_entityIdToIndex.size()) {

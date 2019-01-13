@@ -28,8 +28,12 @@ void makeFloorFromSpheres(en::Engine& engine, float sideLength, int numSpheresPe
     const float diameter = 2.f * sideLength / numSpheresPerSide;
     const float radius = diameter * 0.5f;
 
-    auto material = en::Resources<TextureMaterial>::get(config::TEXTURE_PATH + "bricks.jpg");
-    auto mesh = en::Resources<Mesh>::get(config::MODEL_PATH + "sphere_smooth.obj");
+    auto mesh = en::Meshes::get(config::MODEL_PATH + "sphere_smooth.obj");
+    auto material = std::make_shared<en::Material>("lit");
+    material->setUniformValue("diffuseMap", en::Textures::get(config::TEXTURE_PATH + "bricks.jpg"));
+    material->setUniformValue("diffuseColor", glm::vec3(1));
+    material->setUniformValue("specularMap", en::Textures::white());
+    material->setUniformValue("specularColor", glm::vec3(0.));
 
     for (int y = 0; y < numSpheresPerSide; ++y) {
         for (int x = 0; x < numSpheresPerSide; ++x) {
@@ -45,7 +49,7 @@ void makeFloorFromSpheres(en::Engine& engine, float sideLength, int numSpheresPe
             };
             tf.setLocalPosition({
                 sideLength * positionNormalized.x * 0.5f,
-                -20 + 8 * glm::length2(positionNormalized),
+                -10 + 8 * glm::length2(positionNormalized),
                 sideLength * positionNormalized.y * 0.5f
             });
             tf.setLocalScale({radius, radius, radius});
@@ -61,9 +65,23 @@ void makeFloorFromSpheres(en::Engine& engine, float sideLength, int numSpheresPe
 
 void addRingItems(en::Engine& engine, en::Entity parent, std::size_t numItems = 10, float radius = 3.5f) {
 
-    auto cubeMesh       = en::Resources<Mesh>::get(config::MODEL_PATH + "cube_flat.obj");
-    auto sphereMesh     = en::Resources<Mesh>::get(config::MODEL_PATH + "sphere_smooth.obj");
-    auto sphereMaterial = en::Resources<TextureMaterial>::get(config::TEXTURE_PATH + "runicfloor.png");
+    auto cubeMesh       = en::Meshes::get(config::MODEL_PATH + "cube_flat.obj");
+    auto sphereMesh     = en::Meshes::get(config::MODEL_PATH + "sphere_smooth.obj");
+    //auto sphereMaterial = en::Resources<TextureMaterial>::get(config::TEXTURE_PATH + "runicfloor.png");
+
+    auto sphereMaterial = std::make_shared<en::Material>("lit");
+    sphereMaterial->setUniformValue("diffuseColor", glm::vec3(1, 1, 1));
+    sphereMaterial->setUniformValue("diffuseMap", en::Textures::white());
+    sphereMaterial->setUniformValue("specularColor", glm::vec3(1, 1, 1));
+    sphereMaterial->setUniformValue("specularMap", en::Textures::white());
+    sphereMaterial->setUniformValue("shininess", 10.f);
+
+    auto cubeMaterial = std::make_shared<en::Material>("lit");
+    cubeMaterial->setUniformValue("diffuseColor", glm::vec3(1, 1, 1));
+    cubeMaterial->setUniformValue("diffuseMap", en::Textures::get(config::TEXTURE_PATH + "container/diffuse.png"));
+    cubeMaterial->setUniformValue("specularColor", glm::vec3(1, 1, 1));
+    cubeMaterial->setUniformValue("specularMap", en::Textures::get(config::TEXTURE_PATH + "container/specular.png"));
+    cubeMaterial->setUniformValue("shininess", 64.f);
 
     for (std::size_t i = 0; i < numItems; ++i) {
 
@@ -94,11 +112,14 @@ void addRingItems(en::Engine& engine, en::Entity parent, std::size_t numItems = 
         object.add<RotatingBehavior>();
 
         if (i % 2 == 0) {
-            object.add<en::Light>();
-            auto material = std::make_shared<ColorMaterial>(glm::abs(glm::sphericalRand(1.f)));
-            object.add<en::RenderInfo>(cubeMesh, std::move(material));
-        } else {
+
+            object.add<en::Light>().intensity = 4;
             object.add<en::RenderInfo>(sphereMesh, sphereMaterial);
+
+        } else {
+
+            object.add<en::RenderInfo>(cubeMesh, cubeMaterial);
+            object.get<en::Transform>().scale(glm::vec3(2));
         }
     }
 }
@@ -109,22 +130,25 @@ void TestScene::open(en::Engine& engine) {
 
     // load a bunch of meshes we will be using throughout this demo
     // F is flat shaded, S is smooth shaded (normals aligned or not), check the models folder!
-    std::shared_ptr<Mesh> planeMeshDefault = en::Resources<Mesh>::get(config::MODEL_PATH + "plane.obj");
-    std::shared_ptr<Mesh> cubeMeshF        = en::Resources<Mesh>::get(config::MODEL_PATH + "cube_flat.obj");
-    std::shared_ptr<Mesh> sphereMeshS      = en::Resources<Mesh>::get(config::MODEL_PATH + "sphere_smooth.obj");
-    std::shared_ptr<Mesh> testObjectMeshS  = en::Resources<Mesh>::get(config::MODEL_PATH + "sphere2.obj");
+    std::shared_ptr<Mesh> planeMeshDefault = en::Meshes::get(config::MODEL_PATH + "plane.obj");
+    std::shared_ptr<Mesh> cubeMeshF        = en::Meshes::get(config::MODEL_PATH + "cube_flat.obj");
+    std::shared_ptr<Mesh> sphereMeshS      = en::Meshes::get(config::MODEL_PATH + "sphere_smooth.obj");
+    std::shared_ptr<Mesh> testObjectMeshS  = en::Meshes::get(config::MODEL_PATH + "sphere2.obj");
 
     // MATERIALS
     auto runicStoneMaterial = en::Resources<en::Material>::get("runicStoneMaterial", "texture");
-    runicStoneMaterial->setUniformValue("diffuseTexture", en::Resources<Texture>::get(config::TEXTURE_PATH + "runicfloor.png"));
+    runicStoneMaterial->setUniformValue("diffuseTexture", en::Textures::get(config::TEXTURE_PATH + "runicfloor.png"));
 
-    auto floorMaterial = en::Resources<en::Material>::get("floorMaterial", "texture");
-    floorMaterial->setUniformValue("diffuseTexture", en::Resources<Texture>::get(config::TEXTURE_PATH + "land.jpg"));
+    auto floorMaterial = en::Resources<en::Material>::get("floorMaterial", "lit");
+    floorMaterial->setUniformValue("diffuseMap", en::Textures::get(config::TEXTURE_PATH + "land.jpg"));
+    floorMaterial->setUniformValue("diffuseColor", glm::vec3(1));
+    floorMaterial->setUniformValue("specularMap", en::Textures::white());
+    floorMaterial->setUniformValue("specularColor", glm::vec3(0.04));
 
     auto wobblingMaterial = en::Resources<WobblingMaterial>::get(config::TEXTURE_PATH + "runicfloor.png");
 
-    //en::Resources<Mesh>::get(config::MODEL_PATH + "sphere3.obj");
-    //en::Resources<Mesh>::removeUnused();
+    //en::Meshes::get(config::MODEL_PATH + "sphere3.obj");
+    //en::Meshes::removeUnused();
 
     // SCENE SETUP
 
@@ -141,14 +165,24 @@ void TestScene::open(en::Engine& engine) {
     // Add the floor
     // Use en::Registry this time,
     // this is more representative of what's actually happening under the hood.
-    en::EntityRegistry& registry = engine.getRegistry();
-    en::Entity plane = registry.makeEntity("Plane");
-    auto& planeTransform = registry.add<en::Transform>(plane);
-    planeTransform.setLocalPosition({0, -4, 0});
-    planeTransform.setLocalScale({5, 5, 5});
-    registry.add<en::RenderInfo>(plane, planeMeshDefault, floorMaterial);
+//    en::EntityRegistry& registry = engine.getRegistry();
+//    en::Entity plane = registry.makeEntity("Plane");
+//    auto& planeTransform = registry.add<en::Transform>(plane);
+//    planeTransform.setLocalPosition({0, -4, 0});
+//    planeTransform.setLocalScale({5, 5, 5});
+//    registry.add<en::RenderInfo>(plane, planeMeshDefault, floorMaterial);
 
     makeFloorFromSpheres(engine, 30, 20);
+
+    // Add a directional light
+    en::Actor directionalLight = engine.makeActor("DirectionalLight");
+    directionalLight.add<en::Transform>()
+        .setLocalRotation(glm::toQuat(glm::orientate3(glm::radians(glm::vec3(-45, 0, 90)))));
+    {
+        auto& l = directionalLight.add<en::Light>();
+        l.kind = en::Light::Kind::DIRECTIONAL;
+        l.colorAmbient = {0.2, 0.2, 0.2};
+    }
 
     // Add an empty rotating object.
     en::Actor ring = engine.makeActor("Ring");
@@ -159,6 +193,7 @@ void TestScene::open(en::Engine& engine) {
         rb.radius = 2.5f;
     }
     ring.add<RotatingBehavior>();
+    addRingItems(engine, ring, 18);
 
     //add a spinning sphere
     en::Actor sphere = engine.makeActor("Main sphere");
@@ -167,6 +202,4 @@ void TestScene::open(en::Engine& engine) {
     tf.setLocalScale({2.5f, 2.5f, 2.5f});
     sphere.add<en::RenderInfo>(testObjectMeshS, wobblingMaterial);
     cameraOrbitBehavior.setTarget(sphere);
-
-    addRingItems(engine, ring, 20);
 }

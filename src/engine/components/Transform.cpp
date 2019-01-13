@@ -24,7 +24,7 @@ namespace en {
         if (m_matrixWorldDirty) {
 
             if (!en::isNullEntity(m_parent)) {
-                m_matrixWorld = m_registry->get<Transform>(m_parent).getLocalTransform() * getLocalTransform();
+                m_matrixWorld = m_registry->get<Transform>(m_parent).getWorldTransform() * getLocalTransform();
             } else {
                 m_matrixWorld = getLocalTransform();
             }
@@ -35,30 +35,33 @@ namespace en {
         return m_matrixWorld;
     }
 
-    void Transform::setLocalPosition(const glm::vec3& localPosition) {
+    Transform& Transform::setLocalPosition(const glm::vec3& localPosition) {
 
         m_position = localPosition;
         markDirty();
+        return *this;
     }
 
-    void Transform::setLocalRotation(const glm::quat& localRotation) {
+    Transform& Transform::setLocalRotation(const glm::quat& localRotation) {
 
         m_rotation = localRotation;
         markDirty();
+        return *this;
     }
 
-    void Transform::setLocalScale(const glm::vec3& localScale) {
+    Transform& Transform::setLocalScale(const glm::vec3& localScale) {
 
         m_scale = localScale;
         markDirty();
+        return *this;
     }
 
     // TODO Make this preserve world position
-    void Transform::setParent(Entity newParent) {
+    Transform& Transform::setParent(Entity newParent) {
 
         Entity oldParent = m_parent;
         if (!isNullEntity(oldParent)) {
-            if (oldParent == newParent) return;
+            if (oldParent == newParent) return *this;
             m_registry->get<Transform>(oldParent).removeChild(m_entity);
         }
 
@@ -69,6 +72,7 @@ namespace en {
 
         m_parent = newParent;
         m_matrixWorldDirty = true;
+        return *this;
     }
 
     void Transform::markDirty() {
@@ -102,27 +106,31 @@ namespace en {
         m_children.erase(it, m_children.end());
     }
 
-    void Transform::move(const glm::vec3& offset) {
+    Transform& Transform::move(const glm::vec3& offset) {
 
         m_position += offset;
         markDirty();
+        return *this;
     }
 
-    void Transform::rotate(const glm::quat& offset) {
+    Transform& Transform::rotate(const glm::quat& offset) {
 
         m_rotation = offset * m_rotation;
         markDirty();
+        return *this;
     }
 
-    void Transform::rotate(float angle, const glm::vec3& axis) {
+    Transform& Transform::rotate(float angle, const glm::vec3& axis) {
 
         rotate(glm::angleAxis(angle, glm::normalize(axis)));
+        return *this;
     }
 
-    void Transform::scale(const glm::vec3& scale) {
+    Transform& Transform::scale(const glm::vec3& scale) {
 
         m_scale *= scale;
         markDirty();
+        return *this;
     }
 
     glm::vec3 Transform::getWorldPosition() const {

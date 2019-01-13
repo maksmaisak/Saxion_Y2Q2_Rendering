@@ -15,9 +15,12 @@ namespace en {
         LUA_COMPONENT_TYPE(Light);
 
         enum class Kind {
-            POINT,
+
+            POINT = 0,
             DIRECTIONAL,
-            SPOT
+            SPOT,
+
+            COUNT
         };
 
         struct Falloff {

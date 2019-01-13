@@ -294,5 +294,5 @@ void Material::setUniformSpotLight(
     gl::setUniform(locations.falloffLinear   , light.falloff.linear);
     gl::setUniform(locations.falloffQuadratic, light.falloff.quadratic);
     gl::setUniform(locations.innerCutoff, light.spotlightInnerCutoff);
-    gl::setUniform(locations.outerCutoff, light.spotlightOuterCutoff);
+    gl::setUniform(locations.outerCutoff, glm::min(light.spotlightInnerCutoff, light.spotlightOuterCutoff));
 }

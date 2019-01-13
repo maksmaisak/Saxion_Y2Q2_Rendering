@@ -73,6 +73,7 @@ void Material::setBuiltinUniforms(
     // Add lights
     int numPointLights = 0;
     int numDirectionalLights = 0;
+    int numSpotLights = 0;
     for (Entity e : registry.with<Transform, Light>()) {
 
         // TODO sort lights by proximity, pick the closest ones.
@@ -93,34 +94,41 @@ void Material::setBuiltinUniforms(
                 setUniformDirectionalLight(u.directionalLights[numDirectionalLights], light, tf);
                 numDirectionalLights += 1;
                 break;
+            case Light::Kind::SPOT:
+                if (numSpotLights >= m_numSupportedSpotLights)
+                    break;
+                setUniformSpotLight(u.spotLights[numSpotLights], light, tf);
+                numSpotLights += 1;
+                break;
             default:
                 break;
         }
     }
     gl::setUniform(u.numPointLights, numPointLights);
     gl::setUniform(u.numDirectionalLights, numDirectionalLights);
+    gl::setUniform(u.numSpotLights, numSpotLights);
 }
 
 template<typename T>
-void Material::setCustomUniformsOfType(const Material::NameToLocationValuePair<T>& values) {
+void Material::setCustomUniformsOfType(const Material::LocationToUniformValue<T>& values) {
 
-    for (auto& [name, locationValuePair] : values) {
-        gl::setUniform(locationValuePair.location, locationValuePair.value);
+    for (auto& [location, value] : values) {
+        gl::setUniform(location, value);
     }
 }
 
 template<>
-void Material::setCustomUniformsOfType<std::shared_ptr<Texture>>(const Material::NameToLocationValuePair<std::shared_ptr<Texture>>& values) {
+void Material::setCustomUniformsOfType<std::shared_ptr<Texture>>(const Material::LocationToUniformValue<std::shared_ptr<Texture>>& values) {
 
     GLenum i = 0;
-    for (auto& [name, locationValuePair] : values) {
+    for (auto& [location, value] : values) {
 
         // Activate texture slot i
         glActiveTexture(GL_TEXTURE0 + i);
         // Bind the texture to the current active slot
-        glBindTexture(GL_TEXTURE_2D, locationValuePair.value->getId());
+        glBindTexture(GL_TEXTURE_2D, value->getId());
         // Tell the shader the texture slot for the diffuse texture is slot i
-        glUniform1i(locationValuePair.location, i);
+        glUniform1i(location, i);
 
         i += 1;
         if (i > GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS) {
@@ -157,15 +165,15 @@ Material::BuiltinUniformLocations Material::cacheBuiltinUniformLocations() {
         std::string prefix = "pointLights[" + std::to_string(i) + "].";
         auto& locations = u.pointLights[i];
 
-        locations.color        = m_shader->getUniformLocation(prefix + "color");
+        locations.color = m_shader->getUniformLocation(prefix + "color");
+        if (locations.color == -1)
+            break;
+
         locations.colorAmbient = m_shader->getUniformLocation(prefix + "colorAmbient");
         locations.position     = m_shader->getUniformLocation(prefix + "position");
         locations.falloffConstant  = m_shader->getUniformLocation(prefix + "falloffConstant");
         locations.falloffLinear    = m_shader->getUniformLocation(prefix + "falloffLinear");
         locations.falloffQuadratic = m_shader->getUniformLocation(prefix + "falloffQuadratic");
-
-        if (locations.color == -1)
-            break;
 
         m_numSupportedPointLights = i + 1;
     }
@@ -177,17 +185,40 @@ Material::BuiltinUniformLocations Material::cacheBuiltinUniformLocations() {
         std::string prefix = "directionalLights[" + std::to_string(i) + "].";
         auto& locations = u.directionalLights[i];
 
-        locations.color        = m_shader->getUniformLocation(prefix + "color");
+        locations.color = m_shader->getUniformLocation(prefix + "color");
+        if (locations.color == -1)
+            break;
+
         locations.colorAmbient = m_shader->getUniformLocation(prefix + "colorAmbient");
         locations.direction    = m_shader->getUniformLocation(prefix + "direction");
         locations.falloffConstant  = m_shader->getUniformLocation(prefix + "falloffConstant");
         locations.falloffLinear    = m_shader->getUniformLocation(prefix + "falloffLinear");
         locations.falloffQuadratic = m_shader->getUniformLocation(prefix + "falloffQuadratic");
 
+        m_numSupportedDirectionalLights = i + 1;
+    }
+
+    // Spot lights
+    u.numSpotLights = m_shader->getUniformLocation("numSpotLights");
+    for (int i = 0; i < MAX_NUM_SPOT_LIGHTS; ++i) {
+
+        std::string prefix = "spotLights[" + std::to_string(i) + "].";
+        auto& locations = u.spotLights[i];
+
+        locations.color = m_shader->getUniformLocation(prefix + "color");
         if (locations.color == -1)
             break;
 
-        m_numSupportedDirectionalLights = i + 1;
+        locations.colorAmbient = m_shader->getUniformLocation(prefix + "colorAmbient");
+        locations.position     = m_shader->getUniformLocation(prefix + "position");
+        locations.direction    = m_shader->getUniformLocation(prefix + "direction");
+        locations.falloffConstant  = m_shader->getUniformLocation(prefix + "falloffConstant");
+        locations.falloffLinear    = m_shader->getUniformLocation(prefix + "falloffLinear");
+        locations.falloffQuadratic = m_shader->getUniformLocation(prefix + "falloffQuadratic");
+        locations.innerCutoff      = m_shader->getUniformLocation(prefix + "innerCutoff");
+        locations.outerCutoff      = m_shader->getUniformLocation(prefix + "outerCutoff");
+
+        m_numSupportedSpotLights = i + 1;
     }
 
     return u;
@@ -244,4 +275,24 @@ void Material::setUniformDirectionalLight(
     gl::setUniform(locations.falloffConstant , light.falloff.constant);
     gl::setUniform(locations.falloffLinear   , light.falloff.linear);
     gl::setUniform(locations.falloffQuadratic, light.falloff.quadratic);
+}
+
+void Material::setUniformSpotLight(
+    const BuiltinUniformLocations::SpotLightLocations& locations,
+    const Light& light,
+    const Transform& tf
+) {
+    if (valid(locations.position))
+        gl::setUniform(locations.position, tf.getWorldPosition());
+
+    if (valid(locations.direction))
+        gl::setUniform(locations.direction, glm::normalize(glm::vec3(tf.getWorldTransform()[2])));
+
+    gl::setUniform(locations.color       , light.color * light.intensity);
+    gl::setUniform(locations.colorAmbient, light.colorAmbient * light.intensity);
+    gl::setUniform(locations.falloffConstant , light.falloff.constant);
+    gl::setUniform(locations.falloffLinear   , light.falloff.linear);
+    gl::setUniform(locations.falloffQuadratic, light.falloff.quadratic);
+    gl::setUniform(locations.innerCutoff, light.spotlightInnerCutoff);
+    gl::setUniform(locations.outerCutoff, light.spotlightOuterCutoff);
 }

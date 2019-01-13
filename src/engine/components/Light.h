@@ -16,7 +16,8 @@ namespace en {
 
         enum class Kind {
             POINT,
-            DIRECTIONAL
+            DIRECTIONAL,
+            SPOT
         };
 
         struct Falloff {
@@ -31,6 +32,10 @@ namespace en {
         glm::vec3 color = {1, 1, 1};
         float intensity = 1;
         Falloff falloff = {1, 0, 1};
+
+        // cos of angle in radius
+        float spotlightInnerCutoff = glm::cos(glm::radians(40.f));
+        float spotlightOuterCutoff = glm::cos(glm::radians(50.f));
     };
 
     struct FalloffFunctions {

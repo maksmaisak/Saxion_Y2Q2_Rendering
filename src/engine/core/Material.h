@@ -38,19 +38,12 @@ namespace en {
 
     private:
 
-        // The necessary info for assigning a material-specific value for a uniform.
-        template<typename T>
-        struct UniformLocationValuePair {
-            GLint location = -1;
-            T value;
-        };
-
         // TODO Make this a mapping from location instead of from name.
         template<typename T>
-        using NameToLocationValuePair = std::unordered_map<std::string, UniformLocationValuePair<T>>;
+        using LocationToUniformValue = std::unordered_map<GLint, T>;
 
         template<typename... T>
-        using UniformValues = std::tuple<NameToLocationValuePair<T>...>;
+        using UniformValues = std::tuple<LocationToUniformValue<T>...>;
 
         static constexpr int MAX_NUM_POINT_LIGHTS = 10;
         static constexpr int MAX_NUM_DIRECTIONAL_LIGHTS = 10;
@@ -60,6 +53,7 @@ namespace en {
 
         int m_numSupportedPointLights = 0;
         int m_numSupportedDirectionalLights = 0;
+        int m_numSupportedSpotLights = 0;
 
         struct BuiltinUniformLocations {
 
@@ -103,6 +97,7 @@ namespace en {
             GLint numSpotLights = -1;
             struct SpotLightLocations {
 
+                GLint position  = -1;
                 GLint direction = -1;
 
                 GLint color        = -1;
@@ -111,6 +106,8 @@ namespace en {
                 GLint falloffConstant  = -1;
                 GLint falloffLinear    = -1;
                 GLint falloffQuadratic = -1;
+                GLint innerCutoff = -1;
+                GLint outerCutoff = -1;
 
             } spotLights[MAX_NUM_SPOT_LIGHTS];;
 
@@ -127,6 +124,8 @@ namespace en {
         // All uniforms in the shader.
         std::unordered_map<std::string, UniformInfo> m_uniforms;
 
+        // Values of custom material-specific uniforms.
+        // A tuple of maps between locations and values.
         // Only types listed here will be supported as custom uniform values,
         // i.e settable via material.setUniform
         UniformValues<
@@ -144,10 +143,11 @@ namespace en {
         void setCustomUniforms();
 
         template<typename T>
-        void setCustomUniformsOfType(const NameToLocationValuePair<T>& values);
+        void setCustomUniformsOfType(const LocationToUniformValue<T>& values);
 
         void setUniformsPointLight(const BuiltinUniformLocations::PointLightLocations& locations, const Light& light, const Transform& tf);
         void setUniformDirectionalLight(const BuiltinUniformLocations::DirectionalLightLocations& locations, const Light& light, const Transform& tf);
+        void setUniformSpotLight(const BuiltinUniformLocations::SpotLightLocations& locations, const Light& light, const Transform& tf);
     };
 
     template<typename T>
@@ -159,12 +159,12 @@ namespace en {
         }
 
         static_assert(
-            has_type_v<NameToLocationValuePair<T>, decltype(m_uniformValues)>,
+            has_type_v<LocationToUniformValue<T>, decltype(m_uniformValues)>,
             "This type is unsupported for custom uniforms."
         );
 
-        auto& values = std::get<NameToLocationValuePair<T>>(m_uniformValues);
-        values[name] = {it->second.location, value};
+        auto& values = std::get<LocationToUniformValue<T>>(m_uniformValues);
+        values[it->second.location] = value;
     }
 }
 

@@ -44,13 +44,39 @@ void LightingScene::open(en::Engine& engine) {
         l.intensity = 0.4f;
     }
 
+    auto spotLight = engine.makeActor("SpotLight");
+    spotLight.add<en::Transform>()
+        .move({0, 0, -2});
+    {
+        glm::vec3 spotLightColor = {0, 1, 1};
+
+        {
+            auto child = engine.makeActor("SpotLightModel");
+            child.add<en::Transform>()
+                .setParent(spotLight)
+                .scale(glm::vec3(0.2f))
+                .rotate(glm::radians(-90.f), {1, 0, 0})
+                .move({0, 0, 0.1});
+
+            auto mesh = en::Meshes::get(config::MODEL_PATH + "cone_smooth.obj");
+            auto material = std::make_shared<en::Material>("color");
+            material->setUniformValue("diffuseColor", spotLightColor);
+            child.add<en::RenderInfo>(mesh, material);
+        }
+
+        auto& l = spotLight.add<en::Light>();
+        l.kind  = en::Light::Kind::SPOT;
+        l.color = spotLightColor;
+    }
+    spotLight.add<RotatingBehavior>(glm::vec3(1, 0, 0));
+
     auto rotatingLights = engine.makeActor("RotatingLights");
     rotatingLights.add<en::Transform>();
     rotatingLights.add<RotatingBehavior>(glm::vec3(0,1,0));
 
     auto lightMesh = en::Resources<Mesh>::get(config::MODEL_PATH + "cube_flat.obj");
 
-    constexpr int numLights = 6;
+    constexpr int numLights = 2;
     for (int i = 0; i < numLights; ++i) {
 
         auto light = engine.makeActor("Light");
@@ -73,11 +99,11 @@ void LightingScene::open(en::Engine& engine) {
     {
         auto mesh = en::Resources<Mesh>::get(config::MODEL_PATH + "sphere2.obj");
         auto material = std::make_shared<en::Material>("lit");
-        material->setUniformValue("diffuseMap" , en::Textures::white());
-        material->setUniformValue("diffuseColor", glm::vec3(1));
-        material->setUniformValue("specularMap", en::Textures::white());
+        material->setUniformValue("diffuseMap"   , en::Textures::white());
+        material->setUniformValue("diffuseColor" , glm::vec3(1));
+        material->setUniformValue("specularMap"  , en::Textures::white());
         material->setUniformValue("specularColor", glm::vec3(1));
-        material->setUniformValue("shininess", 10.f);
+        material->setUniformValue("shininess"    , 10.f);
         sphere.add<en::RenderInfo>(mesh, std::move(material));
     }
     camera.get<CameraOrbitBehavior>().setTarget(sphere);
@@ -87,11 +113,11 @@ void LightingScene::open(en::Engine& engine) {
     {
         auto mesh = en::Resources<Mesh>::get(config::MODEL_PATH + "plane.obj");
         auto material = std::make_shared<en::Material>("lit");
-        material->setUniformValue("diffuseColor", glm::vec3(1));
-        material->setUniformValue("diffuseMap" , en::Textures::get(config::TEXTURE_PATH + "land.jpg"));
+        material->setUniformValue("diffuseColor"  , glm::vec3(1));
+        material->setUniformValue("diffuseMap"   , en::Textures::get(config::TEXTURE_PATH + "land.jpg"));
         material->setUniformValue("specularColor", glm::vec3(0.04));
-        material->setUniformValue("specularMap", en::Textures::white());
-        material->setUniformValue("shininess", 10.f);
+        material->setUniformValue("specularMap"  , en::Textures::white());
+        material->setUniformValue("shininess"    , 10.f);
         plane.add<en::RenderInfo>(mesh, std::move(material));
     }
 }

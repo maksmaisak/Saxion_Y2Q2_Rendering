@@ -34,8 +34,8 @@ int main() {
     }
 
     //engine->getSceneManager().setCurrentScene<TestScene>();
-    engine->getSceneManager().setCurrentScene<LightingScene>();
-    //engine->getSceneManager().setCurrentScene<LuaScene>("assets/scripts/luaScene.lua");
+    //engine->getSceneManager().setCurrentScene<LightingScene>();
+    engine->getSceneManager().setCurrentScene<LuaScene>("assets/scripts/luaScene.lua");
 
     engine->run();
 

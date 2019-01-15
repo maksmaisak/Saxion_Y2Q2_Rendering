@@ -12,6 +12,7 @@
 #include "Entity.h"
 #include "Behavior.h"
 #include "ComponentsToLua.h"
+#include "LuaStack.h"
 
 namespace en {
 

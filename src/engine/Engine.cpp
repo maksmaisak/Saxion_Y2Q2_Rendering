@@ -13,6 +13,10 @@
 #include "ComponentsToLua.h"
 #include "GLHelpers.h"
 
+#include "MetatableHelper.h"
+#include "Transform.h"
+#include "Name.h"
+
 namespace en {
 
     const sf::Time TimestepFixed = sf::seconds(0.01f);
@@ -138,16 +142,48 @@ namespace en {
 
     void Engine::initializeLua() {
 
+        // TODO move the metatable population code into static functions on their respecive classes.
+        {
+            getMetatable<Actor>(m_lua);
+
+            ClosureHelper::makeClosure(m_lua, &Actor::operator bool);
+            lua_setfield(m_lua, -2, "isValid");
+
+            ClosureHelper::makeClosure(m_lua, &Actor::tryGet<Transform>);
+            lua_setfield(m_lua, -2, "getTransform");
+
+
+            // TODO have this return std::optional<std::string> and add support for optionals. (just use nil)
+            std::function<std::string(Actor&)> getName = [](Actor& actor){Name* ptr = actor.tryGet<Name>(); return ptr ? ptr->value : "unnamed";};
+            ClosureHelper::makeClosure(m_lua, getName);
+            lua_setfield(m_lua, -2, "getName");
+
+            lua_pop(m_lua, 1);
+        }
+
+        {
+            getMetatable<Transform*>(m_lua);
+
+            // TODO make it possible not to cast the lambda to a concrete std::function<...> type before passing to makeClosure
+            std::function<void(Transform*, float, float, float)> move = [](Transform* tf, float x, float y, float z) {
+                tf->move({x, y, z});
+            };
+            ClosureHelper::makeClosure(m_lua, move);
+            lua_setfield(m_lua, -2, "move");
+
+            lua_pop(m_lua, 1);
+        }
+
         lua_newtable(m_lua);
 
-        ClosureHelper::makeClosure(m_lua, &Engine::findByName, this);
-        lua_setfield(m_lua, -2, "findByName");
+        ClosureHelper::makeClosure(m_lua, &testFreeFunction);
+        lua_setfield(m_lua, -2, "testFreeFunction");
 
         ClosureHelper::makeClosure(m_lua, &Engine::testMemberFunction, this);
         lua_setfield(m_lua, -2, "testMemberFunction");
 
-        ClosureHelper::makeClosure(m_lua, &testFreeFunction);
-        lua_setfield(m_lua, -2, "testFreeFunction");
+        ClosureHelper::makeClosure(m_lua, &Engine::findByName, this);
+        lua_setfield(m_lua, -2, "findByName");
 
         lua_setglobal(m_lua, "Game");
 

@@ -8,6 +8,7 @@
 #include <type_traits>
 #include "Entity.h"
 #include "EntityRegistry.h"
+#include "MetatableHelper.h"
 
 namespace en {
 
@@ -37,10 +38,9 @@ namespace en {
         inline TComponent& remove() {return m_registry->remove<TComponent>(m_entity);}
 
         inline Engine& getEngine() const {return *m_engine;}
-        inline bool isValid() const {return m_engine;}
 
         inline operator Entity() const {return m_entity;}
-        inline operator bool() const {return isValid() && !isNullEntity(m_entity) && m_registry->isAlive(m_entity);}
+        inline operator bool() const {return m_engine && !isNullEntity(m_entity) && m_registry->isAlive(m_entity);}
 
     private:
         Engine* m_engine = nullptr;

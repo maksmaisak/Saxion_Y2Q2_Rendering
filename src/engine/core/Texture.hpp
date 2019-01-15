@@ -11,9 +11,9 @@ class Texture
 		static Texture* load(const std::string& pTexturePath);
 		virtual ~Texture();
         Texture(const Texture&) = delete;
-        Texture(const Texture&&) = delete;
+        Texture(Texture&&) = delete;
         Texture& operator=(const Texture&) = delete;
-        Texture& operator=(const Texture&&) = delete;
+        Texture& operator=(Texture&&) = delete;
 
 		GLuint getId();
 

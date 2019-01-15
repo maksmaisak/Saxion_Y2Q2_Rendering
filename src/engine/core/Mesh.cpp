@@ -4,10 +4,18 @@
 #include <fstream>
 
 #include "engine/core/Mesh.hpp"
+#include "Mesh.hpp"
+
 
 Mesh::Mesh() : _indexBufferId(0), _vertexBufferId(0), _normalBufferId(0), _uvBufferId(0), _vertices(), _normals(), _uvs(), _indices() {
 	//ctor
 }
+
+Mesh::~Mesh() {
+
+	// TODO destroy the VAO, free buffers.
+}
+
 
 /**
  * Load reads the obj data into a new mesh using C++ combined with c style coding.

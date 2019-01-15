@@ -193,7 +193,7 @@ void TestScene::open(en::Engine& engine) {
     ring.add<en::Transform>();
     {
         auto& rb = ring.add<en::Rigidbody>();
-        rb.isKinematic = true;
+        //rb.isKinematic = true;
         rb.radius = 2.5f;
     }
     ring.add<RotatingBehavior>();

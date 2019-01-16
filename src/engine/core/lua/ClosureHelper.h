@@ -29,26 +29,36 @@ namespace lua {
     namespace detail {
 
         template<typename... T>
-        struct types {};
+        struct types {
+            using indices = std::make_index_sequence<sizeof...(T)> ;
+            static constexpr std::size_t size() {return sizeof...(T);}
+        };
 
         template<typename TResult, typename TOwner, typename... TArgs>
-        struct basicTraits {
+        struct functionTraitsBase {
             using Result = TResult;
             using Owner  = TOwner;
             using Arguments = types<TArgs...>;
+            using Signature = TResult(TArgs...);
         };
 
         template<typename Signature>
         struct functionTraits;
 
         template<typename TResult, typename... Args>
-        struct functionTraits<TResult(*)(Args...)> : basicTraits<TResult, void, Args...> {};
+        struct functionTraits<TResult(*)(Args...)> : functionTraitsBase<TResult, void, Args...> {};
 
         template<typename TResult, typename TOwner, typename... Args>
-        struct functionTraits<TResult(TOwner::*)(Args...)> : basicTraits<TResult, TOwner, Args...> {};
+        struct functionTraits<TResult(TOwner::*)(Args...)> : functionTraitsBase<TResult, TOwner, Args...> {};
 
         template<typename TResult, typename... Args>
-        struct functionTraits<TResult(Args...)> : basicTraits<TResult, void, Args...> {};
+        struct functionTraits<TResult(Args...)> : functionTraitsBase<TResult, void, Args...> {};
+
+        template<typename TResult, typename TOwner, typename... Args>
+        struct functionTraits<TResult(TOwner::*)(Args...) const> : functionTraitsBase<TResult, TOwner, Args...> {};
+
+        template<typename TResult, typename... Args>
+        struct functionTraits<TResult(Args...) const> : functionTraitsBase<TResult, void, Args...> {};
     }
 
     class ClosureHelper {
@@ -57,10 +67,13 @@ namespace lua {
 
         /// Pushes a C closure out of a given std::function
         /// Handles getting the arguments out of the lua stack and pushing the result onto it.
+        template<typename F>
+        static inline void makeClosure(lua_State* l, const F& function);
+
         template<typename TResult, typename... TArgs>
         static inline void makeClosure(lua_State* l, const std::function<TResult(TArgs...)>& function);
 
-        /// Pushes a C closure out of a given function pointer onto the lua stack.
+            /// Pushes a C closure out of a given function pointer onto the lua stack.
         /// Handles getting the arguments out of the lua stack and pushing the result onto it.
         template<typename TResult, typename... TArgs>
         static inline void makeClosure(lua_State* l, functionPtr<TResult, TArgs...> freeFunction);
@@ -105,6 +118,14 @@ namespace lua {
         template<typename TResult>
         static inline void pushResult(lua_State* l, const TResult& result);
     };
+
+    template<typename F>
+    void ClosureHelper::makeClosure(lua_State* l, const F& func) {
+
+        using traits = detail::functionTraits<decltype(&unqualified_t<F>::operator())>;
+        std::function<typename traits::Signature> function = func;
+        makeClosure(l, function);
+    }
 
     template<typename TResult, typename... TArgs>
     void ClosureHelper::makeClosure(lua_State* l, const std::function<TResult(TArgs...)>& function) {

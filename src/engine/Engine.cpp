@@ -149,14 +149,14 @@ namespace en {
             ClosureHelper::makeClosure(m_lua, &Actor::operator bool);
             lua_setfield(m_lua, -2, "isValid");
 
-            std::function<std::optional<Transform*>(Actor&)> getTransform = [](Actor& actor){
+            auto getTransform = [](Actor& actor){
                 auto* ptr = actor.tryGet<Transform>();
                 return ptr ? std::make_optional(ptr) : std::nullopt;
             };
             ClosureHelper::makeClosure(m_lua, getTransform);
             lua_setfield(m_lua, -2, "getTransform");
 
-            std::function<std::string(Actor&)> getName = [](Actor& actor){Name* ptr = actor.tryGet<Name>(); return ptr ? ptr->value : "unnamed";};
+            auto getName = [](Actor& actor){Name* ptr = actor.tryGet<Name>(); return ptr ? ptr->value : "unnamed";};
             ClosureHelper::makeClosure(m_lua, getName);
             lua_setfield(m_lua, -2, "getName");
 
@@ -166,18 +166,14 @@ namespace en {
         {
             getMetatable<Transform*>(m_lua);
 
-            // TODO make it possible not to cast the lambda to a concrete std::function<...> type before passing to makeClosure
-            auto move = [](Transform* tf, float x, float y, float z) {
+            ClosureHelper::makeClosure(m_lua, [](Transform* tf, float x, float y, float z) {
                 tf->move({x, y, z});
-            };
-            static_assert(std::is_same_v<decltype(&decltype(move)::operator()), void(*)(Transform*, float, float, float)>);
-            ClosureHelper::makeClosure(m_lua, (std::function<void(Transform*, float, float, float)>)move);
+            });
             lua_setfield(m_lua, -2, "move");
 
-            std::function<void(Transform*, float, float, float, float)> rotate = [](Transform* tf, float angle, float x, float y, float z) {
+            ClosureHelper::makeClosure(m_lua, [](Transform* tf, float angle, float x, float y, float z) {
                 tf->rotate(glm::radians(angle), {x, y, z});
-            };
-            ClosureHelper::makeClosure(m_lua, rotate);
+            });
             lua_setfield(m_lua, -2, "rotate");
 
             lua_pop(m_lua, 1);

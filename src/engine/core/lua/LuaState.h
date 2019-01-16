@@ -42,14 +42,14 @@ namespace en {
 
         inline operator lua_State* () {return L;}
 
-        /* TODO Implement template pushing
+        /*
         template<typename TResult, typename... TArgs>
         std::optional<TResult> protectedCall(TArgs&&... args) {
 
-            (lua::pushAdapter<TArgs>{}(args), ...);
+            (lua::push<TArgs>{}(args), ...);
             lua_pcall(L, sizeof...(TArgs), 1, 0);
             return get<TResult>();
-            //(lua::toAdapter<TResults>{}(L, index), ...);
+            //(lua::to<TResults>(L, index), ...);
         }*/
 
         template<typename T>
@@ -82,10 +82,10 @@ namespace en {
         }
 
         template<typename T>
-        inline bool is(int index = -1) const {return lua::TypeAdapter<T>::is(L, index);}
+        inline bool is(int index = -1) const {return lua::is<T>(L, index);}
 
         template<typename T>
-        inline T    to(int index = -1) const {return lua::TypeAdapter<T>::to(L, index);}
+        inline T    to(int index = -1) const {return lua::to<T>(L, index);}
 
     private:
 

@@ -152,7 +152,6 @@ namespace en {
             ClosureHelper::makeClosure(m_lua, &Actor::tryGet<Transform>);
             lua_setfield(m_lua, -2, "getTransform");
 
-
             // TODO have this return std::optional<std::string> and add support for optionals. (just use nil)
             std::function<std::string(Actor&)> getName = [](Actor& actor){Name* ptr = actor.tryGet<Name>(); return ptr ? ptr->value : "unnamed";};
             ClosureHelper::makeClosure(m_lua, getName);
@@ -182,7 +181,12 @@ namespace en {
         ClosureHelper::makeClosure(m_lua, &Engine::testMemberFunction, this);
         lua_setfield(m_lua, -2, "testMemberFunction");
 
-        ClosureHelper::makeClosure(m_lua, &Engine::findByName, this);
+        std::function<std::optional<Actor>(const std::string&)> find = [this](const std::string& name) -> std::optional<Actor> {
+            Actor actor = findByName(name);
+            if (actor) return std::make_optional<Actor>(actor);
+            return std::nullopt;
+        };
+        ClosureHelper::makeClosure(m_lua, find);
         lua_setfield(m_lua, -2, "findByName");
 
         lua_setglobal(m_lua, "Game");

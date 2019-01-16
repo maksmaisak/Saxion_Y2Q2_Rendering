@@ -58,8 +58,7 @@ function scene.update(dt)
     --Game.testMemberFunction()
 
     local head = Game.findByName("head")
-
-    if (head:isValid()) then
+    if (head) then
         print(head:getName())
         print(head:getTransform())
         head:getTransform():move(0, dt, 0)

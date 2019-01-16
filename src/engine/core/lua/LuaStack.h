@@ -84,6 +84,22 @@ namespace lua {
         static void        push(lua_State* L, const std::string& value) { lua_pushstring(L, value.c_str()); }
     };
 
+    template<typename T>
+    struct TypeAdapter<std::optional<T>> {
+        static bool is  (lua_State* L, int index = -1) {
+            return lua_isnil(L, index) || lua::is<T>(L, index);
+        }
+        static std::optional<T> to (lua_State* L, int index = -1) {
+            return lua_isnil(L, index) ? std::nullopt : lua::to<T>(L, index);
+        }
+        static void push(lua_State* L, const std::optional<T>& value) {
+            if (value)
+                lua::push(L, *value);
+            else
+                lua_pushnil(L);
+        }
+    };
+
     class PopperOnDestruct {
 
     public:

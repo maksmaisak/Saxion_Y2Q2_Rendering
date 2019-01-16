@@ -95,6 +95,7 @@ namespace en {
 
         inline static std::shared_ptr<Texture> white() {return get(config::TEXTURE_PATH + "white.png");}
         inline static std::shared_ptr<Texture> black() {return get(config::TEXTURE_PATH + "black.png");}
+        inline static std::shared_ptr<Texture> transparent() {return get(config::TEXTURE_PATH + "transparent.png");}
     };
 }
 

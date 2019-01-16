@@ -31,7 +31,7 @@ namespace lua {
                 std::cout << "Created metatable for type " << utils::demangle<T>() << std::endl;
             }
 
-            // TODO? set __gc in the metatable to the destructor
+            // TODO Set __gc for userdata metatables
             lua_setmetatable(L, -2);
         }
 

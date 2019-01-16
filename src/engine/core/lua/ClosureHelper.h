@@ -26,6 +26,31 @@ namespace lua {
     template<typename TResult, typename... TArgs>
     using functionPtr = TResult(*)(TArgs...);
 
+    namespace detail {
+
+        template<typename... T>
+        struct types {};
+
+        template<typename TResult, typename TOwner, typename... TArgs>
+        struct basicTraits {
+            using Result = TResult;
+            using Owner  = TOwner;
+            using Arguments = types<TArgs...>;
+        };
+
+        template<typename Signature>
+        struct functionTraits;
+
+        template<typename TResult, typename... Args>
+        struct functionTraits<TResult(*)(Args...)> : basicTraits<TResult, void, Args...> {};
+
+        template<typename TResult, typename TOwner, typename... Args>
+        struct functionTraits<TResult(TOwner::*)(Args...)> : basicTraits<TResult, TOwner, Args...> {};
+
+        template<typename TResult, typename... Args>
+        struct functionTraits<TResult(Args...)> : basicTraits<TResult, void, Args...> {};
+    }
+
     class ClosureHelper {
 
     public:

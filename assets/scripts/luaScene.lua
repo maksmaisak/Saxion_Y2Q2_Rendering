@@ -61,7 +61,8 @@ function scene.update(dt)
     if (head) then
         print(head:getName())
         print(head:getTransform())
-        head:getTransform():move(0, dt, 0)
+        head:getTransform():move(dt, dt, 0)
+        head:getTransform():rotate(10 * dt, 0, 1, 0)
     end
 
 --    local floor = Game.find("Floor")

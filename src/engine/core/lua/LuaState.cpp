@@ -55,7 +55,7 @@ void LuaState::makeEnvironment() {
     lua_newtable(L);
     int metatableIndex = lua_gettop(L);
     
-    // __index = _G
+    // set __index = _G
     lua_pushglobaltable(L);
     lua_setfield(L, metatableIndex, "__index");
 

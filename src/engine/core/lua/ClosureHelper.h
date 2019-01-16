@@ -10,6 +10,8 @@
 #include <type_traits>
 #include <functional>
 
+#include "Demangle.h"
+
 namespace lua {
 
     // T without const, volatile, & or &&
@@ -24,50 +26,175 @@ namespace lua {
     template<typename TResult, typename... TArgs>
     using functionPtr = TResult(*)(TArgs...);
 
+    namespace detail {
+
+        template<typename... T>
+        struct types {
+            using indices = std::make_index_sequence<sizeof...(T)> ;
+            static constexpr std::size_t size() {return sizeof...(T);}
+        };
+
+        template<typename TResult, typename TOwner, typename... TArgs>
+        struct functionTraitsBase {
+            using Result = TResult;
+            using Owner  = TOwner;
+            using Arguments = types<TArgs...>;
+            using Signature = TResult(TArgs...);
+        };
+
+        template<typename Signature>
+        struct functionTraits;
+
+        template<typename TResult, typename... Args>
+        struct functionTraits<TResult(*)(Args...)> : functionTraitsBase<TResult, void, Args...> {};
+
+        template<typename TResult, typename TOwner, typename... Args>
+        struct functionTraits<TResult(TOwner::*)(Args...)> : functionTraitsBase<TResult, TOwner, Args...> {};
+
+        template<typename TResult, typename... Args>
+        struct functionTraits<TResult(Args...)> : functionTraitsBase<TResult, void, Args...> {};
+
+        template<typename TResult, typename TOwner, typename... Args>
+        struct functionTraits<TResult(TOwner::*)(Args...) const> : functionTraitsBase<TResult, TOwner, Args...> {};
+
+        template<typename TResult, typename... Args>
+        struct functionTraits<TResult(Args...) const> : functionTraitsBase<TResult, void, Args...> {};
+    }
+
     class ClosureHelper {
 
     public:
 
+        /// Pushes a C closure out of a given std::function
+        /// Handles getting the arguments out of the lua stack and pushing the result onto it.
+        template<typename F>
+        static inline void makeClosure(lua_State* l, const F& function);
+
+        template<typename TResult, typename... TArgs>
+        static inline void makeClosure(lua_State* l, const std::function<TResult(TArgs...)>& function);
+
+            /// Pushes a C closure out of a given function pointer onto the lua stack.
+        /// Handles getting the arguments out of the lua stack and pushing the result onto it.
+        template<typename TResult, typename... TArgs>
+        static inline void makeClosure(lua_State* l, functionPtr<TResult, TArgs...> freeFunction);
+
         /// Pushes a C closure out of a given member function pointer onto the lua stack.
         /// Handles getting the arguments out of the lua stack and pushing the result onto it.
         template<typename TResult, typename TOwner, typename... TArgs>
-        static inline void makeClosure(en::LuaState& lua, memberFunctionPtr<TResult, TOwner, TArgs...> memberFunction, TOwner* typeInstance);
+        static inline void makeClosure(lua_State* l, memberFunctionPtr<TResult, TOwner, TArgs...> memberFunction, TOwner* typeInstance);
 
-        /// Pushes a C closure out of a given function pointer onto the lua stack.
+        /// Pushes a C closure out of a given member function pointer onto the lua stack, while getting the *this pointer from the stack.
         /// Handles getting the arguments out of the lua stack and pushing the result onto it.
-        template<typename TResult, typename... TArgs>
-        static inline void makeClosure(en::LuaState& lua, functionPtr<TResult, TArgs...> freeFunction);
-
-    private:
+        template<typename TResult, typename TOwner, typename... TArgs>
+        static inline void makeClosure(lua_State* l, memberFunctionPtr<TResult, TOwner, TArgs...> memberFunction);
 
         template<typename TResult, typename TOwner, typename... TArgs>
-        static inline int callMember(lua_State* l);
+        static inline void makeClosure(lua_State* l, TResult(TOwner::*memberFunctionConst)(TArgs...) const) {
+            makeClosure(l, reinterpret_cast<memberFunctionPtr<TResult, TOwner, TArgs...>>(memberFunctionConst));
+        }
+
+        template<typename TResult, typename TOwner, typename... TArgs>
+        static inline void makeClosure(lua_State* l, memberFunctionPtr<TResult, TOwner, TArgs...> const memberFunctionConst, const TOwner* typeInstanceConst) {
+            makeClosure(l, reinterpret_cast<memberFunctionPtr<TResult, TOwner, TArgs...>>(memberFunctionConst), reinterpret_cast<TOwner*>(typeInstanceConst));
+        }
+
+    private:
 
         template<typename TResult, typename... TArgs>
         static inline int call(lua_State* l);
 
+        template<typename TResult, typename TOwner, typename... TArgs>
+        static inline int callMember(lua_State* l);
+
+        template<typename TResult, typename TOwner, typename... TArgs>
+        static inline int callMemberFromStack(lua_State* l);
+
+        template<typename TResult, typename... TArgs>
+        static inline int callStdFunction(lua_State* l);
+
         template<typename... TArgs>
-        static inline std::tuple<TArgs...> readArgsFromStack(lua_State* l);
+        static inline std::tuple<TArgs...> readArgsFromStack(lua_State* l, int startIndex = 1);
 
         template<typename TResult>
         static inline void pushResult(lua_State* l, const TResult& result);
     };
 
-    template<typename TResult, typename TOwner, typename... TArgs>
-    void ClosureHelper::makeClosure(en::LuaState& lua, memberFunctionPtr<TResult, TOwner, TArgs...> memberFunction, TOwner* typeInstance) {
+    template<typename F>
+    void ClosureHelper::makeClosure(lua_State* l, const F& func) {
 
-        // Put the member function pointer into a full userdata instead of a light userdata
-        // because member function pointers for some types may be bigger than a void*.
-        lua::TypeAdapter<decltype(memberFunction)>::push(lua, memberFunction);
-        lua_pushlightuserdata(lua, typeInstance);
-        lua_pushcclosure(lua, &callMember<TResult, TOwner, unqualified_t<TArgs>...>, 2);
+        using traits = detail::functionTraits<decltype(&unqualified_t<F>::operator())>;
+        std::function<typename traits::Signature> function = func;
+        makeClosure(l, function);
     }
 
     template<typename TResult, typename... TArgs>
-    void ClosureHelper::makeClosure(en::LuaState& lua, functionPtr<TResult, TArgs...> freeFunction) {
+    void ClosureHelper::makeClosure(lua_State* l, const std::function<TResult(TArgs...)>& function) {
 
-        lua_pushlightuserdata(lua, (void*)freeFunction);
-        lua_pushcclosure(lua, &call<TResult, unqualified_t<TArgs>...>, 1);
+        lua::push(l, function);
+        lua_pushcclosure(l, &callStdFunction<TResult, unqualified_t<TArgs>...>, 1);
+    }
+
+    template<typename TResult, typename... TArgs>
+    void ClosureHelper::makeClosure(lua_State* l, functionPtr<TResult, TArgs...> freeFunction) {
+
+        lua_pushlightuserdata(l, (void*)freeFunction);
+        lua_pushcclosure(l, &call<TResult, unqualified_t<TArgs>...>, 1);
+    }
+
+    template<typename TResult, typename TOwner, typename... TArgs>
+    void ClosureHelper::makeClosure(lua_State* l, memberFunctionPtr<TResult, TOwner, TArgs...> memberFunction, TOwner* typeInstance) {
+
+        // Put the member function pointer into a full userdata instead of a light userdata
+        // because member function pointers for some types may be bigger than a void*.
+        lua::push(l, memberFunction);
+        lua_pushlightuserdata(l, typeInstance);
+        lua_pushcclosure(l, &callMember<TResult, TOwner, unqualified_t<TArgs>...>, 2);
+    }
+
+    template<typename TResult, typename TOwner, typename... TArgs>
+    void ClosureHelper::makeClosure(lua_State* l, memberFunctionPtr<TResult, TOwner, TArgs...> memberFunction) {
+
+        lua::push(l, memberFunction);
+        lua_pushcclosure(l, &callMemberFromStack<TResult, TOwner, unqualified_t<TArgs>...>, 1);
+    }
+
+    template<typename TResult, typename... TArgs>
+    int ClosureHelper::callStdFunction(lua_State* l) {
+
+        void* voidPtr = lua_touserdata(l, lua_upvalueindex(1));
+        auto& function = *static_cast<std::function<TResult(TArgs...)>*>(voidPtr);
+
+        std::tuple<TArgs...> arguments = readArgsFromStack<TArgs...>(l);
+
+        if constexpr (std::is_void_v<TResult>) {
+
+            std::apply(function, arguments);
+            return 0;
+
+        } else {
+
+            pushResult(l, std::apply(function, arguments));
+            return 1;
+        }
+    }
+
+    template<typename TResult, typename... TArgs>
+    int ClosureHelper::call(lua_State* l) {
+
+        auto* function = (functionPtr<TResult, TArgs...>)lua_touserdata(l, lua_upvalueindex(1));
+
+        std::tuple<TArgs...> arguments = readArgsFromStack<TArgs...>(l);
+
+        if constexpr (std::is_void_v<TResult>) {
+
+            (*function)(std::get<TArgs>(arguments)...);
+            return 0;
+
+        } else {
+
+            pushResult(l, (*function)(std::get<TArgs>(arguments)...));
+            return 1;
+        }
     }
 
     template<typename TResult, typename TOwner, typename... TArgs>
@@ -92,23 +219,42 @@ namespace lua {
         }
     }
 
-    template<typename TResult, typename... TArgs>
-    int ClosureHelper::call(lua_State* l) {
+    template<typename TResult, typename TOwner, typename... TArgs>
+    int ClosureHelper::callMemberFromStack(lua_State* l) {
 
-        auto* function = (functionPtr<TResult, TArgs...>)lua_touserdata(l, lua_upvalueindex(1));
+        void* userdataVoidPtr = lua_touserdata(l, lua_upvalueindex(1));
+        auto memberFunction = *static_cast<memberFunctionPtr<TResult, TOwner, TArgs...>*>(userdataVoidPtr);
 
-        std::tuple<TArgs...> arguments = readArgsFromStack<TArgs...>(l);
+        TOwner* owner = nullptr;
+        if (lua::is<TOwner*>(l, 1)) {
+            owner = lua::to<TOwner*>(l, 1);
+        } else {
+            owner = static_cast<TOwner*>(lua_touserdata(l, 1));
+        }
+
+        std::tuple<TArgs...> arguments = readArgsFromStack<TArgs...>(l, 2);
 
         if constexpr (std::is_void_v<TResult>) {
 
-            (*function)(std::get<TArgs>(arguments)...);
+            std::apply([=](auto&&... args){(*owner.*memberFunction)(args...);}, arguments);
             return 0;
 
         } else {
 
-            pushResult(l, (*function)(std::get<TArgs>(arguments)...));
+            pushResult(l, std::apply([=](auto&&... args){return (*owner.*memberFunction)(args...);}, arguments));
             return 1;
         }
+    }
+
+    template<typename T>
+    inline bool checkArgType(lua_State* l, int index) {
+
+        if (lua::is<T>(l, index))
+            return true;
+
+        //std::cerr << "Invalid argument #" + std::to_string(index) + ": expected " + utils::demangle<T>() << std::endl;
+        luaL_error(l, "Invalid argument #%d: expected %s", index, utils::demangle<T>().c_str());
+        return false;
     }
 
     /// Reads the arguments from the stack.
@@ -117,9 +263,15 @@ namespace lua {
     /// that might cause the i++ being evaluated in the wrong order, i.e. getting the arguments from the wrong indices.
     /// So we put the arguments in a tuple first before calling the function.
     template<typename... TArgs>
-    std::tuple<TArgs...> ClosureHelper::readArgsFromStack(lua_State* l) {
-        int i = 1;
-        return {lua::TypeAdapter<TArgs>::to(l, i++)...};
+    std::tuple<TArgs...> ClosureHelper::readArgsFromStack(lua_State* l, int startIndex) {
+
+        {
+            int i = startIndex;
+            (checkArgType<TArgs>(l, i++), ...);
+        }
+
+        int i = startIndex;
+        return {lua::to<TArgs>(l, i++)...};
     }
 
     template<typename TResult>

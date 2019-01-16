@@ -54,8 +54,16 @@ local scene = {
 
 function scene.update(dt)
 
-    print(Game.testFreeFunction())
-    Game.testMemberFunction()
+    --print(Game.testFreeFunction())
+    --Game.testMemberFunction()
+
+    local head = Game.findByName("head")
+    if (head) then
+        print(head:getName())
+        print(head:getTransform())
+        head:getTransform():move(dt, dt, 0)
+        head:getTransform():rotate(10 * dt, 0, 1, 0)
+    end
 
 --    local floor = Game.find("Floor")
 --    if (floor) then

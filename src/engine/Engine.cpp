@@ -142,23 +142,24 @@ namespace en {
 
     void Engine::initializeLua() {
 
-        // TODO move the metatable population code into static functions on their respecive classes.
+        // TODO move the metatable population code into static functions on their respective classes.
         {
             getMetatable<Actor>(m_lua);
+
+            static_assert(!utils::functionTraits<float>::value);
 
             ClosureHelper::makeClosure(m_lua, &Actor::operator bool);
             lua_setfield(m_lua, -2, "isValid");
 
-            auto getTransform = [](Actor& actor){
+            m_lua.setField("getTransform", [](Actor& actor){
                 auto* ptr = actor.tryGet<Transform>();
                 return ptr ? std::make_optional(ptr) : std::nullopt;
-            };
-            ClosureHelper::makeClosure(m_lua, getTransform);
-            lua_setfield(m_lua, -2, "getTransform");
+            });
 
-            auto getName = [](Actor& actor){Name* ptr = actor.tryGet<Name>(); return ptr ? ptr->value : "unnamed";};
-            ClosureHelper::makeClosure(m_lua, getName);
-            lua_setfield(m_lua, -2, "getName");
+            m_lua.setField("getName", [](Actor& actor){
+                Name* ptr = actor.tryGet<Name>();
+                return ptr ? std::make_optional(ptr->value) : std::nullopt;
+            });
 
             lua_pop(m_lua, 1);
         }
@@ -166,34 +167,30 @@ namespace en {
         {
             getMetatable<Transform*>(m_lua);
 
-            ClosureHelper::makeClosure(m_lua, [](Transform* tf, float x, float y, float z) {
+            m_lua.setField("move", [](Transform* tf, float x, float y, float z) {
                 tf->move({x, y, z});
             });
-            lua_setfield(m_lua, -2, "move");
 
-            ClosureHelper::makeClosure(m_lua, [](Transform* tf, float angle, float x, float y, float z) {
+            m_lua.setField("rotate", [](Transform* tf, float angle, float x, float y, float z) {
                 tf->rotate(glm::radians(angle), {x, y, z});
             });
-            lua_setfield(m_lua, -2, "rotate");
 
             lua_pop(m_lua, 1);
         }
 
         lua_newtable(m_lua);
 
-        ClosureHelper::makeClosure(m_lua, &testFreeFunction);
-        lua_setfield(m_lua, -2, "testFreeFunction");
+        m_lua.setField("testValue", 3.1415926f);
+        m_lua.setField("testFreeFunction", &testFreeFunction);
 
         ClosureHelper::makeClosure(m_lua, &Engine::testMemberFunction, this);
         lua_setfield(m_lua, -2, "testMemberFunction");
 
-        std::function<std::optional<Actor>(const std::string&)> find = [this](const std::string& name) -> std::optional<Actor> {
+        m_lua.setField("findByName", [this](const std::string& name) -> std::optional<Actor> {
             Actor actor = findByName(name);
             if (actor) return std::make_optional(actor);
             return std::nullopt;
-        };
-        ClosureHelper::makeClosure(m_lua, find);
-        lua_setfield(m_lua, -2, "findByName");
+        });
 
         lua_setglobal(m_lua, "Game");
 

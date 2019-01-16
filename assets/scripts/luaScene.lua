@@ -54,14 +54,15 @@ local scene = {
 
 function scene.update(dt)
 
-    --print(Game.testFreeFunction())
+    print(Game.testFreeFunction())
+    print(Game.testValue)
     --Game.testMemberFunction()
 
     local head = Game.findByName("head")
     if (head) then
         print(head:getName())
         print(head:getTransform())
-        head:getTransform():move(dt, dt, 0)
+        head:getTransform():move(0, dt, 0)
         head:getTransform():rotate(10 * dt, 0, 1, 0)
     end
 

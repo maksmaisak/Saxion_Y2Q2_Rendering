@@ -12,6 +12,7 @@
 #include <optional>
 
 #include "LuaStack.h"
+#include "ClosureHelper.h"
 
 namespace en {
 
@@ -64,11 +65,23 @@ namespace en {
 
             if (!lua_istable(L, tableIndex)) return std::nullopt;
 
+            lua_getfield(L, tableIndex, name.c_str());
+            return get<T>();
+        }
+
+        template<typename T, typename = void>
+        inline void setField(const std::string& name, T&& value, int tableIndex = -1) {
+
+            luaL_checktype(L, tableIndex, LUA_TTABLE);
             tableIndex = lua_absindex(L, tableIndex);
 
-            lua_pushstring(L, name.c_str());
-            lua_gettable(L, tableIndex);
-            return get<T>();
+            if constexpr (utils::functionTraits<unqualified_t<T>>::value) {
+                ClosureHelper::makeClosure(L, std::forward<T>(value));
+            } else {
+                lua::push(L, std::forward<T>(value));
+            }
+
+            lua_setfield(L, tableIndex, name.c_str());
         }
 
         /// Pops and returns the value on top of the stack.

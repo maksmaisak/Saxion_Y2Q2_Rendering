@@ -12,6 +12,7 @@
 #include <iostream>
 
 #include "Demangle.h"
+#include "FunctionTraits.h"
 
 namespace lua {
 

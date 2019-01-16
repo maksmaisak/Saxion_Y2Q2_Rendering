@@ -5,12 +5,12 @@
 #ifndef SAXION_Y2Q2_RENDERING_LUACLOSURE_H
 #define SAXION_Y2Q2_RENDERING_LUACLOSURE_H
 
-#include "LuaState.h"
 #include "LuaStack.h"
 #include <type_traits>
 #include <functional>
 
 #include "Demangle.h"
+#include "FunctionTraits.h"
 
 namespace lua {
 
@@ -25,41 +25,6 @@ namespace lua {
 
     template<typename TResult, typename... TArgs>
     using functionPtr = TResult(*)(TArgs...);
-
-    namespace detail {
-
-        template<typename... T>
-        struct types {
-            using indices = std::make_index_sequence<sizeof...(T)> ;
-            static constexpr std::size_t size() {return sizeof...(T);}
-        };
-
-        template<typename TResult, typename TOwner, typename... TArgs>
-        struct functionTraitsBase {
-            using Result = TResult;
-            using Owner  = TOwner;
-            using Arguments = types<TArgs...>;
-            using Signature = TResult(TArgs...);
-        };
-
-        template<typename Signature>
-        struct functionTraits;
-
-        template<typename TResult, typename... Args>
-        struct functionTraits<TResult(*)(Args...)> : functionTraitsBase<TResult, void, Args...> {};
-
-        template<typename TResult, typename TOwner, typename... Args>
-        struct functionTraits<TResult(TOwner::*)(Args...)> : functionTraitsBase<TResult, TOwner, Args...> {};
-
-        template<typename TResult, typename... Args>
-        struct functionTraits<TResult(Args...)> : functionTraitsBase<TResult, void, Args...> {};
-
-        template<typename TResult, typename TOwner, typename... Args>
-        struct functionTraits<TResult(TOwner::*)(Args...) const> : functionTraitsBase<TResult, TOwner, Args...> {};
-
-        template<typename TResult, typename... Args>
-        struct functionTraits<TResult(Args...) const> : functionTraitsBase<TResult, void, Args...> {};
-    }
 
     class ClosureHelper {
 
@@ -122,7 +87,8 @@ namespace lua {
     template<typename F>
     void ClosureHelper::makeClosure(lua_State* l, const F& func) {
 
-        using traits = detail::functionTraits<decltype(&unqualified_t<F>::operator())>;
+        using traits = utils::functionTraits<decltype(&unqualified_t<F>::operator())>;
+        static_assert(traits::value);
         std::function<typename traits::Signature> function = func;
         makeClosure(l, function);
     }

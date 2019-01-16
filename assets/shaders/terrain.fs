@@ -54,6 +54,8 @@ uniform int numSpotLights = 0;
 
 uniform vec3 viewPosition;
 
+uniform float time;
+
 // Custom uniforms
 // Height
 uniform sampler2D heightmap;
@@ -71,17 +73,23 @@ uniform float shininess = 1;
 
 out vec4 fragmentColor;
 
-vec3 CalculateDirectionalLightContribution(DirectionalLight light, vec3 normal, vec3 viewDirection, vec3 materialDiffuse, vec3 materialSpecular);
-vec3 CalculatePointLightContribution(PointLight light, vec3 normal, vec3 viewDirection, vec3 materialDiffuse, vec3 materialSpecular);
-vec3 CalculateSpotLightContribution(SpotLight light, vec3 normal, vec3 viewDirection, vec3 materialDiffuse, vec3 materialSpecular);
-vec3 GetLightsContribution(vec3 normal, vec3 viewDirection, vec3 materialDiffuse, vec3 materialSpecular);
+vec3 calculateDirectionalLightContribution(DirectionalLight light, vec3 normal, vec3 viewDirection, vec3 materialDiffuse, vec3 materialSpecular);
+vec3 calculatePointLightContribution(PointLight light, vec3 normal, vec3 viewDirection, vec3 materialDiffuse, vec3 materialSpecular);
+vec3 calculateSpotLightContribution(SpotLight light, vec3 normal, vec3 viewDirection, vec3 materialDiffuse, vec3 materialSpecular);
+vec3 getLightsContribution(vec3 normal, vec3 viewDirection, vec3 materialDiffuse, vec3 materialSpecular);
+
+vec4 animate(sampler2D sampler, vec2 uv) {
+
+    vec2 displacement = vec2(cos(time), sin(time)) * 0.05;
+    return texture(diffuse2, uv + displacement) * (1 + sin(time * 0.5) * 0.4);
+}
 
 vec3 sampleDiffuse(vec2 uv) {
 
     vec4 weights = texture(splatmap, texCoords);
     vec4 result =
         weights.r * texture(diffuse1, uv) +
-        weights.g * texture(diffuse2, uv) +
+        weights.g * animate(diffuse2, uv) +
         weights.b * texture(diffuse3, uv) +
         weights.a * texture(diffuse4, uv);
 
@@ -127,31 +135,35 @@ void main() {
     vec3 materialDiffuse  = diffuseColor  * getDiffuse(normal);
     vec3 materialSpecular = specularColor * vec3(texture(specularMap, texCoords));
 
-    vec3 color = GetLightsContribution(normal, viewDirection, materialDiffuse, materialSpecular);
+    vec3 color = getLightsContribution(normal, viewDirection, materialDiffuse, materialSpecular);
 	fragmentColor = vec4(color, 1);
-	//fragmentColor = vec4((normal + vec3(1)) * 0.5, 1);
+
+	// uncomment one for debug view
+	//fragmentColor = vec4((normal + vec3(1)) * 0.5, 1); // normals
+	//fragmentColor = texture(splatmap, texCoords); // splatma,
+	//fragmentColor = vec4(vec3(texture(splatmap, texCoords).b), 1); // splatmap channel
 }
 
-vec3 GetLightsContribution(vec3 normal, vec3 viewDirection, vec3 materialDiffuse, vec3 materialSpecular) {
+vec3 getLightsContribution(vec3 normal, vec3 viewDirection, vec3 materialDiffuse, vec3 materialSpecular) {
 
     vec3 color = vec3(0,0,0);
 
     for (int i = 0; i < numDirectionalLights; ++i) {
-        color += CalculateDirectionalLightContribution(directionalLights[i], normal, viewDirection, materialDiffuse, materialSpecular);
+        color += calculateDirectionalLightContribution(directionalLights[i], normal, viewDirection, materialDiffuse, materialSpecular);
     }
 
     for (int i = 0; i < numPointLights; ++i) {
-        color += CalculatePointLightContribution(pointLights[i], normal, viewDirection, materialDiffuse, materialSpecular);
+        color += calculatePointLightContribution(pointLights[i], normal, viewDirection, materialDiffuse, materialSpecular);
     }
 
     for (int i = 0; i < numSpotLights; ++i) {
-        color += CalculateSpotLightContribution(spotLights[i], normal, viewDirection, materialDiffuse, materialSpecular);
+        color += calculateSpotLightContribution(spotLights[i], normal, viewDirection, materialDiffuse, materialSpecular);
     }
 
 	return color;
 }
 
-vec3 CalculateDirectionalLightContribution(DirectionalLight light, vec3 normal, vec3 viewDirection, vec3 materialDiffuse, vec3 materialSpecular) {
+vec3 calculateDirectionalLightContribution(DirectionalLight light, vec3 normal, vec3 viewDirection, vec3 materialDiffuse, vec3 materialSpecular) {
 
     vec3 ambient = light.colorAmbient * materialDiffuse;
 
@@ -163,7 +175,7 @@ vec3 CalculateDirectionalLightContribution(DirectionalLight light, vec3 normal, 
     return ambient + diffuse + specular;
 }
 
-vec3 CalculatePointLightContribution(PointLight light, vec3 normal, vec3 viewDirection, vec3 materialDiffuse, vec3 materialSpecular) {
+vec3 calculatePointLightContribution(PointLight light, vec3 normal, vec3 viewDirection, vec3 materialDiffuse, vec3 materialSpecular) {
 
     vec3 ambient = light.colorAmbient * materialDiffuse;
 
@@ -181,7 +193,7 @@ vec3 CalculatePointLightContribution(PointLight light, vec3 normal, vec3 viewDir
     return ambient + attenuation * (diffuse + specular);
 }
 
-vec3 CalculateSpotLightContribution(SpotLight light, vec3 normal, vec3 viewDirection, vec3 materialDiffuse, vec3 materialSpecular) {
+vec3 calculateSpotLightContribution(SpotLight light, vec3 normal, vec3 viewDirection, vec3 materialDiffuse, vec3 materialSpecular) {
 
     vec3 ambient = light.colorAmbient * materialDiffuse;
 

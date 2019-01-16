@@ -35,8 +35,8 @@ void main(void) {
     vec3 uvSpacePosition = samplePositionUVSpace(uv);
     vec3 tangentX = samplePositionUVSpace(uv + vec2(0.01, 0)) - uvSpacePosition;
     vec3 tangentZ = samplePositionUVSpace(uv + vec2(0, 0.01)) - uvSpacePosition;
-
     vec3 computedNormal = normalize(cross(normalize(tangentZ), normalize(tangentX)));
     worldNormal = mat3(transpose(inverse(matrixModel))) * computedNormal;
+
     texCoords = uv;
 }

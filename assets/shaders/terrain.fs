@@ -70,6 +70,8 @@ uniform sampler2D splatmap;
 uniform vec3 specularColor = vec3(1,1,1);
 uniform sampler2D specularMap;
 uniform float shininess = 1;
+// Animation
+uniform sampler2D noise;
 
 out vec4 fragmentColor;
 
@@ -80,8 +82,15 @@ vec3 getLightsContribution(vec3 normal, vec3 viewDirection, vec3 materialDiffuse
 
 vec4 animate(sampler2D sampler, vec2 uv) {
 
-    vec2 displacement = vec2(cos(time), sin(time)) * 0.05;
-    return texture(diffuse2, uv + displacement) * (1 + sin(time * 0.5) * 0.4);
+    float noiseValue = texture(noise, uv).r;
+    float noisedTime = time + noiseValue;
+    vec2 displacement = normalize(texCoords - vec2(0.5, 0.5)) * sin(noisedTime * 0.5) * 0.4;
+
+    float weightMultiplier = (1 + sin(time * 0.5) * 0.4);
+
+    vec4 layer1 = texture(diffuse2, uv + displacement);
+    vec4 layer2 = texture(diffuse2, uv - displacement);
+    return mix(layer1, layer2, texture(noise, uv + displacement).r) * weightMultiplier;
 }
 
 vec3 sampleDiffuse(vec2 uv) {
@@ -138,10 +147,11 @@ void main() {
     vec3 color = getLightsContribution(normal, viewDirection, materialDiffuse, materialSpecular);
 	fragmentColor = vec4(color, 1);
 
-	// uncomment one for debug view
+	// uncomment one of these for debug view
 	//fragmentColor = vec4((normal + vec3(1)) * 0.5, 1); // normals
 	//fragmentColor = texture(splatmap, texCoords); // splatma,
 	//fragmentColor = vec4(vec3(texture(splatmap, texCoords).b), 1); // splatmap channel
+	//fragmentColor = vec4(vec3(length(texCoords - vec2(0.5, 0.5))), 1); // texcoord from center
 }
 
 vec3 getLightsContribution(vec3 normal, vec3 viewDirection, vec3 materialDiffuse, vec3 materialSpecular) {

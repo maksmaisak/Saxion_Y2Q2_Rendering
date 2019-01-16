@@ -34,26 +34,27 @@ void TerrainScene::open(en::Engine& engine) {
     {
         auto& l = directionalLight.add<en::Light>();
         l.kind = en::Light::Kind::DIRECTIONAL;
-        //l.colorAmbient = {0.1, 0.1, 0.1};
+        l.colorAmbient = {0.1, 0.1, 0.1};
         l.intensity = 1.f;
     }
 
     auto terrain = engine.makeActor("Terrain");
-    terrain.add<en::Transform>().scale({4, 1, 4});
+    terrain.add<en::Transform>().scale({3, 1, 3});
     {
         auto mesh = en::Meshes::get(config::MODEL_PATH + "plane_8192.obj");
         auto material = std::make_shared<en::Material>("terrain");
         material->setUniformValue("heightmap", en::Textures::get(config::TEXTURE_PATH + "terrain/heightmap.png"));
-        material->setUniformValue("maxHeight", 4.f);
+        material->setUniformValue("maxHeight", 3.f);
         material->setUniformValue("splatmap", en::Textures::get(config::TEXTURE_PATH + "terrain/splatmap.png"));
         material->setUniformValue("diffuse1", en::Textures::get(config::TEXTURE_PATH + "terrain/diffuse1.jpg"));
-        material->setUniformValue("diffuse2", en::Textures::get(config::TEXTURE_PATH + "terrain/water.jpg"));
+        material->setUniformValue("diffuse2", en::Textures::get(config::TEXTURE_PATH + "terrain/water/water.jpg"));
         material->setUniformValue("diffuse3", en::Textures::get(config::TEXTURE_PATH + "terrain/diffuse3.jpg"));
         material->setUniformValue("diffuse4", en::Textures::get(config::TEXTURE_PATH + "terrain/diffuse4.jpg"));
         material->setUniformValue("diffuseColor" , glm::vec3(1));
-        material->setUniformValue("specularColor", glm::vec3(0.04));
+        material->setUniformValue("specularColor", glm::vec3(0.02));
         material->setUniformValue("specularMap", en::Textures::white());
         material->setUniformValue("shininess"  , 64.f);
+        material->setUniformValue("noise", en::Textures::get(config::TEXTURE_PATH + "terrain/water/noise_c.jpg"));
         terrain.add<en::RenderInfo>(mesh, std::move(material));
     }
     //terrain.add<RotatingBehavior>(glm::vec3(0, 1, 0), glm::radians(45.f));

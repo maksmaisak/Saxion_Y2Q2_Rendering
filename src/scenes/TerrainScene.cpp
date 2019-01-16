@@ -32,8 +32,9 @@ void TerrainScene::open(en::Engine& engine) {
     ambientLight.add<en::Transform>();
     {
         auto& l = ambientLight.add<en::Light>();
-        l.color = {0,0,0};
-        l.intensity = 0.4;
+        l.kind = en::Light::Kind::DIRECTIONAL;
+        l.colorAmbient = {1, 1, 1};
+        l.intensity = 1.f;
     }
 
     auto directionalLight = engine.makeActor("DirectionalLight");
@@ -42,11 +43,11 @@ void TerrainScene::open(en::Engine& engine) {
     {
         auto& l = directionalLight.add<en::Light>();
         l.kind = en::Light::Kind::DIRECTIONAL;
-        l.intensity = 0.4f;
+        l.intensity = 1.f;
     }
 
     auto terrain = engine.makeActor("Terrain");
-    terrain.add<en::Transform>().scale(glm::vec3(5));
+    terrain.add<en::Transform>().scale({5, 1, 5});
     {
         auto mesh = en::Meshes::get(config::MODEL_PATH + "plane_8192.obj");
         auto material = std::make_shared<en::Material>("terrain");
@@ -58,10 +59,11 @@ void TerrainScene::open(en::Engine& engine) {
         material->setUniformValue("diffuse3", en::Textures::get(config::TEXTURE_PATH + "terrain/diffuse3.jpg"));
         material->setUniformValue("diffuse4", en::Textures::get(config::TEXTURE_PATH + "terrain/diffuse4.jpg"));
         material->setUniformValue("diffuseColor" , glm::vec3(1));
-        material->setUniformValue("specularColor", glm::vec3(1));
+        material->setUniformValue("specularColor", glm::vec3(0.04));
         material->setUniformValue("specularMap", en::Textures::white());
         material->setUniformValue("shininess"  , 64.f);
         terrain.add<en::RenderInfo>(mesh, std::move(material));
     }
+    terrain.add<RotatingBehavior>(glm::vec3(0, 1, 0), glm::radians(45.f));
     camera.get<CameraOrbitBehavior>().setTarget(terrain);
 }

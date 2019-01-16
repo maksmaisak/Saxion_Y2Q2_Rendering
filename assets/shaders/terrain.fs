@@ -78,7 +78,7 @@ vec3 GetLightsContribution(vec3 normal, vec3 viewDirection, vec3 materialDiffuse
 
 vec3 sampleDiffuse(vec2 uv) {
 
-    vec4 weights = texture(splatmap, uv);
+    vec4 weights = texture(splatmap, texCoords);
     vec4 result =
         weights.r * texture(diffuse1, uv) +
         weights.g * texture(diffuse2, uv) +
@@ -86,6 +86,24 @@ vec3 sampleDiffuse(vec2 uv) {
         weights.a * texture(diffuse4, uv);
 
     return vec3(result);
+}
+
+vec3 getDiffuse(vec3 normal) {
+
+    vec2 texCoordsX = worldPosition.zy;
+    vec2 texCoordsY = worldPosition.xz;
+    vec2 texCoordsZ = worldPosition.xy;
+
+    vec3 sampleX = sampleDiffuse(texCoordsX);
+    vec3 sampleY = sampleDiffuse(texCoordsY);
+    vec3 sampleZ = sampleDiffuse(texCoordsZ);
+
+    vec3 weights = abs(normal);
+    weights /= (weights.x + weights.y + weights.z);
+    return
+        weights.x * sampleX +
+        weights.y * sampleY +
+        weights.z * sampleZ;
 }
 
 vec3 samplePositionUVSpace(vec2 heightmapUv) {
@@ -106,7 +124,7 @@ void main() {
 
     vec3 normal = normalize(worldNormal);//calculateNormal(texCoords);
     vec3 viewDirection = normalize(viewPosition - worldPosition);
-    vec3 materialDiffuse  = diffuseColor  * sampleDiffuse(texCoords);
+    vec3 materialDiffuse  = diffuseColor  * getDiffuse(normal);
     vec3 materialSpecular = specularColor * vec3(texture(specularMap, texCoords));
 
     vec3 color = GetLightsContribution(normal, viewDirection, materialDiffuse, materialSpecular);

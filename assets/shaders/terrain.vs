@@ -29,14 +29,14 @@ vec3 samplePositionUVSpace(vec2 heightmapUv) {
 
 void main(void) {
 
+    worldPosition = vec3(matrixModel * vec4(vertex + vec3(0, sampleHeight(uv), 0), 1));
+    gl_Position = matrixProjection * matrixView * vec4(worldPosition, 1);
+
     vec3 uvSpacePosition = samplePositionUVSpace(uv);
     vec3 tangentX = samplePositionUVSpace(uv + vec2(0.01, 0)) - uvSpacePosition;
     vec3 tangentZ = samplePositionUVSpace(uv + vec2(0, 0.01)) - uvSpacePosition;
 
-    worldPosition = vec3(matrixModel * vec4(vertex, 1)) + vec3(0, sampleHeight(uv), 0);
-    gl_Position = matrixProjection * matrixView * vec4(worldPosition, 1);
-
-    worldNormal = normalize(cross(normalize(tangentZ), normalize(tangentX)));
-    //worldNormal = mat3(transpose(inverse(matrixModel))) * normal;
+    vec3 computedNormal = normalize(cross(normalize(tangentZ), normalize(tangentX)));
+    worldNormal = mat3(transpose(inverse(matrixModel))) * computedNormal;
     texCoords = uv;
 }

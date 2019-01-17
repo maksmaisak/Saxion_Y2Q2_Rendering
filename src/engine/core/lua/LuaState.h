@@ -69,7 +69,7 @@ namespace en {
             return get<T>();
         }
 
-        template<typename T, typename = void>
+        template<typename T>
         inline void setField(const std::string& name, T&& value, int tableIndex = -1) {
 
             luaL_checktype(L, tableIndex, LUA_TTABLE);
@@ -80,6 +80,17 @@ namespace en {
             } else {
                 lua::push(L, std::forward<T>(value));
             }
+
+            lua_setfield(L, tableIndex, name.c_str());
+        }
+
+        template<typename TResult, typename TOwner, typename... Args>
+        inline void setField(const std::string& name, TResult(TOwner::*memberFunctionPtr)(Args...), TOwner* ownerPtr, int tableIndex = -1) {
+
+            luaL_checktype(L, tableIndex, LUA_TTABLE);
+            tableIndex = lua_absindex(L, tableIndex);
+
+            ClosureHelper::makeClosure(L, memberFunctionPtr, ownerPtr);
 
             lua_setfield(L, tableIndex, name.c_str());
         }

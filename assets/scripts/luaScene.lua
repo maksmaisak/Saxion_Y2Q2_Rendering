@@ -54,12 +54,13 @@ local scene = {
 
 function scene.update(dt)
 
-    print(Game.testFreeFunction())
     print(Game.testValue)
-    --Game.testMemberFunction()
+    print(Game.testFreeFunction())
+    print(Game.testMemberFunction())
 
     local head = Game.findByName("head")
     if (head) then
+        print(head:isValid())
         print(head:getName())
         print(head:getTransform())
         head:getTransform():move(0, dt, 0)

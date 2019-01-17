@@ -148,8 +148,7 @@ namespace en {
 
             static_assert(!utils::functionTraits<float>::value);
 
-            ClosureHelper::makeClosure(m_lua, &Actor::operator bool);
-            lua_setfield(m_lua, -2, "isValid");
+            m_lua.setField("isValid", &Actor::operator bool);
 
             m_lua.setField("getTransform", [](Actor& actor){
                 auto* ptr = actor.tryGet<Transform>();
@@ -181,11 +180,8 @@ namespace en {
         lua_newtable(m_lua);
 
         m_lua.setField("testValue", 3.1415926f);
-        m_lua.setField("testFreeFunction", &testFreeFunction);
-
-        ClosureHelper::makeClosure(m_lua, &Engine::testMemberFunction, this);
-        lua_setfield(m_lua, -2, "testMemberFunction");
-
+        m_lua.setField("testFreeFunction"  , &testFreeFunction);
+        m_lua.setField("testMemberFunction", &Engine::testMemberFunction, this);
         m_lua.setField("findByName", [this](const std::string& name) -> std::optional<Actor> {
             Actor actor = findByName(name);
             if (actor) return std::make_optional(actor);

@@ -7,21 +7,15 @@
 
 namespace utils {
 
-    template<typename... T>
-    struct types {
-        using indices = std::make_index_sequence<sizeof...(T)> ;
-        static constexpr std::size_t size() {return sizeof...(T);}
-    };
-
     template<class F>
     struct checkDeducibleSignature {
 
         template<class G>
         static auto test(int) -> decltype(&G::operator(), void());
 
-        struct nat {};
+        struct dummy {};
         template<class>
-        static auto test(...) -> nat;
+        static auto test(...) -> dummy;
 
         using type = std::is_void<decltype(test<F>(0))>;
     };
@@ -37,7 +31,6 @@ namespace utils {
 
         using Result = TResult;
         using Owner  = TOwner;
-        using Arguments = types<TArgs...>;
         using Signature = TResult(TArgs...);
     };
 

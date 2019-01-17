@@ -24,18 +24,30 @@ vec3 sampleDisplacement(vec2 heightmapUv) {
 }
 
 vec3 samplePositionUVSpace(vec2 heightmapUv) {
-    return vec3(heightmapUv.x, texture(heightmap, heightmapUv).r, heightmapUv.y);
+    return vec3(heightmapUv.x, sampleHeight(heightmapUv), heightmapUv.y);
+}
+
+vec3 sampleModelSpace(vec2 heightmapUv) {
+
+    vec3 uvspacePosition = samplePositionUVSpace(heightmapUv);
+    return vec3(
+        uvspacePosition.x * 2.f - 1.f,
+        uvspacePosition.y,
+        uvspacePosition.z * -2.f - 1.f
+    );
 }
 
 void main(void) {
 
-    worldPosition = vec3(matrixModel * vec4(vertex + vec3(0, sampleHeight(uv), 0), 1));
+    worldPosition = vec3(matrixModel * vec4(vertex + sampleDisplacement(uv), 1));
     gl_Position = matrixProjection * matrixView * vec4(worldPosition, 1);
 
-    vec3 uvSpacePosition = samplePositionUVSpace(uv);
-    vec3 tangentX = samplePositionUVSpace(uv + vec2(0.01, 0)) - uvSpacePosition;
-    vec3 tangentZ = samplePositionUVSpace(uv + vec2(0, 0.01)) - uvSpacePosition;
+    vec3 modelspacePosition = sampleModelSpace(uv);
+    vec3 tangentX = sampleModelSpace(uv + vec2(0.01, 0)) - modelspacePosition;
+    vec3 tangentZ = sampleModelSpace(uv + vec2(0, 0.01)) - modelspacePosition;
     vec3 computedNormal = normalize(cross(normalize(tangentZ), normalize(tangentX)));
+
+    //worldNormal = computedNormal;
     worldNormal = mat3(transpose(inverse(matrixModel))) * computedNormal;
 
     texCoords = uv;

@@ -57,8 +57,6 @@ uniform vec3 viewPosition;
 uniform float time;
 
 // Custom uniforms
-// Height
-uniform sampler2D heightmap;
 // Diffuse
 uniform vec3 diffuseColor  = vec3(1,1,1);
 uniform sampler2D diffuse1;
@@ -123,23 +121,9 @@ vec3 getDiffuse(vec3 normal) {
         weights.z * sampleZ;
 }
 
-vec3 samplePositionUVSpace(vec2 heightmapUv) {
-    float height = texture(heightmap, heightmapUv).r;
-    return vec3(heightmapUv.x, height, heightmapUv.y);
-}
-
-vec3 calculateNormal(vec2 heightmapUv) {
-
-    vec3 uvSpacePosition = samplePositionUVSpace(heightmapUv);
-    vec3 tangentX = samplePositionUVSpace(heightmapUv + vec2(0.0001, 0)) - uvSpacePosition;
-    vec3 tangentZ = samplePositionUVSpace(heightmapUv + vec2(0, 0.0001)) - uvSpacePosition;
-
-    return cross(normalize(tangentZ), normalize(tangentX));
-}
-
 void main() {
 
-    vec3 normal = normalize(worldNormal);//calculateNormal(texCoords);
+    vec3 normal = normalize(worldNormal);
     vec3 viewDirection = normalize(viewPosition - worldPosition);
     vec3 materialDiffuse  = diffuseColor  * getDiffuse(normal);
     vec3 materialSpecular = specularColor * vec3(texture(specularMap, texCoords));

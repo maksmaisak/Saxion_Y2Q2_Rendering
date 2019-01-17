@@ -25,26 +25,29 @@ void TerrainScene::open(en::Engine& engine) {
 
     auto camera = engine.makeActor("Camera");
     camera.add<en::Camera>();
-    camera.add<en::Transform>();
+    camera.add<en::Transform>().move({0, 2, 5});
     camera.add<CameraOrbitBehavior>(5, -45.f, 89.f);
 
     auto directionalLight = engine.makeActor("DirectionalLight");
     directionalLight.add<en::Transform>()
         .setLocalRotation(glm::toQuat(glm::orientate4(glm::radians(glm::vec3(-45,0,-90)))));
+        //.rotate(glm::radians(-180.f), glm::vec3(0, 1, 0));
+        //.rotate(glm::radians(-90.f), glm::vec3(0, 1, 0));
     {
         auto& l = directionalLight.add<en::Light>();
         l.kind = en::Light::Kind::DIRECTIONAL;
         l.colorAmbient = {0.1, 0.1, 0.1};
         l.intensity = 1.f;
     }
+    //directionalLight.add<RotatingBehavior>(glm::vec3(0, 1, 0), glm::radians(45.f));
 
     auto terrain = engine.makeActor("Terrain");
-    terrain.add<en::Transform>().scale({3, 1, 3});
+    terrain.add<en::Transform>().scale({3, 3, 3});
     {
         auto mesh = en::Meshes::get(config::MODEL_PATH + "plane_8192.obj");
         auto material = std::make_shared<en::Material>("terrain");
         material->setUniformValue("heightmap", en::Textures::get(config::TEXTURE_PATH + "terrain/heightmap.png"));
-        material->setUniformValue("maxHeight", 3.f);
+        material->setUniformValue("maxHeight", 1.f);
         material->setUniformValue("splatmap", en::Textures::get(config::TEXTURE_PATH + "terrain/splatmap.png"));
         material->setUniformValue("diffuse1", en::Textures::get(config::TEXTURE_PATH + "terrain/diffuse1.jpg"));
         material->setUniformValue("diffuse2", en::Textures::get(config::TEXTURE_PATH + "terrain/water/water.jpg"));

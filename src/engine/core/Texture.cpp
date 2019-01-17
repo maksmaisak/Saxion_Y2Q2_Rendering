@@ -3,37 +3,38 @@
 
 #include <SFML/Graphics.hpp>
 #include "engine/core/Texture.hpp"
+#include "Texture.hpp"
 
-Texture::Texture() : _id() {
-    glGenTextures(1, &_id);
+Texture::Texture(const std::string& filename, GLint internalFormat) {
+
+    // Load from file and store in cache
+    sf::Image image;
+    if (!image.loadFromFile(filename))
+        return;
+
+    // Normal image 0,0 is top left, but opengl considers 0,0 to be bottom left, so we flip the image internally
+    image.flipVertically();
+
+    glGenTextures(1, &m_id);
+    glBindTexture(GL_TEXTURE_2D, m_id);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, image.getSize().x, image.getSize().y, 0, GL_RGBA, GL_UNSIGNED_BYTE, image.getPixelsPtr());
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 Texture::~Texture() {
-	glDeleteTextures(1, &_id);
+	glDeleteTextures(1, &m_id);
 }
 
 GLuint Texture::getId() {
-	return _id;
+	return m_id;
 }
 
-// importer for textures
-Texture* Texture::load(const std::string& pFilename) {
-
-    // load from file and store in cache
-    sf::Image image;
-    if (!image.loadFromFile(pFilename)) return nullptr;
-
-    //normal image 0,0 is top left, but opengl considers 0,0 to be bottom left, so we flip the image internally
-    image.flipVertically();
-    //create a wrapper for the id (texture is nothing more than that) and
-    //load corresponding data into opengl using this id
-    auto* texture = new Texture();
-    glBindTexture(GL_TEXTURE_2D, texture->getId());
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB_ALPHA, image.getSize().x, image.getSize().y, 0, GL_RGBA, GL_UNSIGNED_BYTE, image.getPixelsPtr());
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glBindTexture(GL_TEXTURE_2D, 0);
-    return texture;
+bool Texture::isValid() {
+    return m_id == 0;
 }
 
 

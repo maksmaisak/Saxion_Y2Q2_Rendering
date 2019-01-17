@@ -16,14 +16,14 @@
 
 namespace en {
 
-    template<typename TLoader, typename SFINAEDummy = void>
-    struct can_load_with_no_args : std::false_type {};
+    template<typename TLoader, typename = void>
+    struct canLoadWithNoArgs : std::false_type {};
 
     template<typename TLoader>
-    struct can_load_with_no_args<TLoader, decltype(TLoader::load())> : std::true_type {};
+    struct canLoadWithNoArgs<TLoader, decltype(TLoader::load())> : std::true_type {};
 
     template<typename TLoader>
-    inline constexpr bool can_load_with_no_args_v = can_load_with_no_args<TLoader>::value;
+    inline constexpr bool canLoadWithNoArgs_v = canLoadWithNoArgs<TLoader>::value;
 
     template<typename TResource>
     class Resources {
@@ -37,7 +37,7 @@ namespace en {
         /// - static TResource::load, returning a shared_ptr or a raw pointer to TResource.
         /// - the constructor of TResource, if exists.
         /// If no valid load function could be determined, you get a compile error.
-        /// If no extra arguments given and the load function can't be called with no arguments, calls it with the key.
+        /// If the load function can't be called with the given arguments, it will be called with the key AND the arguments.
         template<typename TLoader = ResourceLoader<TResource>, typename... Args>
         inline static std::shared_ptr<TResource> get(const std::string& key, Args&&... args) {
 
@@ -46,22 +46,25 @@ namespace en {
 
             bool didAdd = false;
 
-            // Fall back to constructor if there is no valid loader.
-            if constexpr (std::is_base_of_v<NoLoader, TLoader>) {
+            std::shared_ptr<TResource> resource;
 
-                if constexpr(sizeof...(Args) > 0 || std::is_constructible_v<TResource>)
-                    std::tie(it, didAdd) = m_resources.emplace(key, std::make_shared<TResource>(std::forward<Args>(args)...));
+            // Fall back to constructor if there is no valid loader.
+            if constexpr (!std::is_base_of_v<NoLoader, TLoader>) {
+
+                if constexpr (sizeof...(Args) > 0 || canLoadWithNoArgs_v<TLoader>)
+                    resource = TLoader::load(std::forward<Args>(args)...);
                 else
-                    std::tie(it, didAdd) = m_resources.emplace(key, std::make_shared<TResource>(key));
+                    resource = TLoader::load(key);
 
             } else {
 
-                if constexpr(sizeof...(Args) > 0 || can_load_with_no_args_v<TLoader>)
-                    std::tie(it, didAdd) = m_resources.emplace(key, TLoader::load(std::forward<Args>(args)...));
+                if constexpr (std::is_constructible_v<TResource, Args...>)
+                    resource = std::make_shared<TResource>(std::forward<Args>(args)...);
                 else
-                    std::tie(it, didAdd) = m_resources.emplace(key, TLoader::load(key));
+                    resource = std::make_shared<TResource>(key, std::forward<Args>(args)...);
             }
 
+            std::tie(it, didAdd) = m_resources.emplace(key, std::move(resource));
             assert(didAdd);
             return it->second;
         }

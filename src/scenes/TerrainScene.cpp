@@ -46,9 +46,9 @@ void TerrainScene::open(en::Engine& engine) {
     {
         auto mesh = en::Meshes::get(config::MODEL_PATH + "plane_8192.obj");
         auto material = std::make_shared<en::Material>("terrain");
-        material->setUniformValue("heightmap", en::Textures::get(config::TEXTURE_PATH + "terrain/heightmap.png"));
+        material->setUniformValue("heightmap", en::Textures::get(config::TEXTURE_PATH + "terrain/heightmap.png", GL_RGBA));
         material->setUniformValue("maxHeight", 1.f);
-        material->setUniformValue("splatmap", en::Textures::get(config::TEXTURE_PATH + "terrain/splatmap.png"));
+        material->setUniformValue("splatmap", en::Textures::get(config::TEXTURE_PATH + "terrain/splatmap.png", GL_RGBA));
         material->setUniformValue("diffuse1", en::Textures::get(config::TEXTURE_PATH + "terrain/diffuse1.jpg"));
         material->setUniformValue("diffuse2", en::Textures::get(config::TEXTURE_PATH + "terrain/water/water.jpg"));
         material->setUniformValue("diffuse3", en::Textures::get(config::TEXTURE_PATH + "terrain/diffuse3.jpg"));

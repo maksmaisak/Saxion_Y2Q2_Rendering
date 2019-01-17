@@ -83,6 +83,7 @@ vec4 animate(sampler2D sampler, vec2 uv) {
     float noiseValue = texture(noise, uv).r;
     float noisedTime = time + noiseValue;
     vec2 displacement = normalize(texCoords - vec2(0.5, 0.5)) * sin(noisedTime * 0.5) * 0.4;
+    displacement.y = -displacement.y;
 
     float weightMultiplier = (1 + sin(time * 0.5) * 0.4);
 

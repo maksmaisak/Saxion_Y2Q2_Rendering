@@ -5,23 +5,25 @@
 #include <string>
 #include <GL/glew.h>
 
-class Texture
-{
-	public:
-		static Texture* load(const std::string& pTexturePath);
-		virtual ~Texture();
-        Texture(const Texture&) = delete;
-        Texture(Texture&&) = delete;
-        Texture& operator=(const Texture&) = delete;
-        Texture& operator=(Texture&&) = delete;
+/// A wrapper around a texture id.
+/// Manages the lifetime of said id.
+class Texture {
 
-		GLuint getId();
+public:
+	Texture(const std::string& path, GLint internalFormat = GL_SRGB_ALPHA);
+	virtual ~Texture();
+	Texture(const Texture&) = delete;
+	Texture(Texture&&) = delete;
+	Texture& operator=(const Texture&) = delete;
+	Texture& operator=(Texture&&) = delete;
 
-	protected:
-	    Texture();
+	GLuint getId();
+	bool isValid();
 
-	    //OpenGL id for texture buffer
-		GLuint _id;
+protected:
+
+	//OpenGL id for texture buffer
+	GLuint m_id = 0;
 };
 
 #endif // TEXTURE_HPP

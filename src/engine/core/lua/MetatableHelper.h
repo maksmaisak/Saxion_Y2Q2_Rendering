@@ -16,64 +16,36 @@ namespace lua {
 
     namespace detail {
 
-        template<typename... TArgs>
-        struct metatableSetter;/* {
-
-            inline void set(lua_State* l, TArgs&& ... args) {
-
-                std::cerr << "invalid arguments to setMetatable!" << std::endl;
-            }
-        };*/
-
-        template<>
-        struct metatableSetter<> {
-
-            inline void set(lua_State* l) {}
+        template<typename T, typename = void>
+        struct metatableInitializer {
+            inline static void initializeMetatable(en::LuaState& lua) {}
         };
 
-        template<typename TResult, typename... TArgs, typename... Rest>
-        struct metatableSetter<const std::string&, functionPtr<TResult, TArgs...>, Rest...> {
-
-            inline void set(lua_State* l, const std::string& name, functionPtr<TResult, TArgs...> freeFunction, Rest&&... rest) {
-
-                ClosureHelper::makeClosure(l, freeFunction);
-                lua_setfield(l, -2, name.c_str());
-
-                metatableSetter<Rest...>::set(l, std::forward<Rest>(rest)...);
+        template<typename T>
+        struct metatableInitializer<T, std::enable_if_t<std::is_invocable_v<decltype(T::initializeMetatable), en::LuaState&>>> {
+            inline static void initializeMetatable(en::LuaState& lua) {
+                T::initializeMetatable(lua);
             }
         };
 
-        template<typename TResult, typename TOwner, typename... TArgs, typename... Rest>
-        struct metatableSetter<const std::string&, memberFunctionPtr<TResult, TOwner, TArgs...>, Rest...> {
-
-            inline void set(lua_State* l, const std::string& name, memberFunctionPtr<TResult, TOwner, TArgs...> memberFunction, Rest&&... rest) {
-
-                ClosureHelper::makeClosure(l, memberFunction);
-                lua_setfield(l, -2, name.c_str());
-
-                metatableSetter<Rest...>::set(l, std::forward<Rest>(rest)...);
-            }
-        };
-    }
-
-    template<typename T, typename... TArgs>
-    inline void makeMetatable(lua_State* l, TArgs&&... args) {
-
-        luaL_newmetatable(l, utils::demangle<T>().c_str());
-        detail::metatableSetter<TArgs...>::set(l, std::forward<TArgs>(args)...);
-        lua_pop(l, 1);
+        template<typename T>
+        inline void initializeMetatable(en::LuaState& lua) {metatableInitializer<T>::initializeMetatable(lua);}
     }
 
     // Gets or adds a metatable for a given type.
     // Returns true if the metatable did not exist before.
     template<typename T>
-    inline bool getMetatable(lua_State* l) {
+    inline bool getMetatable(en::LuaState& lua) {
 
-        if (!luaL_newmetatable(l, utils::demangle<T>().c_str()))
+        if (!luaL_newmetatable(lua, utils::demangle<T>().c_str()))
             return false;
 
-        lua_pushvalue(l, -1);
-        lua_setfield(l, -2, "__index");
+        std::cout << "Created metatable for type " << utils::demangle<T>() << std::endl;
+
+        lua_pushvalue(lua, -1);
+        lua_setfield(lua, -2, "__index");
+        detail::initializeMetatable<T>(lua);
+
         return true;
     }
 }

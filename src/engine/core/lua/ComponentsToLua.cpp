@@ -14,7 +14,7 @@ void ComponentsToLua::makeComponent(Actor& actor, const std::string& componentTy
     auto popComponentValue = lua::PopperOnDestruct(lua);
     lua_pushvalue(lua, componentValueIndex);
 
-    auto& map = getNameToMakeFunctionMap();
+    auto& map = getNameToTypeInfoMap();
     auto it = map.find(componentTypeName);
     if (it == map.end()) {
         std::cout << "Unknown component type: " << componentTypeName << std::endl;
@@ -22,15 +22,22 @@ void ComponentsToLua::makeComponent(Actor& actor, const std::string& componentTy
     }
 
     int oldTop = lua_gettop(lua);
-    it->second(actor, lua);
+    it->second.addFromLua(actor, lua);
     assert(oldTop == lua_gettop(lua));
+}
+
+void ComponentsToLua::populateComponentMetatables(LuaState& lua) {
+
+    for (auto& kvp : getNameToTypeInfoMap()) {
+        kvp.second.initializeMetatable(lua);
+    }
 }
 
 void ComponentsToLua::printDebugInfo() {
 
     std::cout << std::endl << "Registered component types:" << std::endl;
 
-    for (auto& pair : getNameToMakeFunctionMap()) {
+    for (auto& pair : getNameToTypeInfoMap()) {
         std::cout << pair.first << std::endl;
     }
 

@@ -27,7 +27,9 @@ namespace utils {
     inline constexpr bool hasDeducibleSignature_v = hasDeducibleSignature<F>::value;
 
     template<typename TResult, typename TOwner, typename... TArgs>
-    struct functionTraitsBase : std::true_type {
+    struct functionTraitsBase {
+
+        inline static constexpr bool isFunction = true;
 
         using Result = TResult;
         using Owner  = TOwner;
@@ -35,7 +37,9 @@ namespace utils {
     };
 
     template<typename T, bool = hasDeducibleSignature_v<T>>
-    struct functionTraits : std::false_type {};
+    struct functionTraits {
+        inline static constexpr bool isFunction = false;
+    };
 
     template<typename TResult, typename... Args>
     struct functionTraits<TResult(*)(Args...), false> : functionTraitsBase<TResult, void, Args...> {};
@@ -52,7 +56,7 @@ namespace utils {
     template<typename TResult, typename... Args>
     struct functionTraits<TResult(Args...) const, false> : functionTraitsBase<TResult, void, Args...> {};
 
-    template <typename F>
+    template<typename F>
     struct functionTraits<F, true> : functionTraits<typename functionTraits<decltype(&F::operator())>::Signature> {};
 }
 

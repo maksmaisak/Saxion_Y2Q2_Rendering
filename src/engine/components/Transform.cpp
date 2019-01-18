@@ -184,4 +184,15 @@ namespace en {
 
         return transform;
     }
+
+    void Transform::initializeMetatable(LuaState& lua) {
+
+        lua.setField("move", [](Transform* tf, float x, float y, float z) {
+            tf->move({x, y, z});
+        });
+
+        lua.setField("rotate", [](Transform* tf, float angle, float x, float y, float z) {
+            tf->rotate(glm::radians(angle), {x, y, z});
+        });
+    }
 }

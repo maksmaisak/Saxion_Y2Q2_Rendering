@@ -19,13 +19,52 @@
 
 namespace en {
 
+    using LuaComponentFactoryFunction = std::function<void(Actor&, LuaState&)>;
+    using InitializeMetatableFunction = std::function<void(LuaState&)>;
+
+    namespace detail {
+
+        template<typename T, typename = void>
+        struct LuaComponentFactoryFunctionOf {
+
+            inline static void addComponent(Actor& actor, LuaState&) {actor.add<T>();}
+            inline static LuaComponentFactoryFunction get() {return addComponent;}
+        };
+
+        template<typename T>
+        struct LuaComponentFactoryFunctionOf<T, std::enable_if_t<std::is_convertible_v<decltype(&T::addFromLua), LuaComponentFactoryFunction>>> {
+
+            inline static LuaComponentFactoryFunction get() {return T::addFromLua;}
+        };
+
+        template<typename T, typename = void>
+        struct InitializeMetatableFunctionOf {
+
+            inline static void initializeMetatable(LuaState&) {}
+            inline static InitializeMetatableFunction get() {return initializeMetatable;}
+        };
+
+        template<typename T>
+        struct InitializeMetatableFunctionOf<T, std::enable_if_t<std::is_convertible_v<decltype(&std::remove_pointer_t<utils::unqualified_t<T>>::initializeMetatable), InitializeMetatableFunction>>> {
+
+            inline static void initializeMetatable(LuaState& lua) {
+
+                using TComponent = std::remove_pointer_t<utils::unqualified_t<T>>;
+
+                getMetatable<T>(lua);
+                TComponent::initializeMetatable(lua);
+                lua_pop(lua, 1);
+            }
+
+            inline static InitializeMetatableFunction get() {return initializeMetatable;}
+        };
+    }
 
     /// Handles reading component definitions out of lua values.
     /// See makeComponent
     /// Use registerComponentType<T>(name) to map a type name to a component type
     class ComponentsToLua {
 
-        using componentFactoryFunction = std::function<void(Actor&, LuaState&)>;
 
     public:
 
@@ -33,36 +72,25 @@ namespace en {
         static void registerComponentType(const std::string& name);
 
         /// Adds a component of a given type from a value at the given index in the lua stack
-        static void makeComponent(en::Actor& actor, const std::string& componentTypeName, int componentValueIndex = -1);
+        static void makeComponent(Actor& actor, const std::string& componentTypeName, int componentValueIndex = -1);
+
+        static void populateComponentMetatables(LuaState& lua);
 
         static void printDebugInfo();
 
     private:
 
+        struct TypeInfo {
+
+            LuaComponentFactoryFunction addFromLua;
+            InitializeMetatableFunction initializeMetatable;
+        };
+
         // Doing it this way instead of just having a static field makes sure the map is initialized whenever it's needed.
-        inline static std::map<std::string, componentFactoryFunction>& getNameToMakeFunctionMap() {
-            static std::map<std::string, componentFactoryFunction> nameToMakeFunctionMap;
-            return nameToMakeFunctionMap;
+        inline static std::map<std::string, TypeInfo>& getNameToTypeInfoMap() {
+            static std::map<std::string, TypeInfo> nameToTypeInfoMap;
+            return nameToTypeInfoMap;
         }
-
-        // If no custom `addFromLua(Actor&, LuaState&)` function provided, just add the component when needed.
-        template<typename TComponent, typename = void>
-        struct Registerer {
-
-            inline static void registerComponentType(const std::string& name) {
-                static auto make = [](Actor& actor, LuaState& luaState){return actor.add<TComponent>();};
-                getNameToMakeFunctionMap().emplace(name, make);
-            }
-        };
-
-        // If a custom `addFromLua(Actor&, LuaState&)` function exists, use it.
-        template<typename TComponent>
-        struct Registerer<TComponent, std::enable_if_t<std::is_convertible_v<decltype(&TComponent::addFromLua), componentFactoryFunction>>> {
-
-            inline static void registerComponentType(const std::string& name) {
-                getNameToMakeFunctionMap().emplace(name, TComponent::addFromLua);
-            }
-        };
     };
 
     template<typename TComponent>
@@ -71,8 +99,12 @@ namespace en {
     public:
 
         explicit inline ComponentTypeRequirement(const std::string& name) {
+
             if (isRegistered) return;
+
             ComponentsToLua::registerComponentType<TComponent>(name);
+            ComponentsToLua::registerComponentType<TComponent*>(name + " *");
+
             isRegistered = true;
         }
 
@@ -81,9 +113,13 @@ namespace en {
         inline static bool isRegistered = false;
     };
 
-    template<typename TComponent>
+    template<typename T>
     inline void ComponentsToLua::registerComponentType(const std::string& name) {
-        ComponentsToLua::Registerer<TComponent>::registerComponentType(name);
+
+        LuaComponentFactoryFunction addFromLua          = detail::LuaComponentFactoryFunctionOf<T>::get();
+        InitializeMetatableFunction initializeMetatable = detail::InitializeMetatableFunctionOf<T>::get();
+
+        getNameToTypeInfoMap().emplace(name, TypeInfo{addFromLua, initializeMetatable});
     }
 }
 

@@ -17,8 +17,8 @@ namespace en {
 
     int pushByName(lua_State* l) {
 
-        auto actor = lua::to<Actor>(l, 1);
-        auto name = lua::to<std::string>(l, 2);
+        auto actor = lua::check<Actor>(l, 1);
+        auto name = lua::check<std::string>(l, 2);
 
         ComponentsToLua::pushComponentFromActorByName(actor, name);
 
@@ -39,7 +39,6 @@ namespace en {
             return ptr ? std::make_optional(ptr->value) : std::nullopt;
         });
 
-        // TODO Make this support lua_CFunction
         lua.setField("getComponent", &pushByName);
     }
 }

@@ -42,6 +42,12 @@ namespace lua {
             return *reinterpret_cast<T*>(ptr);
         }
 
+        inline static T& check(lua_State* L, int index = -1) {
+
+            void* ptr = luaL_checkudata(L, index, utils::demangle<T>().c_str());
+            return *reinterpret_cast<T*>(ptr);
+        }
+
         inline static bool is(lua_State* L, int index = -1) {
 
             return luaL_testudata(L, index, utils::demangle<T>().c_str()) != nullptr;
@@ -57,38 +63,49 @@ namespace lua {
     template<typename T>
     inline T to(lua_State* L, int index = -1) {return TypeAdapter<T>::to(L, index);}
 
+    template<typename T>
+    inline T check(lua_State* L, int index = -1) {return TypeAdapter<T>::check(L, index);}
+
     template<>
     struct TypeAdapter<bool> {
-        static bool is  (lua_State* L, int index = -1) { return lua_isboolean(L, index); }
-        static bool to  (lua_State* L, int index = -1) { return lua_toboolean(L, index); }
-        static void push(lua_State* L, bool value) { lua_pushboolean(L, value); }
+        static bool is   (lua_State* L, int index = -1) { return lua_isboolean(L, index); }
+        static bool to   (lua_State* L, int index = -1) { return lua_toboolean(L, index); }
+        static bool check(lua_State* L, int index = -1) { return luaL_checktype(L, index, LUA_TBOOLEAN), to(L, index); }
+        static void push (lua_State* L, bool value) { lua_pushboolean(L, value); }
     };
 
     template<typename T>
     struct TypeAdapter<T, std::enable_if_t<std::is_integral_v<T>>> {
-        static bool is  (lua_State* L, int index = -1) { return lua_isinteger(L, index); }
-        static T    to  (lua_State* L, int index = -1) { return lua_tointeger(L, index); }
-        static void push(lua_State* L, T value) { lua_pushinteger(L, value); }
+        static bool is   (lua_State* L, int index = -1) { return lua_isinteger(L, index); }
+        static T    to   (lua_State* L, int index = -1) { return lua_tointeger(L, index); }
+        static T    check(lua_State* L, int index = -1) { return luaL_checkinteger(L, index); }
+        static void push (lua_State* L, T value) { lua_pushinteger(L, value); }
     };
 
     template<typename T>
     struct TypeAdapter<T, std::enable_if_t<std::is_floating_point_v<T>>> {
-        static bool is  (lua_State* L, int index = -1) { return lua_isnumber(L, index); }
-        static T    to  (lua_State* L, int index = -1) { return lua_tonumber(L, index); }
-        static void push(lua_State* L, T value) { lua_pushnumber(L, value); }
+        static bool is   (lua_State* L, int index = -1) { return lua_isnumber(L, index); }
+        static T    to   (lua_State* L, int index = -1) { return lua_tonumber(L, index); }
+        static T    check(lua_State* L, int index = -1) { return luaL_checknumber(L, index); }
+        static void push (lua_State* L, T value) { lua_pushnumber(L, value); }
     };
 
     template<>
     struct TypeAdapter<std::string> {
-        static bool        is  (lua_State* L, int index = -1) { return lua_isstring(L, index); }
-        static std::string to  (lua_State* L, int index = -1) { return lua_tostring(L, index); }
-        static void        push(lua_State* L, const std::string& value) { lua_pushstring(L, value.c_str()); }
+        static bool        is   (lua_State* L, int index = -1) { return lua_isstring(L, index); }
+        static std::string to   (lua_State* L, int index = -1) { return lua_tostring(L, index); }
+        static std::string check(lua_State* L, int index = -1) { return luaL_checkstring(L, index); }
+        static void        push (lua_State* L, const std::string& value) { lua_pushstring(L, value.c_str()); }
     };
 
     template<>
     struct TypeAdapter<lua_CFunction> {
         static bool          is  (lua_State* L, int index = -1) { return lua_iscfunction(L, index); }
         static lua_CFunction to  (lua_State* L, int index = -1) { return lua_tocfunction(L, index); }
+        static lua_CFunction check(lua_State* L, int index = -1) {
+            if (!is(L, index)) luaL_error(L, "Bad argument #%d, expected %s, got %s", index, "c function", luaL_typename(L, index));
+            return to(L, index);
+        }
         static void          push(lua_State* L, lua_CFunction func) { lua_pushcfunction(L, func); }
     };
 
@@ -99,6 +116,10 @@ namespace lua {
         }
         static std::optional<T> to (lua_State* L, int index = -1) {
             return lua_isnil(L, index) ? std::nullopt : lua::to<T>(L, index);
+        }
+        static lua_CFunction check(lua_State* L, int index = -1) {
+            if (!is(L, index)) luaL_error(L, "Bad argument #%d, expected %s, got %s", index, utils::demangle<T>().c_str(), luaL_typename(L, index));
+            return to(L, index);
         }
         static void push(lua_State* L, const std::optional<T>& value) {
             if (value)

@@ -6,6 +6,8 @@
 #include "Engine.h"
 #include "Transform.h"
 #include "Name.h"
+#include "ActorDecl.h"
+
 
 namespace en {
 
@@ -13,14 +15,24 @@ namespace en {
         m_engine(&engine),
         m_registry(&engine.getRegistry()),
         m_entity(entity)
-    {}
+        {}
 
-    int pushByName(lua_State* l) {
+    int pushByTypeName(lua_State* l) {
 
         auto actor = lua::check<Actor>(l, 1);
         auto name = lua::check<std::string>(l, 2);
 
-        ComponentsToLua::pushComponentFromActorByName(actor, name);
+        ComponentsToLua::pushComponentFromActorByTypeName(actor, name);
+
+        return 1;
+    }
+
+    int addByTypeName(lua_State* l) {
+
+        auto actor = lua::check<Actor>(l, 1);
+        auto name = lua::check<std::string>(l, 2);
+
+        ComponentsToLua::addComponentToActorByTypeName(actor, name);
 
         return 1;
     }
@@ -39,6 +51,14 @@ namespace en {
             return ptr ? std::make_optional(ptr->value) : std::nullopt;
         });
 
-        lua.setField("getComponent", &pushByName);
+        lua.setField("getComponent", &pushByTypeName);
+        lua.setField("addComponent", &addByTypeName);
+    }
+
+    std::string Actor::getName() const {
+
+        Name* ptr = tryGet<Name>();
+        if (ptr) return ptr->value;
+        return "unnamed";
     }
 }

@@ -63,17 +63,18 @@ function scene.update(dt)
         print(head:isValid())
         print(head:getName())
         print(head:getTransform())
-        print(head:getComponent("Transform"));
-        print(head:getComponent("RenderInfo"));
-        print(head:getComponent("Rigidbody"));
+        print(head:getComponent("Transform"))
+        print(head:getComponent("RenderInfo"))
+        print(head:getComponent("Rigidbody"))
         head:getTransform():move(0, dt, 0)
         head:getTransform():rotate(10 * dt, 0, 1, 0)
     end
 
---    local floor = Game.find("Floor")
---    if (floor) then
---        floor.getComponent("Transform").move(0, dt, 0)
---    end
+    local actor = Game.makeActor("name")
+    print(actor:getComponent("Transform"))
+    actor:addComponent("Transform")
+    print(actor:getComponent("Transform"))
+    print(actor:getComponent("Transform") == actor:getComponent("Transform"))
 end
 
 return scene

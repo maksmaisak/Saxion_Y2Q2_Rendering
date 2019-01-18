@@ -8,6 +8,7 @@
 #include <map>
 #include <type_traits>
 #include <cassert>
+#include <functional>
 #include "engine/core/lua/LuaState.h"
 #include "MetatableHelper.h"
 #include "Actor.h"
@@ -23,6 +24,7 @@ namespace en {
     using LuaComponentFactoryFunction = std::function<void(Actor&, LuaState&)>;
     using InitializeMetatableFunction = std::function<void(LuaState&)>;
     using PushComponentFromActorFunction = std::function<void(Actor&, LuaState&)>;
+    using AddComponentToActorFunction = std::function<void(Actor&, LuaState&)>;
 
     namespace detail {
 
@@ -54,6 +56,7 @@ namespace en {
                 using TComponent = std::remove_pointer_t<utils::unqualified_t<T>>;
 
                 getMetatable<T>(lua);
+                
                 TComponent::initializeMetatable(lua);
                 lua_pop(lua, 1);
             }
@@ -78,7 +81,8 @@ namespace en {
         /// Adds a component of a given type from a value at the given index in the lua stack
         static void makeComponent(Actor& actor, const std::string& componentTypeName, int componentValueIndex = -1);
 
-        static void pushComponentFromActorByName(Actor& actor, const std::string& componentTypeName);
+        static void pushComponentFromActorByTypeName(Actor& actor, const std::string& componentTypeName);
+        static void addComponentToActorByTypeName(Actor& actor, const std::string& componentTypeName);
 
         static void printDebugInfo();
 
@@ -89,6 +93,7 @@ namespace en {
             LuaComponentFactoryFunction addFromLua;
             InitializeMetatableFunction initializeMetatable;
             PushComponentFromActorFunction pushFromActor;
+            AddComponentToActorFunction addToActor;
         };
 
         // Doing it this way instead of just having a static field makes sure the map is initialized whenever it's needed.
@@ -138,8 +143,20 @@ namespace en {
             else
                 lua_pushnil(lua);
         };
+        AddComponentToActorFunction addToActor = [](Actor& actor, LuaState& lua) {
 
-        getNameToTypeInfoMap().emplace(name, TypeInfo {addFromLua, initializeMetatable, pushFromActor});
+            if (actor.tryGet<T>())
+                luaL_error(lua, "Actor %s already has a component of type %s", actor.getName().c_str(), utils::demangle<T>().c_str());
+
+            lua::push(lua, actor.add<T>());
+        };
+
+        getNameToTypeInfoMap()[name] = {
+            std::move(addFromLua),
+            std::move(initializeMetatable),
+            std::move(pushFromActor),
+            std::move(addToActor)
+        };
     }
 }
 

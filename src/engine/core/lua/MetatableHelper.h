@@ -14,24 +14,6 @@
 
 namespace lua {
 
-    namespace detail {
-
-        template<typename T, typename = void>
-        struct metatableInitializer {
-            inline static void initializeMetatable(en::LuaState& lua) {}
-        };
-
-        template<typename T>
-        struct metatableInitializer<T, std::enable_if_t<std::is_invocable_v<decltype(T::initializeMetatable), en::LuaState&>>> {
-            inline static void initializeMetatable(en::LuaState& lua) {
-                T::initializeMetatable(lua);
-            }
-        };
-
-        template<typename T>
-        inline void initializeMetatable(en::LuaState& lua) {metatableInitializer<T>::initializeMetatable(lua);}
-    }
-
     // Gets or adds a metatable for a given type.
     // Returns true if the metatable did not exist before.
     template<typename T>
@@ -44,7 +26,10 @@ namespace lua {
 
         lua_pushvalue(lua, -1);
         lua_setfield(lua, -2, "__index");
-        detail::initializeMetatable<T>(lua);
+
+        if constexpr (std::is_pointer_v<T>) {
+            lua.setField("__eq", [](const T& a, const T& b){ return a == b; });
+        }
 
         return true;
     }

@@ -147,18 +147,21 @@ namespace en {
         // Configure metatables of all registered component types
         ComponentsToLua::populateMetatables(m_lua);
 
-        lua_newtable(m_lua);
+        {
+            lua_newtable(m_lua);
 
-        m_lua.setField("testValue", 3.1415926f);
-        m_lua.setField("testFreeFunction"  , &testFreeFunction);
-        m_lua.setField("testMemberFunction", &Engine::testMemberFunction, this);
-        m_lua.setField("findByName", [this](const std::string& name) -> std::optional<Actor> {
-            Actor actor = findByName(name);
-            if (actor) return std::make_optional(actor);
-            return std::nullopt;
-        });
+            m_lua.setField("testValue", 3.1415926f);
+            m_lua.setField("testFreeFunction", &testFreeFunction);
+            m_lua.setField("testMemberFunction", &Engine::testMemberFunction, this);
+            m_lua.setField("findByName", [this](const std::string& name) -> std::optional<Actor> {
+                Actor actor = findByName(name);
+                if (actor) return std::make_optional(actor);
+                return std::nullopt;
+            });
+            m_lua.setField("makeActor", [this](const std::string& name) { return makeActor(name); });
 
-        lua_setglobal(m_lua, "Game");
+            lua_setglobal(m_lua, "Game");
+        }
 
         ComponentsToLua::printDebugInfo();
     }

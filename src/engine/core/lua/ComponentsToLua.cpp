@@ -44,7 +44,7 @@ void ComponentsToLua::printDebugInfo() {
     std::cout << std::endl;
 }
 
-void ComponentsToLua::pushComponentFromActorByName(Actor& actor, const std::string& componentTypeName) {
+void ComponentsToLua::pushComponentFromActorByTypeName(Actor& actor, const std::string& componentTypeName) {
 
     auto& lua = actor.getEngine().getLuaState();
 
@@ -57,4 +57,19 @@ void ComponentsToLua::pushComponentFromActorByName(Actor& actor, const std::stri
     }
 
     it->second.pushFromActor(actor, lua);
+}
+
+void ComponentsToLua::addComponentToActorByTypeName(Actor& actor, const std::string& componentTypeName) {
+
+    auto& lua = actor.getEngine().getLuaState();
+
+    auto& map = getNameToTypeInfoMap();
+    auto it = map.find(componentTypeName);
+    if (it == map.end()) {
+        std::cout << "Unknown component type: " << componentTypeName << std::endl;
+        lua_pushnil(lua);
+        return;
+    }
+
+    it->second.addToActor(actor, lua);
 }

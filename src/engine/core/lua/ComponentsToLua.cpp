@@ -26,7 +26,7 @@ void ComponentsToLua::makeComponent(Actor& actor, const std::string& componentTy
     assert(oldTop == lua_gettop(lua));
 }
 
-void ComponentsToLua::populateComponentMetatables(LuaState& lua) {
+void ComponentsToLua::populateMetatables(LuaState& lua) {
 
     for (auto& kvp : getNameToTypeInfoMap()) {
         kvp.second.initializeMetatable(lua);

@@ -18,7 +18,7 @@ namespace en {
 
     struct RenderInfo {
 
-        LUA_COMPONENT_TYPE(RenderInfo)
+        LUA_TYPE(RenderInfo)
         static RenderInfo& addFromLua(en::Actor& actor, en::LuaState& lua);
 
         std::shared_ptr<Mesh> mesh;

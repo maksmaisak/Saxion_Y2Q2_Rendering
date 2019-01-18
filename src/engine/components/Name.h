@@ -12,7 +12,7 @@ namespace en {
 
     struct Name {
 
-        LUA_COMPONENT_TYPE(Name)
+        LUA_TYPE(Name)
 
         static Name& addFromLua(Actor& actor, LuaState& lua);
 

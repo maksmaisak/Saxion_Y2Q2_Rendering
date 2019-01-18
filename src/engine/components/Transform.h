@@ -22,7 +22,7 @@ namespace en {
 
     class Transform final {
 
-        LUA_COMPONENT_TYPE(Transform)
+        LUA_TYPE(Transform)
 
         friend class TransformHierarchySystem;
 

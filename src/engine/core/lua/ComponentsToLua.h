@@ -9,13 +9,14 @@
 #include <type_traits>
 #include <cassert>
 #include "engine/core/lua/LuaState.h"
-#include "engine/actor/Actor.h"
+#include "MetatableHelper.h"
+#include "Actor.h"
 
-// Calls en::ComponentsToLua::registerComponentType<T>(#T); at dynamic initialization
+// Calls en::ComponentsToLua::registerType<T>(#T); at dynamic initialization
 // Put this in a class definition
-#define LUA_COMPONENT_TYPE(T) inline static const auto __componentTypeRequirement = en::ComponentTypeRequirement<T>(#T);
+#define LUA_TYPE(T) inline static const auto __componentTypeRequirement = en::LuaTypeRequirement<T>(#T);
 
-#define LUA_REGISTER_COMPONENT_TYPE(T) en::ComponentsToLua::registerComponentType<T>(#T);
+#define LUA_REGISTER_TYPE(T) en::ComponentsToLua::registerType<T>(#T);
 
 namespace en {
 
@@ -65,16 +66,16 @@ namespace en {
     /// Use registerComponentType<T>(name) to map a type name to a component type
     class ComponentsToLua {
 
-
     public:
 
         template<typename TComponent>
-        static void registerComponentType(const std::string& name);
+        static void registerType(const std::string& name);
 
         /// Adds a component of a given type from a value at the given index in the lua stack
         static void makeComponent(Actor& actor, const std::string& componentTypeName, int componentValueIndex = -1);
 
-        static void populateComponentMetatables(LuaState& lua);
+        /// Populates metatables of registered types by calling their initializeMetatable function with the metatable being on top of the stack.
+        static void populateMetatables(LuaState& lua);
 
         static void printDebugInfo();
 
@@ -94,16 +95,16 @@ namespace en {
     };
 
     template<typename TComponent>
-    class ComponentTypeRequirement {
+    class LuaTypeRequirement {
 
     public:
 
-        explicit inline ComponentTypeRequirement(const std::string& name) {
+        explicit inline LuaTypeRequirement(const std::string& name) {
 
             if (isRegistered) return;
 
-            ComponentsToLua::registerComponentType<TComponent>(name);
-            ComponentsToLua::registerComponentType<TComponent*>(name + " *");
+            ComponentsToLua::registerType<TComponent>(name);
+            ComponentsToLua::registerType<TComponent*>(name + " *");
 
             isRegistered = true;
         }
@@ -114,10 +115,17 @@ namespace en {
     };
 
     template<typename T>
-    inline void ComponentsToLua::registerComponentType(const std::string& name) {
+    inline void ComponentsToLua::registerType(const std::string& name) {
 
         LuaComponentFactoryFunction addFromLua          = detail::LuaComponentFactoryFunctionOf<T>::get();
         InitializeMetatableFunction initializeMetatable = detail::InitializeMetatableFunctionOf<T>::get();
+
+        auto& map = getNameToTypeInfoMap();
+        auto it = map.find(name);
+        if (it != map.end()) {
+            std::cout << "Warning: type " << name << " already registered" << std::endl;
+            return;
+        }
 
         getNameToTypeInfoMap().emplace(name, TypeInfo{addFromLua, initializeMetatable});
     }

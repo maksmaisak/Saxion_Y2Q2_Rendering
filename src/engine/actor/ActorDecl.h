@@ -9,6 +9,7 @@
 #include "Entity.h"
 #include "EntityRegistry.h"
 #include "MetatableHelper.h"
+#include "LuaState.h"
 
 namespace en {
 
@@ -22,6 +23,8 @@ namespace en {
     class Actor final {
 
     public:
+        static void initializeMetatable(LuaState& lua);
+
         Actor() = default;
         Actor(Engine& engine, Entity entity);
 

@@ -142,27 +142,10 @@ namespace en {
 
     void Engine::initializeLua() {
 
+        LUA_REGISTER_TYPE(Actor);
+        
         // Configure metatables of all registered component types
-        ComponentsToLua::populateComponentMetatables(m_lua);
-
-        // TODO move the metatable population code into static functions on their respective classes.
-        {
-            getMetatable<Actor>(m_lua);
-
-            m_lua.setField("isValid", &Actor::operator bool);
-
-            m_lua.setField("getTransform", [](Actor& actor){
-                auto* ptr = actor.tryGet<Transform>();
-                return ptr ? std::make_optional(ptr) : std::nullopt;
-            });
-
-            m_lua.setField("getName", [](Actor& actor){
-                Name* ptr = actor.tryGet<Name>();
-                return ptr ? std::make_optional(ptr->value) : std::nullopt;
-            });
-
-            lua_pop(m_lua, 1);
-        }
+        ComponentsToLua::populateMetatables(m_lua);
 
         lua_newtable(m_lua);
 

@@ -12,7 +12,7 @@ namespace en {
 
     struct Light {
 
-        LUA_COMPONENT_TYPE(Light);
+        LUA_TYPE(Light);
 
         enum class Kind {
 

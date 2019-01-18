@@ -85,6 +85,13 @@ namespace lua {
         static void        push(lua_State* L, const std::string& value) { lua_pushstring(L, value.c_str()); }
     };
 
+    template<>
+    struct TypeAdapter<lua_CFunction> {
+        static bool          is  (lua_State* L, int index = -1) { return lua_iscfunction(L, index); }
+        static lua_CFunction to  (lua_State* L, int index = -1) { return lua_tocfunction(L, index); }
+        static void          push(lua_State* L, lua_CFunction func) { lua_pushcfunction(L, func); }
+    };
+
     template<typename T>
     struct TypeAdapter<std::optional<T>> {
         static bool is  (lua_State* L, int index = -1) {

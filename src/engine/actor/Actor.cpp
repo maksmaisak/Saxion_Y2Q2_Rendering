@@ -12,8 +12,18 @@ namespace en {
     Actor::Actor(Engine& engine, Entity entity) :
         m_engine(&engine),
         m_registry(&engine.getRegistry()),
-        m_entity(entity) {}
+        m_entity(entity)
+    {}
 
+    int pushByName(lua_State* l) {
+
+        auto actor = lua::to<Actor>(l, 1);
+        auto name = lua::to<std::string>(l, 2);
+
+        ComponentsToLua::pushComponentFromActorByName(actor, name);
+
+        return 1;
+    }
 
     void Actor::initializeMetatable(LuaState& lua) {
 
@@ -28,5 +38,8 @@ namespace en {
             Name* ptr = actor.tryGet<Name>();
             return ptr ? std::make_optional(ptr->value) : std::nullopt;
         });
+
+        // TODO Make this support lua_CFunction
+        lua.setField("getComponent", &pushByName);
     }
 }

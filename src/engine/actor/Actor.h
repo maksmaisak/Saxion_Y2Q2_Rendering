@@ -21,8 +21,11 @@ namespace en {
     TComponent& Actor::add(Args&&... args) {
 
         if constexpr (!isBehavior<TComponent>) {
+
             return m_registry->add<TComponent>(m_entity, std::forward<Args>(args)...);
+
         } else {
+
             m_engine->ensureBehaviorSystem<TComponent>();
             auto& behavior = m_registry->add<TComponent>(m_entity, *this, std::forward<Args>(args)...);
             behavior.start();

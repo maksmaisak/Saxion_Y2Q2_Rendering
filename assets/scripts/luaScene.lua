@@ -63,6 +63,9 @@ function scene.update(dt)
         print(head:isValid())
         print(head:getName())
         print(head:getTransform())
+        print(head:getComponent("Transform"));
+        print(head:getComponent("RenderInfo"));
+        print(head:getComponent("Rigidbody"));
         head:getTransform():move(0, dt, 0)
         head:getTransform():rotate(10 * dt, 0, 1, 0)
     end

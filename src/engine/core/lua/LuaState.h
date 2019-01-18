@@ -75,7 +75,7 @@ namespace en {
             luaL_checktype(L, tableIndex, LUA_TTABLE);
             tableIndex = lua_absindex(L, tableIndex);
 
-            if constexpr (utils::functionTraits<utils::unqualified_t<T>>::isFunction) {
+            if constexpr (utils::functionTraits<utils::unqualified_t<T>>::isFunction && !std::is_same_v<lua_CFunction, T>) {
                 ClosureHelper::makeClosure(L, std::forward<T>(value));
             } else {
                 lua::push(L, std::forward<T>(value));

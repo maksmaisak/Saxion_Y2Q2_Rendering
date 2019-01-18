@@ -43,3 +43,18 @@ void ComponentsToLua::printDebugInfo() {
 
     std::cout << std::endl;
 }
+
+void ComponentsToLua::pushComponentFromActorByName(Actor& actor, const std::string& componentTypeName) {
+
+    auto& lua = actor.getEngine().getLuaState();
+
+    auto& map = getNameToTypeInfoMap();
+    auto it = map.find(componentTypeName);
+    if (it == map.end()) {
+        std::cout << "Unknown component type: " << componentTypeName << std::endl;
+        lua_pushnil(lua);
+        return;
+    }
+
+    it->second.pushFromActor(actor, lua);
+}

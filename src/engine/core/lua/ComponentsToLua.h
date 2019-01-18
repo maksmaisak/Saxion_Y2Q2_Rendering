@@ -22,6 +22,7 @@ namespace en {
 
     using LuaComponentFactoryFunction = std::function<void(Actor&, LuaState&)>;
     using InitializeMetatableFunction = std::function<void(LuaState&)>;
+    using PushComponentFromActorFunction = std::function<void(Actor&, LuaState&)>;
 
     namespace detail {
 
@@ -71,11 +72,13 @@ namespace en {
         template<typename TComponent>
         static void registerType(const std::string& name);
 
+        /// Populates metatables of registered types by calling their initializeMetatable function with the metatable being on top of the stack.
+        static void populateMetatables(LuaState& lua);
+
         /// Adds a component of a given type from a value at the given index in the lua stack
         static void makeComponent(Actor& actor, const std::string& componentTypeName, int componentValueIndex = -1);
 
-        /// Populates metatables of registered types by calling their initializeMetatable function with the metatable being on top of the stack.
-        static void populateMetatables(LuaState& lua);
+        static void pushComponentFromActorByName(Actor& actor, const std::string& componentTypeName);
 
         static void printDebugInfo();
 
@@ -85,6 +88,7 @@ namespace en {
 
             LuaComponentFactoryFunction addFromLua;
             InitializeMetatableFunction initializeMetatable;
+            PushComponentFromActorFunction pushFromActor;
         };
 
         // Doing it this way instead of just having a static field makes sure the map is initialized whenever it's needed.
@@ -117,9 +121,6 @@ namespace en {
     template<typename T>
     inline void ComponentsToLua::registerType(const std::string& name) {
 
-        LuaComponentFactoryFunction addFromLua          = detail::LuaComponentFactoryFunctionOf<T>::get();
-        InitializeMetatableFunction initializeMetatable = detail::InitializeMetatableFunctionOf<T>::get();
-
         auto& map = getNameToTypeInfoMap();
         auto it = map.find(name);
         if (it != map.end()) {
@@ -127,7 +128,18 @@ namespace en {
             return;
         }
 
-        getNameToTypeInfoMap().emplace(name, TypeInfo{addFromLua, initializeMetatable});
+        LuaComponentFactoryFunction addFromLua          = detail::LuaComponentFactoryFunctionOf<T>::get();
+        InitializeMetatableFunction initializeMetatable = detail::InitializeMetatableFunctionOf<T>::get();
+        PushComponentFromActorFunction pushFromActor = [](Actor& actor, LuaState& lua) {
+
+            T* componentPtr = actor.tryGet<T>();
+            if (componentPtr)
+                lua::push(lua, componentPtr);
+            else
+                lua_pushnil(lua);
+        };
+
+        getNameToTypeInfoMap().emplace(name, TypeInfo {addFromLua, initializeMetatable, pushFromActor});
     }
 }
 

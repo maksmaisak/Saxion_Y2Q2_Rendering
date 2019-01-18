@@ -143,7 +143,7 @@ namespace en {
     void Engine::initializeLua() {
 
         LUA_REGISTER_TYPE(Actor);
-        
+
         // Configure metatables of all registered component types
         ComponentsToLua::populateMetatables(m_lua);
 

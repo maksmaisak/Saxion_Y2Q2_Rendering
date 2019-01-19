@@ -148,7 +148,7 @@ namespace en {
             if (actor.tryGet<T>())
                 luaL_error(lua, "Actor %s already has a component of type %s", actor.getName().c_str(), utils::demangle<T>().c_str());
 
-            lua::push(lua, actor.add<T>());
+            lua::push(lua, &actor.add<T>());
         };
 
         getNameToTypeInfoMap()[name] = {

@@ -13,6 +13,8 @@
 #include "ShaderProgram.hpp"
 #include "Texture.hpp"
 #include "TupleUtils.h"
+#include "Light.h"
+#include "Transform.h"
 
 namespace en {
 

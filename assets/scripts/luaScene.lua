@@ -21,38 +21,79 @@ local scene = {
     {
         Name = "plane",
         Transform = {
-            position = { x = 0, y = -4, z = 0 },
-            scale    = { x = 5, y =  5, z = 5 }
+            position = { x = 0, y = 0, z = 0 },
+            scale    = { x = 5, y = 5, z = 5 }
         },
         RenderInfo = {
             mesh = "models/plane.obj",
-            texture = "textures/land.jpg" -- TODO add support for materials
+            material = {
+                diffuse = "textures/land.jpg",
+                shininess = 10
+            }
+        },
+    },
+    {
+        Name = "cube",
+        Transform = {
+            position = { x = 0, y = 2, z = 0 },
+            scale    = { x = 1, y = 1, z = 1 }
+        },
+        RenderInfo = {
+            mesh = "models/cube_flat.obj",
+            material = {
+                diffuse = "textures/container/diffuse.png",
+                specular = "textures/container/specular.png",
+                shininess = 100
+            }
         },
     },
     {
         Name = "head",
         Transform = {
-            position = { x = 0, y = 2, z = 0 }
+            position = { x = 0, y = 5, z = 0 }
         },
         RenderInfo = {
             mesh = "models/suzanna_flat.obj",
-            texture = "textures/bricks.jpg" -- TODO add support for materials
+            material = {
+                diffuse = "textures/bricks.jpg",
+                shininess = 100
+            }
         },
         Scripts = { "mover" }
     },
     {
         Name = "teapot",
         Transform = {
-            position = { x = 0, y = 4, z = 0 }
+            position = { x = 0, y = 7, z = 0 }
         },
         RenderInfo = {
             mesh = "models/teapot_smooth.obj",
-            texture = "textures/bricks.jpg" -- TODO add support for materials
+            material = {
+                diffuse = "textures/bricks.jpg"
+            }
         }
     }
 }
 
+local didStart = false
+
+local function start()
+
+    local actor = Game.makeActor("Light")
+    actor:addComponent("Transform"):move(-5, 3, 0)
+    actor:addComponent("Light")
+
+    local actor2 = Game.makeActor("Light")
+    actor2:addComponent("Transform"):move(5, 3, 0)
+    actor2:addComponent("Light")
+end
+
 function scene.update(dt)
+
+    if (not didStart) then
+        start()
+        didStart = true
+    end
 
     print(Game.testValue)
     print(Game.testFreeFunction())
@@ -66,8 +107,8 @@ function scene.update(dt)
         print(head:getComponent("Transform"))
         print(head:getComponent("RenderInfo"))
         print(head:getComponent("Rigidbody"))
-        head:getTransform():move(0, dt, 0)
-        head:getTransform():rotate(10 * dt, 0, 1, 0)
+        --head:getTransform():move(0, dt, 0)
+        --head:getTransform():rotate(10 * dt, 0, 1, 0)
     end
 
     local actor = Game.makeActor("name")

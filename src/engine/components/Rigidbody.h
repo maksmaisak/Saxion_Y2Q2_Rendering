@@ -6,10 +6,13 @@
 #define SAXION_Y2Q1_CPP_RIGIDBODY_H
 
 #include "glm.hpp"
+#include "ComponentsToLua.h"
 
 namespace en {
 
     struct Rigidbody {
+
+        LUA_TYPE(Rigidbody)
 
         bool isKinematic = false;
         glm::vec3 velocity;

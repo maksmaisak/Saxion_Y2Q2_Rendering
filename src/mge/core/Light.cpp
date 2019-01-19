@@ -1,3 +1,6 @@
+
+#include <engine/components/Light.h>
+
 #include "mge/core/Light.hpp"
 #include "mge/core/World.hpp"
 
@@ -21,5 +24,3 @@ void Light::_setWorldRecursively (World* pWorld) {
 	if (newWorld != nullptr) newWorld->registerLight(this);
 
 }
-
-

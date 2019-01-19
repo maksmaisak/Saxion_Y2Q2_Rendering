@@ -18,8 +18,10 @@
 #include "engine/components/Name.h"
 #include "engine/components/Transform.h"
 #include "engine/components/RenderInfo.h"
+#include "engine/components/Rigidbody.h"
+#include "engine/components/Light.h"
 #include "engine/components/Camera.h"
-#include "TextureMaterial.hpp"
+#include "Material.h"
 
 using namespace en;
 

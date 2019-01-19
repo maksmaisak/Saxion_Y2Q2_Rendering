@@ -14,6 +14,9 @@ namespace en {
 
         LUA_TYPE(Light);
 
+        static void addFromLua(Actor& actor, LuaState& lua);
+        static void initializeMetatable(LuaState& lua);
+
         enum class Kind {
 
             POINT = 0,

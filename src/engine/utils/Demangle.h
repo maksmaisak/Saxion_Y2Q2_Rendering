@@ -51,7 +51,7 @@ namespace utils {
 #elif defined(_MSC_VER)
 
     template <typename T>
-    inline std::string ctti_get_type_name() {
+    inline std::string demangleOnce() {
         static const std::array<std::string, 7> removals = {{"public:", "private:", "protected:", "struct ", "class ", "`anonymous-namespace'", "`anonymous namespace'"}};
         std::string name = __FUNCSIG__;
         std::size_t start = name.find("get_type_name");

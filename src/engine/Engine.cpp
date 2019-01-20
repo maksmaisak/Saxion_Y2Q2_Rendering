@@ -86,9 +86,9 @@ namespace en {
         std::cout << "Initializing window..." << std::endl;
 
         m_lua.doFileInNewEnvironment("assets/scripts/config.lua");
-        unsigned int width  = m_lua.getField<unsigned int>("width" ).value_or(800);
-        unsigned int height = m_lua.getField<unsigned int>("height").value_or(600);
-        bool useVSync = m_lua.getField<bool>("vSync").value_or(true);
+        unsigned int width  = m_lua.tryGetField<unsigned int>("width").value_or(800);
+        unsigned int height = m_lua.tryGetField<unsigned int>("height").value_or(600);
+        bool useVSync = m_lua.tryGetField<bool>("vSync").value_or(true);
         lua_pop(m_lua, 1);
 
         auto contextSettings = sf::ContextSettings(24, 8, 8, 3, 3);

@@ -149,38 +149,26 @@ namespace en {
         return orientation;
     }
 
-    glm::vec3 luaToVec3(LuaState& lua, glm::vec3 defaultValue = {0, 0, 0}) {
-
-        return {
-            lua.getField<float>("x").value_or(defaultValue.x),
-            lua.getField<float>("y").value_or(defaultValue.y),
-            lua.getField<float>("z").value_or(defaultValue.z)
-        };
-    }
-
     Transform& Transform::addFromLua(Actor& actor, LuaState& lua) {
+
+        if (!lua_istable(lua, -1))
+            throw "Can't make Transform from non-table.";
 
         auto& transform = actor.add<en::Transform>();
 
-        if (!lua_istable(lua, -1)) throw "Can't make Transform from non-table.";
+        auto position = lua.tryGetField<glm::vec3>("position");
+        if (position)
+            transform.m_position = *position;
 
-        {
-            auto pop = lua::PopperOnDestruct(lua);
-            lua_getfield(lua, -1, "position");
-            transform.setLocalPosition(luaToVec3(lua));
-        }
+        auto rotation = lua.tryGetField<glm::vec3>("rotation");
+        if (rotation)
+            transform.m_rotation = glm::quat(*rotation);
 
-        {
-            auto pop = lua::PopperOnDestruct(lua);
-            lua_getfield(lua, -1, "rotation");
-            transform.setLocalRotation(glm::quat(luaToVec3(lua)));
-        }
+        auto scale = lua.tryGetField<glm::vec3>("scale");
+        if (scale)
+            transform.m_scale = *scale;
 
-        {
-            auto pop = lua::PopperOnDestruct(lua);
-            lua_getfield(lua, -1, "scale");
-            transform.setLocalScale(luaToVec3(lua, {1, 1, 1}));
-        }
+        transform.markDirty();
 
         return transform;
     }
@@ -188,11 +176,11 @@ namespace en {
     void Transform::initializeMetatable(LuaState& lua) {
 
         lua.setField("move", [](Transform* tf, float x, float y, float z) {
-            tf->move({x, y, z});
+            return &tf->move({x, y, z});
         });
 
         lua.setField("rotate", [](Transform* tf, float angle, float x, float y, float z) {
-            tf->rotate(glm::radians(angle), {x, y, z});
+            return &tf->rotate(glm::radians(angle), {x, y, z});
         });
     }
 }

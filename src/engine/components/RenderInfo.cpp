@@ -14,7 +14,7 @@ RenderInfo& RenderInfo::addFromLua(Actor& actor, LuaState& lua) {
 
     if (!lua_istable(lua, -1)) throw "Can't make RenderInfo from a non-table.";
 
-    std::optional<std::string> meshPath = lua.getField<std::string>("mesh");
+    std::optional<std::string> meshPath = lua.tryGetField<std::string>("mesh");
     if (meshPath) renderInfo.mesh = en::Resources<Mesh>::get("assets/" + *meshPath);
 
     {
@@ -29,15 +29,15 @@ RenderInfo& RenderInfo::addFromLua(Actor& actor, LuaState& lua) {
 
         material->setUniformValue("diffuseColor" , glm::vec3(1, 1, 1));
         material->setUniformValue("specularColor", glm::vec3(1, 1, 1));
-        material->setUniformValue("shininess", lua.getField<float>("shininess").value_or(10.f));
+        material->setUniformValue("shininess", lua.tryGetField<float>("shininess").value_or(10.f));
 
-        std::optional<std::string> diffusePath = lua.getField<std::string>("diffuse");
+        std::optional<std::string> diffusePath = lua.tryGetField<std::string>("diffuse");
         if (diffusePath)
             material->setUniformValue("diffuseMap", Textures::get(config::ASSETS_PATH + *diffusePath));
         else
             material->setUniformValue("diffuseMap", Textures::white());
 
-        std::optional<std::string> specularPath = lua.getField<std::string>("specular");
+        std::optional<std::string> specularPath = lua.tryGetField<std::string>("specular");
         if (specularPath)
             material->setUniformValue("specularMap", Textures::get(config::ASSETS_PATH + *specularPath));
         else

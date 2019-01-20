@@ -54,19 +54,15 @@ namespace en {
         }*/
 
         template<typename T>
-        inline std::optional<T> getGlobal(const std::string& name) {
+        inline std::optional<T> tryGetGlobal(const std::string& name) {
 
             lua_getglobal(L, name.c_str());
-            return get<T>();
+            return tryGet<T>();
         }
 
         template<typename T>
-        inline std::optional<T> getField(const std::string& name, int tableIndex = -1) {
-
-            if (!lua_istable(L, tableIndex)) return std::nullopt;
-
-            lua_getfield(L, tableIndex, name.c_str());
-            return get<T>();
+        inline std::optional<T> tryGetField(const std::string& name, int tableIndex = -1) {
+            return lua::tryGetField<T>(L, name, tableIndex);
         }
 
         template<typename T>
@@ -97,13 +93,7 @@ namespace en {
 
         /// Pops and returns the value on top of the stack.
         template<typename T>
-        inline std::optional<T> get() {
-
-            auto popper = PopperOnDestruct(L); // pop when the function returns
-
-            if (lua_isnil(L, -1) || !is<T>()) return std::nullopt;
-            return to<T>();
-        }
+        inline std::optional<T> tryGet() {return lua::tryGet<T>(L);}
 
         template<typename T>
         inline bool is(int index = -1) const {return lua::is<T>(L, index);}

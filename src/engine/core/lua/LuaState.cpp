@@ -71,5 +71,5 @@ void LuaState::setEnvironment(int environmentIndex) {
 
 void LuaState::printError() {
 
-    std::cerr << get<std::string>().value_or("An error occured, but the error message could not be retrieved.") << std::endl;
+    std::cerr << tryGet<std::string>().value_or("An error occured, but the error message could not be retrieved.") << std::endl;
 }

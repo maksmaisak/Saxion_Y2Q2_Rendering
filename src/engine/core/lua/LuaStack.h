@@ -12,9 +12,20 @@
 #include <iostream>
 
 #include "Demangle.h"
-#include "FunctionTraits.h"
+#include "Meta.h"
+#include "glm.hpp"
 
 namespace lua {
+
+    class PopperOnDestruct {
+
+    public:
+        inline PopperOnDestruct(lua_State* luaState) : L(luaState) {}
+        inline ~PopperOnDestruct() {lua_pop(L, 1);}
+
+    private:
+        lua_State* L;
+    };
 
     // Default case. Treat everything as userdata
     template<typename T, typename = void>
@@ -66,6 +77,44 @@ namespace lua {
     template<typename T>
     inline T check(lua_State* L, int index = -1) {return TypeAdapter<T>::check(L, index);}
 
+    template<typename T>
+    inline std::optional<T> tryGet(lua_State* L) {
+
+        auto p = PopperOnDestruct(L); // pop when the function returns
+        if (lua_isnil(L, -1) || !is<T>(L)) return std::nullopt;
+        return to<T>(L);
+    }
+
+    template<typename T, typename TKey, typename = void>
+    struct FieldGetter {
+
+        static std::optional<T> tryGetField(lua_State* L, TKey&& key, int tableIndex = -1) {
+
+            if (!lua_istable(L, tableIndex)) return std::nullopt;
+
+            push(L, std::forward<TKey>(key));
+            lua_gettable(L, -2);
+            return tryGet<T>(L);
+        }
+    };
+
+    template<typename T, typename TKey>
+    struct FieldGetter<T, TKey, std::enable_if_t<utils::is_string_v<TKey>>> {
+
+        static std::optional<T> tryGetField(lua_State* L, TKey&& key, int tableIndex = -1) {
+
+            if (!lua_istable(L, tableIndex)) return std::nullopt;
+
+            lua_getfield(L, tableIndex, &key[0]);
+            return tryGet<T>(L);
+        }
+    };
+
+    template<typename T, typename TKey>
+    inline std::optional<T> tryGetField(lua_State* L, TKey&& key, int tableIndex = -1) {
+        return FieldGetter<T, TKey>::tryGetField(L, std::forward<TKey>(key), tableIndex);
+    }
+
     template<>
     struct TypeAdapter<bool> {
         static bool is   (lua_State* L, int index = -1) { return lua_isboolean(L, index); }
@@ -111,7 +160,7 @@ namespace lua {
 
     template<typename T>
     struct TypeAdapter<std::optional<T>> {
-        static bool is  (lua_State* L, int index = -1) {
+        static bool is(lua_State* L, int index = -1) {
             return lua_isnil(L, index) || lua::is<T>(L, index);
         }
         static std::optional<T> to (lua_State* L, int index = -1) {
@@ -129,14 +178,57 @@ namespace lua {
         }
     };
 
-    class PopperOnDestruct {
+    template<>
+    struct TypeAdapter<glm::vec3> {
 
-    public:
-        inline PopperOnDestruct(lua_State* luaState) : L(luaState) {}
-        inline ~PopperOnDestruct() {lua_pop(L, 1);}
+        static bool is(lua_State* L, int index = -1) {
+            return lua_istable(L, index);
+        }
 
-    private:
-        lua_State* L;
+        static glm::vec3 check(lua_State* L, int index = -1) {
+            if (!is(L, index)) luaL_error(L, "Bad argument #%d, expected %s, got %s", index, utils::demangle<glm::vec3>().c_str(), luaL_typename(L, index));
+            return to(L, index);
+        }
+
+        static float tryGetValue(lua_State* L, const std::string& key1, const std::string& key2, int key3) {
+
+            auto opt1 = lua::tryGetField<float>(L, key1);
+            if (opt1)
+                return *opt1;
+
+            auto opt2 = lua::tryGetField<float>(L, key2);
+            if (opt2)
+                return *opt2;
+
+            auto opt3 = lua::tryGetField<float>(L, key3);
+            if (opt3)
+                return *opt3;
+
+            return 0.f;
+        }
+
+        static glm::vec3 to(lua_State* L, int index = -1) {
+
+            return {
+                tryGetValue(L, "x", "r", 1),
+                tryGetValue(L, "y", "g", 2),
+                tryGetValue(L, "z", "b", 3)
+            };
+        }
+
+        static void push(lua_State* L, const glm::vec3& value) {
+
+            lua_createtable(L, 0, 0);
+
+            lua::push(L, value.x);
+            lua_setfield(L, -2, "x");
+
+            lua::push(L, value.y);
+            lua_setfield(L, -2, "y");
+
+            lua::push(L, value.z);
+            lua_setfield(L, -2, "z");
+        }
     };
 }
 

@@ -14,19 +14,19 @@ CameraOrbitBehavior& CameraOrbitBehavior::addFromLua(en::Actor& actor, en::LuaSt
 
     auto& behavior = actor.add<CameraOrbitBehavior>();
 
-    auto targetName = lua.getField<std::string>("target");
+    auto targetName = lua.tryGetField<std::string>("target");
     if (targetName) behavior.m_target = actor.getEngine().findByName(*targetName);
 
-    auto distance = lua.getField<float>("distance");
+    auto distance = lua.tryGetField<float>("distance");
     if (distance) behavior.m_distance = *distance;
 
-    auto minTilt = lua.getField<float>("minTilt");
+    auto minTilt = lua.tryGetField<float>("minTilt");
     if (minTilt) behavior.m_minTilt = *minTilt;
 
-    auto maxTilt = lua.getField<float>("maxTilt");
+    auto maxTilt = lua.tryGetField<float>("maxTilt");
     if (maxTilt) behavior.m_maxTilt = *maxTilt;
 
-    auto rotationSpeed = lua.getField<float>("rotationSpeed");
+    auto rotationSpeed = lua.tryGetField<float>("rotationSpeed");
     if (rotationSpeed) behavior.m_rotationSpeed = *rotationSpeed;
 
     return behavior;

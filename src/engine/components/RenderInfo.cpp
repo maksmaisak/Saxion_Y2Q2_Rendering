@@ -24,7 +24,8 @@ RenderInfo& RenderInfo::addFromLua(Actor& actor, LuaState& lua) {
         luaL_checktype(lua, -1, LUA_TTABLE);
 
         // TODO reuse materials instead of creating new ones for each instance.
-        auto material = std::make_shared<Material>(lua.getField<std::string>("shader").value_or("lit"));
+        // TODO make it possible to specify different shaders, other than "lit".
+        auto material = std::make_shared<Material>("lit");
 
         material->setUniformValue("diffuseColor" , glm::vec3(1, 1, 1));
         material->setUniformValue("specularColor", glm::vec3(1, 1, 1));

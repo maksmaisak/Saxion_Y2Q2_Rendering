@@ -127,7 +127,9 @@ void addRingItems(en::Engine& engine, en::Entity parent, std::size_t numItems = 
     }
 }
 
-void TestScene::open(en::Engine& engine) {
+void TestScene::open() {
+
+    en::Engine& engine = getEngine();
 
     // MESHES
 

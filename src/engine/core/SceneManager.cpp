@@ -12,7 +12,10 @@ namespace en {
         closeCurrentScene();
 
         m_currentScene = std::move(scene);
-        if (m_currentScene) m_currentScene->open(*m_engine);
+        if (m_currentScene) {
+            m_currentScene->setEngine(*m_engine);
+            m_currentScene->open();
+        }
     }
 
     void SceneManager::setCurrentScene(Scene* scene) {
@@ -24,7 +27,7 @@ namespace en {
 
         if (!m_currentScene) return;
 
-        m_currentScene->close(*m_engine);
+        m_currentScene->close();
         m_engine->getRegistry().destroyAll();
     }
 }

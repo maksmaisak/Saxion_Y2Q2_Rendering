@@ -12,7 +12,7 @@
 class TerrainScene : public en::Scene {
 
 public:
-    void open(en::Engine& engine) override;
+    void open() override;
 };
 
 #endif //SAXION_Y2Q2_RENDERING_TERRAINSCENE_H

@@ -12,7 +12,7 @@
 class TestScene : public en::Scene {
 
 public:
-    void open(en::Engine& engine) override;
+    void open() override;
 };
 
 

@@ -16,7 +16,7 @@ public:
     LuaScene(const std::string& filename);
     virtual ~LuaScene();
 
-    void open(en::Engine& engine) override;
+    void open() override;
     void update(float dt) override;
 
 private:
@@ -26,8 +26,6 @@ private:
     void addComponents(en::Actor& actor, int entityDefinitionIndex = -1);
 
     std::string m_filename;
-
-    en::Engine* m_engine = nullptr;
 
     int m_luaUpdateFunctionRef = LUA_NOREF;
 };

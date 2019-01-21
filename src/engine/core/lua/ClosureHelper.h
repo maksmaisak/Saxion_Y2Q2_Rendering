@@ -81,7 +81,7 @@ namespace lua {
     template<typename F>
     void ClosureHelper::makeClosure(lua_State* l, const F& func) {
 
-        using traits = utils::functionTraits<decltype(&utils::unqualified_t<F>::operator())>;
+        using traits = utils::functionTraits<decltype(&utils::remove_cvref_t<F>::operator())>;
         static_assert(traits::isFunction);
         std::function<typename traits::Signature> function = func;
         makeClosure(l, function);
@@ -91,14 +91,14 @@ namespace lua {
     void ClosureHelper::makeClosure(lua_State* l, const std::function<TResult(TArgs...)>& function) {
 
         lua::push(l, function);
-        lua_pushcclosure(l, &callStdFunction<TResult, utils::unqualified_t<TArgs>...>, 1);
+        lua_pushcclosure(l, &callStdFunction<TResult, utils::remove_cvref_t<TArgs>...>, 1);
     }
 
     template<typename TResult, typename... TArgs>
     void ClosureHelper::makeClosure(lua_State* l, functionPtr<TResult, TArgs...> freeFunction) {
 
         lua_pushlightuserdata(l, (void*)freeFunction);
-        lua_pushcclosure(l, &call<TResult, utils::unqualified_t<TArgs>...>, 1);
+        lua_pushcclosure(l, &call<TResult, utils::remove_cvref_t<TArgs>...>, 1);
     }
 
     template<typename TResult, typename TOwner, typename... TArgs>
@@ -108,14 +108,14 @@ namespace lua {
         // because member function pointers for some types may be bigger than a void*.
         lua::push(l, memberFunction);
         lua_pushlightuserdata(l, typeInstance);
-        lua_pushcclosure(l, &callMember<TResult, TOwner, utils::unqualified_t<TArgs>...>, 2);
+        lua_pushcclosure(l, &callMember<TResult, TOwner, utils::remove_cvref_t<TArgs>...>, 2);
     }
 
     template<typename TResult, typename TOwner, typename... TArgs>
     void ClosureHelper::makeClosure(lua_State* l, memberFunctionPtr<TResult, TOwner, TArgs...> memberFunction) {
 
         lua::push(l, memberFunction);
-        lua_pushcclosure(l, &callMemberFromStack<TResult, TOwner, utils::unqualified_t<TArgs>...>, 1);
+        lua_pushcclosure(l, &callMemberFromStack<TResult, TOwner, utils::remove_cvref_t<TArgs>...>, 1);
     }
 
     template<typename TResult, typename... TArgs>
@@ -236,7 +236,7 @@ namespace lua {
 
     template<typename TResult>
     void ClosureHelper::pushResult(lua_State* l, const TResult& result) {
-        lua::TypeAdapter<utils::unqualified_t<TResult>>::push(l, result);
+        lua::TypeAdapter<utils::remove_cvref_t<TResult>>::push(l, result);
     }
 }
 

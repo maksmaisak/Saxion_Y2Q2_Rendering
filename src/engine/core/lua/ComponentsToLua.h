@@ -49,11 +49,11 @@ namespace en {
         };
 
         template<typename T>
-        struct InitializeMetatableFunctionOf<T, std::enable_if_t<std::is_convertible_v<decltype(&std::remove_pointer_t<utils::unqualified_t<T>>::initializeMetatable), InitializeMetatableFunction>>> {
+        struct InitializeMetatableFunctionOf<T, std::enable_if_t<std::is_convertible_v<decltype(&std::remove_pointer_t<utils::remove_cvref_t<T>>::initializeMetatable), InitializeMetatableFunction>>> {
 
             inline static void initializeMetatable(LuaState& lua) {
 
-                using TComponent = std::remove_pointer_t<utils::unqualified_t<T>>;
+                using TComponent = std::remove_pointer_t<utils::remove_cvref_t<T>>;
 
                 getMetatable<T>(lua);
                 

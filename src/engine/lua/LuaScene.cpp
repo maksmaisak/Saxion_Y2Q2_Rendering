@@ -29,13 +29,12 @@ LuaScene::LuaScene(const std::string& filename) : m_filename(filename) {}
 
 LuaScene::~LuaScene() {
 
-    luaL_unref(m_engine->getLuaState(), LUA_REGISTRYINDEX, m_luaUpdateFunctionRef);
+    luaL_unref(getEngine().getLuaState(), LUA_REGISTRYINDEX, m_luaUpdateFunctionRef);
 }
 
-void LuaScene::open(en::Engine& engine) {
+void LuaScene::open() {
 
-    m_engine = &engine;
-    en::LuaState& lua = m_engine->getLuaState();
+    en::LuaState& lua = getEngine().getLuaState();
 
     std::cout << "Loading lua-defined scene " + m_filename + "..." << std::endl;
 
@@ -57,7 +56,7 @@ void LuaScene::open(en::Engine& engine) {
 /// This is necessary to make sure findByName works during component initialization.
 void LuaScene::makeEntities(int sceneDefinitionIndex) {
 
-    en::LuaState& lua = m_engine->getLuaState();
+    en::LuaState& lua = getEngine().getLuaState();
     sceneDefinitionIndex = lua_absindex(lua, sceneDefinitionIndex);
 
     std::vector<std::tuple<int, en::Actor>> entities;
@@ -97,17 +96,19 @@ void LuaScene::makeEntities(int sceneDefinitionIndex) {
         assert(oldTop == newTop);
     }
 
-    for (auto[ref, actor] : entities) luaL_unref(lua, LUA_REGISTRYINDEX, ref);
+    for (auto[ref, actor] : entities)
+        luaL_unref(lua, LUA_REGISTRYINDEX, ref);
 }
 
 en::Actor LuaScene::makeEntity(int entityDefinitionIndex) {
 
-    en::LuaState& lua = m_engine->getLuaState();
+    en::Engine& engine = getEngine();
+    en::LuaState& lua = engine.getLuaState();
 
     entityDefinitionIndex = lua_absindex(lua, entityDefinitionIndex);
     assert(lua_istable(lua, entityDefinitionIndex));
 
-    en::Actor actor = m_engine->makeActor();
+    en::Actor actor = engine.makeActor();
 
     // Get and assign the name
     auto pop = lua::PopperOnDestruct(lua);
@@ -117,9 +118,9 @@ en::Actor LuaScene::makeEntity(int entityDefinitionIndex) {
     return actor;
 }
 
-void LuaScene::addComponents( en::Actor& actor, int entityDefinitionIndex) {
+void LuaScene::addComponents(en::Actor& actor, int entityDefinitionIndex) {
 
-    en::LuaState& lua = m_engine->getLuaState();
+    en::LuaState& lua = getEngine().getLuaState();
     entityDefinitionIndex = lua_absindex(lua, entityDefinitionIndex);
 
     // Iterate over the entity definition.
@@ -141,7 +142,7 @@ void LuaScene::update(float dt) {
 
     if (m_luaUpdateFunctionRef == LUA_NOREF) return;
 
-    auto& lua = m_engine->getLuaState();
+    auto& lua = getEngine().getLuaState();
 
     lua_rawgeti(lua, LUA_REGISTRYINDEX, m_luaUpdateFunctionRef);
     if (lua_isnil(lua, -1)) {
@@ -149,6 +150,6 @@ void LuaScene::update(float dt) {
         return;
     }
 
-    lua_pushnumber(lua, dt);
+    lua.push(dt);
     lua.pCall(1, 0);
 }

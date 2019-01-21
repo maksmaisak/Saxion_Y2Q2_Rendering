@@ -4,6 +4,12 @@
 -- Time: 17:28
 --
 
+local CubeMaterial = {
+    diffuse = "textures/container/diffuse.png",
+    specular = "textures/container/specular.png",
+    shininess = 100
+}
+
 local scene = {
     {
         Name = "plane",
@@ -19,25 +25,39 @@ local scene = {
         },
     },
     {
-        Name = "cube",
+        Name = "player1",
         Transform = {
-            position = { 0, 2, 0 },
+            position = { -5, 1, 5 },
             scale    = { 1, 1, 1 }
         },
         RenderInfo = {
             mesh = "models/cube_flat.obj",
-            material = {
-                diffuse = "textures/container/diffuse.png",
-                specular = "textures/container/specular.png",
-                shininess = 100
-            }
+            material = CubeMaterial
+        }
+    },
+    {
+        Name = "player2",
+        Transform = {
+            position = { 5, 1, -5 },
+            scale    = { 0.1, 1, 1 }
+        },
+        RenderInfo = {
+            mesh = "models/cube_flat.obj",
+            material = CubeMaterial
+        }
+    },
+    {
+        Name = "DirectionalLight",
+        Transform = {},
+        Light = {
+            kind = "directional",
+            colorAmbient = {0.02, 0.02, 0.04}
         }
     },
     {
         Name = "Light",
         Light = {
             intensity = 1,
-            colorAmbient = {0.02, 0.02, 0.04}
         },
         Transform = {
             position = { x = 0, y = 2, z = 2 },
@@ -53,7 +73,8 @@ local scene = {
 }
 
 local didStart = false
-local cube
+local player1
+local player2
 
 local function start()
 
@@ -63,7 +84,21 @@ local function start()
         :rotate(-90, 1, 0, 0)
     camera:addComponent("Camera")
 
-    cube = Game.findByName("cube")
+    local player1Actor = Game.findByName("player1")
+    local player2Actor = Game.findByName("player2")
+
+    player1 = require("./assets/scripts/basicPlayerAI") {
+        actor = player1Actor,
+        enemy = player2Actor
+    }
+
+    player2 = require("./assets/scripts/basicPlayerAI") {
+        actor = player2Actor,
+        enemy = player1Actor
+    }
+
+    player1:start()
+    player2:start()
 end
 
 function scene.update(dt)
@@ -73,7 +108,8 @@ function scene.update(dt)
         didStart = true
     end
 
-    cube:getComponent("Transform"):move(0, 0, -dt)
+    player1:update(dt)
+    player2:update(dt)
 end
 
 return scene

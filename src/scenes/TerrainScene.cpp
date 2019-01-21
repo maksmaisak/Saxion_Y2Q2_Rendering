@@ -21,7 +21,9 @@
 #include "glm.hpp"
 #include <glm/gtx/euler_angles.hpp>
 
-void TerrainScene::open(en::Engine& engine) {
+void TerrainScene::open() {
+
+    auto& engine = getEngine();
 
     auto camera = engine.makeActor("Camera");
     camera.add<en::Camera>();

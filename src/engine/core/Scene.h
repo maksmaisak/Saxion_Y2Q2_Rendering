@@ -16,10 +16,16 @@ namespace en {
     public:
         virtual ~Scene() = default;
 
-        virtual void open(en::Engine& engine) = 0;
-        virtual void close(en::Engine& engine) {};
+        virtual void open() = 0;
+        virtual void close() {};
 
         virtual void update(float dt) {}
+
+        Engine& getEngine();
+        void setEngine(Engine& engine);
+
+    private:
+        en::Engine* m_engine = nullptr;
     };
 }
 

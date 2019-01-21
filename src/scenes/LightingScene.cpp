@@ -24,7 +24,9 @@
 constexpr bool AnimateLightProperties = false;
 constexpr int NumRotatingLights = 4;
 
-void LightingScene::open(en::Engine& engine) {
+void LightingScene::open() {
+
+    en::Engine& engine = getEngine();
 
     auto camera = engine.makeActor("Camera");
     camera.add<en::Camera>();

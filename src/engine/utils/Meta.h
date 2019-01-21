@@ -10,16 +10,16 @@
 namespace utils {
 
     // T without const, volatile, & or &&
-    // unqualified_t<const std::string&> is std::string
+    // remove_cvref_t<const std::string&> is std::string
     // Equivalent to std::remove_cvref_t from C++20
     template<typename T>
-    using unqualified_t = std::remove_cv_t<std::remove_reference_t<T>>;
+    using remove_cvref_t = std::remove_cv_t<std::remove_reference_t<T>>;
 
     template<typename T>
     using is_string = std::disjunction<
-        std::is_same<std::decay_t<unqualified_t<T>>, const char*>,
-        std::is_same<std::decay_t<unqualified_t<T>>, char*>,
-        std::is_same<unqualified_t<T>, std::string>
+        std::is_same<std::decay_t<remove_cvref_t<T>>, const char*>,
+        std::is_same<std::decay_t<remove_cvref_t<T>>, char*>,
+        std::is_same<remove_cvref_t<T>, std::string>
     >;
 
     template<typename T>

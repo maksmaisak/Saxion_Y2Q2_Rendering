@@ -66,16 +66,16 @@ namespace lua {
     };
 
     template<typename T>
-    inline void push(lua_State* L, const T& value) {TypeAdapter<T>::push(L, value);}
+    inline void push(lua_State* L, const T& value) {TypeAdapter<utils::remove_cvref_t<T>>::push(L, value);}
 
     template<typename T>
-    inline bool is(lua_State* L, int index = -1) {return TypeAdapter<T>::is(L, index);}
+    inline bool is(lua_State* L, int index = -1) {return TypeAdapter<utils::remove_cvref_t<T>>::is(L, index);}
 
     template<typename T>
-    inline T to(lua_State* L, int index = -1) {return TypeAdapter<T>::to(L, index);}
+    inline T to(lua_State* L, int index = -1) {return TypeAdapter<utils::remove_cvref_t<T>>::to(L, index);}
 
     template<typename T>
-    inline T check(lua_State* L, int index = -1) {return TypeAdapter<T>::check(L, index);}
+    inline T check(lua_State* L, int index = -1) {return TypeAdapter<utils::remove_cvref_t<T>>::check(L, index);}
 
     template<typename T>
     inline std::optional<T> tryGet(lua_State* L) {

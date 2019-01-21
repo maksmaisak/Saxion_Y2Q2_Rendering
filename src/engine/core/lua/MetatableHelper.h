@@ -121,12 +121,22 @@ namespace lua {
         return true;
     }
 
-    template<typename Owner, typename T>
+    template<typename T, typename Owner = struct NoOwner>
     class Property {
 
     public:
-        using Getter = std::function<T(const Owner&)>;
-        using Setter = std::function<void(Owner&, T&&)>;
+
+        using Getter = std::conditional_t<
+            std::is_same_v<Owner, NoOwner>,
+            std::function<T()>,
+            std::function<T(const Owner&)>
+        >;
+
+        using Setter = std::conditional_t<
+            std::is_same_v<Owner, NoOwner>,
+            std::function<void(T&&)>,
+            std::function<void(Owner&, T&&)>
+        >;
 
         inline Property(const Getter& getter, const Setter& setter) : m_getter(getter), m_setter(setter) {}
         inline Property(const Getter& getter) : m_getter(getter) {}

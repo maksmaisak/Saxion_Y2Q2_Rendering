@@ -5,6 +5,7 @@
 --
 
 require("./assets/scripts/object")
+require("math")
 
 AI = Object:new()
 
@@ -28,9 +29,10 @@ end
 function AI:update(dt)
 
     --self.transform:move(0, 0, -dt)
-    self.transform.position = {0, 1, 0}
-    print(self.transform.position)
-    --self:shootAt(self.enemyTransform.position)
+    local time = Game.getTime()
+    self.transform.position = {math.cos(time) * 5, 0, math.sin(time * 2) * 5}
+
+    self:shootAt(self.enemyTransform.position)
 end
 
 return function(o)

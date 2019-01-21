@@ -12,6 +12,7 @@
 #include "Actor.h"
 #include "ComponentsToLua.h"
 #include "GLHelpers.h"
+#include "GameTime.h"
 
 #include "MetatableHelper.h"
 #include "Transform.h"
@@ -159,6 +160,9 @@ namespace en {
                 return std::nullopt;
             });
             m_lua.setField("makeActor", [this](const std::string& name) { return makeActor(name); });
+            m_lua.setField("getTime", [](){ return GameTime::now().asSeconds(); });
+
+            //lua::addProperty(m_lua, "time", lua::Property<float>([](){return GameTime::now().asSeconds();}));
 
             lua_setglobal(m_lua, "Game");
         }

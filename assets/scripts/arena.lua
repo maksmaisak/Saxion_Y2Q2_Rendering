@@ -75,11 +75,15 @@ local scene = {
 local didStart = false
 local player1
 local player2
+local cameraTransform
+
+local makePlayerAI_A = require("./assets/scripts/playerAI_A")
+local makePlayerAI_B = require("./assets/scripts/playerAI_B")
 
 local function start()
 
     local camera = Game.makeActor("Camera")
-    camera:addComponent("Transform")
+    cameraTransform = camera:addComponent("Transform")
         :move(0, 20, 0)
         :rotate(-90, 1, 0, 0)
     camera:addComponent("Camera")
@@ -87,12 +91,12 @@ local function start()
     local player1Actor = Game.findByName("player1")
     local player2Actor = Game.findByName("player2")
 
-    player1 = require("./assets/scripts/basicPlayerAI") {
+    player1 = makePlayerAI_A {
         actor = player1Actor,
         enemy = player2Actor
     }
 
-    player2 = require("./assets/scripts/basicPlayerAI") {
+    player2 = makePlayerAI_B {
         actor = player2Actor,
         enemy = player1Actor
     }
@@ -110,6 +114,14 @@ function scene.update(dt)
 
     player1:update(dt)
     player2:update(dt)
+
+    local position1 = player1.actor:getComponent("Transform").position
+    local position2 = player2.actor:getComponent("Transform").position
+    cameraTransform.position = {
+        (position1.x + position2.x) * 0.5,
+        cameraTransform.position.y,
+        (position1.z + position2.z) * 0.5
+    }
 end
 
 return scene

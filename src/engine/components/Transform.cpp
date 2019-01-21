@@ -182,5 +182,20 @@ namespace en {
         lua.setField("rotate", [](Transform* tf, float angle, float x, float y, float z) {
             return &tf->rotate(glm::radians(angle), {x, y, z});
         });
+
+        lua::addProperty(lua, "position", lua::Property<Transform*, glm::vec3>(
+            [](Transform* tf) {return tf->getLocalPosition();},
+            [](Transform* tf, const glm::vec3& pos) {return tf->setLocalPosition(pos);}
+        ));
+
+        lua::addProperty(lua, "rotation", lua::Property<Transform*, glm::vec3>(
+            [](Transform* tf) {return glm::eulerAngles(tf->getLocalRotation());},
+            [](Transform* tf, const glm::vec3& eulerAngles) {return tf->setLocalRotation(eulerAngles);}
+        ));
+
+        lua::addProperty(lua, "scale", lua::Property<Transform*, glm::vec3>(
+            [](Transform* tf) {return tf->getLocalScale();},
+            [](Transform* tf, const glm::vec3& scale) {return tf->setLocalScale(scale);}
+        ));
     }
 }

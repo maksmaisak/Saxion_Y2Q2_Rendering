@@ -68,8 +68,8 @@ namespace en {
         template<typename T>
         inline void setField(const std::string& name, T&& value, int tableIndex = -1) {
 
-            luaL_checktype(L, tableIndex, LUA_TTABLE);
             tableIndex = lua_absindex(L, tableIndex);
+            luaL_checktype(L, tableIndex, LUA_TTABLE);
 
             if constexpr (utils::functionTraits<utils::remove_cvref_t<T>>::isFunction && !std::is_same_v<lua_CFunction, T>) {
                 ClosureHelper::makeClosure(L, std::forward<T>(value));

@@ -55,10 +55,10 @@ namespace en {
 
                 using TComponent = std::remove_pointer_t<utils::remove_cvref_t<T>>;
 
+                int oldTop = lua_gettop(lua);
                 getMetatable<T>(lua);
-                
                 TComponent::initializeMetatable(lua);
-                lua_pop(lua, 1);
+                lua_settop(lua, oldTop);
             }
 
             inline static InitializeMetatableFunction get() {return initializeMetatable;}

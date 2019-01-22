@@ -76,7 +76,12 @@ function AI:update(dt)
     local time = Game.getTime()
     self.transform.position = {math.cos(time) * 5, self.transform.position.y, math.sin(time * 2) * 5 }
 
-    local bulletPos = Game.findByName("Bullet"):getComponent("Transform").position
+    local bullet = Game.findByName("Bullet")
+    local bulletTransform = bullet:getComponent("Transform")
+    local bulletRigidbody = bullet:getComponent("Rigidbody")
+    bulletTransform.position = { bulletTransform.position.x, 0, bulletTransform.position.z }
+    bulletRigidbody.velocity = { bulletRigidbody.velocity.x, 0, bulletRigidbody.velocity.z }
+
     --print("bullet position: ", bulletPos.x, bulletPos.y, bulletPos.z)
 end
 

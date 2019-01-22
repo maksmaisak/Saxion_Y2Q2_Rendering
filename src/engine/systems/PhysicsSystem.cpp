@@ -62,9 +62,11 @@ std::tuple<bool, float> PhysicsSystem::move(Entity entity, Transform& tf, Rigidb
 
         if (hit.has_value()) {
 
+            float otherInvMass = otherRb.isKinematic ? 0.f : otherRb.invMass;
+
             en::resolve(
                 rb.velocity,      rb.invMass,
-                otherRb.velocity, otherRb.invMass,
+                otherRb.velocity, otherInvMass,
                 hit->normal, std::min(rb.bounciness, otherRb.bounciness)
             );
 

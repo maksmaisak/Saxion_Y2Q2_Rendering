@@ -14,7 +14,7 @@ local scenery = {
     {
         Name = "plane",
         Transform = {
-            position = { 0, 0, 0 },
+            position = { 0, -1, 0 },
             scale    = { 10, 10, 10 }
         },
         RenderInfo = {
@@ -63,9 +63,46 @@ local makePlayerAI_B = require("./assets/scripts/playerAI_B")
 
 local scene = {}
 
+local function makeBorders(sideLength)
+
+    sideLength = sideLength or 20
+    local halfSideLength = sideLength / 2
+
+    local function makeBorderPiece(position, radius)
+        return Game.makeActor {
+            Name = "BorderPiece",
+            Transform = {
+                position = position,
+                scale = {radius, radius, radius}
+            },
+            RenderInfo = {
+                mesh = "models/sphere2.obj",
+                material = {}
+            },
+            Rigidbody = {
+                isKinematic = true,
+                useGravity = false,
+                radius = radius
+            }
+        }
+    end
+
+    local radius = 1
+    local step = radius * 1
+
+    for x = -halfSideLength,halfSideLength,step do
+        for y = -halfSideLength,halfSideLength,step do
+            if ((x == -halfSideLength or x == halfSideLength) or (y == -halfSideLength or y == halfSideLength)) then
+                makeBorderPiece({x, 0, y}, radius)
+            end
+        end
+    end
+end
+
 function scene.start()
 
     Game.makeActors(scenery)
+    makeBorders(20)
 
     local function makePlayer(name, position)
 
@@ -89,8 +126,8 @@ function scene.start()
         }
     end
 
-    local player1Actor = makePlayer("player1", {5, 1, -5})
-    local player2Actor = makePlayer("player2", {-5, 1, 5})
+    local player1Actor = makePlayer("player1", {5, 0, -5})
+    local player2Actor = makePlayer("player2", {-5, 0, 5})
 
     local camera = Game.makeActor("Camera")
     cameraTransform = camera:addComponent("Transform")

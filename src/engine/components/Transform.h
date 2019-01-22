@@ -28,7 +28,6 @@ namespace en {
 
     public:
 
-        static Transform& addFromLua(Actor& actor, LuaState& lua);
         static void initializeMetatable(LuaState& lua);
 
         Transform() = default;

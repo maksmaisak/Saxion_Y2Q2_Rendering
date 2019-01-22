@@ -10,20 +10,20 @@ local cubeMaterial = {
     shininess = 100
 }
 
-local actors = {
---    {
---        Name = "plane",
---        Transform = {
---            position = { 0, 0, 0 },
---            scale    = { 10, 10, 10 }
---        },
---        RenderInfo = {
---            mesh = "models/plane.obj",
---            material = {
---                shininess = 10
---            }
---        },
---    },
+local scenery = {
+    {
+        Name = "plane",
+        Transform = {
+            position = { 0, 0, 0 },
+            scale    = { 10, 10, 10 }
+        },
+        RenderInfo = {
+            mesh = "models/plane.obj",
+            material = {
+                shininess = 10
+            }
+        },
+    },
     {
         Name = "DirectionalLight",
         Light = {
@@ -33,16 +33,8 @@ local actors = {
             kind = "DIRECTIONAL"
         },
         Transform = {
-            position = { 2, 2, 0},
             rotation = { -20, 0, 0},
-            scale    = { 0.1, 0.1, 0.1 }
         },
-        RenderInfo = {
-            mesh = "models/sphere2.obj",
-            material = {
-                shininess = 100
-            }
-        }
     },
     {
         Name = "Light",
@@ -50,7 +42,7 @@ local actors = {
             intensity = 4,
         },
         Transform = {
-            position = { x = 0, y = 2, z = 0 },
+            position = { x = 5, y = 2, z = 0 },
             scale    = { 0.1, 0.1, 0.1 }
         },
         RenderInfo = {
@@ -73,8 +65,7 @@ local scene = {}
 
 function scene.start()
 
-    print('before Game.makeActors(actors)')
-    Game.makeActors(actors)
+    Game.makeActors(scenery)
 
     local function makePlayer(name, position)
 
@@ -91,14 +82,15 @@ function scene.start()
                 mesh = "models/cube_flat.obj",
                 material = cubeMaterial
             },
-            Rigidbody = {}
+            Rigidbody = {
+                isKinematic = true,
+                useGravity = false
+            }
         }
     end
 
-    local player1Actor = makePlayer("player1")
-    local player2Actor = makePlayer("player2")
-
-    print('before Game.makeActor {...')
+    local player1Actor = makePlayer("player1", {5, 1, -5})
+    local player2Actor = makePlayer("player2", {-5, 1, 5})
 
     local camera = Game.makeActor("Camera")
     cameraTransform = camera:addComponent("Transform")

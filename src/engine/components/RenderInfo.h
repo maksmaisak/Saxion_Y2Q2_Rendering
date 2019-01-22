@@ -20,6 +20,7 @@ namespace en {
 
         LUA_TYPE(RenderInfo)
         static RenderInfo& addFromLua(Actor& actor, LuaState& lua);
+        static void initializeMetatable(LuaState& lua);
 
         std::shared_ptr<Mesh> mesh;
         std::shared_ptr<AbstractMaterial> material;

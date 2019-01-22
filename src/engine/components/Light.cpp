@@ -31,18 +31,13 @@ void setKind(Light& light, const std::optional<std::string>& kindName) {
 void Light::addFromLua(Actor& actor, LuaState& lua) {
 
     auto& light = actor.add<Light>();
-
     luaL_checktype(lua, -1, LUA_TTABLE);
-
     setKind(light, lua.tryGetField<std::string>("kind"));
-    light.intensity    = lua.tryGetField<float>("intensity").value_or(light.intensity);
-    light.color        = lua.tryGetField<glm::vec3>("color").value_or(light.color);
-    light.colorAmbient = lua.tryGetField<glm::vec3>("colorAmbient").value_or(light.colorAmbient);
 }
 
 void Light::initializeMetatable(LuaState& lua) {
 
-    lua::addProperty(lua, "intensity"   , Property<float, Light*>(&Light::intensity));
-    lua::addProperty(lua, "color"       , Property<glm::vec3, Light*>(&Light::color));
-    lua::addProperty(lua, "colorAmbient", Property<glm::vec3, Light*>(&Light::colorAmbient));
+    lua::addProperty(lua, "intensity"   , property(&Light::intensity));
+    lua::addProperty(lua, "color"       , property(&Light::color));
+    lua::addProperty(lua, "colorAmbient", property(&Light::colorAmbient));
 }

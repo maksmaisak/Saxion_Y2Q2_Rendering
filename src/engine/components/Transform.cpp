@@ -149,30 +149,6 @@ namespace en {
         return orientation;
     }
 
-    Transform& Transform::addFromLua(Actor& actor, LuaState& lua) {
-
-        if (!lua_istable(lua, -1))
-            throw "Can't make Transform from non-table.";
-
-        auto& transform = actor.add<en::Transform>();
-
-        auto position = lua.tryGetField<glm::vec3>("position");
-        if (position)
-            transform.m_position = *position;
-
-        auto rotation = lua.tryGetField<glm::vec3>("rotation");
-        if (rotation)
-            transform.m_rotation = glm::quat(*rotation);
-
-        auto scale = lua.tryGetField<glm::vec3>("scale");
-        if (scale)
-            transform.m_scale = *scale;
-
-        transform.markDirty();
-
-        return transform;
-    }
-
     void Transform::initializeMetatable(LuaState& lua) {
 
         lua.setField("move", [](Transform* tf, float x, float y, float z) {
@@ -183,17 +159,17 @@ namespace en {
             return &tf->rotate(glm::radians(angle), {x, y, z});
         });
 
-        lua::addProperty(lua, "position", lua::Property<glm::vec3, Transform*>(
+        lua::addProperty(lua, "position", lua::property(
             [](Transform* tf) {return tf->getLocalPosition();},
             [](Transform* tf, const glm::vec3& pos) {return tf->setLocalPosition(pos);}
         ));
 
-        lua::addProperty(lua, "rotation", lua::Property<glm::vec3, Transform*>(
+        lua::addProperty(lua, "rotation", lua::property(
             [](Transform* tf) {return glm::eulerAngles(tf->getLocalRotation());},
             [](Transform* tf, const glm::vec3& eulerAngles) {return tf->setLocalRotation(eulerAngles);}
         ));
 
-        lua::addProperty(lua, "scale", lua::Property<glm::vec3, Transform*>(
+        lua::addProperty(lua, "scale", lua::property(
             [](Transform* tf) {return tf->getLocalScale();},
             [](Transform* tf, const glm::vec3& scale) {return tf->setLocalScale(scale);}
         ));

@@ -34,6 +34,7 @@ namespace utils {
         using Result = TResult;
         using Owner  = TOwner;
         using Signature = TResult(TArgs...);
+        using FunctionType = std::function<Signature>;
     };
 
     template<typename T, bool = hasDeducibleSignature_v<T>>

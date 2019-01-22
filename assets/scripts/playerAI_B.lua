@@ -20,7 +20,7 @@ return function(o)
     function o:update(dt)
 
         local time = Game.getTime()
-        transform.position = {math.sin(time) * 5, 0, math.cos(time * 2) * 5 }
+        --transform.position = {math.sin(time) * 5, 0, math.cos(time * 2) * 5 }
         transform.scale = {math.cos(time) ^ 2, 1, math.sin(time) ^ 2}
     end
 

@@ -70,7 +70,7 @@ namespace lua {
                     lua_pushvalue(L, 3);
                     lua_rawset(L, 1);
                 } else {
-                    luaL_error(L, "Can't assign this key to a userdata");
+                    std::cout << "Can't assign this key to userdata " << std::endl;
                 }
 
                 return 0;

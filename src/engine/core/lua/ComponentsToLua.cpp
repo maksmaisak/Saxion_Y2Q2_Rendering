@@ -149,7 +149,22 @@ void ComponentsToLua::makeComponent(Actor& actor, const std::string& componentTy
     lua_pushvalue(lua, componentValueIndex);
     it->second.addFromLua(actor, lua);
     lua_pop(lua, 1);
-
     int newTop = lua_gettop(lua);
     assert(oldTop == newTop);
+
+    if (!lua_istable(lua, -1)) return;
+
+    // TODO make the addFromLua function push the component pointer onto the stack to avoid a second string lookup here.
+    pushComponentPointerFromActorByTypeName(actor, componentTypeName);
+    auto popComponentPointer = PopperOnDestruct(lua);
+    int componentPointerIndex = lua_gettop(lua);
+
+    lua_pushnil(lua);
+    while (lua_next(lua, componentValueIndex)) {
+
+        auto popValue = PopperOnDestruct(lua);
+        lua_pushvalue(lua, -2);
+        lua_pushvalue(lua, -2);
+        lua_settable(lua, componentPointerIndex);
+    }
 }

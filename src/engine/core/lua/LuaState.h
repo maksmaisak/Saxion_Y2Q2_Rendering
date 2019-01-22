@@ -27,7 +27,7 @@ namespace en {
 
         bool pCall(int numArgs = 0, int numResults = 0, int messageHandlerIndex = 0);
         bool loadFile(const std::string& filename);
-        bool doFile(const std::string& filename);
+        bool doFile(const std::string& filename, int numResults = 0, int messageHandlerIndex = 0);
 
         /// Creates a new environment table that inherits from the global one.
         /// Pushes it onto the stack.
@@ -39,7 +39,7 @@ namespace en {
 
         /// Loads a file and runs it in a new environment (see makeEnvironment)
         /// Pushes the environment table onto the stack.
-        bool doFileInNewEnvironment(const std::string& filename);
+        bool doFileInNewEnvironment(const std::string& filename, int numResults = 0, int messageHandlerIndex = 0);
 
         inline operator lua_State* () {return L;}
 

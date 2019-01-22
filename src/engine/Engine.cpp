@@ -141,6 +141,15 @@ namespace en {
         return "Result returned from free function";
     }
 
+    int makeActors(lua_State* L) {
+
+        luaL_checktype(L, 1, LUA_TTABLE);
+        Engine& engine = *lua::to<Engine*>(L, lua_upvalueindex(1));
+        ComponentsToLua::makeEntities(engine, 1);
+
+        return 0;
+    }
+
     void Engine::initializeLua() {
 
         LUA_REGISTER_TYPE(Actor);
@@ -159,9 +168,15 @@ namespace en {
                 if (actor) return std::make_optional(actor);
                 return std::nullopt;
             });
+
+            m_lua.push(this);
+            lua_pushcclosure(m_lua, &makeActors, 1);
+            lua_setfield(m_lua, -2, "makeActors");
+
             m_lua.setField("makeActor", [this](const std::string& name) { return makeActor(name); });
             m_lua.setField("getTime", [](){ return GameTime::now().asSeconds(); });
 
+            // TODO make addProperty work on both tables and their metatables
             //lua::addProperty(m_lua, "time", lua::Property<float>([](){return GameTime::now().asSeconds();}));
 
             lua_setglobal(m_lua, "Game");

@@ -10,7 +10,7 @@ local CubeMaterial = {
     shininess = 100
 }
 
-local scene = {
+local actors = {
     {
         Name = "plane",
         Transform = {
@@ -72,7 +72,6 @@ local scene = {
     }
 }
 
-local didStart = false
 local player1
 local player2
 local cameraTransform
@@ -80,7 +79,11 @@ local cameraTransform
 local makePlayerAI_A = require("./assets/scripts/playerAI_A")
 local makePlayerAI_B = require("./assets/scripts/playerAI_B")
 
-local function start()
+local scene = {}
+
+function scene.start()
+
+    Game.makeActors(actors)
 
     local camera = Game.makeActor("Camera")
     cameraTransform = camera:addComponent("Transform")
@@ -106,11 +109,6 @@ local function start()
 end
 
 function scene.update(dt)
-
-    if (not didStart) then
-        start()
-        didStart = true
-    end
 
     player1:update(dt)
     player2:update(dt)

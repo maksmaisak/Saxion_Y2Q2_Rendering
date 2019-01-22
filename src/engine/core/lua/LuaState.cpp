@@ -32,17 +32,17 @@ bool LuaState::pCall(int numArgs, int numResults, int messageHandlerIndex) {
     return true;
 }
 
-bool LuaState::doFile(const std::string& filename) {
-    return loadFile(filename) && pCall(0, 0);
+bool LuaState::doFile(const std::string& filename, int numResults, int messageHandlerIndex) {
+    return loadFile(filename) && pCall(0, numResults, messageHandlerIndex);
 }
 
-bool LuaState::doFileInNewEnvironment(const std::string& filename) {
+bool LuaState::doFileInNewEnvironment(const std::string& filename, int numResults, int messageHandlerIndex) {
 
     makeEnvironment();
 
     if (!loadFile(filename)) return false;
     setEnvironment(-2);
-    return pCall();
+    return pCall(0, numResults, messageHandlerIndex);
 }
 
 void LuaState::makeEnvironment() {

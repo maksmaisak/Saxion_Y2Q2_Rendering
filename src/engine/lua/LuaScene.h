@@ -21,12 +21,7 @@ public:
 
 private:
 
-    void makeEntities(int sceneDefinitionIndex = -1);
-    en::Actor makeEntity(int entityDefinitionIndex = -1);
-    void addComponents(en::Actor& actor, int entityDefinitionIndex = -1);
-
     std::string m_filename;
-
     int m_luaUpdateFunctionRef = LUA_NOREF;
 };
 

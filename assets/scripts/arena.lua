@@ -85,6 +85,24 @@ function scene.start()
 
     Game.makeActors(actors)
 
+    Game.makeActor {
+        Name = "Light2",
+        Light = {
+            intensity = 1,
+            color = {1, 0, 0}
+        },
+        Transform = {
+            position = { 2, 2, 0},
+            scale    = { 0.1, 0.1, 0.1 }
+        },
+        RenderInfo = {
+            mesh = "models/sphere2.obj",
+            material = {
+                shininess = 100
+            }
+        }
+    }
+
     local camera = Game.makeActor("Camera")
     cameraTransform = camera:addComponent("Transform")
         :move(0, 20, 0)

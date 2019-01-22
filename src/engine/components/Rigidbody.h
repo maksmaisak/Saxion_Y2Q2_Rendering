@@ -13,6 +13,7 @@ namespace en {
     struct Rigidbody {
 
         LUA_TYPE(Rigidbody)
+        static void initializeMetatable(LuaState& lua);
 
         bool isKinematic = false;
         glm::vec3 velocity;

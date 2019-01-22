@@ -4,5 +4,5 @@
 -- Time: 01:26
 --
 
-width = 1280
-height = 800
+width = 1920
+height = 1200

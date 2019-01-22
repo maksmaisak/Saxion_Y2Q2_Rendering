@@ -17,7 +17,7 @@ end
 
 function AI:shootAt(position)
 
-    print("position: ", position.x, position.y, position.z)
+    --print("position: ", position.x, position.y, position.z)
 
 --    local b = Game.makeActor("Bullet")
 --    b.addComponent("Transform")

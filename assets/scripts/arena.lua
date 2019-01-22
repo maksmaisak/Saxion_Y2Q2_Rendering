@@ -4,7 +4,7 @@
 -- Time: 17:28
 --
 
-local CubeMaterial = {
+local cubeMaterial = {
     diffuse = "textures/container/diffuse.png",
     specular = "textures/container/specular.png",
     shininess = 100
@@ -25,33 +25,22 @@ local actors = {
         },
     },
     {
-        Name = "player1",
-        Transform = {
-            position = { -5, 1, 5 },
-            scale    = { 1, 1, 1 }
-        },
-        RenderInfo = {
-            mesh = "models/cube_flat.obj",
-            material = CubeMaterial
-        }
-    },
-    {
-        Name = "player2",
-        Transform = {
-            position = { 5, 1, -5 },
-            scale    = { 0.1, 1, 1 }
-        },
-        RenderInfo = {
-            mesh = "models/cube_flat.obj",
-            material = CubeMaterial
-        }
-    },
-    {
         Name = "DirectionalLight",
-        Transform = {},
         Light = {
-            kind = "directional",
-            colorAmbient = {0.02, 0.02, 0.04}
+            intensity = 0.1,
+            color = {0, 0, 1},
+            kind = "DIRECTIONAL"
+        },
+        Transform = {
+            position = { 2, 2, 0},
+            rotation = { -20, 0, 0},
+            scale    = { 0.1, 0.1, 0.1 }
+        },
+        RenderInfo = {
+            mesh = "models/sphere2.obj",
+            material = {
+                shininess = 100
+            }
         }
     },
     {
@@ -86,35 +75,34 @@ function scene.start()
     print('before Game.makeActors(actors)')
     Game.makeActors(actors)
 
-    print('before Game.makeActor {...')
-    Game.makeActor {
-        Name = "DirectionalLight",
-        Light = {
-            intensity = 0.1,
-            color = {0, 0, 1},
-            kind = "DIRECTIONAL"
-        },
-        Transform = {
-            position = { 2, 2, 0},
-            rotation = { -20, 0, 0},
-            scale    = { 0.1, 0.1, 0.1 }
-        },
-        RenderInfo = {
-            mesh = "models/sphere2.obj",
-            material = {
-                shininess = 100
+    local function makePlayer(name, position)
+
+        name = name or "unnamed"
+        position = position or {0,0,0}
+
+        return Game.makeActor {
+            Name = name,
+            Transform = {
+                position = position,
+                scale = {1,1,1}
+            },
+            RenderInfo = {
+                mesh = "models/cube_flat.obj",
+                material = cubeMaterial
             }
         }
-    }
+    end
+
+    local player1Actor = makePlayer("player1")
+    local player2Actor = makePlayer("player2")
+
+    print('before Game.makeActor {...')
 
     local camera = Game.makeActor("Camera")
     cameraTransform = camera:addComponent("Transform")
         :move(0, 20, 0)
         :rotate(-90, 1, 0, 0)
     camera:addComponent("Camera")
-
-    local player1Actor = Game.findByName("player1")
-    local player2Actor = Game.findByName("player2")
 
     player1 = makePlayerAI_A {
         actor = player1Actor,

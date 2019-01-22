@@ -20,6 +20,9 @@ namespace lua {
     template<typename TResult, typename... TArgs>
     using functionPtr = TResult(*)(TArgs...);
 
+    /// TODO This needs refactoring.
+    /// Handling functions expecting pointers versus references,
+    /// same handling for both function pointers and lambdas.
     class ClosureHelper {
 
     public:

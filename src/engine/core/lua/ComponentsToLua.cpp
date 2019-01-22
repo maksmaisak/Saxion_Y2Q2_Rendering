@@ -149,6 +149,7 @@ void ComponentsToLua::makeComponent(Actor& actor, const std::string& componentTy
     lua_pushvalue(lua, componentValueIndex);
     it->second.addFromLua(actor, lua);
     lua_pop(lua, 1);
+
     int newTop = lua_gettop(lua);
     assert(oldTop == newTop);
 }

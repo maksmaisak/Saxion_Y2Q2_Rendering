@@ -28,7 +28,8 @@ void PhysicsSystem::update(float dt) {
 
         auto& tf = m_registry->get<Transform>(entity);
 
-        addGravity(entity, tf, rb, dt);
+        if (rb.useGravity)
+            addGravity(entity, tf, rb, dt);
 
         constexpr int maxNumSteps = 10;
         float moveTime = dt;

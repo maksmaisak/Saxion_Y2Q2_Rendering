@@ -16,6 +16,7 @@ namespace en {
         static void initializeMetatable(LuaState& lua);
 
         bool isKinematic = false;
+        bool useGravity = true;
         glm::vec3 velocity;
         float invMass = 1.f;
         float bounciness = 1.f;

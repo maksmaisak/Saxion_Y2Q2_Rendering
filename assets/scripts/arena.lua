@@ -11,24 +11,25 @@ local cubeMaterial = {
 }
 
 local actors = {
-    {
-        Name = "plane",
-        Transform = {
-            position = { 0, 0, 0 },
-            scale    = { 10, 10, 10 }
-        },
-        RenderInfo = {
-            mesh = "models/plane.obj",
-            material = {
-                shininess = 10
-            }
-        },
-    },
+--    {
+--        Name = "plane",
+--        Transform = {
+--            position = { 0, 0, 0 },
+--            scale    = { 10, 10, 10 }
+--        },
+--        RenderInfo = {
+--            mesh = "models/plane.obj",
+--            material = {
+--                shininess = 10
+--            }
+--        },
+--    },
     {
         Name = "DirectionalLight",
         Light = {
             intensity = 0.1,
             color = {0, 0, 1},
+            colorAmbient = {1, 1, 1},
             kind = "DIRECTIONAL"
         },
         Transform = {
@@ -46,10 +47,10 @@ local actors = {
     {
         Name = "Light",
         Light = {
-            intensity = 1,
+            intensity = 4,
         },
         Transform = {
-            position = { x = 0, y = 2, z = 2 },
+            position = { x = 0, y = 2, z = 0 },
             scale    = { 0.1, 0.1, 0.1 }
         },
         RenderInfo = {
@@ -89,7 +90,8 @@ function scene.start()
             RenderInfo = {
                 mesh = "models/cube_flat.obj",
                 material = cubeMaterial
-            }
+            },
+            Rigidbody = {}
         }
     end
 

@@ -51,7 +51,7 @@ void LuaScene::open() {
 
     lua_getfield(lua, -1, "start");
     if (lua_isfunction(lua, -1))
-        lua_pcall(lua, 0, 0, 0);
+        lua.pCall(0, 0);
     else
         lua_pop(lua, 1);
 

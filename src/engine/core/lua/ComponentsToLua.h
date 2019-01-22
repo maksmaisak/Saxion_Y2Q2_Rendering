@@ -89,7 +89,7 @@ namespace en {
         /// Adds a component of a given type from a value at the given index in the lua stack
         static void makeComponent(Actor& actor, const std::string& componentTypeName, int componentValueIndex = -1);
 
-        static void pushComponentFromActorByTypeName(Actor& actor, const std::string& componentTypeName);
+        static void pushComponentPointerFromActorByTypeName(Actor& actor, const std::string& componentTypeName);
         static void addComponentToActorByTypeName(Actor& actor, const std::string& componentTypeName);
 
         static void printDebugInfo();

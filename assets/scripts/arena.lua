@@ -83,10 +83,12 @@ local scene = {}
 
 function scene.start()
 
+    print('before Game.makeActors(actors)')
     Game.makeActors(actors)
 
+    print('before Game.makeActor {...')
     Game.makeActor {
-        Name = "Light2",
+        Name = "DirectionalLight",
         Light = {
             intensity = 0.1,
             color = {0, 0, 1},
@@ -129,6 +131,9 @@ function scene.start()
 end
 
 function scene.update(dt)
+
+    Game.findByName("Light"):getComponent("Light").intensity = math.sin(Game.getTime()) ^ 2
+    --Game.findByName("DirectionalLight"):getComponent("Transform"):rotate(60 * dt, 1, 0, 0)
 
     player1:update(dt)
     player2:update(dt)

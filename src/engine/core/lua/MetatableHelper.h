@@ -8,6 +8,7 @@
 #include "LuaState.h"
 #include "LuaStack.h"
 #include "ClosureHelper.h"
+#include "Meta.h"
 #include "Demangle.h"
 #include <functional>
 #include <vector>
@@ -18,78 +19,11 @@ namespace lua {
 
         /// The __index function: (table, key) -> value
         /// Try using a property getter from __getters, otherwise look it up in the metatable
-        inline int indexFunction(lua_State* L) {
-
-            luaL_checkany(L, 1); // table or userdata
-            luaL_checkany(L, 2); // key
-
-            bool hasMetatable = lua_getmetatable(L, 1) == 1;
-            assert(hasMetatable);
-
-            // get a property getter from metatable.__getters
-            lua_getfield(L, -1, "__getters");
-            lua_pushvalue(L, 2);
-            lua_gettable(L, -2);
-
-            if (lua_isnil(L, -1)) {
-
-                lua_pop(L, 2); // remove __getters, nil
-                lua_pushvalue(L, 2);
-                lua_gettable(L, -2); // get from metatable
-
-                lua_remove(L, -2); // remove metatable
-
-                return 1;
-            }
-
-            lua_remove(L, -2); // remove __getters
-
-            // call the getter
-            lua_pushvalue(L, 1); // table
-            lua_pushvalue(L, 2); // key
-            lua_pcall(L, 2, 1, 0); // getter(table, key)
-
-            lua_remove(L, -2); // remove metatable
-
-            return 1;
-        }
+        int indexFunction(lua_State* L);
 
         /// The __index function: (table, key, value) -> ()
         /// Try using a property setter from __setters, otherwise just rawset it
-        inline int newindexFunction(lua_State* L) {
-
-            luaL_checkany(L, 1); // table or userdata
-            luaL_checkany(L, 2); // key
-            luaL_checkany(L, 3); // value
-
-            bool hasMetatable = lua_getmetatable(L, 1) == 1;
-            assert(hasMetatable);
-
-            // get a property setter from metatable.__setter
-            lua_getfield(L, -1, "__setters");
-            lua_pushvalue(L, 2);
-            lua_gettable(L, -2);
-
-            if (lua_isnil(L, -1)) {
-
-                lua_pop(L, 3); // remove metatable, __setters, nil
-                lua_pushvalue(L, 2);
-                lua_pushvalue(L, 3);
-                lua_rawset(L, -3); // set
-
-                return 0;
-            }
-
-            lua_remove(L, -2); // remove __setters
-
-            lua_pushvalue(L, 1); // table
-            lua_pushvalue(L, 3); // value
-            lua_pcall(L, 2, 0, 0);
-
-            lua_remove(L, -2); // remove the metatable
-
-            return 0;
-        }
+        int newindexFunction(lua_State* L);
     }
 
     // Gets or adds a metatable for a given type.
@@ -129,7 +63,7 @@ namespace lua {
         using Getter = std::conditional_t<
             std::is_same_v<Owner, NoOwner>,
             std::function<T()>,
-            std::function<T(const Owner&)>
+            std::function<T(Owner&)>
         >;
 
         using Setter = std::conditional_t<
@@ -137,6 +71,32 @@ namespace lua {
             std::function<void(T&&)>,
             std::function<void(Owner&, T&&)>
         >;
+
+        using UnderlyingOwner = std::remove_pointer_t<utils::remove_cvref_t<Owner>>;
+
+        inline Property(T UnderlyingOwner::* memberPtr) :
+            m_getter([memberPtr](Owner& owner){
+                if constexpr (std::is_pointer_v<Owner>)
+                    return *owner.*memberPtr;
+                else
+                    return owner.*memberPtr;
+            }),
+            m_setter([memberPtr](Owner& owner, T&& value){
+                if constexpr (std::is_pointer_v<Owner>)
+                    *owner.*memberPtr = std::forward<T>(value);
+                else
+                    owner.*memberPtr = std::forward<T>(value);
+            })
+            {}
+
+        inline Property(const T UnderlyingOwner::* memberPtr) :
+            m_getter([memberPtr](Owner& owner){
+                if constexpr (std::is_pointer_v<Owner>)
+                    return *owner.*memberPtr;
+                else
+                    return owner.*memberPtr;
+            })
+            {}
 
         inline Property(const Getter& getter, const Setter& setter) : m_getter(getter), m_setter(setter) {}
         inline Property(const Getter& getter) : m_getter(getter) {}

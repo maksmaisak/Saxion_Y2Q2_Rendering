@@ -22,7 +22,7 @@ namespace en {
         auto actor = lua::check<Actor>(l, 1);
         auto name = lua::check<std::string>(l, 2);
 
-        ComponentsToLua::pushComponentFromActorByTypeName(actor, name);
+        ComponentsToLua::pushComponentPointerFromActorByTypeName(actor, name);
 
         return 1;
     }

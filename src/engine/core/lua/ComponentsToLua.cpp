@@ -10,24 +10,6 @@
 
 using namespace en;
 
-void ComponentsToLua::makeComponent(Actor& actor, const std::string& componentTypeName, int componentValueIndex) {
-
-    auto& lua = actor.getEngine().getLuaState();
-    auto popComponentValue = lua::PopperOnDestruct(lua);
-    lua_pushvalue(lua, componentValueIndex);
-
-    auto& map = getNameToTypeInfoMap();
-    auto it = map.find(componentTypeName);
-    if (it == map.end()) {
-        std::cout << "Unknown component type: " << componentTypeName << std::endl;
-        return;
-    }
-
-    int oldTop = lua_gettop(lua);
-    it->second.addFromLua(actor, lua);
-    assert(oldTop == lua_gettop(lua));
-}
-
 void ComponentsToLua::populateMetatables(LuaState& lua) {
 
     for (auto& kvp : getNameToTypeInfoMap()) {
@@ -46,7 +28,7 @@ void ComponentsToLua::printDebugInfo() {
     std::cout << std::endl;
 }
 
-void ComponentsToLua::pushComponentFromActorByTypeName(Actor& actor, const std::string& componentTypeName) {
+void ComponentsToLua::pushComponentPointerFromActorByTypeName(Actor& actor, const std::string& componentTypeName) {
 
     auto& lua = actor.getEngine().getLuaState();
 
@@ -95,7 +77,6 @@ void ComponentsToLua::makeEntities(Engine& engine, int index) {
         lua_pushvalue(lua, -1);
         entities.emplace_back(luaL_ref(lua, LUA_REGISTRYINDEX), actor);
     }
-    lua_pop(lua, 0); // pop key.
 
     // Add all other components to the entities.
     for (auto[ref, actor] : entities) {
@@ -147,7 +128,27 @@ void ComponentsToLua::addComponents(Actor& actor, int entityDefinitionIndex) {
         // -2: key   (component type name)
         auto componentTypeName = lua.to<std::string>(-2);
         if (componentTypeName != "Name") {
-            ComponentsToLua::makeComponent(actor, componentTypeName, -1);
+            makeComponent(actor, componentTypeName, -1);
         }
     }
+}
+
+void ComponentsToLua::makeComponent(Actor& actor, const std::string& componentTypeName, int componentValueIndex) {
+
+    auto& lua = actor.getEngine().getLuaState();
+    componentValueIndex = lua_absindex(lua, componentValueIndex);
+
+    auto& map = getNameToTypeInfoMap();
+    auto it = map.find(componentTypeName);
+    if (it == map.end()) {
+        std::cout << "Unknown component type: " << componentTypeName << std::endl;
+        return;
+    }
+
+    int oldTop = lua_gettop(lua);
+    lua_pushvalue(lua, componentValueIndex);
+    it->second.addFromLua(actor, lua);
+    lua_pop(lua, 1);
+    int newTop = lua_gettop(lua);
+    assert(oldTop == newTop);
 }

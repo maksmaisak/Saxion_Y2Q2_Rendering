@@ -42,4 +42,7 @@ void Light::addFromLua(Actor& actor, LuaState& lua) {
 
 void Light::initializeMetatable(LuaState& lua) {
 
+    lua::addProperty(lua, "intensity"   , Property<float, Light*>(&Light::intensity));
+    lua::addProperty(lua, "color"       , Property<glm::vec3, Light*>(&Light::color));
+    lua::addProperty(lua, "colorAmbient", Property<glm::vec3, Light*>(&Light::colorAmbient));
 }

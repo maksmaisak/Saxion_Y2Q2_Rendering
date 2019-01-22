@@ -88,11 +88,13 @@ function scene.start()
     Game.makeActor {
         Name = "Light2",
         Light = {
-            intensity = 1,
-            color = {1, 0, 0}
+            intensity = 0.1,
+            color = {0, 0, 1},
+            kind = "DIRECTIONAL"
         },
         Transform = {
             position = { 2, 2, 0},
+            rotation = { -20, 0, 0},
             scale    = { 0.1, 0.1, 0.1 }
         },
         RenderInfo = {

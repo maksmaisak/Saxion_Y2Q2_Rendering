@@ -4,23 +4,27 @@
 
 #include "Light.h"
 #include <map>
+#include <string>
+#include <algorithm>
 
 using namespace en;
 
 void setKind(Light& light, const std::optional<std::string>& kindName) {
 
-    if (kindName) {
+    if (!kindName) return;
 
-        static const std::map<std::string, Light::Kind> kinds = {
-            {"DIRECTIONAL", Light::Kind::DIRECTIONAL},
-            {"POINT", Light::Kind::POINT},
-            {"SPOT", Light::Kind::SPOT}
-        };
+    static const std::map<std::string, Light::Kind> kinds = {
+        {"DIRECTIONAL", Light::Kind::DIRECTIONAL},
+        {"POINT", Light::Kind::POINT},
+        {"SPOT", Light::Kind::SPOT}
+    };
 
-        auto it = kinds.find(*kindName);
-        if (it != kinds.end()) {
-            light.kind = it->second;
-        }
+    std::string name = *kindName;
+    std::transform(name.begin(), name.end(), name.begin(), ::toupper);
+
+    auto it = kinds.find(name);
+    if (it != kinds.end()) {
+        light.kind = it->second;
     }
 }
 

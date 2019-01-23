@@ -17,22 +17,34 @@ namespace en {
         m_entity(entity)
         {}
 
-    int pushByTypeName(lua_State* l) {
+    std::string Actor::getName() const {
 
-        auto actor = lua::check<Actor>(l, 1);
-        auto name = lua::check<std::string>(l, 2);
+        Name* ptr = tryGet<Name>();
+        if (ptr) return ptr->value;
+        return "unnamed";
+    }
 
-        ComponentsToLua::pushComponentPointerFromActorByTypeName(actor, name);
+    void Actor::destroy() {
+
+        m_registry->destroy(m_entity);
+    }
+
+    int pushByTypeName(lua_State* L) {
+
+        auto actor = lua::check<Actor>(L, 1);
+        auto name = lua::check<std::string>(L, 2);
+
+        ComponentsToLua::pushComponentPointerFromActorByTypeName(L, actor, name);
 
         return 1;
     }
 
-    int addByTypeName(lua_State* l) {
+    int addByTypeName(lua_State* L) {
 
-        auto actor = lua::check<Actor>(l, 1);
-        auto name = lua::check<std::string>(l, 2);
+        auto actor = lua::check<Actor>(L, 1);
+        auto name = lua::check<std::string>(L, 2);
 
-        ComponentsToLua::addComponentToActorByTypeName(actor, name);
+        ComponentsToLua::addComponentToActorByTypeName(L, actor, name);
 
         return 1;
     }
@@ -53,12 +65,6 @@ namespace en {
 
         lua.setField("get", &pushByTypeName);
         lua.setField("add", &addByTypeName);
-    }
-
-    std::string Actor::getName() const {
-
-        Name* ptr = tryGet<Name>();
-        if (ptr) return ptr->value;
-        return "unnamed";
+        lua.setField("destroy", &Actor::destroy);
     }
 }

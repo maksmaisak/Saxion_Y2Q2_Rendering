@@ -28,24 +28,24 @@ void ComponentsToLua::printDebugInfo() {
     std::cout << std::endl;
 }
 
-void ComponentsToLua::pushComponentPointerFromActorByTypeName(Actor& actor, const std::string& componentTypeName) {
+void ComponentsToLua::pushComponentPointerFromActorByTypeName(lua_State* L, Actor& actor, const std::string& componentTypeName) {
 
-    auto& lua = actor.getEngine().getLuaState();
+    auto lua = LuaState(L);
 
     auto& map = getNameToTypeInfoMap();
     auto it = map.find(componentTypeName);
     if (it == map.end()) {
         std::cout << "Unknown component type: " << componentTypeName << std::endl;
-        lua_pushnil(lua);
+        lua_pushnil(L);
         return;
     }
 
     it->second.pushFromActor(actor, lua);
 }
 
-void ComponentsToLua::addComponentToActorByTypeName(Actor& actor, const std::string& componentTypeName) {
+void ComponentsToLua::addComponentToActorByTypeName(lua_State* L, Actor& actor, const std::string& componentTypeName) {
 
-    auto& lua = actor.getEngine().getLuaState();
+    auto lua = LuaState(L);
 
     auto& map = getNameToTypeInfoMap();
     auto it = map.find(componentTypeName);
@@ -58,85 +58,80 @@ void ComponentsToLua::addComponentToActorByTypeName(Actor& actor, const std::str
     it->second.addToActor(actor, lua);
 }
 
-void ComponentsToLua::makeEntities(Engine& engine, int index) {
+void ComponentsToLua::makeEntities(lua_State* L, Engine& engine, int index) {
 
-    en::LuaState& lua = engine.getLuaState();
-    index = lua_absindex(lua, index);
+    index = lua_absindex(L, index);
 
     std::vector<std::tuple<int, en::Actor>> entities;
 
     // Create entities and assign their names.
-    lua_pushnil(lua);
-    while (lua_next(lua, index)) {
+    lua_pushnil(L);
+    while (lua_next(L, index)) {
 
-        auto popValue = lua::PopperOnDestruct(lua);
-        if (!lua_istable(lua, -1)) continue;
+        auto popValue = lua::PopperOnDestruct(L);
+        if (!lua_istable(L, -1)) continue;
 
-        en::Actor actor = makeEntity(engine, -1);
+        en::Actor actor = makeEntity(L, engine, -1);
         // Save a ref to the entity definition and the actor for adding components later.
-        lua_pushvalue(lua, -1);
-        entities.emplace_back(luaL_ref(lua, LUA_REGISTRYINDEX), actor);
+        lua_pushvalue(L, -1);
+        entities.emplace_back(luaL_ref(L, LUA_REGISTRYINDEX), actor);
     }
 
     // Add all other components to the entities.
     for (auto[ref, actor] : entities) {
 
-        auto pop = lua::PopperOnDestruct(lua);
-        lua_rawgeti(lua, LUA_REGISTRYINDEX, ref);
+        auto pop = lua::PopperOnDestruct(L);
+        lua_rawgeti(L, LUA_REGISTRYINDEX, ref);
 
-        int oldTop = lua_gettop(lua);
-        addComponents(actor, -1);
-        int newTop = lua_gettop(lua);
+        int oldTop = lua_gettop(L);
+        addComponents(L, actor, -1);
+        int newTop = lua_gettop(L);
         assert(oldTop == newTop);
     }
 
     // Release the references
     for (auto[ref, actor] : entities)
-        luaL_unref(lua, LUA_REGISTRYINDEX, ref);
+        luaL_unref(L, LUA_REGISTRYINDEX, ref);
 }
 
-Actor ComponentsToLua::makeEntity(Engine& engine, int entityDefinitionIndex) {
+Actor ComponentsToLua::makeEntity(lua_State* L, Engine& engine, int entityDefinitionIndex) {
 
-    en::LuaState& lua = engine.getLuaState();
-
-    entityDefinitionIndex = lua_absindex(lua, entityDefinitionIndex);
-    assert(lua_istable(lua, entityDefinitionIndex));
+    entityDefinitionIndex = lua_absindex(L, entityDefinitionIndex);
+    assert(lua_istable(L, entityDefinitionIndex));
 
     en::Actor actor = engine.makeActor();
 
     // Get and assign the name
-    auto pop = lua::PopperOnDestruct(lua);
-    lua_getfield(lua, entityDefinitionIndex, "Name");
-    if (lua.is<std::string>())
-        actor.add<en::Name>(lua.to<std::string>());
+    auto pop = lua::PopperOnDestruct(L);
+    lua_getfield(L, entityDefinitionIndex, "Name");
+    if (lua::is<std::string>(L))
+        actor.add<en::Name>(lua::to<std::string>(L));
 
     return actor;
 }
 
-void ComponentsToLua::addComponents(Actor& actor, int entityDefinitionIndex) {
+void ComponentsToLua::addComponents(lua_State* L, Actor& actor, int entityDefinitionIndex) {
 
-    en::LuaState& lua = actor.getEngine().getLuaState();
-    entityDefinitionIndex = lua_absindex(lua, entityDefinitionIndex);
+    entityDefinitionIndex = lua_absindex(L, entityDefinitionIndex);
 
     // Iterate over the entity definition.
-    lua_pushnil(lua);
-    while (lua_next(lua, entityDefinitionIndex)) {
+    lua_pushnil(L);
+    while (lua_next(L, entityDefinitionIndex)) {
 
-        auto popValue = lua::PopperOnDestruct(lua);
+        auto popValue = lua::PopperOnDestruct(L);
 
         // -1: value (component definition)
         // -2: key   (component type name)
-        auto componentTypeName = lua.to<std::string>(-2);
+        auto componentTypeName = lua::to<std::string>(L, -2);
         if (componentTypeName != "Name") {
-            makeComponent(actor, componentTypeName, -1);
+            makeComponent(L, actor, componentTypeName, -1);
         }
     }
 }
 
-void ComponentsToLua::makeComponent(Actor& actor, const std::string& componentTypeName, int componentValueIndex) {
+void ComponentsToLua::makeComponent(lua_State* L, Actor& actor, const std::string& componentTypeName, int componentValueIndex) {
 
-    auto& lua = actor.getEngine().getLuaState();
-    componentValueIndex = lua_absindex(lua, componentValueIndex);
+    componentValueIndex = lua_absindex(L, componentValueIndex);
 
     auto& map = getNameToTypeInfoMap();
     auto it = map.find(componentTypeName);
@@ -145,26 +140,27 @@ void ComponentsToLua::makeComponent(Actor& actor, const std::string& componentTy
         return;
     }
 
-    int oldTop = lua_gettop(lua);
-    lua_pushvalue(lua, componentValueIndex);
-    it->second.addFromLua(actor, lua);
-    lua_pop(lua, 1);
-    int newTop = lua_gettop(lua);
+    int oldTop = lua_gettop(L);
+    lua_pushvalue(L, componentValueIndex);
+    LuaState stateWrapper = LuaState(L);
+    it->second.addFromLua(actor, stateWrapper);
+    lua_pop(L, 1);
+    int newTop = lua_gettop(L);
     assert(oldTop == newTop);
 
-    if (!lua_istable(lua, -1)) return;
+    if (!lua_istable(L, -1)) return;
 
     // TODO make the addFromLua function push the component pointer onto the stack to avoid a second string lookup here.
-    pushComponentPointerFromActorByTypeName(actor, componentTypeName);
-    auto popComponentPointer = PopperOnDestruct(lua);
-    int componentPointerIndex = lua_gettop(lua);
+    pushComponentPointerFromActorByTypeName(L, actor, componentTypeName);
+    auto popComponentPointer = PopperOnDestruct(L);
+    int componentPointerIndex = lua_gettop(L);
 
-    lua_pushnil(lua);
-    while (lua_next(lua, componentValueIndex)) {
+    lua_pushnil(L);
+    while (lua_next(L, componentValueIndex)) {
 
-        auto popValue = PopperOnDestruct(lua);
-        lua_pushvalue(lua, -2);
-        lua_pushvalue(lua, -2);
-        lua_settable(lua, componentPointerIndex);
+        auto popValue = PopperOnDestruct(L);
+        lua_pushvalue(L, -2);
+        lua_pushvalue(L, -2);
+        lua_settable(L, componentPointerIndex);
     }
 }

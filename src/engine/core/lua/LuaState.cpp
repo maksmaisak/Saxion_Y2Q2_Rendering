@@ -8,8 +8,16 @@
 
 using namespace en;
 
-LuaState::LuaState() : luaStateOwner(luaL_newstate()), L(luaStateOwner.get()) {
+LuaState::LuaState() : L(luaL_newstate()), shouldCloseOnDestroy(true) {
     luaL_openlibs(L);
+}
+
+LuaState::LuaState(lua_State* existingL) : L(existingL), shouldCloseOnDestroy(false)
+{}
+
+LuaState::~LuaState() {
+    if (shouldCloseOnDestroy)
+        lua_close(L);
 }
 
 bool LuaState::loadFile(const std::string& filename) {

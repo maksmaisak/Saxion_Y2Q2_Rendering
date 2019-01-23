@@ -7,19 +7,40 @@
 require("./assets/scripts/object")
 require("math")
 
-AI = Object:new()
+AI = Object:new {
+    maxNumActiveBullets = 5
+}
 
 function AI:start()
 
     self.transform = self.actor:get("Transform")
     self.enemyTransform = self.enemy:get("Transform")
+    self.bullets = {}
 
-    self:shoot(self.transform.position, self.enemyTransform.position, 20)
+    self.shootIfReady = coroutine.wrap(function()
+
+        while true do
+
+            self:shoot(self.enemyTransform.position, 20)
+
+            local timeToShoot = Game.getTime() + 2
+            while Game.getTime() < timeToShoot do
+                coroutine.yield()
+            end
+
+            if #self.bullets >= self.maxNumActiveBullets then
+
+                local bullet = table.remove(self.bullets, 1)
+                bullet:destroy()
+            end
+        end
+    end)
 end
 
-function AI:shoot(startPosition, targetPosition, speed)
+function AI:shoot(targetPosition, speed)
 
     speed = speed or 10
+    local startPosition = self.transform.position
 
     local delta = {
         x = targetPosition.x - startPosition.x,
@@ -45,7 +66,8 @@ function AI:shoot(startPosition, targetPosition, speed)
 
     local size = 0.2
 
-    return Game.makeActor("Bullet", {
+    local bullet = Game.makeActor {
+        Name = "Bullet",
         Transform = {
             position = startPosition,
             scale = {size, size, size}
@@ -68,7 +90,11 @@ function AI:shoot(startPosition, targetPosition, speed)
             intensity = 1,
             color = {1, 0, 0}
         }
-    });
+    }
+
+    table.insert(self.bullets, bullet)
+
+    return bullet
 end
 
 function AI:update(dt)
@@ -76,12 +102,16 @@ function AI:update(dt)
     local time = Game.getTime()
     self.transform.position = {math.cos(time) * 5, self.transform.position.y, math.sin(time * 2) * 5 }
 
-    local bullet = Game.find("Bullet")
-    local bulletTransform = bullet:get("Transform")
-    local bulletRigidbody = bullet:get("Rigidbody")
-    bulletTransform.position = { bulletTransform.position.x, 0, bulletTransform.position.z }
-    bulletRigidbody.velocity = { bulletRigidbody.velocity.x, 0, bulletRigidbody.velocity.z }
+    self.shootIfReady()
 
+    for i, bullet in ipairs(self.bullets) do
+        if (bullet) then
+            local bulletTransform = bullet:get("Transform")
+            local bulletRigidbody = bullet:get("Rigidbody")
+            bulletTransform.position = { bulletTransform.position.x, 0, bulletTransform.position.z }
+            bulletRigidbody.velocity = { bulletRigidbody.velocity.x, 0, bulletRigidbody.velocity.z }
+        end
+    end
     --print("bullet position: ", bulletPos.x, bulletPos.y, bulletPos.z)
 end
 

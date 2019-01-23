@@ -37,12 +37,12 @@ local scenery = {
         },
     },
     {
-        Name = "Light",
+        Name = "PointLight",
         Light = {
             intensity = 4,
         },
         Transform = {
-            position = { x = 5, y = 2, z = 0 },
+            position = { x = 0, y = 2, z = 0 },
             scale    = { 0.1, 0.1, 0.1 }
         },
         RenderInfo = {
@@ -151,7 +151,7 @@ end
 
 function scene.update(dt)
 
-    Game.find("Light"):get("Light").intensity = math.sin(Game.getTime()) ^ 2
+    Game.find("PointLight"):get("Light").intensity = math.sin(Game.getTime()) ^ 2
     --Game.find("DirectionalLight"):get("Transform"):rotate(60 * dt, 1, 0, 0)
 
     player1:update(dt)

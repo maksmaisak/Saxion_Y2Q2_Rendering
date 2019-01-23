@@ -24,6 +24,8 @@ namespace en {
     public:
 
         LuaState();
+        LuaState(lua_State* existingL);
+        ~LuaState();
 
         bool pCall(int numArgs = 0, int numResults = 0, int messageHandlerIndex = 0);
         bool loadFile(const std::string& filename);
@@ -106,13 +108,9 @@ namespace en {
 
     private:
 
-        struct LuaStateDeleter {
-            inline void operator()(lua_State* L) { lua_close(L); }
-        };
-
         void printError();
 
-        std::unique_ptr<lua_State, LuaStateDeleter> luaStateOwner;
+        bool shouldCloseOnDestroy = true;
         lua_State* L;
     };
 }

@@ -145,7 +145,7 @@ namespace en {
 
         luaL_checktype(L, 1, LUA_TTABLE);
         Engine& engine = *lua::to<Engine*>(L, lua_upvalueindex(1));
-        ComponentsToLua::makeEntities(engine, 1);
+        ComponentsToLua::makeEntities(L, engine, 1);
 
         return 0;
     }
@@ -157,8 +157,8 @@ namespace en {
         // makeActor(table)
         if (lua_istable(L, 1)) {
 
-            Actor actor = ComponentsToLua::makeEntity(engine, 1);
-            ComponentsToLua::addComponents(actor, 1);
+            Actor actor = ComponentsToLua::makeEntity(L, engine, 1);
+            ComponentsToLua::addComponents(L, actor, 1);
             lua::push(L, actor);
 
             return 1;
@@ -167,7 +167,7 @@ namespace en {
         // makeActor(name, [table])
         Actor actor = engine.makeActor(luaL_checkstring(L, 1));
         if (lua_istable(L, 2))
-            ComponentsToLua::addComponents(actor, 2);
+            ComponentsToLua::addComponents(L, actor, 2);
         lua::push(L, actor);
         return 1;
     }

@@ -40,6 +40,8 @@ namespace en {
         template<typename TComponent>
         inline TComponent& remove() {return m_registry->remove<TComponent>(m_entity);}
 
+        void destroy();
+
         inline Engine& getEngine() const {return *m_engine;}
         std::string getName() const;
 

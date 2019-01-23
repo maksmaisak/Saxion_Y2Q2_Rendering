@@ -13,15 +13,15 @@ return function(o)
     local transform
 
     function o:start()
-
+        
         transform = self.actor:get("Transform")
     end
 
     function o:update(dt)
 
         local time = Game.getTime()
-        transform.position = {math.sin(time) * 5, 0, math.cos(time * 2) * 5 }
-        transform.scale = {math.cos(time) ^ 2, 1, math.sin(time) ^ 2}
+        transform.position = {math.sin(time) * 5, 0, math.cos(time * 2) * 5}
+        transform.scale    = {math.cos(time) ^ 2, 1, math.sin(time) ^ 2}
     end
 
     return o

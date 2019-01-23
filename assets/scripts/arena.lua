@@ -126,8 +126,8 @@ function scene.start()
         }
     end
 
-    local player1Actor = makePlayer("player1", {5, 0, -5})
-    local player2Actor = makePlayer("player2", {-5, 0, 5})
+    local player1Actor = makePlayer("Player1", {5, 0, -5})
+    local player2Actor = makePlayer("Player2", {-5, 0, 5})
 
     local camera = Game.makeActor("Camera")
     cameraTransform = camera:add("Transform")
@@ -154,11 +154,11 @@ function scene.update(dt)
     Game.find("PointLight"):get("Light").intensity = math.sin(Game.getTime()) ^ 2
     --Game.find("DirectionalLight"):get("Transform"):rotate(60 * dt, 1, 0, 0)
 
-    player1:update(dt)
-    player2:update(dt)
+    if (player1.actor.isValid) then player1:update(dt) end
+    if (player2.actor.isValid) then player2:update(dt) end
 
-    local position1 = player1.actor:get("Transform").position
-    local position2 = player2.actor:get("Transform").position
+    local position1 = player1.actor.isValid and player1.actor:get("Transform").position or {x = 0, y = 0, z = 0}
+    local position2 = player2.actor.isValid and player2.actor:get("Transform").position or {x = 0, y = 0, z = 0}
     cameraTransform.position = {
         (position1.x + position2.x) * 0.5,
         cameraTransform.position.y,
@@ -169,6 +169,31 @@ end
 function scene.onCollision(a, b)
 
     print("scene.onCollision:", a.name, b.name)
+
+    local bullet
+    local player
+
+    if string.find(a.name, "Player") ~= nil then
+        player = a
+    elseif string.find(b.name, "Player") ~= nil then
+        player = b
+    end
+
+    if string.find(a.name, "Bullet") ~= nil then
+        bullet = a
+    elseif string.find(b.name, "Bullet") ~= nil then
+        bullet = b
+    end
+
+    if (not bullet) then return end
+
+    local light = bullet:get("Light")
+    local color = light.color
+    light.color = {color.y, color.z, color.x }
+
+    if (not player) then return end
+
+    player:destroy()
 end
 
 return scene

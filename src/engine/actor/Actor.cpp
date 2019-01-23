@@ -66,5 +66,20 @@ namespace en {
         lua.setField("get", &pushByTypeName);
         lua.setField("add", &addByTypeName);
         lua.setField("destroy", &Actor::destroy);
+
+        lua::addProperty(lua, "name", lua::property(
+            [](Actor& actor){
+                Name* ptr = actor.tryGet<Name>();
+                return ptr ? std::make_optional(ptr->value) : std::nullopt;
+            },
+            [](Actor& actor, const std::string& newName) {
+                Name* ptr = actor.tryGet<Name>();
+                if (ptr) {
+                    ptr->value = newName;
+                } else {
+                    actor.add<Name>(newName);
+                }
+            }
+        ));
     }
 }

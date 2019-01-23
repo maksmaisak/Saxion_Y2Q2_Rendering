@@ -168,8 +168,7 @@ end
 
 function scene.onCollision(a, b)
 
-    print("scene.onCollision:", a:getName(), b:getName())
+    print("scene.onCollision:", a.name, b.name)
 end
 
 return scene
-

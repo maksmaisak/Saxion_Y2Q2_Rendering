@@ -51,8 +51,8 @@ namespace en {
             return ptr ? std::make_optional(ptr->value) : std::nullopt;
         });
 
-        lua.setField("getComponent", &pushByTypeName);
-        lua.setField("addComponent", &addByTypeName);
+        lua.setField("get", &pushByTypeName);
+        lua.setField("add", &addByTypeName);
     }
 
     std::string Actor::getName() const {

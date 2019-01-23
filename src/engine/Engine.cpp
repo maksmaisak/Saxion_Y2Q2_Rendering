@@ -185,7 +185,7 @@ namespace en {
             m_lua.setField("testValue", 3.1415926f);
             m_lua.setField("testFreeFunction", &testFreeFunction);
             m_lua.setField("testMemberFunction", &Engine::testMemberFunction, this);
-            m_lua.setField("findByName", [this](const std::string& name) -> std::optional<Actor> {
+            m_lua.setField("find", [this](const std::string& name) -> std::optional<Actor> {
                 Actor actor = findByName(name);
                 if (actor) return std::make_optional(actor);
                 return std::nullopt;

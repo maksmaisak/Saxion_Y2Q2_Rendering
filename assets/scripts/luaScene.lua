@@ -80,12 +80,12 @@ local didStart = false
 local function start()
 
     local actor = Game.makeActor("Light")
-    actor:addComponent("Transform"):move(-5, 3, 0)
-    actor:addComponent("Light")
+    actor:add("Transform"):move(-5, 3, 0)
+    actor:add("Light")
 
     local actor2 = Game.makeActor("Light")
-    actor2:addComponent("Transform"):move(5, 3, 0)
-    actor2:addComponent("Light")
+    actor2:add("Transform"):move(5, 3, 0)
+    actor2:add("Light")
 end
 
 function scene.update(dt)
@@ -99,23 +99,23 @@ function scene.update(dt)
     print(Game.testFreeFunction())
     print(Game.testMemberFunction())
 
-    local head = Game.findByName("head")
+    local head = Game.find("head")
     if (head) then
         print(head:isValid())
         print(head:getName())
         print(head:getTransform())
-        print(head:getComponent("Transform"))
-        print(head:getComponent("RenderInfo"))
-        print(head:getComponent("Rigidbody"))
+        print(head:get("Transform"))
+        print(head:get("RenderInfo"))
+        print(head:get("Rigidbody"))
         --head:getTransform():move(0, dt, 0)
         --head:getTransform():rotate(10 * dt, 0, 1, 0)
     end
 
     local actor = Game.makeActor("name")
-    print(actor:getComponent("Transform"))
-    actor:addComponent("Transform")
-    print(actor:getComponent("Transform"))
-    print(actor:getComponent("Transform") == actor:getComponent("Transform"))
+    print(actor:get("Transform"))
+    actor:add("Transform")
+    print(actor:get("Transform"))
+    print(actor:get("Transform") == actor:get("Transform"))
 end
 
 return scene

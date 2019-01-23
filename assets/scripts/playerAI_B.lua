@@ -14,7 +14,7 @@ return function(o)
 
     function o:start()
 
-        transform = self.actor:getComponent("Transform")
+        transform = self.actor:get("Transform")
     end
 
     function o:update(dt)

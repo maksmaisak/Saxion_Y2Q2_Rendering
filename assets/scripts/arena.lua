@@ -12,7 +12,7 @@ local cubeMaterial = {
 
 local scenery = {
     {
-        Name = "plane",
+        Name = "Plane",
         Transform = {
             position = { 0, -1, 0 },
             scale    = { 10, 10, 10 }
@@ -130,10 +130,10 @@ function scene.start()
     local player2Actor = makePlayer("player2", {-5, 0, 5})
 
     local camera = Game.makeActor("Camera")
-    cameraTransform = camera:addComponent("Transform")
+    cameraTransform = camera:add("Transform")
         :move(0, 20, 0)
         :rotate(-90, 1, 0, 0)
-    camera:addComponent("Camera")
+    camera:add("Camera")
 
     player1 = makePlayerAI_A {
         actor = player1Actor,
@@ -151,14 +151,14 @@ end
 
 function scene.update(dt)
 
-    Game.findByName("Light"):getComponent("Light").intensity = math.sin(Game.getTime()) ^ 2
-    --Game.findByName("DirectionalLight"):getComponent("Transform"):rotate(60 * dt, 1, 0, 0)
+    Game.find("Light"):get("Light").intensity = math.sin(Game.getTime()) ^ 2
+    --Game.find("DirectionalLight"):get("Transform"):rotate(60 * dt, 1, 0, 0)
 
     player1:update(dt)
     player2:update(dt)
 
-    local position1 = player1.actor:getComponent("Transform").position
-    local position2 = player2.actor:getComponent("Transform").position
+    local position1 = player1.actor:get("Transform").position
+    local position2 = player2.actor:get("Transform").position
     cameraTransform.position = {
         (position1.x + position2.x) * 0.5,
         cameraTransform.position.y,

@@ -11,8 +11,8 @@ AI = Object:new()
 
 function AI:start()
 
-    self.transform = self.actor:getComponent("Transform")
-    self.enemyTransform = self.enemy:getComponent("Transform")
+    self.transform = self.actor:get("Transform")
+    self.enemyTransform = self.enemy:get("Transform")
 
     self:shoot(self.transform.position, self.enemyTransform.position, 20)
 end
@@ -76,9 +76,9 @@ function AI:update(dt)
     local time = Game.getTime()
     self.transform.position = {math.cos(time) * 5, self.transform.position.y, math.sin(time * 2) * 5 }
 
-    local bullet = Game.findByName("Bullet")
-    local bulletTransform = bullet:getComponent("Transform")
-    local bulletRigidbody = bullet:getComponent("Rigidbody")
+    local bullet = Game.find("Bullet")
+    local bulletTransform = bullet:get("Transform")
+    local bulletRigidbody = bullet:get("Rigidbody")
     bulletTransform.position = { bulletTransform.position.x, 0, bulletTransform.position.z }
     bulletRigidbody.velocity = { bulletRigidbody.velocity.x, 0, bulletRigidbody.velocity.z }
 

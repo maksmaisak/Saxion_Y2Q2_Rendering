@@ -27,7 +27,7 @@ namespace en {
         LuaState(lua_State* existingL);
         ~LuaState();
 
-        bool pCall(int numArgs = 0, int numResults = 0, int messageHandlerIndex = 0);
+        bool pcall(int numArgs = 0, int numResults = 0, int messageHandlerIndex = 0);
         bool loadFile(const std::string& filename);
         bool doFile(const std::string& filename, int numResults = 0, int messageHandlerIndex = 0);
 

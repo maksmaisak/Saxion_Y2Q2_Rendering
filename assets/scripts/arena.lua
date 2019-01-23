@@ -166,5 +166,10 @@ function scene.update(dt)
     }
 end
 
+function scene.onCollision(a, b)
+
+    print("scene.onCollision:", a:getName(), b:getName())
+end
+
 return scene
 

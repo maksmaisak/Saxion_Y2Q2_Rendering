@@ -30,7 +30,7 @@ bool LuaState::loadFile(const std::string& filename) {
     return true;
 }
 
-bool LuaState::pCall(int numArgs, int numResults, int messageHandlerIndex) {
+bool LuaState::pcall(int numArgs, int numResults, int messageHandlerIndex) {
 
     int errorCode = lua_pcall(L, numArgs, numResults, messageHandlerIndex);
     if (errorCode != LUA_OK) {
@@ -41,7 +41,7 @@ bool LuaState::pCall(int numArgs, int numResults, int messageHandlerIndex) {
 }
 
 bool LuaState::doFile(const std::string& filename, int numResults, int messageHandlerIndex) {
-    return loadFile(filename) && pCall(0, numResults, messageHandlerIndex);
+    return loadFile(filename) && pcall(0, numResults, messageHandlerIndex);
 }
 
 bool LuaState::doFileInNewEnvironment(const std::string& filename, int numResults, int messageHandlerIndex) {
@@ -50,7 +50,7 @@ bool LuaState::doFileInNewEnvironment(const std::string& filename, int numResult
 
     if (!loadFile(filename)) return false;
     setEnvironment(-2);
-    return pCall(0, numResults, messageHandlerIndex);
+    return pcall(0, numResults, messageHandlerIndex);
 }
 
 void LuaState::makeEnvironment() {

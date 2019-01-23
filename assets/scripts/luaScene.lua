@@ -101,7 +101,7 @@ function scene.update(dt)
 
     local head = Game.find("head")
     if (head) then
-        print(head:isValid())
+        print(head.isValid)
         print(head.name)
         print(head:getTransform())
         print(head:get("Transform"))

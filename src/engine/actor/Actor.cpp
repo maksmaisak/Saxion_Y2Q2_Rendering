@@ -51,8 +51,6 @@ namespace en {
 
     void Actor::initializeMetatable(LuaState& lua) {
 
-        lua.setField("isValid", &Actor::operator bool);
-
         lua.setField("getTransform", [](Actor& actor){
             auto* ptr = actor.tryGet<Transform>();
             return ptr ? std::make_optional(ptr) : std::nullopt;
@@ -81,5 +79,7 @@ namespace en {
                 }
             }
         ));
+
+        lua::addProperty(lua, "isValid", lua::readonlyProperty([](Actor& actor) -> bool {return actor;}));
     }
 }

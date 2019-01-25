@@ -102,6 +102,7 @@ namespace en {
 
         static_assert(std::is_base_of_v<Behavior, TBehavior>);
 
+        // TODO Use CustomTypeIndex for this.
         auto typeIndex = std::type_index(typeid(TBehavior));
         if (m_behaviorSystemPresence.find(typeIndex) == m_behaviorSystemPresence.end()) {
 

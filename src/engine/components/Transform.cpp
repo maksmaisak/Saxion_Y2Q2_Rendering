@@ -165,8 +165,8 @@ namespace en {
         ));
 
         lua::addProperty(lua, "rotation", lua::property(
-            [](Transform* tf) {return glm::eulerAngles(tf->getLocalRotation());},
-            [](Transform* tf, const glm::vec3& eulerAngles) {return tf->setLocalRotation(eulerAngles);}
+            [](Transform* tf) {return glm::degrees(glm::eulerAngles(tf->getLocalRotation()));},
+            [](Transform* tf, const glm::vec3& eulerAngles) {return tf->setLocalRotation(glm::radians(eulerAngles));}
         ));
 
         lua::addProperty(lua, "scale", lua::property(

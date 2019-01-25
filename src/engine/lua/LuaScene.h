@@ -18,15 +18,12 @@ public:
     LuaScene(const std::string& filename);
     virtual ~LuaScene();
 
-private:
-    void receive(const en::Collision& info) override;
-
-public:
-
     void open() override;
     void update(float dt) override;
 
 private:
+
+    void receive(const en::Collision& info) override;
 
     std::string m_filename;
     int m_luaUpdateFunctionRef = LUA_NOREF;

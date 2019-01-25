@@ -13,10 +13,10 @@
 #include "ComponentsToLua.h"
 #include "GLHelpers.h"
 #include "GameTime.h"
-
 #include "MetatableHelper.h"
 #include "Transform.h"
 #include "Name.h"
+#include "LuaScene.h"
 
 namespace en {
 
@@ -200,6 +200,8 @@ namespace en {
             lua_setfield(m_lua, -2, "makeActor");
 
             m_lua.setField("getTime", [](){ return GameTime::now().asSeconds(); });
+
+            m_lua.setField("loadScene", [this](const std::string path){m_sceneManager.setCurrentScene<LuaScene>("assets/" + path);});
 
             // TODO make addProperty work on both tables and their metatables
             //lua::addProperty(m_lua, "time", lua::Property<float>([](){return GameTime::now().asSeconds();}));

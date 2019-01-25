@@ -60,6 +60,7 @@ namespace lua {
             void* ptr = lua_newuserdata(L, sizeof(T));
             T* valuePtr = new(ptr) T(value); // copy-construct in place.
 
+            // TODO Instead of this, use getMetatable<T>() from the metatable helper to take advantage of T::initializeMetatable
             if (luaL_newmetatable(L, utils::demangle<T>().c_str())) {
 
                 lua_pushvalue(L, -1);

@@ -129,11 +129,15 @@ function scene.start()
     local player1Actor = makePlayer("Player1", {5, 0, -5})
     local player2Actor = makePlayer("Player2", {-5, 0, 5})
 
-    local camera = Game.makeActor("Camera")
-    cameraTransform = camera:add("Transform")
-        :move(0, 20, 0)
-        :rotate(-90, 1, 0, 0)
-    camera:add("Camera")
+    local camera = Game.makeActor {
+        Name = "Camera",
+        Transform = {
+            position = {0, 20, 0},
+            rotation = {-90, 0, 0}
+        },
+        Camera = {}
+    }
+    cameraTransform = camera:get("Transform")
 
     player1 = makePlayerAI_A {
         actor = player1Actor,
@@ -164,6 +168,10 @@ function scene.update(dt)
         cameraTransform.position.y,
         (position1.z + position2.z) * 0.5
     }
+
+    if (not player1.actor.isValid or not player2.actor.isValid) then
+        Game.loadScene("scripts/arena.lua")
+    end
 end
 
 function scene.onCollision(a, b)

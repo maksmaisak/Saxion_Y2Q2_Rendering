@@ -8,9 +8,9 @@ using namespace en;
 
 void Rigidbody::initializeMetatable(LuaState& lua) {
 
-    lua::addProperty(lua, "velocity",    property(&Rigidbody::velocity));
-    lua::addProperty(lua, "isKinematic", property(&Rigidbody::isKinematic));
-    lua::addProperty(lua, "useGravity",  property(&Rigidbody::useGravity));
-    lua::addProperty(lua, "bounciness",  property(&Rigidbody::bounciness));
-    lua::addProperty(lua, "radius",      property(&Rigidbody::radius));
+    lua::addProperty(lua, "velocity",    lua::property(&Rigidbody::velocity));
+    lua::addProperty(lua, "isKinematic", lua::property(&Rigidbody::isKinematic));
+    lua::addProperty(lua, "useGravity",  lua::property(&Rigidbody::useGravity));
+    lua::addProperty(lua, "bounciness",  lua::property(&Rigidbody::bounciness));
+    lua::addProperty(lua, "radius",      lua::property(&Rigidbody::radius));
 }

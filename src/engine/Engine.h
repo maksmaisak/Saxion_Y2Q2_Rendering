@@ -18,13 +18,12 @@
 #include "BehaviorSystem.h"
 #include "Scheduler.h"
 #include "SceneManager.h"
-#include "LuaState.h"
-#include "ClosureHelper.h"
 
 namespace en {
 
     class Behavior;
     class Actor;
+    class LuaState;
 
     class Engine {
 
@@ -43,7 +42,7 @@ namespace en {
         inline Scheduler& getScheduler()       { return m_scheduler; }
         inline sf::RenderWindow& getWindow()   { return m_window; }
         inline SceneManager& getSceneManager() { return m_sceneManager; }
-        inline LuaState& getLuaState()         { return m_lua; }
+        inline LuaState& getLuaState()         { return *m_lua; }
         inline float getFps()                  { return m_fps; }
 
         Actor actor(Entity entity);
@@ -66,7 +65,7 @@ namespace en {
     private:
 
         EntityRegistry m_registry;
-        LuaState m_lua;
+        std::unique_ptr<LuaState> m_lua;
         Scheduler m_scheduler;
         sf::RenderWindow m_window;
         SceneManager m_sceneManager;

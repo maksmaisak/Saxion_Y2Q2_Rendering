@@ -49,10 +49,10 @@ namespace en {
         template<typename TResult, typename... TArgs>
         std::optional<TResult> protectedCall(TArgs&&... args) {
 
-            (lua::push<TArgs>{}(args), ...);
+            (lua::push<TArgs>(args), ...);
             lua_pcall(L, sizeof...(TArgs), 1, 0);
             return get<TResult>();
-            //(lua::to<TResults>(L, index), ...);
+            //return {lua::to<TResults>(L, index), ...};
         }*/
 
         template<typename T>

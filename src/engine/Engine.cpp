@@ -17,254 +17,260 @@
 #include "Transform.h"
 #include "Name.h"
 #include "LuaScene.h"
+#include "LuaState.h"
+#include "ClosureHelper.h"
 
-namespace en {
+using namespace en;
 
-    const sf::Time TimestepFixed = sf::seconds(0.01f);
-    const unsigned int FramerateCap = 240;
+const sf::Time TimestepFixed = sf::seconds(0.01f);
+const unsigned int FramerateCap = 240;
 
-    Engine::Engine() : m_sceneManager(this) {}
+Engine::Engine() :
+    m_sceneManager(this),
+    m_lua(std::make_unique<LuaState>()) {}
 
-    void Engine::initialize() {
+void Engine::initialize() {
 
-        initializeWindow(m_window);
-        printGLContextVersionInfo();
-        initializeGlew();
-        initializeLua();
-    }
+    initializeWindow(m_window);
+    printGLContextVersionInfo();
+    initializeGlew();
+    initializeLua();
+}
 
-    void Engine::run() {
+void Engine::run() {
 
-        sf::Clock fixedUpdateClock;
-        sf::Time fixedUpdateLag = sf::Time::Zero;
+    sf::Clock fixedUpdateClock;
+    sf::Time fixedUpdateLag = sf::Time::Zero;
 
-        sf::Clock drawClock;
-        sf::Time timeSinceLastDraw = sf::Time::Zero;
+    sf::Clock drawClock;
+    sf::Time timeSinceLastDraw = sf::Time::Zero;
 
-        const float timestepFixedSeconds = TimestepFixed.asSeconds();
-        const sf::Time timestepDraw = sf::seconds(1.f / FramerateCap);
+    const float timestepFixedSeconds = TimestepFixed.asSeconds();
+    const sf::Time timestepDraw = sf::seconds(1.f / FramerateCap);
 
-        while (m_window.isOpen()) {
+    while (m_window.isOpen()) {
 
-            fixedUpdateLag += fixedUpdateClock.restart();
-            while (fixedUpdateLag >= TimestepFixed) {
-                update(timestepFixedSeconds);
-                fixedUpdateLag -= TimestepFixed;
-            }
-
-            if (drawClock.getElapsedTime() >= timestepDraw) {
-                m_fps = 1.f / drawClock.getElapsedTime().asSeconds();
-                draw();
-                drawClock.restart();
-            } else {
-                do sf::sleep(sf::microseconds(1));
-                while (drawClock.getElapsedTime() < timestepDraw && fixedUpdateLag + fixedUpdateClock.getElapsedTime() < TimestepFixed);
-            }
-
-            processWindowEvents();
+        fixedUpdateLag += fixedUpdateClock.restart();
+        while (fixedUpdateLag >= TimestepFixed) {
+            update(timestepFixedSeconds);
+            fixedUpdateLag -= TimestepFixed;
         }
-    }
 
-    void Engine::update(float dt) {
-
-        auto* currentScene = m_sceneManager.getCurrentScene();
-        if (currentScene) currentScene->update(dt);
-
-        for (auto& pSystem : m_systems) pSystem->update(dt);
-
-        m_scheduler.update(dt);
-    }
-
-    void Engine::draw() {
-
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        for (auto& pSystem : m_systems) pSystem->draw();
-        m_window.display();
-    }
-
-    void Engine::initializeWindow(sf::RenderWindow& window) {
-
-        std::cout << "Initializing window..." << std::endl;
-
-        m_lua.doFileInNewEnvironment("assets/scripts/config.lua");
-        unsigned int width  = m_lua.tryGetField<unsigned int>("width").value_or(800);
-        unsigned int height = m_lua.tryGetField<unsigned int>("height").value_or(600);
-        bool useVSync = m_lua.tryGetField<bool>("vSync").value_or(true);
-        lua_pop(m_lua, 1);
-
-        auto contextSettings = sf::ContextSettings(24, 8, 8, 3, 3);
-        window.create(sf::VideoMode(width, height), "Game", sf::Style::Default, contextSettings);
-        window.setVerticalSyncEnabled(useVSync);
-        window.setActive(true);
-
-        std::cout << "Window initialized." << std::endl << std::endl;
-    }
-
-    void Engine::printGLContextVersionInfo() {
-
-        std::cout << "Context info:" << std::endl;
-        std::cout << "----------------------------------" << std::endl;
-        //print some debug stats for whoever cares
-        const GLubyte* vendor      = glGetString(GL_VENDOR);
-        const GLubyte* renderer    = glGetString(GL_RENDERER);
-        const GLubyte* version     = glGetString(GL_VERSION);
-        const GLubyte* glslVersion = glGetString(GL_SHADING_LANGUAGE_VERSION);
-        //nice consistency here in the way OpenGl retrieves values
-        GLint major, minor;
-        glGetIntegerv(GL_MAJOR_VERSION, &major);
-        glGetIntegerv(GL_MINOR_VERSION, &minor);
-
-        printf("GL Vendor : %s\n", vendor);
-        printf("GL Renderer : %s\n", renderer);
-        printf("GL Version (string) : %s\n", version);
-        printf("GL Version (integer) : %d.%d\n", major, minor);
-        printf("GLSL Version : %s\n", glslVersion);
-
-        std::cout << "----------------------------------" << std::endl << std::endl;
-    }
-
-    void Engine::initializeGlew() {
-
-        std::cout << "Initializing GLEW..." << std::endl;
-
-        GLint glewStatus = glewInit();
-        if (glewStatus == GLEW_OK) {
-            std::cout << "Initialized GLEW: OK" << std::endl;
+        if (drawClock.getElapsedTime() >= timestepDraw) {
+            m_fps = 1.f / drawClock.getElapsedTime().asSeconds();
+            draw();
+            drawClock.restart();
         } else {
-            std::cerr << "Initialized GLEW: FAILED" << std::endl;
-        }
-    }
-
-    std::string testFreeFunction() {
-
-        std::cout << "Free function called from lua" << std::endl;
-        return "Result returned from free function";
-    }
-
-    int makeActors(lua_State* L) {
-
-        luaL_checktype(L, 1, LUA_TTABLE);
-        Engine& engine = *lua::to<Engine*>(L, lua_upvalueindex(1));
-        ComponentsToLua::makeEntities(L, engine, 1);
-
-        return 0;
-    }
-
-    int makeActor(lua_State* L) {
-
-        Engine& engine = *lua::to<Engine*>(L, lua_upvalueindex(1));
-
-        // makeActor(table)
-        if (lua_istable(L, 1)) {
-
-            Actor actor = ComponentsToLua::makeEntity(L, engine, 1);
-            ComponentsToLua::addComponents(L, actor, 1);
-            lua::push(L, actor);
-
-            return 1;
+            do sf::sleep(sf::microseconds(1));
+            while (drawClock.getElapsedTime() < timestepDraw && fixedUpdateLag + fixedUpdateClock.getElapsedTime() < TimestepFixed);
         }
 
-        // makeActor(name, [table])
-        Actor actor = engine.makeActor(luaL_checkstring(L, 1));
-        if (lua_istable(L, 2))
-            ComponentsToLua::addComponents(L, actor, 2);
+        processWindowEvents();
+    }
+}
+
+void Engine::update(float dt) {
+
+    auto* currentScene = m_sceneManager.getCurrentScene();
+    if (currentScene) currentScene->update(dt);
+
+    for (auto& pSystem : m_systems) pSystem->update(dt);
+
+    m_scheduler.update(dt);
+}
+
+void Engine::draw() {
+
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    for (auto& pSystem : m_systems) pSystem->draw();
+    m_window.display();
+}
+
+void Engine::initializeWindow(sf::RenderWindow& window) {
+
+    std::cout << "Initializing window..." << std::endl;
+
+    auto& lua = getLuaState();
+    lua.doFileInNewEnvironment("assets/scripts/config.lua");
+    unsigned int width  = lua.tryGetField<unsigned int>("width").value_or(800);
+    unsigned int height = lua.tryGetField<unsigned int>("height").value_or(600);
+    bool useVSync = lua.tryGetField<bool>("vSync").value_or(true);
+    lua_pop(lua, 1);
+
+    auto contextSettings = sf::ContextSettings(24, 8, 8, 3, 3);
+    window.create(sf::VideoMode(width, height), "Game", sf::Style::Default, contextSettings);
+    window.setVerticalSyncEnabled(useVSync);
+    window.setActive(true);
+
+    std::cout << "Window initialized." << std::endl << std::endl;
+}
+
+void Engine::printGLContextVersionInfo() {
+
+    std::cout << "Context info:" << std::endl;
+    std::cout << "----------------------------------" << std::endl;
+    //print some debug stats for whoever cares
+    const GLubyte* vendor      = glGetString(GL_VENDOR);
+    const GLubyte* renderer    = glGetString(GL_RENDERER);
+    const GLubyte* version     = glGetString(GL_VERSION);
+    const GLubyte* glslVersion = glGetString(GL_SHADING_LANGUAGE_VERSION);
+    //nice consistency here in the way OpenGl retrieves values
+    GLint major, minor;
+    glGetIntegerv(GL_MAJOR_VERSION, &major);
+    glGetIntegerv(GL_MINOR_VERSION, &minor);
+
+    printf("GL Vendor : %s\n", vendor);
+    printf("GL Renderer : %s\n", renderer);
+    printf("GL Version (string) : %s\n", version);
+    printf("GL Version (integer) : %d.%d\n", major, minor);
+    printf("GLSL Version : %s\n", glslVersion);
+
+    std::cout << "----------------------------------" << std::endl << std::endl;
+}
+
+void Engine::initializeGlew() {
+
+    std::cout << "Initializing GLEW..." << std::endl;
+
+    GLint glewStatus = glewInit();
+    if (glewStatus == GLEW_OK) {
+        std::cout << "Initialized GLEW: OK" << std::endl;
+    } else {
+        std::cerr << "Initialized GLEW: FAILED" << std::endl;
+    }
+}
+
+std::string testFreeFunction() {
+
+    std::cout << "Free function called from lua" << std::endl;
+    return "Result returned from free function";
+}
+
+int makeActors(lua_State* L) {
+
+    luaL_checktype(L, 1, LUA_TTABLE);
+    Engine& engine = *lua::to<Engine*>(L, lua_upvalueindex(1));
+    ComponentsToLua::makeEntities(L, engine, 1);
+
+    return 0;
+}
+
+int makeActorFromLua(lua_State* L) {
+
+    Engine& engine = *lua::to<Engine*>(L, lua_upvalueindex(1));
+
+    // makeActor(table)
+    if (lua_istable(L, 1)) {
+
+        Actor actor = ComponentsToLua::makeEntity(L, engine, 1);
+        ComponentsToLua::addComponents(L, actor, 1);
         lua::push(L, actor);
+
         return 1;
     }
 
-    void Engine::initializeLua() {
+    // makeActor(name, [table])
+    Actor actor = engine.makeActor(luaL_checkstring(L, 1));
+    if (lua_istable(L, 2))
+        ComponentsToLua::addComponents(L, actor, 2);
+    lua::push(L, actor);
+    return 1;
+}
 
-        LUA_REGISTER_TYPE(Actor);
+void Engine::initializeLua() {
 
-        // Configure metatables of all registered component types
-        ComponentsToLua::populateMetatables(m_lua);
+    LUA_REGISTER_TYPE(Actor);
 
-        {
-            lua_newtable(m_lua);
+    auto& lua = getLuaState();
 
-            m_lua.setField("testValue", 3.1415926f);
-            m_lua.setField("testFreeFunction", &testFreeFunction);
-            m_lua.setField("testMemberFunction", &Engine::testMemberFunction, this);
-            m_lua.setField("find", [this](const std::string& name) -> std::optional<Actor> {
-                Actor actor = findByName(name);
-                if (actor) return std::make_optional(actor);
-                return std::nullopt;
-            });
+    // Configure metatables of all registered component types
+    ComponentsToLua::populateMetatables(lua);
 
-            m_lua.push(this);
-            lua_pushcclosure(m_lua, &makeActors, 1);
-            lua_setfield(m_lua, -2, "makeActors");
+    {
+        lua_newtable(lua);
 
-            m_lua.push(this);
-            lua_pushcclosure(m_lua, &en::makeActor, 1);
-            lua_setfield(m_lua, -2, "makeActor");
+        lua.setField("testValue", 3.1415926f);
+        lua.setField("testFreeFunction", &testFreeFunction);
+        lua.setField("testMemberFunction", &Engine::testMemberFunction, this);
+        lua.setField("find", [this](const std::string& name) -> std::optional<Actor> {
+            Actor actor = findByName(name);
+            if (actor) return std::make_optional(actor);
+            return std::nullopt;
+        });
 
-            m_lua.setField("getTime", [](){ return GameTime::now().asSeconds(); });
+        lua.push(this);
+        lua_pushcclosure(lua, &makeActors, 1);
+        lua_setfield(lua, -2, "makeActors");
 
-            m_lua.setField("loadScene", [this](const std::string path){m_sceneManager.setCurrentScene<LuaScene>("assets/" + path);});
+        lua.push(this);
+        lua_pushcclosure(lua, &makeActorFromLua, 1);
+        lua_setfield(lua, -2, "makeActor");
 
-            // TODO make addProperty work on both tables and their metatables
-            //lua::addProperty(m_lua, "time", lua::Property<float>([](){return GameTime::now().asSeconds();}));
+        lua.setField("getTime", [](){ return GameTime::now().asSeconds(); });
 
-            lua_setglobal(m_lua, "Game");
+        lua.setField("loadScene", [this](const std::string path){m_sceneManager.setCurrentScene<LuaScene>("assets/" + path);});
+
+        // TODO make addProperty work on both tables and their metatables
+        //lua::addProperty(lua, "time", lua::Property<float>([](){return GameTime::now().asSeconds();}));
+
+        lua_setglobal(lua, "Game");
+    }
+
+    ComponentsToLua::printDebugInfo();
+}
+
+void Engine::testMemberFunction() {
+
+    std::cout << "Member function called from lua" << std::endl;
+}
+
+void Engine::processWindowEvents() {
+
+    bool shouldExit = false;
+
+    sf::Event event{};
+    while (m_window.pollEvent(event)) {
+
+        switch (event.type) {
+
+            case sf::Event::Closed:
+                shouldExit = true;
+                break;
+
+            case sf::Event::KeyPressed:
+                if (event.key.code == sf::Keyboard::Escape) shouldExit = true;
+                break;
+
+            case sf::Event::Resized:
+                //would be better to move this to the render system
+                //this version implements unconstrained match viewport scaling
+                glViewport(0, 0, event.size.width, event.size.height);
+                break;
+
+            default:
+                break;
         }
 
-        ComponentsToLua::printDebugInfo();
+        Receiver<sf::Event>::broadcast(event);
     }
 
-    void Engine::testMemberFunction() {
-
-        std::cout << "Member function called from lua" << std::endl;
+    if (shouldExit) {
+        m_window.close();
     }
+}
 
-    void Engine::processWindowEvents() {
+Actor Engine::actor(Entity entity) {
+    return Actor(*this, entity);
+}
 
-        bool shouldExit = false;
+Actor Engine::makeActor() {
+    return actor(m_registry.makeEntity());
+}
 
-        sf::Event event{};
-        while (m_window.pollEvent(event)) {
+Actor Engine::makeActor(const std::string& name) {
+    return actor(m_registry.makeEntity(name));
+}
 
-            switch (event.type) {
-
-                case sf::Event::Closed:
-                    shouldExit = true;
-                    break;
-
-                case sf::Event::KeyPressed:
-                    if (event.key.code == sf::Keyboard::Escape) shouldExit = true;
-                    break;
-
-                case sf::Event::Resized:
-                    //would be better to move this to the render system
-                    //this version implements unconstrained match viewport scaling
-                    glViewport(0, 0, event.size.width, event.size.height);
-                    break;
-
-                default:
-                    break;
-            }
-
-            Receiver<sf::Event>::broadcast(event);
-        }
-
-        if (shouldExit) {
-            m_window.close();
-        }
-    }
-
-    Actor Engine::actor(Entity entity) {
-        return Actor(*this, entity);
-    }
-
-    Actor Engine::makeActor() {
-        return actor(m_registry.makeEntity());
-    }
-
-    Actor Engine::makeActor(const std::string& name) {
-        return actor(m_registry.makeEntity(name));
-    }
-
-    Actor Engine::findByName(const std::string& name) {
-        return actor(m_registry.findByName(name));
-    }
+Actor Engine::findByName(const std::string& name) {
+    return actor(m_registry.findByName(name));
 }

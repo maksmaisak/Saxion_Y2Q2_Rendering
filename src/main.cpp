@@ -35,10 +35,10 @@ int main() {
     }
 
     //engine->getSceneManager().setCurrentScene<TestScene>();
-    //engine->getSceneManager().setCurrentScene<LightingScene>();
+    engine->getSceneManager().setCurrentScene<LightingScene>();
     //engine->getSceneManager().setCurrentScene<TerrainScene>();
     //engine->getSceneManager().setCurrentScene<LuaScene>("assets/scripts/luaScene.lua");
-    engine->getSceneManager().setCurrentScene<LuaScene>("assets/scripts/arena.lua");
+    //engine->getSceneManager().setCurrentScene<LuaScene>("assets/scripts/arena.lua");
     //engine->getSceneManager().setCurrentScene<LuaScene>("assets/scripts/stressTest.lua");
 
     engine->run();

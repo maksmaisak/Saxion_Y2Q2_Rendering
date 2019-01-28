@@ -71,7 +71,7 @@ namespace en {
         SceneManager m_sceneManager;
 
         std::vector<std::unique_ptr<System>> m_systems;
-        std::set<std::type_index> m_behaviorSystemPresence;
+        utils::CustomTypeMap<struct Dummy, bool> m_behaviorSystemPresence;
 
         float m_fps = 0.f;
 
@@ -101,12 +101,10 @@ namespace en {
 
         static_assert(std::is_base_of_v<Behavior, TBehavior>);
 
-        // TODO Use CustomTypeIndex for this.
-        auto typeIndex = std::type_index(typeid(TBehavior));
-        if (m_behaviorSystemPresence.find(typeIndex) == m_behaviorSystemPresence.end()) {
+        if (!m_behaviorSystemPresence.get<TBehavior>()) {
 
             addSystem<BehaviorSystem<TBehavior>>();
-            m_behaviorSystemPresence.insert(typeIndex);
+            m_behaviorSystemPresence.set<TBehavior>(true);
             return true;
         }
 

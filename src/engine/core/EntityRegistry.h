@@ -56,7 +56,7 @@ namespace en {
 
         Entities m_entities;
 
-        using componentTypeIndices = CustomTypeIndex<struct componentIndicesDummy>;
+        using ComponentTypeIndices = utils::CustomTypeIndex<struct componentIndicesDummy>;
         mutable std::vector<std::unique_ptr<ComponentPoolBase>> m_componentPools;
 
         template<typename TComponent>
@@ -102,7 +102,7 @@ namespace en {
     template<typename TComponent>
     inline ComponentPool<TComponent>& EntityRegistry::getPool(bool mustBePresentAlready) const {
 
-        const std::size_t index = componentTypeIndices::index<TComponent>;
+        const std::size_t index = ComponentTypeIndices::index<TComponent>;
 
         if (index >= m_componentPools.size()) {
             m_componentPools.resize(index + 1);

@@ -9,9 +9,10 @@
 #include <type_traits>
 #include <cassert>
 #include <functional>
-#include "engine/core/lua/LuaState.h"
 #include "MetatableHelper.h"
+#include "LuaState.h"
 #include "Actor.h"
+#include "ComponentReference.h"
 
 // Calls en::ComponentsToLua::registerType<T>(#T); at dynamic initialization
 // Put this in a class definition
@@ -22,7 +23,6 @@
 namespace en {
 
     using LuaComponentFactoryFunction = std::function<void(Actor&, LuaState&)>;
-    using InitializeMetatableFunction = std::function<void(LuaState&)>;
     using PushComponentFromActorFunction = std::function<void(Actor&, LuaState&)>;
     using AddComponentToActorFunction = std::function<void(Actor&, LuaState&)>;
 
@@ -40,29 +40,6 @@ namespace en {
 
             inline static LuaComponentFactoryFunction get() {return T::addFromLua;}
         };
-
-        template<typename T, typename = void>
-        struct InitializeMetatableFunctionOf {
-
-            inline static void initializeMetatable(LuaState&) {}
-            inline static InitializeMetatableFunction get() {return initializeMetatable;}
-        };
-
-        template<typename T>
-        struct InitializeMetatableFunctionOf<T, std::enable_if_t<std::is_convertible_v<decltype(&std::remove_pointer_t<utils::remove_cvref_t<T>>::initializeMetatable), InitializeMetatableFunction>>> {
-
-            inline static void initializeMetatable(LuaState& lua) {
-
-                using TComponent = std::remove_pointer_t<utils::remove_cvref_t<T>>;
-
-                int oldTop = lua_gettop(lua);
-                getMetatable<T>(lua);
-                TComponent::initializeMetatable(lua);
-                lua_settop(lua, oldTop);
-            }
-
-            inline static InitializeMetatableFunction get() {return initializeMetatable;}
-        };
     }
 
     /// Handles reading component definitions out of lua values.
@@ -74,9 +51,6 @@ namespace en {
 
         template<typename TComponent>
         static void registerType(const std::string& name);
-
-        /// Populates metatables of registered types by calling their initializeMetatable function with the metatable being on top of the stack.
-        static void populateMetatables(LuaState& lua);
 
         /// Goes through the table at the given index, and makes entities out of its fields.
         /// First creates all the entities and assigns their names, if provided.
@@ -99,7 +73,6 @@ namespace en {
         struct TypeInfo {
 
             LuaComponentFactoryFunction addFromLua;
-            InitializeMetatableFunction initializeMetatable;
             PushComponentFromActorFunction pushFromActor;
             AddComponentToActorFunction addToActor;
         };
@@ -141,27 +114,26 @@ namespace en {
             return;
         }
 
-        LuaComponentFactoryFunction addFromLua          = detail::LuaComponentFactoryFunctionOf<T>::get();
-        InitializeMetatableFunction initializeMetatable = detail::InitializeMetatableFunctionOf<T>::get();
+        LuaComponentFactoryFunction addFromLua = detail::LuaComponentFactoryFunctionOf<T>::get();
         PushComponentFromActorFunction pushFromActor = [](Actor& actor, LuaState& lua) {
 
             T* componentPtr = actor.tryGet<T>();
             if (componentPtr)
-                lua::push(lua, componentPtr);
+                lua::push(lua, ComponentReference<T>(actor.getEngine().getRegistry(), actor));
             else
                 lua_pushnil(lua);
         };
-        AddComponentToActorFunction addToActor = [](Actor& actor, LuaState& lua) {
+        AddComponentToActorFunction addToActor = [](Actor& actor, LuaState& lua)  {
 
             if (actor.tryGet<T>())
                 luaL_error(lua, "Actor %s already has a component of type %s", actor.getName().c_str(), utils::demangle<T>().c_str());
 
-            lua::push(lua, &actor.add<T>());
+            actor.add<T>();
+            lua::push(lua, ComponentReference<T>(actor.getEngine().getRegistry(), actor));
         };
 
         getNameToTypeInfoMap()[name] = {
             std::move(addFromLua),
-            std::move(initializeMetatable),
             std::move(pushFromActor),
             std::move(addToActor)
         };

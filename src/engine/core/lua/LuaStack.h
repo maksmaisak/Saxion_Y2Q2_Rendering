@@ -17,7 +17,7 @@
 
 namespace lua {
 
-    /// TOOD Move the implementation of non-templates like this into a cpp file
+    /// TOOD Move the implementation of non-templates like this into a .cpp file
     inline void stackDump(lua_State *L) {
 
         int i = lua_gettop(L);
@@ -51,6 +51,9 @@ namespace lua {
         lua_State* L;
     };
 
+    template<typename T>
+    inline bool getMetatable(lua_State*);
+
     // Default case. Treat everything as userdata
     template<typename T, typename = void>
     struct TypeAdapter {
@@ -60,15 +63,8 @@ namespace lua {
             void* ptr = lua_newuserdata(L, sizeof(T));
             T* valuePtr = new(ptr) T(value); // copy-construct in place.
 
-            // TODO Instead of this, use getMetatable<T>() from the metatable helper to take advantage of T::initializeMetatable
-            if (luaL_newmetatable(L, utils::demangle<T>().c_str())) {
+            getMetatable<T>(L);
 
-                lua_pushvalue(L, -1);
-                lua_setfield(L, -2, "__index");
-                std::cout << "Created metatable for type " << utils::demangle<T>() << std::endl;
-            }
-
-            // TODO Set __gc for userdata metatables
             lua_setmetatable(L, -2);
         }
 

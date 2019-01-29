@@ -10,13 +10,6 @@
 
 using namespace en;
 
-void ComponentsToLua::populateMetatables(LuaState& lua) {
-
-    for (auto& kvp : getNameToTypeInfoMap()) {
-        kvp.second.initializeMetatable(lua);
-    }
-}
-
 void ComponentsToLua::printDebugInfo() {
 
     std::cout << std::endl << "Registered component types:" << std::endl;

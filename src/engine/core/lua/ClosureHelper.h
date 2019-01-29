@@ -12,6 +12,12 @@
 #include "Demangle.h"
 #include "Meta.h"
 
+namespace en {
+
+    template<typename T>
+    class ComponentReference;
+}
+
 namespace lua {
 
     template<typename TResult, typename TOwner, typename... TArgs>

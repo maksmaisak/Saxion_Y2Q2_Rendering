@@ -47,7 +47,7 @@ RenderInfo& RenderInfo::addFromLua(Actor& actor, LuaState& lua) {
 
 void RenderInfo::initializeMetatable(LuaState& lua) {
 
-    lua::addProperty(lua, "mesh", lua::writeonlyProperty([](RenderInfo* renderInfo, const std::string& value) {
+    lua::addProperty(lua, "mesh", lua::writeonlyProperty([](ComponentReference<RenderInfo> renderInfo, const std::string& value) {
         renderInfo->mesh = en::Resources<Mesh>::get("assets/" + value);
     }));
 }

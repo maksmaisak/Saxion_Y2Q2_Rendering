@@ -183,9 +183,6 @@ void Engine::initializeLua() {
 
     auto& lua = getLuaState();
 
-    // Configure metatables of all registered component types
-    ComponentsToLua::populateMetatables(lua);
-
     {
         lua_newtable(lua);
 
@@ -206,7 +203,7 @@ void Engine::initializeLua() {
         lua_pushcclosure(lua, &makeActorFromLua, 1);
         lua_setfield(lua, -2, "makeActor");
 
-        lua.setField("getTime", [](){ return GameTime::now().asSeconds(); });
+        lua.setField("getTime", [](){return GameTime::now().asSeconds();});
 
         lua.setField("loadScene", [this](const std::string path){m_sceneManager.setCurrentScene<LuaScene>("assets/" + path);});
 

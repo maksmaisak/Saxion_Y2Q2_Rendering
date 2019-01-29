@@ -8,6 +8,40 @@ namespace lua {
 
     namespace detail {
 
+        std::string getAsString(lua_State* L, int index = -1) {
+
+            int typeId = lua_type(L, index);
+            switch (typeId) {
+                case LUA_TSTRING:
+                    return std::string("\"") + lua_tostring(L, index) + "\"";
+                case LUA_TBOOLEAN:
+                    return lua_toboolean(L, index) ? "true" : "false";
+                case LUA_TNUMBER:
+                    return std::to_string(lua_tonumber(L, index));
+                default:
+                    return lua_typename(L, typeId);
+            }
+        }
+
+        void printValue(lua_State* L, int index = -1) {
+
+            int typeId = lua_type(L, index);
+            switch (typeId) {
+                case LUA_TSTRING:
+                    printf("%d:`%s'\n", index, lua_tostring(L, index));
+                    break;
+                case LUA_TBOOLEAN:
+                    printf("%d: %s\n", index, lua_toboolean(L, index) ? "true" : "false");
+                    break;
+                case LUA_TNUMBER:
+                    printf("%d: %g\n", index, lua_tonumber(L, index));
+                    break;
+                default:
+                    printf("%d: %s\n", index, lua_typename(L, typeId));
+                    break;
+            }
+        }
+
         /// The __index function: (table, key) -> value
         /// Try using a property getter from __getters, otherwise look it up in the metatable
         int indexFunction(lua_State* L) {
@@ -28,6 +62,10 @@ namespace lua {
                 lua_pop(L, 2); // remove __getters, nil
                 lua_pushvalue(L, 2);
                 lua_gettable(L, -2); // get from metatable
+
+                if (lua_isnil(L, -1)) {
+                    std::cout << "No custom getter and no value for key: " << getAsString(L, 2) << std::endl;
+                }
 
                 lua_remove(L, -2); // remove metatable
 
@@ -70,7 +108,7 @@ namespace lua {
                     lua_pushvalue(L, 3);
                     lua_rawset(L, 1);
                 } else {
-                    std::cout << "Can't assign this key to userdata " << std::endl;
+                    std::cout << "Can't assign this to userdata: " << getAsString(L, 2) << ", " << getAsString(L, 3) << std::endl;
                 }
 
                 return 0;

@@ -16,7 +16,7 @@ function scene.start()
 
         local radius = 0.2
 
-        local boid = Game.makeActor {
+        local actor = Game.makeActor {
             Name = "Boid",
             Transform = {
                 position = position,
@@ -34,6 +34,10 @@ function scene.start()
             }
         }
 
+        local boid = {
+            actor = actor,
+        }
+
         table.insert(boids, boid)
 
         return boid
@@ -41,7 +45,7 @@ function scene.start()
 
     local pi2 = math.pi * 2.0
     for radius = 0,5,1 do
-        for theta = 0.0,pi2,pi2/5.0 do
+        for theta = 0.0,pi2,pi2/6.0 do
 
             local position = {
                 x = math.cos(theta) * radius,
@@ -53,13 +57,14 @@ function scene.start()
         end
     end
 
-    Game.makeActor({
+    Game.makeActor {
         Name = "Camera",
         Transform = {
             position = {0, 20, 0},
+            rotation = {-90, 0, 0}
         },
         Camera = {}
-    }):get("Transform"):rotate(-90, 1, 0, 0)
+    }
 
     Game.makeActor {
         Name = "DirectionalLight",
@@ -83,13 +88,19 @@ function scene.start()
             position = {0, 2, 0}
         }
     }
+
+    for i, boid in ipairs(boids) do
+
+        boid.transform = boid.actor:get("Transform")
+        boid.rigidbody = boid.actor:get("Rigidbody")
+    end
 end
 
 function scene.update(dt)
 
     for i, boid in ipairs(boids) do
 
-        local tf = boid:get("Transform")
+        local tf = boid.transform
 
         local acceleration = {x = 0, y = 0, z = 0}
 
@@ -97,7 +108,7 @@ function scene.update(dt)
 
             if i ~= j then
 
-                local otherTf = other:get("Transform")
+                local otherTf = other.transform
 
                 local position = tf.position
                 local otherPosition = otherTf.position
@@ -121,7 +132,7 @@ function scene.update(dt)
             end
         end
 
-        local rb = boid:get("Rigidbody")
+        local rb = boid.rigidbody
         local oldVelocity = rb.velocity
         rb.velocity  = {
             x = oldVelocity.x + acceleration.x * dt,

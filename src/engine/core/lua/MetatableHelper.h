@@ -24,33 +24,85 @@ namespace lua {
         /// The __index function: (table, key, value) -> ()
         /// Try using a property setter from __setters, otherwise just rawset it
         int newindexFunction(lua_State* L);
+
+        using InitializeMetatableFunction = std::function<void(en::LuaState&)>;
+        using InitializeEmptyMetatableFunction = std::function<void(en::LuaState&)>;
+
+        template<typename T, typename = void>
+        struct InitializeMetatableFunctionOf {
+
+            inline static void initializeMetatable(en::LuaState&) {}
+        };
+
+        template<typename T>
+        struct InitializeMetatableFunctionOf<T, std::enable_if_t<std::is_convertible_v<decltype(&std::remove_pointer_t<utils::remove_cvref_t<T>>::initializeMetatable), InitializeMetatableFunction>>> {
+
+            inline static void initializeMetatable(en::LuaState& lua) {
+
+                using TComponent = std::remove_pointer_t<utils::remove_cvref_t<T>>;
+
+                int oldTop = lua_gettop(lua);
+                TComponent::initializeMetatable(lua);
+                int newTop = lua_gettop(lua);
+                assert(oldTop == newTop);
+            }
+        };
+
+        template<typename T, typename = void>
+        struct InitializeEmptyMetatable {
+
+            inline static void initializeEmptyMetatable(en::LuaState& lua) {
+
+                lua_newtable(lua);
+                lua_setfield(lua, -2, "__getters");
+
+                lua_newtable(lua);
+                lua_setfield(lua, -2, "__setters");
+
+                lua_pushcfunction(lua, &detail::indexFunction);
+                lua_setfield(lua, -2, "__index");
+
+                lua_pushcfunction(lua, &detail::newindexFunction);
+                lua_setfield(lua, -2, "__newindex");
+
+                if constexpr (std::is_pointer_v<T>) {
+                    lua.setField("__eq", [](T a, T b) { return a == b; });
+                }
+
+                // TODO Set __gc for userdata metatables
+
+                InitializeMetatableFunctionOf<T>::initializeMetatable(lua);
+            }
+        };
+
+        template<typename T>
+        struct InitializeEmptyMetatable<T, std::enable_if_t<std::is_convertible_v<decltype(&std::remove_pointer_t<utils::remove_cvref_t<T>>::initializeEmptyMetatable), InitializeEmptyMetatableFunction>>> {
+
+            inline static void initializeEmptyMetatable(en::LuaState& lua) {
+
+                using TComponent = std::remove_pointer_t<utils::remove_cvref_t<T>>;
+
+                int oldTop = lua_gettop(lua);
+                TComponent::initializeEmptyMetatable(lua);
+                int newTop = lua_gettop(lua);
+                assert(oldTop == newTop);
+            }
+        };
     }
 
     // Gets or adds a metatable for a given type.
     // Returns true if the metatable did not exist before.
     template<typename T>
-    inline bool getMetatable(en::LuaState& lua) {
+    inline bool getMetatable(lua_State* L) {
+
+        auto lua = en::LuaState(L);
 
         if (!luaL_newmetatable(lua, utils::demangle<T>().c_str()))
             return false;
 
         std::cout << "Created metatable for type " << utils::demangle<T>() << std::endl;
 
-        lua_newtable(lua);
-        lua_setfield(lua, -2, "__getters");
-
-        lua_newtable(lua);
-        lua_setfield(lua, -2, "__setters");
-
-        lua_pushcfunction(lua, &detail::indexFunction);
-        lua_setfield(lua, -2, "__index");
-
-        lua_pushcfunction(lua, &detail::newindexFunction);
-        lua_setfield(lua, -2, "__newindex");
-
-        if constexpr (std::is_pointer_v<T>) {
-            lua.setField("__eq", [](T a, T b) { return a == b; });
-        }
+        detail::InitializeEmptyMetatable<T>::initializeEmptyMetatable(lua);
 
         return true;
     }
@@ -118,9 +170,9 @@ namespace lua {
     template<typename T, typename Owner>
     inline auto property(T Owner::* memberPtr) {
 
-        return property<std::function<T(Owner*)>, std::function<void(Owner*, const T&)>>(
-            [memberPtr](Owner* owner){ return *owner.*memberPtr; },
-            [memberPtr](Owner* owner, const T& value){ return *owner.*memberPtr = value; }
+        return property(
+            [memberPtr](en::ComponentReference<Owner> owner){ return *owner.*memberPtr; },
+            [memberPtr](en::ComponentReference<Owner> owner, const T& value){ return *owner.*memberPtr = value; }
         );
     }
 

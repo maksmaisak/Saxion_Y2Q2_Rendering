@@ -151,27 +151,29 @@ namespace en {
 
     void Transform::initializeMetatable(LuaState& lua) {
 
-        lua.setField("move", [](Transform* tf, float x, float y, float z) {
-            return &tf->move({x, y, z});
+        lua.setField("move", [](ComponentReference<Transform> tf, float x, float y, float z) {
+            tf->move({x, y, z});
+            return tf;
         });
 
-        lua.setField("rotate", [](Transform* tf, float angle, float x, float y, float z) {
-            return &tf->rotate(glm::radians(angle), {x, y, z});
+        lua.setField("rotate", [](ComponentReference<Transform> tf, float angle, float x, float y, float z) {
+            tf->rotate(glm::radians(angle), {x, y, z});
+            return tf;
         });
 
         lua::addProperty(lua, "position", lua::property(
-            [](Transform* tf) {return tf->getLocalPosition();},
-            [](Transform* tf, const glm::vec3& pos) {return tf->setLocalPosition(pos);}
+            [](ComponentReference<Transform> tf) {return tf->getLocalPosition();},
+            [](ComponentReference<Transform> tf, const glm::vec3& pos) {return tf->setLocalPosition(pos), tf;}
         ));
 
         lua::addProperty(lua, "rotation", lua::property(
-            [](Transform* tf) {return glm::degrees(glm::eulerAngles(tf->getLocalRotation()));},
-            [](Transform* tf, const glm::vec3& eulerAngles) {return tf->setLocalRotation(glm::radians(eulerAngles));}
+            [](ComponentReference<Transform> tf) {return glm::degrees(glm::eulerAngles(tf->getLocalRotation()));},
+            [](ComponentReference<Transform> tf, const glm::vec3& eulerAngles) {return tf->setLocalRotation(glm::radians(eulerAngles)), tf;}
         ));
 
         lua::addProperty(lua, "scale", lua::property(
-            [](Transform* tf) {return tf->getLocalScale();},
-            [](Transform* tf, const glm::vec3& scale) {return tf->setLocalScale(scale);}
+            [](ComponentReference<Transform> tf) {return tf->getLocalScale();},
+            [](ComponentReference<Transform> tf, const glm::vec3& scale) {return tf->setLocalScale(scale), tf;}
         ));
     }
 }

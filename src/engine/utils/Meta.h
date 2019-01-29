@@ -46,7 +46,7 @@ namespace utils {
     };
 
     template<typename A, typename B>
-    struct equalityComparer<A, B, std::enable_if_t<is_equatable_v<A, B>>> {
+    struct equalityComparer<A, B, std::enable_if_t<is_equatable_v<const A, const B>>> {
 
         inline bool operator()(const A& a, const B& b) {
             return a == b;

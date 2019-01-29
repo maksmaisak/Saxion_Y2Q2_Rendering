@@ -133,10 +133,10 @@ function scene.update(dt)
         end
 
         local rb = boid.rigidbody
-        --print(rb == rb)
-        --print(rb == boid.rigidbody)
-        --print(rb == boid.actor:get("Rigidbody"))
-        --print(boid.actor:get("Rigidbody") == boid.actor:get("Rigidbody"))
+--        print(rb == rb)
+--        print(rb == boid.rigidbody)
+--        print(rb == boid.actor:get("Rigidbody"))
+--        print(boid.actor:get("Rigidbody") == boid.actor:get("Rigidbody"))
         local oldVelocity = rb.velocity
         rb.velocity  = {
             x = oldVelocity.x + acceleration.x * dt,

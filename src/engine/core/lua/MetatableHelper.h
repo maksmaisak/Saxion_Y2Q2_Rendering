@@ -65,7 +65,7 @@ namespace lua {
                 lua_pushcfunction(lua, &detail::newindexFunction);
                 lua_setfield(lua, -2, "__newindex");
 
-                if constexpr (utils::is_equatable_v<T>) {
+                if constexpr (utils::is_equatable_v<const T>) {
                     lua.setField("__eq", utils::equalityComparer<T>{});
                 }
 

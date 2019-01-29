@@ -18,6 +18,7 @@ namespace en {
     template<typename T>
     class ComponentReference {
 
+
     public:
 
         inline static void initializeMetatable(LuaState& lua) {
@@ -59,7 +60,6 @@ namespace en {
         EntityRegistry* m_registry;
         Entity m_entity;
     };
-
 
 }
 

@@ -65,8 +65,8 @@ namespace lua {
                 lua_pushcfunction(lua, &detail::newindexFunction);
                 lua_setfield(lua, -2, "__newindex");
 
-                if constexpr (std::is_pointer_v<T>) {
-                    lua.setField("__eq", [](T a, T b) { return a == b; });
+                if constexpr (utils::is_equatable_v<T>) {
+                    lua.setField("__eq", utils::equalityComparer<T>{});
                 }
 
                 // TODO Set __gc for userdata metatables
@@ -109,16 +109,16 @@ namespace lua {
 
     struct NoAccessor {};
 
-    template<typename G, typename S>
+    template<typename Getter, typename Setter>
     struct PropertyWrapper {
 
-        using HasGetter = std::negation<std::is_void<G>>;
-        using HasSetter = std::negation<std::is_void<S>>;
+        inline static constexpr bool hasGetter = !std::is_same_v<Getter, NoAccessor>;
+        inline static constexpr bool hasSetter = !std::is_same_v<Setter, NoAccessor>;
 
-        using Getter = std::conditional_t<HasGetter::value, G, NoAccessor>;
-        using Setter = std::conditional_t<HasSetter::value, S, NoAccessor>;
+        using HasGetter = std::negation<std::is_same<Getter, NoAccessor>>;
+        using HasSetter = std::negation<std::is_same<Setter, NoAccessor>>;
 
-        // GetterT and SetterT are expected to be versions of Getter and Setter with various cvref modifiers.
+        // GetterT and SetterT are expected to be versions of Getter and Setter with various cref modifiers.
         template<typename GetterT, typename SetterT>
         inline PropertyWrapper(GetterT&& getter, SetterT&& setter) :
             m_getter(std::forward<GetterT>(getter)),
@@ -170,9 +170,11 @@ namespace lua {
     template<typename T, typename Owner>
     inline auto property(T Owner::* memberPtr) {
 
-        return property(
-            [memberPtr](en::ComponentReference<Owner> owner){ return *owner.*memberPtr; },
-            [memberPtr](en::ComponentReference<Owner> owner, const T& value){ return *owner.*memberPtr = value; }
+        using OwnerRef = en::ComponentReference<Owner>;
+
+        return property<std::function<T(OwnerRef)>, std::function<T(OwnerRef, const T&)>>(
+            [memberPtr](OwnerRef owner){ return (*owner).*memberPtr; },
+            [memberPtr](OwnerRef owner, const T& value){ return (*owner).*memberPtr = value; }
         );
     }
 
@@ -181,7 +183,7 @@ namespace lua {
 
         using traits = utils::functionTraits<Getter>;
         static_assert(traits::isFunction);
-        return PropertyWrapper<typename traits::FunctionType, void>(getter, NoAccessor());
+        return PropertyWrapper<typename traits::FunctionType, NoAccessor>(getter, NoAccessor());
     }
 
     template<typename Setter>
@@ -189,7 +191,7 @@ namespace lua {
 
         using traits = utils::functionTraits<Setter>;
         static_assert(traits::isFunction);
-        return PropertyWrapper<void, typename traits::FunctionType>(NoAccessor(), setter);
+        return PropertyWrapper<NoAccessor, typename traits::FunctionType>(NoAccessor(), setter);
     }
 }
 

@@ -20,16 +20,17 @@ namespace en {
 
     public:
 
-        inline static void initializeEmptyMetatable(LuaState& lua) {
+        inline static void initializeMetatable(LuaState& lua) {
 
             getMetatable<T>(lua);
             lua_setmetatable(lua, -2);
 
-            lua_pushcfunction(lua, &lua::detail::indexFunction);
-            lua_setfield(lua, -2, "__index");
+            // Make it use the getters and setters of the metatable of the component type.
+            lua_pushnil(lua);
+            lua_setfield(lua, -2, "__getters");
 
-            lua_pushcfunction(lua, &lua::detail::newindexFunction);
-            lua_setfield(lua, -2, "__newindex");
+            lua_pushnil(lua);
+            lua_setfield(lua, -2, "__setters");
         }
 
         inline ComponentReference(EntityRegistry& registry, Entity entity) : m_registry(&registry), m_entity(entity) {
@@ -49,11 +50,17 @@ namespace en {
             return operator T*();
         }
 
+        friend inline bool operator==(const ComponentReference<T>& a, const ComponentReference<T>& b) {
+            return a.m_registry == b.m_registry && a.m_entity == b.m_entity;
+        }
+
     private:
 
         EntityRegistry* m_registry;
         Entity m_entity;
     };
+
+
 }
 
 #endif //SAXION_Y2Q2_RENDERING_COMPONENTREFERENCE_H

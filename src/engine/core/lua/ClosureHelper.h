@@ -156,12 +156,12 @@ namespace lua {
 
         if constexpr (std::is_void_v<TResult>) {
 
-            (*function)(std::get<TArgs>(arguments)...);
+            std::apply(function, arguments);
             return 0;
 
         } else {
 
-            pushResult(l, (*function)(std::get<TArgs>(arguments)...));
+            pushResult(l, std::apply(function, arguments));
             return 1;
         }
     }
@@ -173,17 +173,18 @@ namespace lua {
         auto memberFunction = *static_cast<memberFunctionPtr<TResult, TOwner, TArgs...>*>(userdataVoidPtr);
 
         auto* owner = (TOwner*)lua_touserdata(l, lua_upvalueindex(2));
+        auto function = std::bind(memberFunction, owner);
 
         std::tuple<TArgs...> arguments = readArgsFromStack<TArgs...>(l);
 
         if constexpr (std::is_void_v<TResult>) {
 
-            (*owner.*memberFunction)(std::get<TArgs>(arguments)...);
+            std::apply(function, arguments);
             return 0;
 
         } else {
 
-            pushResult(l, (*owner.*memberFunction)(std::get<TArgs>(arguments)...));
+            pushResult(l, std::apply(function, arguments));
             return 1;
         }
     }

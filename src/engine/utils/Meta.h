@@ -24,6 +24,34 @@ namespace utils {
 
     template<typename T>
     inline constexpr bool is_string_v = is_string<T>::value;
+
+    template<typename A, typename B = A, typename = void>
+    struct is_equatable : std::false_type {};
+
+    template<typename A, typename B>
+    struct is_equatable<A, B, std::void_t<decltype(std::declval<A>() == std::declval<B>())>> : std::true_type {};
+
+    template<typename A, typename B = A>
+    inline constexpr bool is_equatable_v = is_equatable<A, B>::value;
+
+    struct test {};
+    static_assert(!is_equatable_v<test>);
+
+    template<typename A, typename B = A, typename = void>
+    struct equalityComparer {
+
+        inline bool operator()(const A& a, const B& b) {
+            return false;
+        }
+    };
+
+    template<typename A, typename B>
+    struct equalityComparer<A, B, std::enable_if_t<is_equatable_v<A, B>>> {
+
+        inline bool operator()(const A& a, const B& b) {
+            return a == b;
+        }
+    };
 }
 
 #endif //SAXION_Y2Q2_RENDERING_META_H

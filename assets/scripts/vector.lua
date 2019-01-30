@@ -34,6 +34,66 @@ function Vector:add(other)
     return self
 end
 
+function Vector:sub(other)
+
+    self.x = self.x - other.x
+    self.y = self.y - other.y
+    self.z = self.z - other.z
+
+    return self
+end
+
+function Vector:mul(scalar)
+
+    self.x = self.x * scalar
+    self.y = self.y * scalar
+    self.z = self.z * scalar
+
+    return self
+end
+
+function Vector:div(scalar)
+
+    self.x = self.x / scalar
+    self.y = self.y / scalar
+    self.z = self.z / scalar
+
+    return self
+end
+
+function Vector:normalize()
+
+    local magnitude = Vector.magnitude(self)
+    if (magnitude > 0.0001) then
+        Vector.div(self, magnitude)
+    end
+
+    return self
+end
+
+function Vector:setMagnitude(magnitude)
+
+    Vector.normalize(self)
+    Vector.mul(self, magnitude)
+    return self
+end
+
+function Vector:truncate(maxMagnitude)
+
+    if Vector.sqrMagnitude(self) > maxMagnitude * maxMagnitude then
+        Vector.setMagnitude(self, maxMagnitude)
+    end
+
+    return self
+end
+
+function Vector:reflect(normal, bounciness)
+
+    bounciness = bounciness or 1
+
+    Vector.sub(self, Vector.__mul(normal, Vector.dot(self, normal)):mul(1 + bounciness))
+end
+
 function Vector.__add(a, b)
 
     return Vector:new {
@@ -70,6 +130,15 @@ function Vector.__mul(vec, scalar)
     }
 end
 
+function Vector.__unm(vec)
+
+    return Vector:new {
+        x = -vec.x,
+        y = -vec.y,
+        z = -vec.z
+    }
+end
+
 function Vector:dot(other)
     return self.x * other.x + self.y * other.y + self.z * other.z
 end
@@ -93,7 +162,12 @@ function Vector:normalized()
 end
 
 function Vector:distance(other)
-    return (self - other):magnitude()
+
+    return Vector.magnitude({
+        x = self.x - other.x,
+        y = self.y - other.y,
+        z = self.z - other.z
+    })
 end
 
 function Vector:getMoveTowardsDelta(other, maxAmount)

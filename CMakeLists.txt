@@ -44,14 +44,21 @@ find_package(lua 5.3 REQUIRED)
 include_directories(${LUA_INCLUDE_DIR})
 find_package(glm REQUIRED)
 find_package(GLEW REQUIRED)
-find_package(SFML 2.5 COMPONENTS audio graphics window system main REQUIRED)
+
+if(WIN32)
+    find_package(SFML 2.5 COMPONENTS audio graphics window system main REQUIRED)
+else()
+    find_package(SFML 2.5 COMPONENTS audio graphics window system REQUIRED)
+endif()
+
 link_directories(${SFML_LIBRARY_DIRS})
 
 if(WIN32)
 	set(LUALIB ${LUA_LIBRARIES})
+    set(SFMLLIB sfml-graphics sfml-audio sfml-window sfml-system sfml-main)
 else()
 	set(LUALIB lua)
+    set(SFMLLIB sfml-graphics sfml-audio sfml-window sfml-system)
 endif()
 
-# Hide the console window in visual studio projects
-target_link_libraries(Saxion_Y2Q2_Rendering ${LUALIB} glm ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} sfml-graphics sfml-audio sfml-window sfml-system sfml-main)
+target_link_libraries(Saxion_Y2Q2_Rendering ${LUALIB} glm ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} ${SFMLLIB})

@@ -5,6 +5,8 @@
 #ifndef SAXION_Y2Q2_RENDERING_FUNCTIONTRAITS_H
 #define SAXION_Y2Q2_RENDERING_FUNCTIONTRAITS_H
 
+#include <functional>
+
 namespace utils {
 
     template<class F>

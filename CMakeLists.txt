@@ -23,7 +23,12 @@ file(GLOB_RECURSE SOURCES "src/*.cpp")
 header_directories(INCLUDES)
 
 include_directories(${INCLUDES})
-add_executable(Saxion_Y2Q2_Rendering ${SOURCES})
+
+if(WIN32)
+	add_executable(Saxion_Y2Q2_Rendering WIN32 ${SOURCES})
+else()
+	add_executable(Saxion_Y2Q2_Rendering ${SOURCES})
+endif()
 
 find_package(OpenGL REQUIRED)
 include_directories(${OpenGL_INCLUDE_DIRS})
@@ -39,13 +44,14 @@ find_package(lua 5.3 REQUIRED)
 include_directories(${LUA_INCLUDE_DIR})
 find_package(glm REQUIRED)
 find_package(GLEW REQUIRED)
-find_package(SFML 2.5 COMPONENTS audio graphics window system REQUIRED)
+find_package(SFML 2.5 COMPONENTS audio graphics window system main REQUIRED)
 link_directories(${SFML_LIBRARY_DIRS})
 
-if (WIN32)
+if(WIN32)
 	set(LUALIB ${LUA_LIBRARIES})
 else()
 	set(LUALIB lua)
 endif()
 
-target_link_libraries(Saxion_Y2Q2_Rendering ${LUALIB} glm ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} sfml-graphics sfml-audio sfml-window sfml-system)
+# Hide the console window in visual studio projects
+target_link_libraries(Saxion_Y2Q2_Rendering ${LUALIB} glm ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} sfml-graphics sfml-audio sfml-window sfml-system sfml-main)

@@ -34,11 +34,12 @@ int main() {
         engine->addSystem<en::DestroySystem>();
     }
 
-    //engine->getSceneManager().setCurrentScene<TestScene>();
-    //engine->getSceneManager().setCurrentScene<LightingScene>();
-    //engine->getSceneManager().setCurrentScene<TerrainScene>();
+    //engine->getSceneManager().setCurrentScene<TestScene>(); // Assignment 2
+    //engine->getSceneManager().setCurrentScene<LightingScene>(); // Assignment 3
+    engine->getSceneManager().setCurrentScene<TerrainScene>(); // Assignment 4
+
     //engine->getSceneManager().setCurrentScene<LuaScene>("assets/scripts/luaScene.lua");
-    engine->getSceneManager().setCurrentScene<LuaScene>("assets/scripts/arena.lua");
+    //engine->getSceneManager().setCurrentScene<LuaScene>("assets/scripts/arena.lua");
     //engine->getSceneManager().setCurrentScene<LuaScene>("assets/scripts/stressTest.lua");
     //engine->getSceneManager().setCurrentScene<LuaScene>("assets/scripts/testComponent.lua");
 

@@ -6,8 +6,7 @@
 #include "Engine.h"
 #include "Transform.h"
 #include "Name.h"
-#include "ActorDecl.h"
-
+#include "LuaState.h"
 
 namespace en {
 

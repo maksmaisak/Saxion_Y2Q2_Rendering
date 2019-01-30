@@ -239,7 +239,7 @@ namespace lua {
 
         static void push(lua_State* L, const glm::vec3& value) {
 
-            lua_createtable(L, 0, 0);
+            lua_createtable(L, 0, 3);
 
             lua::push(L, value.x);
             lua_setfield(L, -2, "x");

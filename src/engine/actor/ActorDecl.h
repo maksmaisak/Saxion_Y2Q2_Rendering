@@ -8,13 +8,12 @@
 #include <type_traits>
 #include "Entity.h"
 #include "EntityRegistry.h"
-#include "MetatableHelper.h"
-#include "LuaState.h"
 
 namespace en {
 
     class Behavior;
     class Engine;
+    class LuaState;
 
     template<typename T>
     constexpr inline bool isBehavior = std::is_base_of<Behavior, T>::value;

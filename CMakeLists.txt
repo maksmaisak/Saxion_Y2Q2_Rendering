@@ -9,8 +9,8 @@ macro(header_directories return_list)
     set(${return_list} ${dir_list})
 endmacro()
 
-# vcpkg arguments for my machine. Modify if needed.
-# -DCMAKE_TOOLCHAIN_FILE=C:/Users/Maks/vcpkg/scripts/buildsystems/vcpkg.cmake -DVCPKG_TARGET_TRIPLET=x86-windows
+# vcpkg arguments.
+# -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake -DVCPKG_TARGET_TRIPLET=x86-windows
 
 cmake_minimum_required(VERSION 3.12)
 project(Saxion_Y2Q2_Rendering)

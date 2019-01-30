@@ -121,7 +121,7 @@ function scene.start()
     end
 
     local pi2 = math.pi * 2.0
-    for radius = 1,40,6 do
+    for radius = 2,41,6 do
         for theta = 0.0,pi2 - 0.001,pi2/8.0 do
 
             local position = {
@@ -143,7 +143,7 @@ function scene.start()
         Name = "Camera",
         Transform = {
             position = {0, 100, 0},
-            rotation = {-90, 0, 0}
+            rotation = {-90, 0, 0 }
         },
         Camera = {},
         CameraOrbitBehavior = {
@@ -161,17 +161,17 @@ function scene.start()
             kind = "DIRECTIONAL"
         },
         Transform = {
-            rotation = { -20, 0, 0},
+            rotation = {-20, 0, 0},
         }
     }
 
     Game.makeActor {
         Name = "PointLight",
         Light = {
-            intensity = 2
+            intensity = 20
         },
         Transform = {
-            position = {0, 2, 0}
+            position = {0, 0, 0}
         }
     }
 end

@@ -74,7 +74,7 @@ namespace en {
         }
 
         std::string debugInfo = std::string("FPS:") + std::to_string((int) m_engine->getFps()) + "\n";
-        //std::cout << debugInfo;
+        std::cout << debugInfo;
         if ((m_engine->getWindow().getSettings().attributeFlags & sf::ContextSettings::Core) == 0) {
             m_debugHud->setDebugInfo(debugInfo);
             m_debugHud->draw();

@@ -230,11 +230,15 @@ namespace lua {
 
         static glm::vec3 to(lua_State* L, int index = -1) {
 
-            return {
+            glm::vec3 result = {
                 tryGetValue(L, "x", "r", 1),
                 tryGetValue(L, "y", "g", 2),
                 tryGetValue(L, "z", "b", 3)
             };
+
+            //std::cout << "received: (" << result.x << ", " << result.y << ", " << result.z << ")\n";
+
+            return result;
         }
 
         static void push(lua_State* L, const glm::vec3& value) {

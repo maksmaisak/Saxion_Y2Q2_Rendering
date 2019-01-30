@@ -37,7 +37,8 @@ void PhysicsSystem::update(float dt) {
 
             bool didCollide;
             std::tie(didCollide, moveTime) = move(entity, tf, rb, moveTime, entities);
-            if (didCollide) continue;
+            if (didCollide)
+                continue;
 
             break;
         }

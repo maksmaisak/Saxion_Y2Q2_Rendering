@@ -30,24 +30,8 @@ local function getAcceleration(i, boid, acceleration)
 
             local delta = otherPosition - position
             local sqrDistance = delta:sqrMagnitude()
-
-            --local delta = {
-            --    x = otherPosition.x - position.x,
-            --    y = otherPosition.y - position.y,
-            --    z = otherPosition.z - position.z
-            --}
-            --local sqrDistance = delta.x ^ 2 + delta.y ^ 2 + delta.z ^ 2
-
             if (sqrDistance > 0.01) then
-                local distance = math.sqrt(sqrDistance)
-                local direction = {
-                    x = delta.x / distance,
-                    y = delta.y / distance,
-                    z = delta.z / distance
-                }
-                acceleration.x = acceleration.x + direction.x / sqrDistance
-                acceleration.y = acceleration.y + direction.y / sqrDistance
-                acceleration.z = acceleration.z + direction.z / sqrDistance
+                acceleration:add(delta:normalized() / sqrDistance);
             end
 
             --separation
@@ -151,12 +135,6 @@ function scene.update(dt)
         --print("setting:", newVelocity)
         rb.velocity = newVelocity
         --print("set: ", rb.velocity.x, rb.velocity.y, rb.velocity.z)
-
-        --boid.velocity:add(acceleration * dt)
-        --boid.transform.position = Vector.from(boid.transform.position):add(boid.velocity * dt)
-        --print(Vector.from(boid.actor:get("Transform").position))
-
-        --print(rb.velocity.x, rb.velocity.y, rb.velocity.z)
     end
 end
 

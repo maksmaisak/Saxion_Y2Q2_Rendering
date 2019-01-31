@@ -80,8 +80,14 @@ namespace lua {
         template<typename TResult, typename... TArgs>
         static inline int callStdFunction(lua_State* l);
 
+        template<typename F, typename... TArgs>
+        static inline int callWithArgsFromStackAndPushResult(lua_State* l, F&& f, utils::types<TArgs...>, int startIndex = 1);
+
+        template<typename F, typename... TArgs>
+        static inline decltype(auto) callWithArgsFromStack(lua_State* l, F&& f, int startIndex = 1);
+
         template<typename... TArgs>
-        static inline std::tuple<TArgs...> readArgsFromStack(lua_State* l, int startIndex = 1);
+        static inline decltype(auto) readArgsFromStack(lua_State* l, int startIndex = 1);
 
         template<typename TResult>
         static inline void pushResult(lua_State* l, const TResult& result);
@@ -132,38 +138,14 @@ namespace lua {
 
         void* voidPtr = lua_touserdata(l, lua_upvalueindex(1));
         auto& function = *static_cast<std::function<TResult(TArgs...)>*>(voidPtr);
-
-        std::tuple<TArgs...> arguments = readArgsFromStack<TArgs...>(l);
-
-        if constexpr (std::is_void_v<TResult>) {
-
-            std::apply(function, arguments);
-            return 0;
-
-        } else {
-
-            pushResult(l, std::apply(function, arguments));
-            return 1;
-        }
+        return callWithArgsFromStackAndPushResult(l, std::forward<std::function<TResult(TArgs...)>>(function), utils::types<TArgs...>{});
     }
 
     template<typename TResult, typename... TArgs>
     int ClosureHelper::call(lua_State* l) {
 
         auto* function = (functionPtr<TResult, TArgs...>)lua_touserdata(l, lua_upvalueindex(1));
-
-        std::tuple<TArgs...> arguments = readArgsFromStack<TArgs...>(l);
-
-        if constexpr (std::is_void_v<TResult>) {
-
-            std::apply(function, arguments);
-            return 0;
-
-        } else {
-
-            pushResult(l, std::apply(function, arguments));
-            return 1;
-        }
+        return callWithArgsFromStackAndPushResult(l, function, utils::types<TArgs...>{});
     }
 
     template<typename TResult, typename TOwner, typename... TArgs>
@@ -171,22 +153,10 @@ namespace lua {
 
         void* userdataVoidPtr = lua_touserdata(l, lua_upvalueindex(1));
         auto memberFunction = *static_cast<memberFunctionPtr<TResult, TOwner, TArgs...>*>(userdataVoidPtr);
-
         auto* owner = (TOwner*)lua_touserdata(l, lua_upvalueindex(2));
-        auto function = std::bind(memberFunction, owner);
 
-        std::tuple<TArgs...> arguments = readArgsFromStack<TArgs...>(l);
-
-        if constexpr (std::is_void_v<TResult>) {
-
-            std::apply(function, arguments);
-            return 0;
-
-        } else {
-
-            pushResult(l, std::apply(function, arguments));
-            return 1;
-        }
+        std::function<TResult(TArgs...)> function = std::bind(memberFunction, owner);
+        return callWithArgsFromStackAndPushResult(l, function, utils::types<TArgs...>{});
     }
 
     template<typename TResult, typename TOwner, typename... TArgs>
@@ -202,20 +172,8 @@ namespace lua {
             owner = static_cast<TOwner*>(lua_touserdata(l, 1));
         }
 
-        auto function = std::bind(memberFunction, owner);
-
-        std::tuple<TArgs...> arguments = readArgsFromStack<TArgs...>(l, 2);
-
-        if constexpr (std::is_void_v<TResult>) {
-
-            std::apply(function, arguments);
-            return 0;
-
-        } else {
-
-            pushResult(l, std::apply(function, arguments));
-            return 1;
-        }
+        std::function<TResult(TArgs...)> function = std::bind(memberFunction, owner);
+        return callWithArgsFromStackAndPushResult(l, function, utils::types<TArgs...>{}, 2);
     }
 
     template<typename T>
@@ -229,21 +187,46 @@ namespace lua {
         return false;
     }
 
-    /// Reads the arguments from the stack.
-    /// Brace initialization {} argument evaluation order is guaranteed left to right.
-    /// Function call argument evaluation order is unspecified, so we can't just call a function with this pack expansion,
-    /// that might cause the i++ being evaluated in the wrong order, i.e. getting the arguments from the wrong indices.
-    /// So we put the arguments in a tuple first before calling the function.
-    template<typename... TArgs>
-    std::tuple<TArgs...> ClosureHelper::readArgsFromStack(lua_State* l, int startIndex) {
+    template<typename F, typename... TArgs>
+    int ClosureHelper::callWithArgsFromStackAndPushResult(lua_State* l, F&& f, utils::types<TArgs...>, int startIndex) {
 
-        {
-            int i = startIndex;
-            (checkArgType<TArgs>(l, i++), ...);
+        using traits = utils::functionTraits<utils::remove_cvref_t<F>>;
+        static_assert(traits::isFunction);
+
+        if constexpr (std::is_void_v<typename traits::Result>) {
+            callWithArgsFromStack<F, TArgs...>(l, std::forward<F>(f), startIndex);
+            return 0;
+        } else {
+            pushResult(l, callWithArgsFromStack<F, TArgs...>(l, std::forward<F>(f), startIndex));
+            return 1;
         }
+    }
 
-        int i = startIndex;
-        return {lua::to<TArgs>(l, i++)...};
+    template<typename F, typename... TArgs, std::size_t... I>
+    inline decltype(auto) callWithArgsFromStackImpl(lua_State* l, F&& f, int startIndex, std::index_sequence<I...>) {
+
+        (checkArgType<TArgs>(l, startIndex + (int) I), ...);
+        return f(lua::to<TArgs>(l, startIndex + (int) I)...);
+    }
+
+    template<typename F, typename... TArgs>
+    decltype(auto) ClosureHelper::callWithArgsFromStack(lua_State* l, F&& f, int startIndex) {
+
+        return callWithArgsFromStackImpl<F, TArgs...>(l, std::forward<F>(f), startIndex, std::make_index_sequence<sizeof...(TArgs)>{});
+    }
+
+    template<typename... TArgs, std::size_t... I>
+    decltype(auto) readArgsFromStackImpl(lua_State* l, int startIndex, std::index_sequence<I...>) {
+
+        (checkArgType<TArgs>(l, startIndex + (int)I), ...);
+        return std::forward_as_tuple(lua::to<TArgs>(l, startIndex + (int)I)...);
+    }
+
+    /// Reads the arguments from the stack.
+    template<typename... TArgs>
+    decltype(auto) ClosureHelper::readArgsFromStack(lua_State* l, int startIndex) {
+
+        return readArgsFromStackImpl<TArgs...>(l, startIndex, std::make_index_sequence<sizeof...(TArgs)>{});
     }
 
     template<typename TResult>

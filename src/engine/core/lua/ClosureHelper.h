@@ -86,11 +86,8 @@ namespace lua {
         template<typename F, typename... TArgs>
         static inline decltype(auto) callWithArgsFromStack(lua_State* l, F&& f, int startIndex = 1);
 
-        template<typename... TArgs>
-        static inline decltype(auto) readArgsFromStack(lua_State* l, int startIndex = 1);
-
         template<typename TResult>
-        static inline void pushResult(lua_State* l, const TResult& result);
+        static inline void pushResult(lua_State* l, TResult&& result);
     };
 
     template<typename F>
@@ -155,8 +152,9 @@ namespace lua {
         auto memberFunction = *static_cast<memberFunctionPtr<TResult, TOwner, TArgs...>*>(userdataVoidPtr);
         auto* owner = (TOwner*)lua_touserdata(l, lua_upvalueindex(2));
 
-        std::function<TResult(TArgs...)> function = std::bind(memberFunction, owner);
-        return callWithArgsFromStackAndPushResult(l, function, utils::types<TArgs...>{});
+        using F = std::function<TResult(TArgs...)>;
+        F function = std::bind(memberFunction, owner);
+        return callWithArgsFromStackAndPushResult(l, std::forward<F>(function), utils::types<TArgs...>{});
     }
 
     template<typename TResult, typename TOwner, typename... TArgs>
@@ -172,19 +170,9 @@ namespace lua {
             owner = static_cast<TOwner*>(lua_touserdata(l, 1));
         }
 
-        std::function<TResult(TArgs...)> function = std::bind(memberFunction, owner);
-        return callWithArgsFromStackAndPushResult(l, function, utils::types<TArgs...>{}, 2);
-    }
-
-    template<typename T>
-    inline bool checkArgType(lua_State* l, int index) {
-
-        if (lua::is<T>(l, index))
-            return true;
-
-        //std::cerr << "Invalid argument #" + std::to_string(index) + ": expected " + utils::demangle<T>() << std::endl;
-        luaL_error(l, "Invalid argument #%d: expected %s", index, utils::demangle<T>().c_str());
-        return false;
+        using F = std::function<TResult(TArgs...)>;
+        F function = std::bind(memberFunction, owner);
+        return callWithArgsFromStackAndPushResult(l, std::forward<F>(function), utils::types<TArgs...>{}, 2);
     }
 
     template<typename F, typename... TArgs>
@@ -202,11 +190,22 @@ namespace lua {
         }
     }
 
+    template<typename T>
+    inline bool checkArgType(lua_State* l, int index) {
+
+        if (lua::is<T>(l, index))
+            return true;
+
+        //std::cerr << "Invalid argument #" + std::to_string(index) + ": expected " + utils::demangle<T>() << std::endl;
+        luaL_error(l, "Invalid argument #%d: expected %s", index, utils::demangle<T>().c_str());
+        return false;
+    }
+
     template<typename F, typename... TArgs, std::size_t... I>
     inline decltype(auto) callWithArgsFromStackImpl(lua_State* l, F&& f, int startIndex, std::index_sequence<I...>) {
 
-        (checkArgType<TArgs>(l, startIndex + (int) I), ...);
-        return f(lua::to<TArgs>(l, startIndex + (int) I)...);
+        (checkArgType<TArgs>(l, startIndex + (int)I), ...);
+        return f(lua::to<TArgs>(l, startIndex + (int)I)...);
     }
 
     template<typename F, typename... TArgs>
@@ -215,23 +214,9 @@ namespace lua {
         return callWithArgsFromStackImpl<F, TArgs...>(l, std::forward<F>(f), startIndex, std::make_index_sequence<sizeof...(TArgs)>{});
     }
 
-    template<typename... TArgs, std::size_t... I>
-    decltype(auto) readArgsFromStackImpl(lua_State* l, int startIndex, std::index_sequence<I...>) {
-
-        (checkArgType<TArgs>(l, startIndex + (int)I), ...);
-        return std::forward_as_tuple(lua::to<TArgs>(l, startIndex + (int)I)...);
-    }
-
-    /// Reads the arguments from the stack.
-    template<typename... TArgs>
-    decltype(auto) ClosureHelper::readArgsFromStack(lua_State* l, int startIndex) {
-
-        return readArgsFromStackImpl<TArgs...>(l, startIndex, std::make_index_sequence<sizeof...(TArgs)>{});
-    }
-
     template<typename TResult>
-    void ClosureHelper::pushResult(lua_State* l, const TResult& result) {
-        lua::TypeAdapter<utils::remove_cvref_t<TResult>>::push(l, result);
+    void ClosureHelper::pushResult(lua_State* l, TResult&& result) {
+        lua::push(l, std::forward<TResult>(result));
     }
 }
 

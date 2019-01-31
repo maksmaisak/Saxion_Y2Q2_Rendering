@@ -5,9 +5,11 @@
 #ifndef SAXION_Y2Q2_RENDERING_META_H
 #define SAXION_Y2Q2_RENDERING_META_H
 
-#include "FunctionTraits.h"
-
 namespace utils {
+
+    /// An aide for automatic template parameter deduction.
+    template<typename... T>
+    struct types {};
 
     // T without const, volatile, & or &&
     // remove_cvref_t<const std::string&> is std::string
@@ -34,9 +36,6 @@ namespace utils {
     template<typename A, typename B = A>
     inline constexpr bool is_equatable_v = is_equatable<A, B>::value;
 
-    struct test {};
-    static_assert(!is_equatable_v<test>);
-
     template<typename A, typename B = A, typename = void>
     struct equalityComparer {
 
@@ -52,6 +51,59 @@ namespace utils {
             return a == b;
         }
     };
+
+    template<class F>
+    struct checkDeducibleSignature {
+
+        template<class G>
+        static auto test(int) -> decltype(&G::operator(), void());
+
+        struct dummy {};
+        template<class>
+        static auto test(...) -> dummy;
+
+        using type = std::is_void<decltype(test<utils::remove_cvref_t<F>>(0))>;
+    };
+
+    template<typename F>
+    struct hasDeducibleSignature : checkDeducibleSignature<F>::type {};
+
+    template<typename F>
+    inline constexpr bool hasDeducibleSignature_v = hasDeducibleSignature<F>::value;
+
+    template<typename TResult, typename TOwner, typename... TArgs>
+    struct functionTraitsBase {
+
+        inline static constexpr bool isFunction = true;
+
+        using Result = TResult;
+        using Owner  = TOwner;
+        using Signature = TResult(TArgs...);
+        using FunctionType = std::function<Signature>;
+    };
+
+    template<typename T, bool = hasDeducibleSignature_v<T>>
+    struct functionTraits {
+        inline static constexpr bool isFunction = false;
+    };
+
+    template<typename TResult, typename... Args>
+    struct functionTraits<TResult(*)(Args...), false> : functionTraitsBase<TResult, void, Args...> {};
+
+    template<typename TResult, typename TOwner, typename... Args>
+    struct functionTraits<TResult(TOwner::*)(Args...), false> : functionTraitsBase<TResult, TOwner, Args...> {};
+
+    template<typename TResult, typename... Args>
+    struct functionTraits<TResult(Args...), false> : functionTraitsBase<TResult, void, Args...> {};
+
+    template<typename TResult, typename TOwner, typename... Args>
+    struct functionTraits<TResult(TOwner::*)(Args...) const, false> : functionTraitsBase<TResult, TOwner, Args...> {};
+
+    template<typename TResult, typename... Args>
+    struct functionTraits<TResult(Args...) const, false> : functionTraitsBase<TResult, void, Args...> {};
+
+    template<typename F>
+    struct functionTraits<F, true> : functionTraits<typename functionTraits<decltype(&F::operator())>::Signature> {};
 }
 
 #endif //SAXION_Y2Q2_RENDERING_META_H

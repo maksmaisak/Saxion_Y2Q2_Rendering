@@ -50,16 +50,6 @@ namespace en {
 
     void Actor::initializeMetatable(LuaState& lua) {
 
-        lua.setField("getTransform", [](Actor& actor){
-            auto* ptr = actor.tryGet<Transform>();
-            return ptr ? std::make_optional(ptr) : std::nullopt;
-        });
-
-        lua.setField("getName", [](Actor& actor){
-            Name* ptr = actor.tryGet<Name>();
-            return ptr ? std::make_optional(ptr->value) : std::nullopt;
-        });
-
         lua.setField("get", &pushByTypeName);
         lua.setField("add", &addByTypeName);
         lua.setField("destroy", &Actor::destroy);

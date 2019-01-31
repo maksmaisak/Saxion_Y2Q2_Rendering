@@ -86,6 +86,12 @@ namespace lua {
         template<typename F, typename... TArgs>
         static inline decltype(auto) callWithArgsFromStack(lua_State* l, F&& f, int startIndex = 1);
 
+        template<typename F, typename... TArgs, std::size_t... I>
+        static inline decltype(auto) callWithArgsFromStackImpl(lua_State* l, F&& f, int startIndex, std::index_sequence<I...>);
+
+        template<typename T>
+        static inline bool checkArgType(lua_State* l, int index);
+
         template<typename TResult>
         static inline void pushResult(lua_State* l, TResult&& result);
     };
@@ -190,19 +196,8 @@ namespace lua {
         }
     }
 
-    template<typename T>
-    inline bool checkArgType(lua_State* l, int index) {
-
-        if (lua::is<T>(l, index))
-            return true;
-
-        //std::cerr << "Invalid argument #" + std::to_string(index) + ": expected " + utils::demangle<T>() << std::endl;
-        luaL_error(l, "Invalid argument #%d: expected %s", index, utils::demangle<T>().c_str());
-        return false;
-    }
-
     template<typename F, typename... TArgs, std::size_t... I>
-    inline decltype(auto) callWithArgsFromStackImpl(lua_State* l, F&& f, int startIndex, std::index_sequence<I...>) {
+    decltype(auto) ClosureHelper::callWithArgsFromStackImpl(lua_State* l, F&& f, int startIndex, std::index_sequence<I...>) {
 
         (checkArgType<TArgs>(l, startIndex + (int)I), ...);
         return f(lua::to<TArgs>(l, startIndex + (int)I)...);
@@ -212,6 +207,17 @@ namespace lua {
     decltype(auto) ClosureHelper::callWithArgsFromStack(lua_State* l, F&& f, int startIndex) {
 
         return callWithArgsFromStackImpl<F, TArgs...>(l, std::forward<F>(f), startIndex, std::make_index_sequence<sizeof...(TArgs)>{});
+    }
+
+    template<typename T>
+    bool ClosureHelper::checkArgType(lua_State* l, int index) {
+
+        if (lua::is<T>(l, index))
+            return true;
+
+        //std::cerr << "Invalid argument #" + std::to_string(index) + ": expected " + utils::demangle<T>() << std::endl;
+        luaL_error(l, "Invalid argument #%d: expected %s", index, utils::demangle<T>().c_str());
+        return false;
     }
 
     template<typename TResult>

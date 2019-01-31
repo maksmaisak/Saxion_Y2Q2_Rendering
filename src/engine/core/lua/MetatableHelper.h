@@ -25,6 +25,13 @@ namespace lua {
         /// Try using a property setter from __setters, otherwise just rawset it
         int newindexFunction(lua_State* L);
 
+        template<typename T>
+        int onBeforeGarbageCollection(lua_State* L) {
+
+            if constexpr (std::is_reference_v<decltype(lua::check<T>(std::declval<lua_State*>()))>)
+                lua::check<T>().~T();
+        }
+
         using InitializeMetatableFunction = std::function<void(en::LuaState&)>;
         using InitializeEmptyMetatableFunction = std::function<void(en::LuaState&)>;
 
@@ -70,7 +77,7 @@ namespace lua {
                 }
 
                 // TODO Set __gc for userdata metatables
-                //lua.setField("__gc", [](T& value){value.~T();});
+                //lua.setField("__gc", onBeforeGarbageCollection<T>);
 
                 InitializeMetatableFunctionOf<T>::initializeMetatable(lua);
             }

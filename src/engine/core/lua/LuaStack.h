@@ -93,10 +93,10 @@ namespace lua {
     inline bool is(lua_State* L, int index = -1) {return TypeAdapter<utils::remove_cvref_t<T>>::is(L, index);}
 
     template<typename T>
-    inline T to(lua_State* L, int index = -1) {return TypeAdapter<utils::remove_cvref_t<T>>::to(L, index);}
+    inline decltype(auto) to(lua_State* L, int index = -1) {return TypeAdapter<utils::remove_cvref_t<T>>::to(L, index);}
 
     template<typename T>
-    inline T check(lua_State* L, int index = -1) {return TypeAdapter<utils::remove_cvref_t<T>>::check(L, index);}
+    inline decltype(auto) check(lua_State* L, int index = -1) {return TypeAdapter<utils::remove_cvref_t<T>>::check(L, index);}
 
     template<typename T>
     inline std::optional<T> tryGet(lua_State* L) {

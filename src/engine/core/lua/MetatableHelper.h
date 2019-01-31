@@ -70,6 +70,7 @@ namespace lua {
                 }
 
                 // TODO Set __gc for userdata metatables
+                //lua.setField("__gc", [](T& value){value.~T();});
 
                 InitializeMetatableFunctionOf<T>::initializeMetatable(lua);
             }

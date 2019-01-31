@@ -49,10 +49,13 @@ namespace en {
 
     bool Entities::contains(Entity entity) const {
 
-        assert(entity != nullEntity);
+        if (entity == nullEntity)
+            return false;
 
         const auto id = getId(entity);
-        if (id >= m_entities.size()) return false;
+        if (id >= m_entities.size())
+            return false;
+
         return m_entities[id] == entity;
     }
 }

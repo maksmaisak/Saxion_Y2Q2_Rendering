@@ -202,16 +202,18 @@ namespace lua {
             owner = static_cast<TOwner*>(lua_touserdata(l, 1));
         }
 
+        auto function = std::bind(memberFunction, owner);
+
         std::tuple<TArgs...> arguments = readArgsFromStack<TArgs...>(l, 2);
 
         if constexpr (std::is_void_v<TResult>) {
 
-            std::apply([=](auto&&... args){(*owner.*memberFunction)(args...);}, arguments);
+            std::apply(function, arguments);
             return 0;
 
         } else {
 
-            pushResult(l, std::apply([=](auto&&... args){return (*owner.*memberFunction)(args...);}, arguments));
+            pushResult(l, std::apply(function, arguments));
             return 1;
         }
     }

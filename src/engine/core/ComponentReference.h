@@ -18,7 +18,6 @@ namespace en {
     template<typename T>
     class ComponentReference {
 
-
     public:
 
         inline static void initializeMetatable(LuaState& lua) {
@@ -40,15 +39,25 @@ namespace en {
         }
 
         inline operator T&() {
-            return *m_registry->tryGet<T>(m_entity);
+            return checkValid(), *m_registry->tryGet<T>(m_entity);
         }
 
         inline operator T*() {
-            return m_registry->tryGet<T>(m_entity);
+            return checkValid(), m_registry->tryGet<T>(m_entity);
         }
 
         inline T* operator->() {
             return operator T*();
+        }
+
+        inline operator bool() {
+            return m_registry && m_registry->isAlive(m_entity);
+        }
+
+        inline void checkValid() {
+
+            if (!operator bool())
+                throw "This ComponentReference to " + utils::demangle<T>() + "is invalid";
         }
 
         friend inline bool operator==(const ComponentReference<T>& a, const ComponentReference<T>& b) {

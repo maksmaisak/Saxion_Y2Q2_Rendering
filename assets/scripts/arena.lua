@@ -4,10 +4,24 @@
 -- Time: 17:28
 --
 
+--Game.makeMaterial("cubeMaterial", {
+--    diffuse = "textures/container/diffuse.png",
+--    specular = "textures/container/specular.png",
+--    shininess = 100
+--})
+--
+--Game.makeMaterial("planeMaterial", {
+--    shininess = 10
+--})
+
 local cubeMaterial = {
     diffuse = "textures/container/diffuse.png",
     specular = "textures/container/specular.png",
     shininess = 100
+}
+
+local planeMaterial = {
+    shininess = 10
 }
 
 local scenery = {
@@ -19,10 +33,8 @@ local scenery = {
         },
         RenderInfo = {
             mesh = "models/plane.obj",
-            material = {
-                shininess = 10
-            }
-        },
+            material = planeMaterial
+        }
     },
     {
         Name = "DirectionalLight",
@@ -34,7 +46,7 @@ local scenery = {
         },
         Transform = {
             rotation = { -20, 0, 0},
-        },
+        }
     },
     {
         Name = "PointLight",

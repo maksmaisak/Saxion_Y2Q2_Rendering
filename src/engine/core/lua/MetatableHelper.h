@@ -28,8 +28,12 @@ namespace lua {
         template<typename T>
         int onBeforeGarbageCollection(lua_State* L) {
 
-            if constexpr (std::is_reference_v<decltype(lua::check<T>(std::declval<lua_State*>()))>)
-                lua::check<T>().~T();
+            if constexpr (std::is_reference_v<decltype(lua::check<T>(std::declval<lua_State*>(), 1))>) {
+                //std::cout << "Garbage collection: " << utils::demangle<T>() << std::endl;
+                lua::check<T>(L, 1).~T();
+            }
+
+            return 0;
         }
 
         using InitializeMetatableFunction = std::function<void(en::LuaState&)>;
@@ -77,7 +81,7 @@ namespace lua {
                 }
 
                 // TODO Set __gc for userdata metatables
-                //lua.setField("__gc", onBeforeGarbageCollection<T>);
+                lua.setField("__gc", &onBeforeGarbageCollection<T>);
 
                 InitializeMetatableFunctionOf<T>::initializeMetatable(lua);
             }

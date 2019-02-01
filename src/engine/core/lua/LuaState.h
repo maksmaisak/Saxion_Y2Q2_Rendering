@@ -73,7 +73,7 @@ namespace en {
             tableIndex = lua_absindex(L, tableIndex);
             luaL_checktype(L, tableIndex, LUA_TTABLE);
 
-            if constexpr (utils::functionTraits<utils::remove_cvref_t<T>>::isFunction && !std::is_same_v<lua_CFunction, T>) {
+            if constexpr (utils::functionTraits<utils::remove_cvref_t<T>>::isFunction && !std::is_convertible_v<T, lua_CFunction>) {
                 ClosureHelper::makeClosure(L, std::forward<T>(value));
             } else {
                 lua::push(L, std::forward<T>(value));
@@ -92,6 +92,9 @@ namespace en {
 
             lua_setfield(L, tableIndex, name.c_str());
         }
+
+        template<typename T>
+        inline decltype(auto) get() {return lua::get<T>(L);}
 
         /// Pops and returns the value on top of the stack.
         template<typename T>

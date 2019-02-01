@@ -17,7 +17,22 @@
 
 namespace lua {
 
-    /// TOOD Move the implementation of non-templates like this into a .cpp file
+    /// TODO Move the implementation of non-templates like this into a .cpp file
+    inline std::string getAsString(lua_State* L, int index = -1) {
+
+        int typeId = lua_type(L, index);
+        switch (typeId) {
+            case LUA_TSTRING:
+                return std::string("\"") + lua_tostring(L, index) + "\"";
+            case LUA_TBOOLEAN:
+                return lua_toboolean(L, index) ? "true" : "false";
+            case LUA_TNUMBER:
+                return std::to_string(lua_tonumber(L, index));
+            default:
+                return lua_typename(L, typeId);
+        }
+    }
+
     inline void stackDump(lua_State *L) {
 
         int i = lua_gettop(L);
@@ -64,7 +79,6 @@ namespace lua {
             T* valuePtr = new(ptr) T(value); // copy-construct in place.
 
             getMetatable<T>(L);
-
             lua_setmetatable(L, -2);
         }
 
@@ -87,7 +101,7 @@ namespace lua {
     };
 
     template<typename T>
-    inline void push(lua_State* L, const T& value) {TypeAdapter<utils::remove_cvref_t<T>>::push(L, value);}
+    inline void push(lua_State* L, T&& value) {TypeAdapter<utils::remove_cvref_t<T>>::push(L, std::forward<T>(value));}
 
     template<typename T>
     inline bool is(lua_State* L, int index = -1) {return TypeAdapter<utils::remove_cvref_t<T>>::is(L, index);}
@@ -97,6 +111,13 @@ namespace lua {
 
     template<typename T>
     inline decltype(auto) check(lua_State* L, int index = -1) {return TypeAdapter<utils::remove_cvref_t<T>>::check(L, index);}
+
+    template<typename T>
+    inline decltype(auto) get(lua_State* L) {
+
+        auto p = PopperOnDestruct(L); // pop when the function returns
+        return to<T>(L);
+    }
 
     template<typename T>
     inline std::optional<T> tryGet(lua_State* L) {

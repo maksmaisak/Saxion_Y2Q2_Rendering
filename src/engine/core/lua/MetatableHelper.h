@@ -50,10 +50,8 @@ namespace lua {
 
             inline static void initializeMetatable(en::LuaState& lua) {
 
-                using TComponent = std::remove_pointer_t<utils::remove_cvref_t<T>>;
-
                 int oldTop = lua_gettop(lua);
-                TComponent::initializeMetatable(lua);
+                std::remove_pointer_t<utils::remove_cvref_t<T>>::initializeMetatable(lua);
                 int newTop = lua_gettop(lua);
                 assert(oldTop == newTop);
             }

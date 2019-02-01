@@ -4,7 +4,11 @@
 -- Time: 18:25
 --
 
+require('assets/scripts/vector')
+
 local scene = {}
+
+local tf
 
 function scene.start()
 
@@ -36,13 +40,17 @@ function scene.start()
     }
 
     local get = cube.get
-    local tf = get(cube, "Transform")
+    tf = get(cube, "Transform")
     local position = tf.position
     local x = position.x
     print("get:", get)
     print("tf:", tf)
     print("position:", position)
     print("x:", x)
+end
+
+function scene.update(dt)
+    tf.position = Vector.from {0, dt, 0} + tf.position
 end
 
 return scene

@@ -115,7 +115,9 @@ namespace en {
     template<typename TComponent>
     TComponent* ComponentPool<TComponent>::tryGet(en::Entity entity) {
 
-        if (!contains(entity)) return nullptr;
+        if (!contains(entity))
+            return nullptr;
+
         return &m_indexToComponent[m_entityIdToIndex[getId(entity)]];
     }
 

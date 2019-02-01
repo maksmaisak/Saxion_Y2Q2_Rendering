@@ -27,6 +27,9 @@ namespace lua {
             }
         }
 
+        // TODO Change the way properties work. Right now getting things from a ComponentReference is really inefficient,
+        // Because it also looks up __getters using this indexFunction too, instead of more directly.
+
         /// The __index function: (table, key) -> value
         /// Try using a property getter from __getters, otherwise look it up in the metatable
         int indexFunction(lua_State* L) {
@@ -70,18 +73,23 @@ namespace lua {
         }
 
         /// The __index function: (table, key, value) -> ()
-        /// Try using a property setter from __setters, otherwise just rawset it
+        /// Try using a property setter from __setters,
+        /// then try just rawsetting it, if assigning to a table,
+        /// otherwise look up the __newindex function of the metatable's metatable and use that.
+        /// That last one's for component reference
         int newindexFunction(lua_State* L) {
 
             luaL_checkany(L, 1); // table or userdata
             luaL_checkany(L, 2); // key
             luaL_checkany(L, 3); // value
 
+            std::string keyAsString = getAsString(L, 2);
+
             bool hasMetatable = lua_getmetatable(L, 1) == 1;
             assert(hasMetatable);
 
             // get a property setter from metatable.__setter
-            lua_getfield(L, -1, "__setters");
+            lua_getfield(L, 4, "__setters");
             lua_pushvalue(L, 2);
             lua_gettable(L, -2);
 
@@ -113,7 +121,7 @@ namespace lua {
                 if (lua_iscfunction(L, -1) && lua_tocfunction(L, -1) == &newindexFunction)
                     return 0;
 
-                //std::cout << "Setting with the __newindex function of the metatable of the metatable: " << getAsString(L, 2) << ", " << getAsString(L, 3) << std::endl;
+                std::cout << "Setting with the __newindex function of the metatable of the metatable: " << getAsString(L, 2) << ", " << getAsString(L, 3) << std::endl;
 
                 lua_pushvalue(L, 1); // table
                 lua_pushvalue(L, 2); // key

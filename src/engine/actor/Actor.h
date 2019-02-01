@@ -27,9 +27,7 @@ namespace en {
         } else {
 
             m_engine->ensureBehaviorSystem<TComponent>();
-            auto& behavior = m_registry->add<TComponent>(m_entity, *this, std::forward<Args>(args)...);
-            behavior.start();
-            return behavior;
+            return m_registry->add<TComponent>(m_entity, *this, std::forward<Args>(args)...);
         }
     }
 }

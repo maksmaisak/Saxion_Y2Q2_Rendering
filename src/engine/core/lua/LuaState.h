@@ -93,6 +93,9 @@ namespace en {
             lua_setfield(L, tableIndex, name.c_str());
         }
 
+        template<typename T>
+        inline decltype(auto) get() {return lua::get<T>(L);}
+
         /// Pops and returns the value on top of the stack.
         template<typename T>
         inline std::optional<T> tryGet() {return lua::tryGet<T>(L);}

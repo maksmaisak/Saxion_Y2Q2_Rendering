@@ -70,9 +70,6 @@ local player1
 local player2
 local cameraTransform
 
-local makePlayerAI_A = require("./assets/scripts/playerAI_A")
-local makePlayerAI_B = require("./assets/scripts/playerAI_B")
-
 local scene = {}
 
 local function makeBorders(sideLength)
@@ -116,10 +113,10 @@ function scene.start()
     Game.makeActors(scenery)
     makeBorders(20)
 
-    local function makePlayer(name, position)
+    local function makePlayer(name, position, ai)
 
         name = name or "unnamed"
-        position = position or {0,0,0}
+        position = position or {0, 0, 0}
 
         return Game.makeActor {
             Name = name,
@@ -134,12 +131,17 @@ function scene.start()
             Rigidbody = {
                 isKinematic = true,
                 useGravity = false
-            }
+            },
+            LuaBehavior = ai
         }
     end
 
-    local player1Actor = makePlayer("Player1", {5, 0, -5})
-    local player2Actor = makePlayer("Player2", {-5, 0, 5})
+    player1 = makePlayer("Player1", {5, 0, -5}, "assets/scripts/playerAI_A.lua")
+    player2 = makePlayer("Player2", {-5, 0, 5}, "assets/scripts/playerAI_B.lua")
+
+    -- TODO This doesn't assign to the underlying table here
+    player1:get("LuaBehavior").enemy = player2
+    player2:get("LuaBehavior").enemy = player1
 
     local camera = Game.makeActor {
         Name = "Camera",
@@ -150,19 +152,6 @@ function scene.start()
         Camera = {}
     }
     cameraTransform = camera:get("Transform")
-
-    player1 = makePlayerAI_A {
-        actor = player1Actor,
-        enemy = player2Actor
-    }
-
-    player2 = makePlayerAI_B {
-        actor = player2Actor,
-        enemy = player1Actor
-    }
-
-    player1:start()
-    player2:start()
 end
 
 function scene.update(dt)
@@ -170,18 +159,15 @@ function scene.update(dt)
     Game.find("PointLight"):get("Light").intensity = math.sin(Game.getTime()) ^ 2
     --Game.find("DirectionalLight"):get("Transform"):rotate(60 * dt, 1, 0, 0)
 
-    if (player1.actor.isValid) then player1:update(dt) end
-    if (player2.actor.isValid) then player2:update(dt) end
-
-    local position1 = player1.actor.isValid and player1.actor:get("Transform").position or {x = 0, y = 0, z = 0}
-    local position2 = player2.actor.isValid and player2.actor:get("Transform").position or {x = 0, y = 0, z = 0}
+    local position1 = player1.isValid and player1:get("Transform").position or {x = 0, y = 0, z = 0}
+    local position2 = player2.isValid and player2:get("Transform").position or {x = 0, y = 0, z = 0}
     cameraTransform.position = {
         (position1.x + position2.x) * 0.5,
         cameraTransform.position.y,
         (position1.z + position2.z) * 0.5
     }
 
-    if (not player1.actor.isValid or not player2.actor.isValid) then
+    if (not player1.isValid or not player2.isValid) then
         Game.loadScene("scripts/arena.lua")
     end
 end

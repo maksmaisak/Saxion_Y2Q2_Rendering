@@ -132,28 +132,32 @@ void ComponentsToLua::makeComponent(lua_State* L, Actor& actor, const std::strin
         std::cout << "Unknown component type: " << componentTypeName << std::endl;
         return;
     }
+    TypeInfo& typeInfo = it->second;
 
     int oldTop = lua_gettop(L);
+
     lua_pushvalue(L, componentValueIndex);
     LuaState stateWrapper = LuaState(L);
-    it->second.addFromLua(actor, stateWrapper);
-    lua_pop(L, 1);
+    typeInfo.addFromLua(actor, stateWrapper);
+    lua_pop(L, 1); // pop the component definition
+
     int newTop = lua_gettop(L);
     assert(oldTop == newTop);
 
-    if (!lua_istable(L, -1)) return;
+    if (lua_istable(L, -1)) {
 
-    // TODO make the addFromLua function push the component pointer onto the stack to avoid a second string lookup here.
-    pushComponentPointerFromActorByTypeName(L, actor, componentTypeName);
-    auto popComponentPointer = PopperOnDestruct(L);
-    int componentPointerIndex = lua_gettop(L);
+        // TODO make the addFromLua function push the component pointer onto the stack to avoid a second string lookup here.
+        pushComponentPointerFromActorByTypeName(L, actor, componentTypeName);
+        auto popComponentPointer = PopperOnDestruct(L);
+        int componentPointerIndex = lua_gettop(L);
 
-    lua_pushnil(L);
-    while (lua_next(L, componentValueIndex)) {
+        lua_pushnil(L);
+        while (lua_next(L, componentValueIndex)) {
 
-        auto popValue = PopperOnDestruct(L);
-        lua_pushvalue(L, -2);
-        lua_pushvalue(L, -2);
-        lua_settable(L, componentPointerIndex);
+            auto popValue = PopperOnDestruct(L);
+            lua_pushvalue(L, -2);
+            lua_pushvalue(L, -2);
+            lua_settable(L, componentPointerIndex);
+        }
     }
 }

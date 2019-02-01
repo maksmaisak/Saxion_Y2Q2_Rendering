@@ -114,29 +114,30 @@ namespace en {
             return;
         }
 
-        LuaComponentFactoryFunction addFromLua = detail::LuaComponentFactoryFunctionOf<T>::get();
-        PushComponentFromActorFunction pushFromActor = [](Actor& actor, LuaState& lua) {
+        TypeInfo& entry = map[name] = {};
 
-            T* componentPtr = actor.tryGet<T>();
-            if (componentPtr)
+        entry.addFromLua = detail::LuaComponentFactoryFunctionOf<T>::get();
+
+        if (!std::is_pointer_v<T>) {
+
+            entry.pushFromActor = [](Actor& actor, LuaState& lua) {
+
+                T* componentPtr = actor.tryGet<T>();
+                if (componentPtr)
+                    lua::push(lua, ComponentReference<T>(actor.getEngine().getRegistry(), actor));
+                else
+                    lua_pushnil(lua);
+            };
+
+            entry.addToActor = [](Actor& actor, LuaState& lua) {
+
+                if (actor.tryGet<T>())
+                    luaL_error(lua, "Actor %s already has a component of type %s", actor.getName().c_str(), utils::demangle<T>().c_str());
+
+                actor.add<T>();
                 lua::push(lua, ComponentReference<T>(actor.getEngine().getRegistry(), actor));
-            else
-                lua_pushnil(lua);
-        };
-        AddComponentToActorFunction addToActor = [](Actor& actor, LuaState& lua)  {
-
-            if (actor.tryGet<T>())
-                luaL_error(lua, "Actor %s already has a component of type %s", actor.getName().c_str(), utils::demangle<T>().c_str());
-
-            actor.add<T>();
-            lua::push(lua, ComponentReference<T>(actor.getEngine().getRegistry(), actor));
-        };
-
-        getNameToTypeInfoMap()[name] = {
-            std::move(addFromLua),
-            std::move(pushFromActor),
-            std::move(addToActor)
-        };
+            };
+        }
     }
 }
 

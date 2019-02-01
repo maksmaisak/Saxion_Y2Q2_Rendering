@@ -21,6 +21,15 @@ function Vector:set(source)
     return self
 end
 
+function Vector:reset()
+
+    self.x = 0
+    self.y = 0
+    self.z = 0
+
+    return self
+end
+
 function Vector:__tostring()
     return "("..self.x..", "..self.y..", "..self.z..")";
 end
@@ -94,6 +103,19 @@ function Vector:reflect(normal, bounciness)
     Vector.sub(self, Vector.__mul(normal, Vector.dot(self, normal)):mul(1 + bounciness))
 end
 
+function Vector:doCross(other)
+
+    local x = self.y * other.z - self.z * other.y
+    local y = self.z * other.x - self.x * other.z
+    local z = self.x * other.y - self.y * other.x
+
+    self.x = x
+    self.y = y
+    self.z = z
+
+    return self
+end
+
 function Vector.__add(a, b)
 
     return Vector:new {
@@ -141,6 +163,10 @@ end
 
 function Vector:dot(other)
     return self.x * other.x + self.y * other.y + self.z * other.z
+end
+
+function Vector.cross(a, b)
+    return Vector.from(a):doCross(b)
 end
 
 function Vector:sqrMagnitude()

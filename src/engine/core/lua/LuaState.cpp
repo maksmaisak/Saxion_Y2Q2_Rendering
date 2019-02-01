@@ -30,27 +30,50 @@ bool LuaState::loadFile(const std::string& filename) {
     return true;
 }
 
-bool LuaState::pcall(int numArgs, int numResults, int messageHandlerIndex) {
+int errorMessageHandler(lua_State* L) {
 
-    int errorCode = lua_pcall(L, numArgs, numResults, messageHandlerIndex);
-    if (errorCode != LUA_OK) {
-        printError();
+    luaL_traceback(L, L, lua_tostring(L, 1), 1);
+    return 1;
+}
+
+bool LuaState::pcall(int numArgs, int numResults) {
+
+    // put the error message handler before the function and its arguments
+    push(&errorMessageHandler);
+    int errorMessageHandlerIndex = -(1 + (1 + numArgs));
+    lua_insert(L, errorMessageHandlerIndex);
+    errorMessageHandlerIndex = lua_absindex(L, errorMessageHandlerIndex);
+
+    try {
+
+        int errorCode = lua_pcall(L, numArgs, numResults, errorMessageHandlerIndex);
+        if (errorCode != LUA_OK) {
+            printError();
+            lua_remove(L, errorMessageHandlerIndex); // TODO Use RAII to avoid copypasting this line across all branches of execution.
+            return false;
+        }
+        lua_remove(L, errorMessageHandlerIndex);
+        return true;
+
+    } catch (std::exception& ex) {
+
+        std::cerr << "An exception was thrown when executing lua code: " << ex.what() << std::endl;
+        lua_remove(L, errorMessageHandlerIndex);
         return false;
     }
-    return true;
 }
 
-bool LuaState::doFile(const std::string& filename, int numResults, int messageHandlerIndex) {
-    return loadFile(filename) && pcall(0, numResults, messageHandlerIndex);
+bool LuaState::doFile(const std::string& filename, int numResults) {
+    return loadFile(filename) && pcall(0, numResults);
 }
 
-bool LuaState::doFileInNewEnvironment(const std::string& filename, int numResults, int messageHandlerIndex) {
+bool LuaState::doFileInNewEnvironment(const std::string& filename, int numResults) {
 
     makeEnvironment();
 
     if (!loadFile(filename)) return false;
     setEnvironment(-2);
-    return pcall(0, numResults, messageHandlerIndex);
+    return pcall(0, numResults);
 }
 
 void LuaState::makeEnvironment() {

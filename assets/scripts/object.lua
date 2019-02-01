@@ -23,10 +23,14 @@ end
 
 function Object:init() end
 
+function Object:getPrototype()
+    return getmetatable(self).__index
+end
+
 function Object:inheritsFrom(potentialPrototype)
 
-    local prototype = getmetatable(self)
+    local prototype = self:getPrototype()
     if (prototype == potentialPrototype) then return true end
 
-    return prototype ~= nil and (prototype == potentialPrototype or prototype:inheritsFrom(potentialPrototype))
+    return prototype ~= nil and prototype:inheritsFrom(potentialPrototype)
 end

@@ -4,6 +4,8 @@
 -- Time: 17:28
 --
 
+local arenaSize = 40
+
 --Game.makeMaterial("cubeMaterial", {
 --    diffuse = "textures/container/diffuse.png",
 --    specular = "textures/container/specular.png",
@@ -29,7 +31,7 @@ local scenery = {
         Name = "Plane",
         Transform = {
             position = { 0, -1, 0 },
-            scale    = { 10, 10, 10 }
+            scale    = { arenaSize, arenaSize, arenaSize }
         },
         RenderInfo = {
             mesh = "models/plane.obj",
@@ -96,7 +98,7 @@ local function makeBorders(sideLength)
         }
     end
 
-    local radius = 1
+    local radius = 4
     local step = radius * 1
 
     for x = -halfSideLength,halfSideLength,step do
@@ -108,10 +110,54 @@ local function makeBorders(sideLength)
     end
 end
 
+function Game.makeBullet(position, velocity, size)
+
+    if #Game.bullets >= Game.maxNumActiveBullets then
+
+        local bullet = table.remove(Game.bullets, 1)
+        bullet:destroy()
+    end
+
+    size = size or 0.2
+
+    local bullet = Game.makeActor {
+        Name = "Bullet",
+        Transform = {
+            position = position or {0, 0, 0},
+            scale = {size, size, size}
+        },
+        Rigidbody = {
+            isKinematic = false,
+            useGravity = false,
+            velocity = velocity or {0, 0, 0},
+            radius = size
+        },
+        RenderInfo = {
+            mesh = "models/sphere2.obj",
+            material = {
+                shininess = 256,
+                diffuseColor = {1, 0, 0},
+                specularColor = {1, 0, 0}
+            }
+        },
+        Light = {
+            intensity = 1,
+            color = {1, 0, 0}
+        }
+    }
+
+    table.insert(Game.bullets, bullet)
+
+    return bullet
+end
+
 function scene.start()
 
+    Game.bullets = {}
+    Game.maxNumActiveBullets = 10
+
     Game.makeActors(scenery)
-    makeBorders(20)
+    makeBorders(arenaSize)
 
     local function makePlayer(name, position, ai)
 
@@ -129,7 +175,7 @@ function scene.start()
                 material = cubeMaterial
             },
             Rigidbody = {
-                isKinematic = true,
+                isKinematic = false,
                 useGravity = false
             },
             LuaBehavior = ai
@@ -159,6 +205,15 @@ function scene.update(dt)
     Game.find("PointLight"):get("Light").intensity = math.sin(Game.getTime()) ^ 2
     --Game.find("DirectionalLight"):get("Transform"):rotate(60 * dt, 1, 0, 0)
 
+    for i, bullet in ipairs(Game.bullets) do
+        if (bullet) then
+            local bulletTransform = bullet:get("Transform")
+            local bulletRigidbody = bullet:get("Rigidbody")
+            bulletTransform.position = { bulletTransform.position.x, 0, bulletTransform.position.z }
+            bulletRigidbody.velocity = { bulletRigidbody.velocity.x, 0, bulletRigidbody.velocity.z }
+        end
+    end
+
     local position1 = player1.isValid and player1:get("Transform").position or {x = 0, y = 0, z = 0}
     local position2 = player2.isValid and player2:get("Transform").position or {x = 0, y = 0, z = 0}
     cameraTransform.position = {
@@ -168,6 +223,8 @@ function scene.update(dt)
     }
 
     if (not player1.isValid or not player2.isValid) then
+        player1 = nil
+        player2 = nil
         Game.loadScene("scripts/arena.lua")
     end
 end

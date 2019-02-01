@@ -238,13 +238,13 @@ void Material::detectAllUniforms() {
 
     std::vector<UniformInfo> uniforms = m_shader->getAllUniforms();
 
-    std::cout << "Uniforms: " << std::endl;
+    //std::cout << "Uniforms: " << std::endl;
     for (auto& info : uniforms) {
 
-        std::cout << info.location << " : " << info.name << std::endl;
+        //std::cout << info.location << " : " << info.name << std::endl;
         m_uniforms[info.name] = info;
     }
-    std::cout << std::endl;
+    //std::cout << std::endl;
 }
 
 void Material::setUniformsPointLight(

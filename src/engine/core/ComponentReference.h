@@ -7,6 +7,7 @@
 
 #include "EntityRegistry.h"
 #include "MetatableHelper.h"
+#include "Exception.h"
 
 namespace en {
 
@@ -70,7 +71,7 @@ namespace en {
         inline void checkValid() {
 
             if (!operator bool())
-                throw "This ComponentReference to " + utils::demangle<T>() + "is invalid";
+                throw utils::Exception("This ComponentReference to " + utils::demangle<T>() + " is invalid");
         }
 
         friend inline bool operator==(const ComponentReference<T>& a, const ComponentReference<T>& b) {

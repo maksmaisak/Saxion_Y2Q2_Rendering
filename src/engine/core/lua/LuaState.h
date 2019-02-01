@@ -73,7 +73,7 @@ namespace en {
             tableIndex = lua_absindex(L, tableIndex);
             luaL_checktype(L, tableIndex, LUA_TTABLE);
 
-            if constexpr (utils::functionTraits<utils::remove_cvref_t<T>>::isFunction && !std::is_same_v<lua_CFunction, T>) {
+            if constexpr (utils::functionTraits<utils::remove_cvref_t<T>>::isFunction && !std::is_convertible_v<T, lua_CFunction>) {
                 ClosureHelper::makeClosure(L, std::forward<T>(value));
             } else {
                 lua::push(L, std::forward<T>(value));

@@ -159,6 +159,9 @@ function scene.update(dt)
     Game.find("PointLight"):get("Light").intensity = math.sin(Game.getTime()) ^ 2
     --Game.find("DirectionalLight"):get("Transform"):rotate(60 * dt, 1, 0, 0)
 
+    print(player1.isValid and player1:get("Transform").position)
+    print(player2.isValid and player2:get("Transform").position)
+
     local position1 = player1.isValid and player1:get("Transform").position or {x = 0, y = 0, z = 0}
     local position2 = player2.isValid and player2:get("Transform").position or {x = 0, y = 0, z = 0}
     cameraTransform.position = {
@@ -174,7 +177,7 @@ end
 
 function scene.onCollision(a, b)
 
-    print("scene.onCollision:", a.name, b.name)
+    --print("scene.onCollision:", a.name, b.name)
 
     local bullet
     local player

@@ -26,8 +26,9 @@ namespace en {
             for (Entity e : m_notStarted) {
 
                 auto* behavior = m_registry->tryGet<TBehavior>(e);
-                if (behavior)
+                if (behavior) {
                     behavior->start();
+                }
             }
             m_notStarted.clear();
 

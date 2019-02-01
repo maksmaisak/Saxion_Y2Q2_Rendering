@@ -17,7 +17,22 @@
 
 namespace lua {
 
-    /// TOOD Move the implementation of non-templates like this into a .cpp file
+    /// TODO Move the implementation of non-templates like this into a .cpp file
+    inline std::string getAsString(lua_State* L, int index = -1) {
+
+        int typeId = lua_type(L, index);
+        switch (typeId) {
+            case LUA_TSTRING:
+                return std::string("\"") + lua_tostring(L, index) + "\"";
+            case LUA_TBOOLEAN:
+                return lua_toboolean(L, index) ? "true" : "false";
+            case LUA_TNUMBER:
+                return std::to_string(lua_tonumber(L, index));
+            default:
+                return lua_typename(L, typeId);
+        }
+    }
+
     inline void stackDump(lua_State *L) {
 
         int i = lua_gettop(L);

@@ -18,6 +18,7 @@ namespace en {
     public:
 
         static LuaBehavior& addFromLua(Actor& actor, LuaState& lua);
+        static void initializeMetatable(LuaState& lua);
 
         LuaBehavior(en::Actor actor);
         LuaBehavior(en::Actor actor, LuaReference&& table);
@@ -26,6 +27,9 @@ namespace en {
         void update(float dt) override;
 
     private:
+
+        static int indexFunction(lua_State*);
+        static int newindexFunction(lua_State*);
 
         LuaReference m_self;
         LuaReference m_start;

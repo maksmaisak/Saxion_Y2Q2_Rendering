@@ -8,21 +8,6 @@ namespace lua {
 
     namespace detail {
 
-        std::string getAsString(lua_State* L, int index = -1) {
-
-            int typeId = lua_type(L, index);
-            switch (typeId) {
-                case LUA_TSTRING:
-                    return std::string("\"") + lua_tostring(L, index) + "\"";
-                case LUA_TBOOLEAN:
-                    return lua_toboolean(L, index) ? "true" : "false";
-                case LUA_TNUMBER:
-                    return std::to_string(lua_tonumber(L, index));
-                default:
-                    return lua_typename(L, typeId);
-            }
-        }
-
         void printValue(lua_State* L, int index = -1) {
 
             int typeId = lua_type(L, index);
@@ -49,37 +34,37 @@ namespace lua {
             luaL_checkany(L, 1); // table or userdata
             luaL_checkany(L, 2); // key
 
+            std::string keyAsString = getAsString(L, 2);
+
             bool hasMetatable = lua_getmetatable(L, 1) == 1;
             assert(hasMetatable);
 
             // get a property getter from metatable.__getters
-            lua_getfield(L, -1, "__getters");
+            lua_getfield(L, 3, "__getters");
+            //std::cout << "metatable.__getters: " << getAsString(L, -1) << std::endl;
             lua_pushvalue(L, 2);
             lua_gettable(L, -2);
 
-            if (lua_isnil(L, -1)) {
+            if (lua_isfunction(L, -1)) {
 
-                lua_pop(L, 2); // remove __getters, nil
-                lua_pushvalue(L, 2);
-                lua_gettable(L, -2); // get from metatable
+                //std::cout << "Getting with custom getter: " << getAsString(L, 2) << std::endl;
 
-                if (lua_isnil(L, -1)) {
-                    std::cout << "No custom getter and no value for key: " << getAsString(L, 2) << std::endl;
-                }
-
-                lua_remove(L, -2); // remove metatable
+                // call the getter
+                lua_pushvalue(L, 1); // table
+                lua_pushvalue(L, 2); // key
+                lua_pcall(L, 2, 1, 0); // getter(table, key)
 
                 return 1;
             }
 
-            lua_remove(L, -2); // remove __getters
+            //std::cout << "Getting from metatable: " << getAsString(L, 2) << std::endl;
 
-            // call the getter
-            lua_pushvalue(L, 1); // table
-            lua_pushvalue(L, 2); // key
-            lua_pcall(L, 2, 1, 0); // getter(table, key)
+            lua_pushvalue(L, 2);
+            lua_gettable(L, 3); // get from metatable
 
-            lua_remove(L, -2); // remove metatable
+            if (lua_isnil(L, -1)) {
+                std::cout << "No custom getter and no value for key: " << getAsString(L, 2) << std::endl;
+            }
 
             return 1;
         }
@@ -100,27 +85,41 @@ namespace lua {
             lua_pushvalue(L, 2);
             lua_gettable(L, -2);
 
-            if (lua_isnil(L, -1)) {
+            if (lua_isfunction(L, -1)) {
 
-                lua_pop(L, 3); // remove metatable, __setters, nil
-                if (lua_istable(L, 1)) {
-                    lua_pushvalue(L, 2);
-                    lua_pushvalue(L, 3);
-                    lua_rawset(L, 1);
-                } else {
-                    std::cout << "Can't assign this to userdata: " << getAsString(L, 2) << ", " << getAsString(L, 3) << std::endl;
-                }
+                //std::cout << "Setting with custom setter: " << getAsString(L, 2) << ", " << getAsString(L, 3) << std::endl;
+
+                lua_pushvalue(L, 1); // table
+                lua_pushvalue(L, 3); // value
+                lua_call(L, 2, 0);
 
                 return 0;
             }
 
-            lua_remove(L, -2); // remove __setters
+            //lua_pop(L, 2); // remove __setters, nil
+            if (lua_istable(L, 1)) {
 
-            lua_pushvalue(L, 1); // table
-            lua_pushvalue(L, 3); // value
-            lua_pcall(L, 2, 0, 0);
+                //std::cout << "Rawsetting to table: " << getAsString(L, 2) << ", " << getAsString(L, 3) << std::endl;
 
-            lua_remove(L, -2); // remove the metatable
+                lua_pushvalue(L, 2);
+                lua_pushvalue(L, 3);
+                lua_rawset(L, 1);
+
+                return 0;
+            }
+
+            if (luaL_getmetafield(L, 4, "__newindex") != LUA_TNIL && lua_isfunction(L, -1)) {
+
+                if (lua_iscfunction(L, -1) && lua_tocfunction(L, -1) == &newindexFunction)
+                    return 0;
+
+                //std::cout << "Setting with the __newindex function of the metatable of the metatable: " << getAsString(L, 2) << ", " << getAsString(L, 3) << std::endl;
+
+                lua_pushvalue(L, 1); // table
+                lua_pushvalue(L, 2); // key
+                lua_pushvalue(L, 3); // value
+                lua_call(L, 3, 0);
+            }
 
             return 0;
         }

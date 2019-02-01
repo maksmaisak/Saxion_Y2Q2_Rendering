@@ -25,6 +25,51 @@ LuaReference makeLuaBehaviorFromScriptFile(LuaState& lua, const std::string& nam
     return LuaReference(lua);
 }
 
+LuaReference getFunctionFromTable(lua_State* L, const std::string& name) {
+
+    lua_getfield(L, -1, name.c_str());
+    if (lua_isfunction(L, -1)) {
+        return lua::LuaReference(L);
+    } else {
+        lua_pop(L, 1);
+        return {};
+    }
+}
+
+int LuaBehavior::indexFunction(lua_State* L) {
+
+    // stack:
+    // 1 ComponentReference to behavior
+    // 2 key
+
+    LuaBehavior& behavior = lua::check<ComponentReference<LuaBehavior>>(L, 1);
+    if (!behavior.m_self)
+        return 0;
+
+    behavior.m_self.push();
+    lua_pushvalue(L, 2);
+    lua_gettable(L, -2);
+    return 1;
+}
+
+int LuaBehavior::newindexFunction(lua_State* L) {
+
+    // stack:
+    // 1 behavior
+    // 2 key
+    // 3 value
+
+    LuaBehavior& behavior = lua::check<ComponentReference<LuaBehavior>>(L, 1);
+    if (!behavior.m_self)
+        return 0;
+
+    behavior.m_self.push();
+    lua_pushvalue(L, 2);
+    lua_pushvalue(L, 3);
+    lua_settable(L, -3);
+    return 0;
+}
+
 LuaBehavior& LuaBehavior::addFromLua(Actor& actor, LuaState& lua) {
 
     auto typeId = lua_type(lua, -1);
@@ -39,15 +84,10 @@ LuaBehavior& LuaBehavior::addFromLua(Actor& actor, LuaState& lua) {
     return actor.add<LuaBehavior>();
 }
 
-LuaReference getFunctionFromTable(lua_State* L, const std::string& name) {
+void LuaBehavior::initializeMetatable(LuaState& lua) {
 
-    lua_getfield(L, -1, name.c_str());
-    if (lua_isfunction(L, -1)) {
-        return lua::LuaReference(L);
-    } else {
-        lua_pop(L, 1);
-        return {};
-    }
+    lua.setField("__index", &indexFunction);
+    lua.setField("__newindex", &newindexFunction);
 }
 
 LuaBehavior::LuaBehavior(en::Actor actor) : Behavior(actor) {}
@@ -59,13 +99,12 @@ LuaBehavior::LuaBehavior(Actor actor, LuaReference&& table) : LuaBehavior(actor)
     LuaState lua = m_self.getLuaState();
 
     m_self.push();
+    auto popSelf = lua::PopperOnDestruct(lua);
 
     m_start  = getFunctionFromTable(lua, "start");
     m_update = getFunctionFromTable(lua, "update");
 
     lua.setField("actor", actor);
-
-    lua_pop(lua, 1);
 }
 
 void LuaBehavior::start() {

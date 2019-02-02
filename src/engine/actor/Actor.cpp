@@ -7,6 +7,7 @@
 #include "Transform.h"
 #include "Name.h"
 #include "LuaState.h"
+#include "Destroy.h"
 
 namespace en {
 
@@ -52,7 +53,11 @@ namespace en {
 
         lua.setField("get", &pushByTypeName);
         lua.setField("add", &addByTypeName);
-        lua.setField("destroy", &Actor::destroy);
+        lua.setField("destroyImmediate", &Actor::destroy);
+        lua.setField("destroy", [](Actor& actor){
+            if (!actor.tryGet<Destroy>())
+                actor.add<Destroy>();
+        });
 
         lua::addProperty(lua, "name", lua::property(
             [](Actor& actor){
@@ -60,15 +65,21 @@ namespace en {
                 return ptr ? std::make_optional(ptr->value) : std::nullopt;
             },
             [](Actor& actor, const std::string& newName) {
-                Name* ptr = actor.tryGet<Name>();
-                if (ptr) {
-                    ptr->value = newName;
+                Name* nameComponent = actor.tryGet<Name>();
+                if (nameComponent) {
+                    nameComponent->value = newName;
                 } else {
                     actor.add<Name>(newName);
                 }
             }
         ));
 
-        lua::addProperty(lua, "isValid", lua::readonlyProperty([](Actor& actor) -> bool {return actor;}));
+        lua::addProperty(lua, "isValid", lua::readonlyProperty([](Actor& actor) -> bool {
+            return actor;
+        }));
+
+        lua::addProperty(lua, "isDestroyed", lua::readonlyProperty([](Actor& actor) -> bool {
+            return !actor || actor.tryGet<Destroy>();
+        }));
     }
 }

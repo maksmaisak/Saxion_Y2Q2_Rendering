@@ -113,9 +113,7 @@ end
 function Game.makeBullet(position, velocity, size)
 
     if #Game.bullets >= Game.maxNumActiveBullets then
-
-        local bullet = table.remove(Game.bullets, 1)
-        bullet:destroy()
+        table.remove(Game.bullets, 1):destroy()
     end
 
     size = size or 0.2
@@ -222,7 +220,7 @@ function scene.update(dt)
         (position1.z + position2.z) * 0.5
     }
 
-    if (not player1.isValid or not player2.isValid) then
+    if (player1.isDestroyed or player2.isDestroyed) then
         player1 = nil
         player2 = nil
         Game.loadScene("scripts/arena.lua")

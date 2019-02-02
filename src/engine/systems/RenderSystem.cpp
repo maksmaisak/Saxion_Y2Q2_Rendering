@@ -73,7 +73,7 @@ namespace en {
             }
         }
 
-        std::string debugInfo = std::string("FPS:") + std::to_string((int) m_engine->getFps()) + "\n";
+        std::string debugInfo = std::string("FPS:") + std::to_string((int)m_engine->getFps()) + "\n";
         //std::cout << debugInfo;
         if ((m_engine->getWindow().getSettings().attributeFlags & sf::ContextSettings::Core) == 0) {
             m_debugHud->setDebugInfo(debugInfo);
@@ -88,7 +88,7 @@ namespace en {
     }
 
     void GLAPIENTRY
-    MessageCallback(
+    messageCallback(
         GLenum source,
         GLenum type,
         GLuint id,
@@ -110,6 +110,6 @@ namespace en {
 
         //glEnable(GL_DEBUG_OUTPUT);
         //glCheckError();
-        //glDebugMessageCallback(MessageCallback, 0);
+        //glDebugMessageCallback(messageCallback, 0);
     }
 }

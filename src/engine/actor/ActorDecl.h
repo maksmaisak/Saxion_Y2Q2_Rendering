@@ -27,6 +27,7 @@ namespace en {
         Actor() = default;
         Actor(Engine& engine, Entity entity);
 
+        // Defined in Actor.h
         template<typename TComponent, typename... Args>
         TComponent& add(Args&&... args);
 

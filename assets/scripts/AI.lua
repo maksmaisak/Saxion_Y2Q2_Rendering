@@ -5,6 +5,8 @@
 --
 
 require('assets/scripts/object')
+require('assets/scripts/vector')
+require('assets/scripts/steering')
 
 AI = Object:new {
     shootCooldown = 2
@@ -28,7 +30,6 @@ function AI:start()
             return nil
         end
         timeToShoot = Game.getTime() + self.shootCooldown
-        print(timeToShoot)
 
         speed = speed or 10
         local spawnAheadDistance = 2

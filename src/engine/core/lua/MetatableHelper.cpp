@@ -55,7 +55,7 @@ namespace lua {
                 // call the getter
                 lua_pushvalue(L, 1); // table
                 lua_pushvalue(L, 2); // key
-                lua_pcall(L, 2, 1, 0); // getter(table, key)
+                lua_call(L, 2, 1); // getter(table, key)
 
                 return 1;
             }

@@ -14,7 +14,7 @@ return function(o)
     local rigidbody
     local steering = Steering:new {
         maxSpeed = 10,
-        maxForce = 1000
+        maxForce = 1000000
     }
 
     function o:start()
@@ -33,6 +33,11 @@ return function(o)
             if Vector.distance(bulletPosition, steering.position) < 10 then
                 steering:dodge(bulletPosition, bullet:get("Rigidbody").velocity)
             end
+        end
+
+        local enemyPosition = self.enemy:get("Transform").position
+        if Vector.distance(enemyPosition, steering.position) < 20 then
+            steering:flee(enemyPosition)
         end
 
         if (steering.steer:magnitude() < 0.001) then

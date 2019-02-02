@@ -157,7 +157,7 @@ int makeActors(lua_State* L) {
 
 int makeActorFromLua(lua_State* L) {
 
-    Engine& engine = *lua::to<Engine*>(L, lua_upvalueindex(1));
+    Engine& engine = *lua::check<Engine*>(L, lua_upvalueindex(1));
 
     // makeActor(table)
     if (lua_istable(L, 1)) {

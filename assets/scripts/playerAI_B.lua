@@ -13,11 +13,6 @@ return function(o)
 
     function o:update(dt)
 
-        if (self:canShoot()) then
-            self:shoot(self.enemyTransform.position)
-            self.timeToShoot = self.timeToShoot + math.random(-1, 1)
-        end
-
         -- dodge bullets
         for i, bullet in ipairs(Game.bullets) do
 
@@ -28,10 +23,16 @@ return function(o)
         end
 
         if (not self.enemy.isDestroyed) then
+
             -- move away from the enemy if too close
             local enemyPosition = self.enemyTransform.position
             if Vector.distance(enemyPosition, self.steering.position) < 10 then
                 self.steering:flee(enemyPosition)
+            end
+
+            if (self:canShoot()) then
+                self:shoot(self.enemyTransform.position)
+                self.timeToShoot = self.timeToShoot + math.random(-1, 1)
             end
         end
 

@@ -38,6 +38,8 @@ int errorMessageHandler(lua_State* L) {
 
 bool LuaState::pcall(int numArgs, int numResults) {
 
+    int oldTop = lua_gettop(L);
+
     // put the error message handler before the function and its arguments
     push(&errorMessageHandler);
     int errorMessageHandlerIndex = -(1 + (1 + numArgs));
@@ -49,7 +51,7 @@ bool LuaState::pcall(int numArgs, int numResults) {
         int errorCode = lua_pcall(L, numArgs, numResults, errorMessageHandlerIndex);
         if (errorCode != LUA_OK) {
             printError();
-            lua_remove(L, errorMessageHandlerIndex); // TODO Use RAII to avoid copypasting this line across all branches of execution.
+            lua_settop(L, oldTop - (1 + numArgs));
             return false;
         }
         lua_remove(L, errorMessageHandlerIndex);
@@ -61,7 +63,7 @@ bool LuaState::pcall(int numArgs, int numResults) {
         luaL_traceback(L, L, nullptr, 1);
         std::cerr << get<std::string>() << std::endl;
 
-        lua_remove(L, errorMessageHandlerIndex);
+        lua_settop(L, oldTop - (1 + numArgs));
         return false;
     }
 }

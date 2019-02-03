@@ -16,7 +16,7 @@ local arenaSize = 60
 --    shininess = 10
 --})
 
-local cubeMaterial = {
+local playerMaterial = {
     diffuse = "textures/container/diffuse.png",
     specular = "textures/container/specular.png",
     shininess = 100
@@ -169,8 +169,8 @@ function scene.start()
                 scale = {1,1,1}
             },
             RenderInfo = {
-                mesh = "models/cube_flat.obj",
-                material = cubeMaterial
+                mesh = "models/cylinder_smooth.obj",
+                material = playerMaterial
             },
             Rigidbody = {
                 isKinematic = false,
@@ -200,6 +200,18 @@ function scene.start()
     cameraTransform = camera:get("Transform")
 end
 
+local sceneUpdateCoroutine = coroutine.wrap(function()
+
+    while not player1.isDestroyed and not player2.isDestroyed do
+        coroutine.yield()
+    end
+
+    local timeToLoadScene = Game.getTime() + 5
+    while Game.getTime() < timeToLoadScene do coroutine.yield() end
+
+    Game.loadScene("scripts/arena.lua")
+end)
+
 function scene.update(dt)
 
     Game.find("PointLight"):get("Light").intensity = math.sin(Game.getTime()) ^ 2
@@ -214,9 +226,7 @@ function scene.update(dt)
         end
     end
 
-    if (player1.isDestroyed or player2.isDestroyed) then
-        Game.loadScene("scripts/arena.lua")
-    end
+    sceneUpdateCoroutine()
 end
 
 function scene.onCollision(a, b)

@@ -61,7 +61,8 @@ namespace en {
             for (Entity e : m_registry->with<Transform, RenderInfo>()) {
 
                 auto& renderInfo = m_registry->get<RenderInfo>(e);
-                if (!renderInfo.material || !renderInfo.mesh) continue;
+                if (!renderInfo.material || !renderInfo.mesh)
+                    continue;
 
                 glm::mat4 matrixModel = m_registry->get<Transform>(e).getWorldTransform();
                 renderInfo.material->render(m_engine, renderInfo.mesh.get(), matrixModel, matrixView, matrixProjection);

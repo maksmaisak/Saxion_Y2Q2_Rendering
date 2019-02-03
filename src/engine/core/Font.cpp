@@ -7,21 +7,36 @@
 
 using namespace en;
 
+/// A RAII wrapper around a FT_Library
+class FreeFontLibrary {
+
+public:
+
+    inline FreeFontLibrary() {
+
+        if (FT_Init_FreeType(&library))
+            std::cerr << "Freetype: Could not initialize a FreeType Library." << std::endl;
+    }
+
+    inline ~FreeFontLibrary() {
+
+        if (library)
+            FT_Done_FreeType(library);
+    }
+
+    inline operator FT_Library&() {
+        return library;
+    }
+
+private:
+
+    FT_Library library = nullptr;
+};
+
 FT_Library& getFreeTypeLibrary() {
 
-    struct LibraryInitializer {
-
-        LibraryInitializer() {
-
-            if (FT_Init_FreeType(&library))
-                std::cerr << "Freetype: Could not initialize a FreeType Library." << std::endl;
-        }
-
-        FT_Library library;
-    };
-
-    static LibraryInitializer owner;
-    return owner.library;
+    static FreeFontLibrary library;
+    return library;
 }
 
 std::optional<Font::Character> loadCharacter(FT_Face& face, FT_ULong charCode) {
@@ -92,6 +107,11 @@ Font::Font(const std::string& filename) : m_shader(Resources<ShaderProgram>::get
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
     glBindVertexArray(0);
+}
+
+Font::~Font() {
+
+    // TODO delete textures, vao, vbo, font face.
 }
 
 // TODO This renders each character in a separate draw call, with each character having its own thing. Use a texture atlas instead and do one draw call per text.

@@ -28,7 +28,7 @@ namespace en {
 
         Font(const std::string& filename);
 
-        void render(const std::string& text, glm::vec<2, GLfloat> pos = {0, 0}, GLfloat scale = 1.f);
+        void render(const std::string& text, glm::vec<2, GLfloat> pos = {0, 0}, GLfloat scale = 1.f, const glm::mat4& projection = glm::ortho(0, 1, 0, 1));
 
     private:
 

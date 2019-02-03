@@ -95,12 +95,12 @@ Font::Font(const std::string& filename) : m_shader(Resources<ShaderProgram>::get
 }
 
 // TODO This renders each character in a separate draw call, with each character having its own thing. Use a texture atlas instead and do one draw call per text.
-void Font::render(const std::string& text, glm::vec<2, GLfloat> pos, GLfloat scale) {
+void Font::render(const std::string& text, glm::vec<2, GLfloat> pos, GLfloat scale, const glm::mat4& projection) {
 
     // Activate corresponding render state
     m_shader->use();
+
     glUniform3f(m_shader->getUniformLocation("textColor"), 1.f, 1.f, 1.f);
-    glm::mat4 projection = glm::ortho(0.0f, static_cast<GLfloat>(1920), 0.0f, static_cast<GLfloat>(1080));
     glUniformMatrix4fv(m_shader->getUniformLocation("projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
     glActiveTexture(GL_TEXTURE0);
@@ -121,13 +121,13 @@ void Font::render(const std::string& text, glm::vec<2, GLfloat> pos, GLfloat sca
 
         // Define the quad for this character
         GLfloat vertices[6][4] = {
-            {posx,     posy + h,   0.0, 0.0},
-            {posx,     posy,       0.0, 1.0},
-            {posx + w, posy,       1.0, 1.0},
+            {posx,     posy + h, 0.0, 0.0},
+            {posx,     posy,     0.0, 1.0},
+            {posx + w, posy,     1.0, 1.0},
 
-            {posx,     posy + h,   0.0, 0.0},
-            {posx + w, posy,       1.0, 1.0},
-            {posx + w, posy + h,   1.0, 0.0}
+            {posx,     posy + h, 0.0, 0.0},
+            {posx + w, posy,     1.0, 1.0},
+            {posx + w, posy + h, 1.0, 0.0}
         };
         glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
         glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);

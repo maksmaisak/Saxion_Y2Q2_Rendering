@@ -10,6 +10,7 @@
 #include "components/Name.h"
 #include "GLHelpers.h"
 #include "Font.h"
+#include "GameTime.h"
 
 namespace en {
 
@@ -79,14 +80,9 @@ namespace en {
         }
 
         std::string debugInfo = std::string("FPS:") + std::to_string((int)m_engine->getFps());
-//        //std::cout << debugInfo;
-//        if ((m_engine->getWindow().getSettings().attributeFlags & sf::ContextSettings::Core) == 0) {
-//            m_debugHud->setDebugInfo(debugInfo);
-//            m_debugHud->draw();
-//        }
-
         auto font = Resources<Font>::get(config::FONT_PATH + "arial.ttf");
-        font->render(debugInfo, {100, 100});
+        auto windowSize = m_engine->getWindow().getSize();
+        font->render(debugInfo, {0.f, 0.f}, 1.f, glm::ortho(0.f, (float)windowSize.x, 0.f, (float)windowSize.y));
     }
 
     Actor RenderSystem::getMainCamera() {

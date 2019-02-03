@@ -221,6 +221,20 @@ end
 
 function scene.onCollision(a, b)
 
+    local function switchBulletColor(bullet)
+        local light = bullet:get("Light")
+        local color = light.color
+        light.color = {color.y, color.z, color.x }
+    end
+
+    if string.find(a.name, "Bullet") ~= nil then
+        switchBulletColor(a)
+    end
+
+    if string.find(b.name, "Bullet") ~= nil then
+        switchBulletColor(b)
+    end
+
     --print("scene.onCollision:", a.name, b.name)
 
     local bullet
@@ -238,15 +252,9 @@ function scene.onCollision(a, b)
         bullet = b
     end
 
-    if (not bullet) then return end
-
-    local light = bullet:get("Light")
-    local color = light.color
-    light.color = {color.y, color.z, color.x }
-
-    if (not player) then return end
-
-    player:destroy()
+    if (bullet and player) then
+        player:destroy()
+    end
 end
 
 return scene

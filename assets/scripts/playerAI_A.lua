@@ -36,14 +36,14 @@ function PlayerAI:update(dt)
         end
     end
 
-    if (not self.enemy.isDestroyed) then
+    if not self.enemy.isDestroyed then
         local enemyPosition = self.enemyTransform.position
         if Vector.distance(enemyPosition, self.steering.position) > 10 then
             self.steering:seek(enemyPosition)
         end
     end
 
-    if (self.steering.steer:magnitude() < 0.001) then
+    if self.steering.steer:magnitude() < 0.001 then
         self.steering:alignVelocity({x = 0, y = 0, z = 0})
     end
 

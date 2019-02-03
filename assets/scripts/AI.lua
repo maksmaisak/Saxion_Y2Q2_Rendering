@@ -9,7 +9,8 @@ require('assets/scripts/vector')
 require('assets/scripts/steering')
 
 AI = Object:new {
-    shootCooldown = 2
+    shootCooldown = 2,
+    bulletSpeed = 20
 }
 
 function AI:start()
@@ -24,19 +25,18 @@ function AI:start()
 
     self.timeToShoot = Game.getTime()
     function self:canShoot() return Game.getTime() >= self.timeToShoot end
-    function self:shoot(targetPosition, speed)
+    function self:shoot(targetPosition)
 
         if not self:canShoot() then
             return nil
         end
         self.timeToShoot = Game.getTime() + self.shootCooldown
 
-        speed = speed or 10
         local spawnAheadDistance = 2
         local startPosition = Vector.from(self.transform.position)
 
         local direction = Vector.from(targetPosition):sub(startPosition):normalize()
-        local velocity = direction * speed;
+        local velocity = direction * self.bulletSpeed;
         startPosition:add(direction * spawnAheadDistance)
         --print("velocity: ", velocity.x, velocity.y, velocity.z)
 

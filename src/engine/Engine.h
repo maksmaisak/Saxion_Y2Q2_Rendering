@@ -64,8 +64,8 @@ namespace en {
 
     private:
 
-        EntityRegistry m_registry;
         std::unique_ptr<LuaState> m_lua;
+        EntityRegistry m_registry;
         Scheduler m_scheduler;
         sf::RenderWindow m_window;
         SceneManager m_sceneManager;

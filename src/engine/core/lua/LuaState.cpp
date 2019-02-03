@@ -16,8 +16,10 @@ LuaState::LuaState(lua_State* existingL) : L(existingL), shouldCloseOnDestroy(fa
 {}
 
 LuaState::~LuaState() {
-    if (shouldCloseOnDestroy)
+    if (shouldCloseOnDestroy) {
+        std::cout << "Closing a lua state" << std::endl;
         lua_close(L);
+    }
 }
 
 bool LuaState::loadFile(const std::string& filename) {

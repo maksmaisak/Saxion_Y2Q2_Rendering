@@ -3,13 +3,19 @@
 //
 
 #include "LuaReference.h"
+#include <cassert>
+#include <iostream>
 
 using namespace lua;
 
 LuaReference::LuaReference() {}
-LuaReference::LuaReference(lua_State* L) : L(L), m_ref(luaL_ref(L, LUA_REGISTRYINDEX)) {}
+LuaReference::LuaReference(lua_State* L) : L(L), m_ref(luaL_ref(L, LUA_REGISTRYINDEX)) {
+    //std::cout << "LuaReference: create ref: " << m_ref << std::endl;
+}
 
-LuaReference::~LuaReference() {unref();}
+LuaReference::~LuaReference() {
+    unref();
+}
 
 LuaReference::LuaReference(LuaReference&& other) noexcept :
     L(other.L),
@@ -53,6 +59,9 @@ void LuaReference::push() const {
 bool LuaReference::unref() {
 
     if (m_ref != LUA_NOREF) {
+
+        //std::cout << "LuaReference: remove ref: " << m_ref << std::endl;
+
         luaL_unref(L, LUA_REGISTRYINDEX, m_ref);
         m_ref = LUA_NOREF;
         return true;

@@ -16,12 +16,6 @@ local arenaSize = 60
 --    shininess = 10
 --})
 
-local playerMaterial = {
-    diffuse = "textures/container/diffuse.png",
-    specular = "textures/container/specular.png",
-    shininess = 100
-}
-
 local planeMaterial = {
     diffuse = "textures/terrain/diffuse4.jpg",
     shininess = 10
@@ -157,10 +151,11 @@ function scene.start()
     Game.makeActors(scenery)
     makeBorders(arenaSize)
 
-    local function makePlayer(name, position, ai)
+    local function makePlayer(name, position, ai, color)
 
         name = name or "unnamed"
-        position = position or {0, 0, 0}
+        position = position or {0, 0, 0 }
+        color = color or {1,1,1}
 
         return Game.makeActor {
             Name = name,
@@ -170,7 +165,10 @@ function scene.start()
             },
             RenderInfo = {
                 mesh = "models/cylinder_smooth.obj",
-                material = playerMaterial
+                material = {
+                    diffuseColor = color,
+                    shininess = 1
+                }
             },
             Rigidbody = {
                 isKinematic = false,
@@ -180,8 +178,8 @@ function scene.start()
         }
     end
 
-    player1 = makePlayer("Player1", {5, 0, -5}, "assets/scripts/playerAI_A.lua")
-    player2 = makePlayer("Player2", {-5, 0, 5}, "assets/scripts/playerAI_B.lua")
+    player1 = makePlayer("Player1", {5, 0, -5}, "assets/scripts/playerAI_A.lua", {1, 0, 0})
+    player2 = makePlayer("Player2", {-5, 0, 5}, "assets/scripts/playerAI_B.lua", {0, 0, 1})
 
     player1:get("LuaBehavior").enemy = player2
     player2:get("LuaBehavior").enemy = player1

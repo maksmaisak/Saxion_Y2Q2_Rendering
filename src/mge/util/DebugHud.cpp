@@ -18,8 +18,7 @@ DebugHud::DebugHud(sf::RenderWindow* aWindow): _window(aWindow), _debugInfo(), _
     _createDebugHud();
 }
 
-DebugHud::~DebugHud()
-{
+DebugHud::~DebugHud() {
 	//dtor
 }
 
@@ -35,8 +34,8 @@ void DebugHud::setDebugInfo(std::string pInfo) {
 	_debugText.setPosition(10, 10);
 }
 
-void DebugHud::draw()
-{
+void DebugHud::draw() {
+    
     // Prevent non core-profile code running in a core-profile context.
 	if ((_window->getSettings().attributeFlags & sf::ContextSettings::Core) != 0) {
 

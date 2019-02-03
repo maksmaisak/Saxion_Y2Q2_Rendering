@@ -46,7 +46,6 @@ include_directories(${LUA_INCLUDE_DIR})
 find_package(glm REQUIRED)
 find_package(GLEW REQUIRED)
 find_package(freetype 2 REQUIRED)
-find_package(FTGL REQUIRED)
 include_directories(${FREETYPE_INCLUDE_DIR_freetype2})
 
 if(WIN32)
@@ -65,4 +64,4 @@ else()
     set(SFMLLIB sfml-graphics sfml-audio sfml-window sfml-system)
 endif()
 
-target_link_libraries(Saxion_Y2Q2_Rendering ${LUALIB} glm ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} ${SFMLLIB} freetype ftgl)
+target_link_libraries(Saxion_Y2Q2_Rendering ${LUALIB} glm ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} ${SFMLLIB} freetype)

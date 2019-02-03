@@ -4,12 +4,12 @@
 
 #include "RenderSystem.h"
 #include <iostream>
-#include <FTGL/ftgl.h>
 #include "components/RenderInfo.h"
 #include "components/Transform.h"
 #include "components/Camera.h"
 #include "components/Name.h"
 #include "GLHelpers.h"
+#include "Font.h"
 
 namespace en {
 
@@ -36,7 +36,11 @@ namespace en {
         //glClearColor((float)0x2d / 0xff, (float)0x6b / 0xff, (float)0xce / 0xff, 1.0f);
         glClearColor(0, 0, 0, 1);
 
+        // Convert ouput from fragment shaders from linear to sRGB
         glEnable(GL_FRAMEBUFFER_SRGB);
+
+        // Disable byte-alignment restriction
+        glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
         m_debugHud = std::make_unique<DebugHud>(&m_engine->getWindow());
     }
@@ -74,12 +78,15 @@ namespace en {
             }
         }
 
-        std::string debugInfo = std::string("FPS:") + std::to_string((int)m_engine->getFps()) + "\n";
-        //std::cout << debugInfo;
-        if ((m_engine->getWindow().getSettings().attributeFlags & sf::ContextSettings::Core) == 0) {
-            m_debugHud->setDebugInfo(debugInfo);
-            m_debugHud->draw();
-        }
+        std::string debugInfo = std::string("FPS:") + std::to_string((int)m_engine->getFps());
+//        //std::cout << debugInfo;
+//        if ((m_engine->getWindow().getSettings().attributeFlags & sf::ContextSettings::Core) == 0) {
+//            m_debugHud->setDebugInfo(debugInfo);
+//            m_debugHud->draw();
+//        }
+
+        auto font = Resources<Font>::get(config::FONT_PATH + "arial.ttf");
+        font->render(debugInfo, {100, 100});
     }
 
     Actor RenderSystem::getMainCamera() {

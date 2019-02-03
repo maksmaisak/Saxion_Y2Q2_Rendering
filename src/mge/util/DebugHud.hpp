@@ -7,8 +7,8 @@
 /**
  * Very simple class capable of rendering a simple piece of text through SFML.
  */
-class DebugHud
-{
+class DebugHud {
+
 	public:
 		DebugHud(sf::RenderWindow* aWindow);
 		virtual ~DebugHud();

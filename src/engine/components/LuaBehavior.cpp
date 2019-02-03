@@ -21,6 +21,11 @@ LuaReference makeLuaBehaviorFromScriptFile(LuaState& lua, const std::string& nam
     if (!lua.pcall(0, 1))
         return {};
 
+    if (!lua_istable(lua, -1)) {
+        lua_pop(lua, 1);
+        return {};
+    }
+
     // Ref the created object and return the reference wrapper.
     return LuaReference(lua);
 }
@@ -72,7 +77,7 @@ int LuaBehavior::newindexFunction(lua_State* L) {
 
 LuaBehavior& LuaBehavior::addFromLua(Actor& actor, LuaState& lua) {
 
-    auto typeId = lua_type(lua, -1);
+    int typeId = lua_type(lua, -1);
 
     if (typeId == LUA_TTABLE) {
         lua_pushvalue(lua, -1);

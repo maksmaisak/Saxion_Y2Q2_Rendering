@@ -27,10 +27,12 @@ return function(o)
             end
         end
 
-        -- move away from the enemy if too close
-        local enemyPosition = self.enemyTransform.position
-        if Vector.distance(enemyPosition, self.steering.position) < 10 then
-            self.steering:flee(enemyPosition)
+        if (not self.enemy.isDestroyed) then
+            -- move away from the enemy if too close
+            local enemyPosition = self.enemyTransform.position
+            if Vector.distance(enemyPosition, self.steering.position) < 10 then
+                self.steering:flee(enemyPosition)
+            end
         end
 
         if (self.steering.steer:magnitude() < 0.001) then

@@ -53,6 +53,25 @@ function Steering:alignVelocity(velocity)
     )
 end
 
+function Steering:brake()
+    self:alignVelocity({0, 0, 0})
+end
+
+function Steering:arrive(position, radius)
+
+    radius = radius or 1
+
+    local distance = Vector.distance(position, self.position)
+    local desiredVelocity = Vector.from(position)
+        :sub(self.position):setMagnitude(self.maxSpeed)
+
+    if (distance < radius) then
+        desiredVelocity:mul(distance / radius)
+    end
+
+    self:alignVelocity(desiredVelocity)
+end
+
 function Steering:dodge(position, velocity)
 
     local toSide = Vector.from(velocity):normalize():doCross({x = 0, y = 1, z = 0}):normalize()

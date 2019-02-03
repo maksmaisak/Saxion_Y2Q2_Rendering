@@ -183,7 +183,6 @@ function scene.start()
     player1 = makePlayer("Player1", {5, 0, -5}, "assets/scripts/playerAI_A.lua")
     player2 = makePlayer("Player2", {-5, 0, 5}, "assets/scripts/playerAI_B.lua")
 
-    -- TODO This doesn't assign to the underlying table here
     player1:get("LuaBehavior").enemy = player2
     player2:get("LuaBehavior").enemy = player1
 
@@ -194,16 +193,8 @@ function scene.start()
             rotation = {-90, 0, 0}
         },
         Camera = {},
-        LuaBehavior = {
-            update = function(dt)
-                local position1 = not player1.isDestroyed and player1:get("Transform").position or {x = 0, y = 0, z = 0}
-                local position2 = not player2.isDestroyed and player2:get("Transform").position or {x = 0, y = 0, z = 0}
-                cameraTransform.position = {
-                    (position1.x + position2.x) * 0.5,
-                    cameraTransform.position.y,
-                    (position1.z + position2.z) * 0.5
-                }
-            end
+        LuaBehavior = require("assets/scripts/camera") {
+            targets = {player1, player2}
         }
     }
     cameraTransform = camera:get("Transform")
@@ -224,8 +215,6 @@ function scene.update(dt)
     end
 
     if (player1.isDestroyed or player2.isDestroyed) then
-        player1 = nil
-        player2 = nil
         Game.loadScene("scripts/arena.lua")
     end
 end

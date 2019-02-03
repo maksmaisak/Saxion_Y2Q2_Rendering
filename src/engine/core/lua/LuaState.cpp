@@ -67,7 +67,14 @@ bool LuaState::pcall(int numArgs, int numResults) {
 }
 
 bool LuaState::doFile(const std::string& filename, int numResults) {
-    return loadFile(filename) && pcall(0, numResults);
+
+    if (!loadFile(filename)) {
+        for (int i = 0; i < numResults; ++i)
+            lua_pushnil(L);
+        return false;
+    }
+
+    return pcall(0, numResults);
 }
 
 bool LuaState::doFileInNewEnvironment(const std::string& filename, int numResults) {

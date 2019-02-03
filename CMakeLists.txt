@@ -13,6 +13,7 @@ endmacro()
 # -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake -DVCPKG_TARGET_TRIPLET=x86-windows
 
 cmake_minimum_required(VERSION 3.12)
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 project(Saxion_Y2Q2_Rendering)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -44,6 +45,9 @@ find_package(lua 5.3 REQUIRED)
 include_directories(${LUA_INCLUDE_DIR})
 find_package(glm REQUIRED)
 find_package(GLEW REQUIRED)
+find_package(freetype 2 REQUIRED)
+find_package(FTGL REQUIRED)
+include_directories(${FREETYPE_INCLUDE_DIR_freetype2})
 
 if(WIN32)
     find_package(SFML 2.5 COMPONENTS audio graphics window system main REQUIRED)
@@ -61,4 +65,4 @@ else()
     set(SFMLLIB sfml-graphics sfml-audio sfml-window sfml-system)
 endif()
 
-target_link_libraries(Saxion_Y2Q2_Rendering ${LUALIB} glm ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} ${SFMLLIB})
+target_link_libraries(Saxion_Y2Q2_Rendering ${LUALIB} glm ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} ${SFMLLIB} freetype ftgl)

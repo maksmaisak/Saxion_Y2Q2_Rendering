@@ -16,6 +16,7 @@ LuaState::LuaState(lua_State* existingL) : L(existingL), shouldCloseOnDestroy(fa
 {}
 
 LuaState::~LuaState() {
+
     if (shouldCloseOnDestroy) {
         std::cout << "Closing a lua state" << std::endl;
         lua_close(L);

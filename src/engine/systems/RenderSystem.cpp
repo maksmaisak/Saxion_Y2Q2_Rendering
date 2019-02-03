@@ -4,6 +4,7 @@
 
 #include "RenderSystem.h"
 #include <iostream>
+#include <FTGL/ftgl.h>
 #include "components/RenderInfo.h"
 #include "components/Transform.h"
 #include "components/Camera.h"

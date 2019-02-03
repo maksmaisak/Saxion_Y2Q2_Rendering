@@ -22,14 +22,14 @@ function AI:start()
     self.steering.position:set(self.transform.position)
     self.steering.velocity:set(self.rigidbody.velocity)
 
-    local timeToShoot = Game.getTime()
-    function self:canShoot() return Game.getTime() >= timeToShoot end
+    self.timeToShoot = Game.getTime()
+    function self:canShoot() return Game.getTime() >= self.timeToShoot end
     function self:shoot(targetPosition, speed)
 
         if not self:canShoot() then
             return nil
         end
-        timeToShoot = Game.getTime() + self.shootCooldown
+        self.timeToShoot = Game.getTime() + self.shootCooldown
 
         speed = speed or 10
         local spawnAheadDistance = 2

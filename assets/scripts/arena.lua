@@ -4,7 +4,7 @@
 -- Time: 17:28
 --
 
-local arenaSize = 40
+local arenaSize = 60
 
 --Game.makeMaterial("cubeMaterial", {
 --    diffuse = "textures/container/diffuse.png",
@@ -23,6 +23,7 @@ local cubeMaterial = {
 }
 
 local planeMaterial = {
+    diffuse = "textures/terrain/diffuse4.jpg",
     shininess = 10
 }
 
@@ -31,7 +32,7 @@ local scenery = {
         Name = "Plane",
         Transform = {
             position = { 0, -1, 0 },
-            scale    = { arenaSize, arenaSize, arenaSize }
+            scale    = { arenaSize / 2, arenaSize / 2, arenaSize / 2}
         },
         RenderInfo = {
             mesh = "models/plane.obj",
@@ -112,10 +113,6 @@ end
 
 function Game.makeBullet(position, velocity, size)
 
-    if #Game.bullets >= Game.maxNumActiveBullets then
-        table.remove(Game.bullets, 1):destroy()
-    end
-
     size = size or 0.2
 
     local bullet = Game.makeActor {
@@ -145,6 +142,9 @@ function Game.makeBullet(position, velocity, size)
     }
 
     table.insert(Game.bullets, bullet)
+    if #Game.bullets >= Game.maxNumActiveBullets then
+        table.remove(Game.bullets, 1):destroy()
+    end
 
     return bullet
 end
@@ -193,7 +193,18 @@ function scene.start()
             position = {0, 20, 0},
             rotation = {-90, 0, 0}
         },
-        Camera = {}
+        Camera = {},
+        LuaBehavior = {
+            update = function(dt)
+                local position1 = not player1.isDestroyed and player1:get("Transform").position or {x = 0, y = 0, z = 0}
+                local position2 = not player2.isDestroyed and player2:get("Transform").position or {x = 0, y = 0, z = 0}
+                cameraTransform.position = {
+                    (position1.x + position2.x) * 0.5,
+                    cameraTransform.position.y,
+                    (position1.z + position2.z) * 0.5
+                }
+            end
+        }
     }
     cameraTransform = camera:get("Transform")
 end
@@ -211,14 +222,6 @@ function scene.update(dt)
             bulletRigidbody.velocity = { bulletRigidbody.velocity.x, 0, bulletRigidbody.velocity.z }
         end
     end
-
-    local position1 = player1.isValid and player1:get("Transform").position or {x = 0, y = 0, z = 0}
-    local position2 = player2.isValid and player2:get("Transform").position or {x = 0, y = 0, z = 0}
-    cameraTransform.position = {
-        (position1.x + position2.x) * 0.5,
-        cameraTransform.position.y,
-        (position1.z + position2.z) * 0.5
-    }
 
     if (player1.isDestroyed or player2.isDestroyed) then
         player1 = nil

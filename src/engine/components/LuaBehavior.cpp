@@ -74,8 +74,12 @@ LuaBehavior& LuaBehavior::addFromLua(Actor& actor, LuaState& lua) {
 
     auto typeId = lua_type(lua, -1);
 
-    if (typeId == LUA_TSTRING) {
+    if (typeId == LUA_TTABLE) {
+        lua_pushvalue(lua, -1);
+        return actor.add<LuaBehavior>(LuaReference(lua));
+    }
 
+    if (typeId == LUA_TSTRING) {
         LuaReference ref = makeLuaBehaviorFromScriptFile(lua, lua.to<std::string>());
         if (ref)
             return actor.add<LuaBehavior>(std::move(ref));

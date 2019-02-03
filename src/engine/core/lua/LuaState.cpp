@@ -58,6 +58,9 @@ bool LuaState::pcall(int numArgs, int numResults) {
     } catch (std::exception& ex) {
 
         std::cerr << "An exception was thrown when executing lua code: " << ex.what() << std::endl;
+        luaL_traceback(L, L, nullptr, 1);
+        std::cerr << get<std::string>() << std::endl;
+
         lua_remove(L, errorMessageHandlerIndex);
         return false;
     }

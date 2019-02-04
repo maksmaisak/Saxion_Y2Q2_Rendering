@@ -179,9 +179,9 @@ end
 
 function Vector:normalized()
 
-    local magnitude = self:magnitude()
+    local magnitude = Vector.magnitude(self)
     if (magnitude > 0.0001) then
-        return self / magnitude
+        return Vector.__div(self, magnitude)
     else
         return Vector:new()
     end

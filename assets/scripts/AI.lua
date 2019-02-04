@@ -10,12 +10,14 @@ require('assets/scripts/steering')
 
 AI = Object:new {
     shootCooldown = 2,
-    bulletSpeed = 20
+    bulletSpeed = 20,
 }
 
 function AI:start()
 
-    self.steering = Steering:new()
+    self.steering = Steering:new {
+        maxForce = 100000
+    }
     self.transform = self.actor:get("Transform")
     self.rigidbody = self.actor:get("Rigidbody")
     self.enemyTransform = self.enemy:get("Transform")

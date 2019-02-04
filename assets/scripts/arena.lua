@@ -5,6 +5,7 @@
 --
 
 local arenaSize = 60
+local levelRestartDelay = 0
 
 --Game.makeMaterial("cubeMaterial", {
 --    diffuse = "textures/container/diffuse.png",
@@ -98,7 +99,7 @@ local function makeBorders(sideLength)
 
     for x = -halfSideLength,halfSideLength,step do
         for y = -halfSideLength,halfSideLength,step do
-            if ((x == -halfSideLength or x == halfSideLength) or (y == -halfSideLength or y == halfSideLength)) then
+            if x == -halfSideLength or x == halfSideLength or y == -halfSideLength or y == halfSideLength then
                 makeBorderPiece({x, 0, y}, radius)
             end
         end
@@ -187,7 +188,7 @@ function scene.start()
     local camera = Game.makeActor {
         Name = "Camera",
         Transform = {
-            position = {0, 20, 0},
+            position = {0, 40, 0},
             rotation = {-90, 0, 0}
         },
         Camera = {},
@@ -204,7 +205,7 @@ local sceneUpdateCoroutine = coroutine.wrap(function()
         coroutine.yield()
     end
 
-    local timeToLoadScene = Game.getTime() + 5
+    local timeToLoadScene = Game.getTime() + levelRestartDelay
     while Game.getTime() < timeToLoadScene do coroutine.yield() end
 
     Game.loadScene("scripts/arena.lua")

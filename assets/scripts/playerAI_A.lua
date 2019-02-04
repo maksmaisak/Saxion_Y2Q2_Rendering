@@ -7,6 +7,9 @@
 require('assets/scripts/AI')
 require('math')
 
+-- How many seconds away a bullet must be from hitting you to be dodged
+local minTimeBeforeBulletHit = 0.2
+
 local PlayerAI = AI:new()
 
 local oldStart = PlayerAI.start
@@ -28,26 +31,28 @@ end
 
 function PlayerAI:update(dt)
 
+    local movers = {}
     for i, bullet in ipairs(Game.bullets) do
 
-        local bulletPosition = bullet:get("Transform").position
-        if Vector.distance(bulletPosition, self.steering.position) < 10 then
-            self.steering:dodge(bulletPosition, bullet:get("Rigidbody").velocity)
-        end
+        movers[i] = {
+            position = bullet:get("Transform").position,
+            velocity = bullet:get("Rigidbody").velocity
+        }
     end
+    self.steering:avoidMovingObjects(movers, minTimeBeforeBulletHit)
 
     if not self.enemy.isDestroyed then
-
-        local enemyPosition = self.enemyTransform.position
-        if Vector.distance(enemyPosition, self.steering.position) > 10 then
-            self.steering:seek(enemyPosition)
-        end
-
         self.shootIfReady()
     end
 
     if self.steering.steer:magnitude() < 0.001 then
-        self.steering:alignVelocity({x = 0, y = 0, z = 0})
+
+        local enemyPosition = not self.enemy.isDestroyed and self.enemy:get("Transform").position
+        if enemyPosition and Vector.distance(self.transform.position, enemyPosition) > 20 then
+            self.steering:seek(enemyPosition)
+        else
+            self.steering:alignVelocity({x = 0, y = 0, z = 0})
+        end
     end
 
     --self.steering:flee(self.enemyTransform.position)

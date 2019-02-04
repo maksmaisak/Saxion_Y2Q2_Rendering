@@ -94,14 +94,16 @@ void Engine::initializeWindow(sf::RenderWindow& window) {
 
     auto& lua = getLuaState();
     lua_getglobal(lua, "Config");
-    unsigned int width  = lua.tryGetField<unsigned int>("width").value_or(800);
-    unsigned int height = lua.tryGetField<unsigned int>("height").value_or(600);
-    bool useVSync = lua.tryGetField<bool>("vSync").value_or(true);
+    unsigned int width      = lua.tryGetField<unsigned int>("width").value_or(800);
+    unsigned int height     = lua.tryGetField<unsigned int>("height").value_or(600);
+    bool vsync              = lua.tryGetField<bool>("vsync").value_or(true);
+    bool fullscreen         = lua.tryGetField<bool>("fullscreen").value_or(false);
+    std::string windowTitle = lua.tryGetField<std::string>("windowTitle").value_or("Game");
     lua_pop(lua, 1);
 
     auto contextSettings = sf::ContextSettings(24, 8, 8, 3, 3);
-    window.create(sf::VideoMode(width, height), "Game", sf::Style::Default, contextSettings);
-    window.setVerticalSyncEnabled(useVSync);
+    window.create(sf::VideoMode(width, height), windowTitle, fullscreen ? sf::Style::Fullscreen : sf::Style::Default, contextSettings);
+    window.setVerticalSyncEnabled(vsync);
     window.setActive(true);
 
     std::cout << "Window initialized." << std::endl << std::endl;

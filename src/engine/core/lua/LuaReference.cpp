@@ -53,6 +53,8 @@ LuaReference::operator bool() const {
 }
 
 void LuaReference::push() const {
+
+    assert(*this);
     lua_rawgeti(L, LUA_REGISTRYINDEX, m_ref);
 }
 

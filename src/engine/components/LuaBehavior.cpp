@@ -119,7 +119,7 @@ LuaBehavior::LuaBehavior(Actor actor, LuaReference&& table) : LuaBehavior(actor)
 
 void LuaBehavior::start() {
 
-    if (!m_start)
+    if (!m_start || !m_self)
         return;
 
     LuaState lua = m_start.getLuaState();
@@ -132,7 +132,7 @@ void LuaBehavior::start() {
 
 void LuaBehavior::update(float dt) {
 
-    if (!m_update)
+    if (!m_update || !m_self)
         return;
 
     LuaState lua = m_update.getLuaState();
@@ -146,7 +146,7 @@ void LuaBehavior::update(float dt) {
 
 void LuaBehavior::onCollision(Entity other) {
 
-    if (!m_onCollision)
+    if (!m_onCollision || !m_self)
         return;
 
     LuaState lua = m_onCollision.getLuaState();

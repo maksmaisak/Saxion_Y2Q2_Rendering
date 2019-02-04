@@ -104,7 +104,10 @@ namespace en {
         inline bool is(int index = -1) const {return lua::is<T>(L, index);}
 
         template<typename T>
-        inline T    to(int index = -1) const {return lua::to<T>(L, index);}
+        inline decltype(auto) to(int index = -1) const {return lua::to<T>(L, index);}
+
+        template<typename T>
+        inline decltype(auto) check(int index = -1) const {return lua::check<T>(L, index);}
 
         template<typename T>
         inline void push(T&& value) {return lua::push<T>(L, std::forward<T>(value));}

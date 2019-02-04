@@ -13,12 +13,14 @@
 #include "ComponentsToLua.h"
 #include "GLHelpers.h"
 #include "GameTime.h"
-#include "MetatableHelper.h"
 #include "Transform.h"
 #include "Name.h"
 #include "LuaScene.h"
 #include "LuaState.h"
+#include "MetatableHelper.h"
 #include "ClosureHelper.h"
+#include "Resources.h"
+#include "Material.h"
 
 using namespace en;
 
@@ -177,15 +179,40 @@ int makeActorFromLua(lua_State* L) {
     return 1;
 }
 
+int makeMaterial(lua_State* L) {
+
+    auto lua = LuaState(L);
+
+    std::shared_ptr<Material> material;
+    if (lua.is<std::string>(1)) {
+
+        if (lua_isnoneornil(L, 2)) {
+            material = Resources<Material>::get(lua.to<std::string>(1));
+        } else {
+            lua_pushvalue(L, 2);
+            material = Resources<Material>::get(lua.to<std::string>(1), lua);
+        }
+    } else {
+
+        if (lua_isnoneornil(L, 1)) {
+            material = std::make_shared<Material>("lit");
+        } else {
+            material = std::make_shared<Material>(lua);
+        }
+    }
+
+    lua.push(std::move(material));
+    return 1;
+}
+
 void Engine::initializeLua() {
 
     LUA_REGISTER_TYPE(Actor);
 
     auto& lua = getLuaState();
 
+    lua_newtable(lua);
     {
-        lua_newtable(lua);
-
         lua.setField("testValue", 3.1415926f);
         lua.setField("testFreeFunction", &testFreeFunction);
         lua.setField("testMemberFunction", &Engine::testMemberFunction, this);
@@ -204,14 +231,14 @@ void Engine::initializeLua() {
         lua_setfield(lua, -2, "makeActor");
 
         lua.setField("getTime", [](){return GameTime::now().asSeconds();});
-
         lua.setField("loadScene", [this](const std::string path){m_sceneManager.setCurrentScene<LuaScene>("assets/" + path);});
 
         // TODO make addProperty work on both tables and their metatables
         //lua::addProperty(lua, "time", lua::Property<float>([](){return GameTime::now().asSeconds();}));
 
-        lua_setglobal(lua, "Game");
+        lua.setField("makeMaterial", &makeMaterial);
     }
+    lua_setglobal(lua, "Game");
 
     ComponentsToLua::printDebugInfo();
 

@@ -18,6 +18,8 @@
 
 namespace en {
 
+    class LuaState;
+
     /// A generic material that works with a given shader.
     /// Automatically sets `built-in` uniforms like transformation matrices, time and lighting data.
     /// Use material.setUniformValue to set material-specific values for uniforms other than the built-in ones.
@@ -28,6 +30,8 @@ namespace en {
 
         explicit Material(const std::string& shaderFilename);
         explicit Material(std::shared_ptr<ShaderProgram> shader);
+        /// Makes a material from the table on top of stack in the given lua state
+        explicit Material(LuaState& lua);
 
         void render(Engine* engine, Mesh* mesh,
             const glm::mat4& modelMatrix,

@@ -9,6 +9,7 @@ height = 1200
 startScene = 'assets/scripts/arena.lua'
 
 bulletSpeed = 30
+levelRestartDelay = 2
 players = {
     {
         color = {1, 0, 0},

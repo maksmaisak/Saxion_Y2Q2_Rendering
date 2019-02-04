@@ -14,6 +14,7 @@
 #include "GLSetUniform.h"
 #include "TupleUtils.h"
 #include "GameTime.h"
+#include "LuaState.h"
 
 using namespace en;
 
@@ -27,6 +28,30 @@ Material::Material(std::shared_ptr<ShaderProgram> shader) : m_shader(std::move(s
     m_builtinUniformLocations = cacheBuiltinUniformLocations();
     m_attributeLocations = cacheAttributeLocations();
     detectAllUniforms();
+}
+
+Material::Material(LuaState& lua) : Material((luaL_checktype(lua, -1, LUA_TTABLE), lua.tryGetField<std::string>("shader").value_or("lit"))) {
+
+    std::string shaderName = lua.tryGetField<std::string>("shader").value_or("lit");
+
+    if (shaderName == "lit") {
+
+        setUniformValue("diffuseColor" , lua.tryGetField<glm::vec3>("diffuseColor").value_or(glm::vec3(1, 1, 1)));
+        setUniformValue("specularColor", lua.tryGetField<glm::vec3>("specularColor").value_or(glm::vec3(1, 1, 1)));
+        setUniformValue("shininess"    , lua.tryGetField<float>("shininess").value_or(10.f));
+
+        std::optional<std::string> diffusePath = lua.tryGetField<std::string>("diffuse");
+        if (diffusePath)
+            setUniformValue("diffuseMap", Textures::get(config::ASSETS_PATH + *diffusePath));
+        else
+            setUniformValue("diffuseMap", Textures::white());
+
+        std::optional<std::string> specularPath = lua.tryGetField<std::string>("specular");
+        if (specularPath)
+            setUniformValue("specularMap", Textures::get(config::ASSETS_PATH + *specularPath));
+        else
+            setUniformValue("specularMap", Textures::white());
+    }
 }
 
 void Material::render(Engine* engine, Mesh* mesh,

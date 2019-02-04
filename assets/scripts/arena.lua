@@ -5,22 +5,6 @@
 --
 
 local arenaSize = 60
-local levelRestartDelay = 0
-
---Game.makeMaterial("cubeMaterial", {
---    diffuse = "textures/container/diffuse.png",
---    specular = "textures/container/specular.png",
---    shininess = 100
---})
---
---Game.makeMaterial("planeMaterial", {
---    shininess = 10
---})
-
-local planeMaterial = {
-    diffuse = "textures/terrain/diffuse4.jpg",
-    shininess = 10
-}
 
 local scenery = {
     {
@@ -31,7 +15,10 @@ local scenery = {
         },
         RenderInfo = {
             mesh = "models/plane.obj",
-            material = planeMaterial
+            material = {
+                diffuse = "textures/terrain/diffuse4.jpg",
+                shininess = 10
+            }
         }
     },
     {
@@ -68,7 +55,9 @@ local player1
 local player2
 local cameraTransform
 
-local scene = {}
+local borderMaterial = Game.makeMaterial {
+    shininess = 100
+}
 
 local function makeBorders(sideLength)
 
@@ -84,7 +73,7 @@ local function makeBorders(sideLength)
             },
             RenderInfo = {
                 mesh = "models/sphere2.obj",
-                material = {}
+                material = borderMaterial
             },
             Rigidbody = {
                 isKinematic = true,
@@ -106,6 +95,10 @@ local function makeBorders(sideLength)
     end
 end
 
+local bulletMaterial = Game.makeMaterial {
+    shininess = 256
+}
+
 function Game.makeBullet(position, direction, size)
 
     size = size or 0.2
@@ -125,11 +118,7 @@ function Game.makeBullet(position, direction, size)
         },
         RenderInfo = {
             mesh = "models/sphere2.obj",
-            material = {
-                shininess = 256,
-                diffuseColor = {1, 0, 0},
-                specularColor = {1, 0, 0}
-            }
+            material = bulletMaterial
         },
         Light = {
             intensity = 1,
@@ -158,6 +147,8 @@ function Game.makeBullet(position, direction, size)
 
     return bullet
 end
+
+local scene = {}
 
 function scene.start()
 
@@ -222,7 +213,7 @@ local sceneUpdateCoroutine = coroutine.wrap(function()
         coroutine.yield()
     end
 
-    local timeToLoadScene = Game.getTime() + levelRestartDelay
+    local timeToLoadScene = Game.getTime() + Config.levelRestartDelay or 0
     while Game.getTime() < timeToLoadScene do coroutine.yield() end
 
     Game.loadScene("scripts/arena.lua")

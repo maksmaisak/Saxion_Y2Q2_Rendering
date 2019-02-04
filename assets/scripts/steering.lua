@@ -18,7 +18,7 @@ function Steering:init()
 
     self.position = self.position or Vector:new()
     self.velocity = self.velocity or Vector:new()
-    self.steer = self.steer or Vector:new()
+    self.steer    = self.steer    or Vector:new()
 end
 
 function Steering:update(dt)

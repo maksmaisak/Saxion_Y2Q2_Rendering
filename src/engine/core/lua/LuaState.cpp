@@ -23,6 +23,10 @@ LuaState::~LuaState() {
     }
 }
 
+void LuaState::pop(int numToPop) {
+    lua_pop(L, numToPop);
+}
+
 bool LuaState::loadFile(const std::string& filename) {
 
     int errorCode = luaL_loadfile(L, filename.c_str());

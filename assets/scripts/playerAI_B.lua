@@ -17,7 +17,7 @@ return function(o)
         for i, bullet in ipairs(Game.bullets) do
 
             local bulletPosition = bullet:get("Transform").position
-            if Vector.distance(bulletPosition, self.steering.position) < 8 then
+            if Vector.distance(bulletPosition, self.steering.position) < 10 then
                 self.steering:dodge(bulletPosition, bullet:get("Rigidbody").velocity)
             end
         end

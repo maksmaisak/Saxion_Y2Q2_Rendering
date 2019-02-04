@@ -10,7 +10,7 @@ require('assets/scripts/steering')
 
 AI = Object:new {
     shootCooldown = 2,
-    bulletSpeed = 20,
+    bulletSpeed = 30
 }
 
 function AI:start()

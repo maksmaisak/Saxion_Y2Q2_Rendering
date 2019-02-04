@@ -31,10 +31,10 @@ Engine::Engine() :
 
 void Engine::initialize() {
 
+    initializeLua();
     initializeWindow(m_window);
     printGLContextVersionInfo();
     initializeGlew();
-    initializeLua();
 }
 
 void Engine::run() {
@@ -91,7 +91,7 @@ void Engine::initializeWindow(sf::RenderWindow& window) {
     std::cout << "Initializing window..." << std::endl;
 
     auto& lua = getLuaState();
-    lua.doFileInNewEnvironment("assets/scripts/config.lua");
+    lua_getglobal(lua, "Config");
     unsigned int width  = lua.tryGetField<unsigned int>("width").value_or(800);
     unsigned int height = lua.tryGetField<unsigned int>("height").value_or(600);
     bool useVSync = lua.tryGetField<bool>("vSync").value_or(true);
@@ -214,6 +214,10 @@ void Engine::initializeLua() {
     }
 
     ComponentsToLua::printDebugInfo();
+
+    if (lua.doFileInNewEnvironment("assets/scripts/config.lua")) {
+        lua_setglobal(lua, "Config");
+    }
 }
 
 void Engine::testMemberFunction() {

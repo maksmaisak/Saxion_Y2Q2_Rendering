@@ -152,11 +152,13 @@ function scene.start()
     Game.makeActors(scenery)
     makeBorders(arenaSize)
 
-    local function makePlayer(name, position, ai, color)
+    local function makePlayer(name, position, config)
 
-        name = name or "unnamed"
+        name     = name or "unnamed"
         position = position or {0, 0, 0 }
-        color = color or {1,1,1}
+        config = config or {}
+        config.color = config.color or {1,1,1}
+        config.ai    = config.ai or {}
 
         return Game.makeActor {
             Name = name,
@@ -167,7 +169,7 @@ function scene.start()
             RenderInfo = {
                 mesh = "models/cylinder_smooth.obj",
                 material = {
-                    diffuseColor = color,
+                    diffuseColor = config.color,
                     shininess = 1
                 }
             },
@@ -175,12 +177,12 @@ function scene.start()
                 isKinematic = false,
                 useGravity = false
             },
-            LuaBehavior = ai
+            LuaBehavior = config.ai
         }
     end
 
-    player1 = makePlayer("Player1", {5, 0, -5}, "assets/scripts/playerAI_A.lua", {1, 0, 0})
-    player2 = makePlayer("Player2", {-5, 0, 5}, "assets/scripts/playerAI_B.lua", {0, 0, 1})
+    player1 = makePlayer("Player1", {-10, 0, 10}, Config.players[1])
+    player2 = makePlayer("Player2", {10, 0, -10}, Config.players[2])
 
     player1:get("LuaBehavior").enemy = player2
     player2:get("LuaBehavior").enemy = player1

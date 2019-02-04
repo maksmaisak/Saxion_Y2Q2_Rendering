@@ -12,7 +12,7 @@ using namespace en;
 
 void ComponentsToLua::printDebugInfo() {
 
-    std::cout << std::endl << "Registered component types:" << std::endl;
+    std::cout << std::endl << "ComponentsToLua:\nRegistered component types:" << std::endl;
 
     for (auto& pair : getNameToTypeInfoMap()) {
         std::cout << pair.first << std::endl;

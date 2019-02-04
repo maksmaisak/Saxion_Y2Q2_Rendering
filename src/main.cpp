@@ -38,10 +38,12 @@ int main() {
     //engine->getSceneManager().setCurrentScene<LightingScene>(); // Assignment 3
     //engine->getSceneManager().setCurrentScene<TerrainScene>(); // Assignment 4
 
-    //engine->getSceneManager().setCurrentScene<LuaScene>("assets/scripts/luaScene.lua");
-    engine->getSceneManager().setCurrentScene<LuaScene>("assets/scripts/arena.lua");
-    //engine->getSceneManager().setCurrentScene<LuaScene>("assets/scripts/stressTest.lua");
-    //engine->getSceneManager().setCurrentScene<LuaScene>("assets/scripts/testComponent.lua");
+    en::LuaState& lua = engine->getLuaState();
+    lua_getglobal(lua, "Config");
+    std::optional<std::string> startScene = lua.tryGetField<std::string>("startScene");
+    if (startScene)
+        engine->getSceneManager().setCurrentScene<LuaScene>(*startScene);
+    lua.pop();
 
     engine->run();
 

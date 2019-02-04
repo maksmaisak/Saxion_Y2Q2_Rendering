@@ -109,6 +109,8 @@ namespace en {
         template<typename T>
         inline void push(T&& value) {return lua::push<T>(L, std::forward<T>(value));}
 
+        void pop(int numToPop = 1);
+
     private:
 
         void printError();

@@ -9,8 +9,7 @@ require('assets/scripts/vector')
 require('assets/scripts/steering')
 
 AI = Object:new {
-    shootCooldown = 2,
-    bulletSpeed = 30
+    shootCooldown = 2
 }
 
 function AI:start()
@@ -38,11 +37,10 @@ function AI:start()
         local startPosition = Vector.from(self.transform.position)
 
         local direction = Vector.from(targetPosition):sub(startPosition):normalize()
-        local velocity = direction * self.bulletSpeed;
         startPosition:add(direction * spawnAheadDistance)
         --print("velocity: ", velocity.x, velocity.y, velocity.z)
 
-        return Game.makeBullet(startPosition, velocity)
+        return Game.makeBullet(startPosition, direction)
     end
 end
 

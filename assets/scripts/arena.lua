@@ -106,9 +106,10 @@ local function makeBorders(sideLength)
     end
 end
 
-function Game.makeBullet(position, velocity, size)
+function Game.makeBullet(position, direction, size)
 
     size = size or 0.2
+    local velocity = Vector.from(direction):setMagnitude(Config.bulletSpeed or 1)
 
     local bullet = Game.makeActor {
         Name = "Bullet",

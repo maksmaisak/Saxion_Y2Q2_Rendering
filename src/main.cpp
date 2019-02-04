@@ -34,9 +34,9 @@ int main() {
         engine->addSystem<en::DestroySystem>();
     }
 
-    //engine->getSceneManager().setCurrentScene<TestScene>(); // Assignment 2
+    //engine->getSceneManager().setCurrentScene<TestScene>();     // Assignment 2
     //engine->getSceneManager().setCurrentScene<LightingScene>(); // Assignment 3
-    //engine->getSceneManager().setCurrentScene<TerrainScene>(); // Assignment 4
+    //engine->getSceneManager().setCurrentScene<TerrainScene>();  // Assignment 4
 
     en::LuaState& lua = engine->getLuaState();
     lua_getglobal(lua, "Config");

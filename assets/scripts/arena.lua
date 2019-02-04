@@ -134,6 +134,20 @@ function Game.makeBullet(position, direction, size)
         Light = {
             intensity = 1,
             color = {1, 0, 0}
+        },
+        LuaBehavior = {
+            onCollision = function(self, collidee)
+
+                local light = self.actor:get("Light")
+                if light then
+                    local color = light.color
+                    light.color = {color.y, color.z, color.x}
+                end
+
+                if string.find(collidee.name, "Player") ~= nil then
+                    collidee:destroy()
+                end
+            end
         }
     }
 
@@ -229,44 +243,6 @@ function scene.update(dt)
     end
 
     sceneUpdateCoroutine()
-end
-
-function scene.onCollision(a, b)
-
-    local function switchBulletColor(bullet)
-        local light = bullet:get("Light")
-        local color = light.color
-        light.color = {color.y, color.z, color.x }
-    end
-
-    if string.find(a.name, "Bullet") ~= nil then
-        switchBulletColor(a)
-    end
-
-    if string.find(b.name, "Bullet") ~= nil then
-        switchBulletColor(b)
-    end
-
-    --print("scene.onCollision:", a.name, b.name)
-
-    local bullet
-    local player
-
-    if string.find(a.name, "Player") ~= nil then
-        player = a
-    elseif string.find(b.name, "Player") ~= nil then
-        player = b
-    end
-
-    if string.find(a.name, "Bullet") ~= nil then
-        bullet = a
-    elseif string.find(b.name, "Bullet") ~= nil then
-        bullet = b
-    end
-
-    if (bullet and player) then
-        player:destroy()
-    end
 end
 
 return scene

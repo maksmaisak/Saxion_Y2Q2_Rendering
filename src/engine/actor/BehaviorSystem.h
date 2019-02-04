@@ -13,11 +13,12 @@
 #include "System.h"
 #include "Behavior.h"
 #include "EntityEvents.h"
+#include "Collision.h"
 
 namespace en {
 
     template<typename TBehavior>
-    class BehaviorSystem : public System, Receiver<ComponentAdded<TBehavior>> {
+    class BehaviorSystem : public System, Receiver<ComponentAdded<TBehavior>>, Receiver<Collision> {
 
         static_assert(std::is_base_of_v<Behavior, TBehavior>);
 
@@ -51,6 +52,15 @@ namespace en {
         inline void receive(const ComponentAdded<TBehavior>& info) override {
 
             m_notStarted.emplace_back(info.entity);
+        }
+
+        inline void receive(const Collision& collision) override {
+
+            if (TBehavior* a = m_registry->tryGet<TBehavior>(collision.a))
+                a->onCollision(collision.b);
+
+            if (TBehavior* b = m_registry->tryGet<TBehavior>(collision.b))
+                b->onCollision(collision.a);
         }
 
         std::vector<Entity> m_notStarted;

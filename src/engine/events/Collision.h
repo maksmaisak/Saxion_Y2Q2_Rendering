@@ -14,9 +14,9 @@
 namespace en {
 
     struct Collision {
-        en::Hit hit;
-        en::Entity a = nullEntity;
-        en::Entity b = nullEntity;
+        Hit hit;
+        Entity a = nullEntity;
+        Entity b = nullEntity;
     };
 
     template<typename TComponentA, typename TComponentB>

@@ -13,7 +13,8 @@
 
 namespace en {
 
-    // WARNING. Update functions are only guaranteed to be called if this component was added using Actor::add<TBehavior>()
+    /// Components inheriting from this will have the virtual callback functions called.
+    /// WARNING. The callback functions are only guaranteed to be called if the component was added using Actor::add<TBehavior>()
     class Behavior {
 
     public:
@@ -27,6 +28,7 @@ namespace en {
         virtual void start() {};
         virtual void update(float dt) {};
         virtual void draw() {};
+        virtual void onCollision(Entity other) {};
 
     protected:
         Actor m_actor;

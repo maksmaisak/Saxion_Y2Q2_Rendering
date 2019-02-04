@@ -15,7 +15,7 @@ namespace en {
     struct Hit {
 
         glm::vec3 normal;
-        float timeOfImpact;
+        float timeOfImpact = 0.f;
         Hit(const glm::vec3& normal, float timeOfImpact) : normal(normal), timeOfImpact(timeOfImpact) {}
     };
 

@@ -25,6 +25,7 @@ namespace en {
 
         void start() override;
         void update(float dt) override;
+        void onCollision(Entity other) override;
 
     private:
 
@@ -32,8 +33,10 @@ namespace en {
         static int newindexFunction(lua_State*);
 
         LuaReference m_self;
+
         LuaReference m_start;
         LuaReference m_update;
+        LuaReference m_onCollision;
     };
 }
 

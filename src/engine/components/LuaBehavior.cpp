@@ -112,6 +112,7 @@ LuaBehavior::LuaBehavior(Actor actor, LuaReference&& table) : LuaBehavior(actor)
 
     m_start  = getFunctionFromTable(lua, "start");
     m_update = getFunctionFromTable(lua, "update");
+    m_onCollision = getFunctionFromTable(lua, "onCollision");
 
     lua.setField("actor", actor);
 }
@@ -140,5 +141,19 @@ void LuaBehavior::update(float dt) {
     m_update.push();
     m_self.push();
     lua.push(dt);
+    lua.pcall(2, 0);
+}
+
+void LuaBehavior::onCollision(Entity other) {
+
+    if (!m_onCollision)
+        return;
+
+    LuaState lua = m_onCollision.getLuaState();
+    assert(lua == m_self.getLuaState());
+
+    m_onCollision.push();
+    m_self.push();
+    lua.push(m_engine->actor(other));
     lua.pcall(2, 0);
 }

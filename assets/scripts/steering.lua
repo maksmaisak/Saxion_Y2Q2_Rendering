@@ -23,6 +23,7 @@ end
 
 function Steering:update(dt)
 
+    self.steer:truncate(self.maxForce)
     self.velocity:add(self.steer    * dt):truncate(self.maxSpeed)
     self.position:add(self.velocity * dt)
 

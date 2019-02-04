@@ -9,13 +9,13 @@ require('assets/scripts/vector')
 require('assets/scripts/steering')
 
 AI = Object:new {
-    shootCooldown = 2
+    shootCooldown = Config.ai.shootCooldown
 }
 
 function AI:start()
 
     self.steering = Steering:new {
-        maxForce = 100000
+        maxForce = Config.ai.maxSteeringForce
     }
     self.transform = self.actor:get("Transform")
     self.rigidbody = self.actor:get("Rigidbody")

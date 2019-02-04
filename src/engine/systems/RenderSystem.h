@@ -20,8 +20,9 @@ namespace en {
 
     private:
         Actor getMainCamera();
+
         std::unique_ptr<DebugHud> m_debugHud;
-        bool m_displayMeshDebugInfo;
+        bool m_displayMeshDebugInfo = false;
     };
 }
 

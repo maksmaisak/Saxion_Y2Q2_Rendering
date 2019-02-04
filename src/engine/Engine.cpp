@@ -25,7 +25,6 @@
 using namespace en;
 
 const sf::Time TimestepFixed = sf::seconds(0.01f);
-const unsigned int FramerateCap = 240;
 
 Engine::Engine() :
     m_sceneManager(this),
@@ -48,7 +47,7 @@ void Engine::run() {
     sf::Time timeSinceLastDraw = sf::Time::Zero;
 
     const float timestepFixedSeconds = TimestepFixed.asSeconds();
-    const sf::Time timestepDraw = sf::seconds(1.f / FramerateCap);
+    const sf::Time timestepDraw = sf::seconds(1.f / m_framerateCap);
 
     while (m_window.isOpen()) {
 
@@ -247,6 +246,10 @@ void Engine::initializeLua() {
     if (lua.doFileInNewEnvironment("assets/scripts/config.lua")) {
         lua_setglobal(lua, "Config");
     }
+
+    lua_getglobal(lua, "Config");
+    m_framerateCap = lua.tryGetField<unsigned int>("framerateCap").value_or(m_framerateCap);
+    lua.pop();
 }
 
 void Engine::testMemberFunction() {

@@ -73,6 +73,7 @@ namespace en {
         std::vector<std::unique_ptr<System>> m_systems;
         utils::CustomTypeMap<struct Dummy, bool> m_behaviorSystemPresence;
 
+        unsigned int m_framerateCap = 240;
         float m_fps = 0.f;
 
         void printGLContextVersionInfo();

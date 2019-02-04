@@ -103,7 +103,6 @@ function scene.update(dt)
     if (head) then
         print(head.isValid)
         print(head.name)
-        print(head:getTransform())
         print(head:get("Transform"))
         print(head:get("RenderInfo"))
         print(head:get("Rigidbody"))

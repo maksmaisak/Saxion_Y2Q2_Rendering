@@ -1,8 +1,8 @@
 
 width  = 1920
 height = 1200
-fullscreen = true
-vsync = false
+fullscreen = false
+vsync      = false
 startScene = 'assets/scripts/arena.lua'
 
 bulletSpeed = 30
@@ -17,5 +17,3 @@ players = {
         ai = 'assets/scripts/playerAI_B.lua'
     }
 }
-
-print(players[1].ai)

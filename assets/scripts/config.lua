@@ -3,6 +3,7 @@
 width  = 1920
 height = 1200
 fullscreen = false
+framerateCap = 24000
 startScene = 'assets/scripts/arena.lua'
 
 -- custom

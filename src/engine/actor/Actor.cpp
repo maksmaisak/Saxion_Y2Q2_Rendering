@@ -61,7 +61,7 @@ namespace en {
         lua.setField("add", &addByTypeName);
         lua.setField("destroyImmediate", &Actor::destroy);
         lua.setField("destroy", [](Actor& actor){
-            if (!actor.tryGet<Destroy>())
+            if (actor && !actor.tryGet<Destroy>())
                 actor.add<Destroy>();
         });
 

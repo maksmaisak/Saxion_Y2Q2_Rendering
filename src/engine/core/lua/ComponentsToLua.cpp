@@ -95,8 +95,8 @@ Actor ComponentsToLua::makeEntity(lua_State* L, Engine& engine, int entityDefini
     en::Actor actor = engine.makeActor();
 
     // Get and assign the name
-    auto pop = lua::PopperOnDestruct(L);
     lua_getfield(L, entityDefinitionIndex, "Name");
+    auto pop = lua::PopperOnDestruct(L);
     if (lua::is<std::string>(L))
         actor.add<en::Name>(lua::to<std::string>(L));
 

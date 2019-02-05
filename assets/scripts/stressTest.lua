@@ -85,6 +85,8 @@ local function getAcceleration(i, boid, acceleration)
     return acceleration
 end
 
+local boidMaterial = {shininess = 100}
+
 function scene.start()
 
     local function makeBoid(position)
@@ -99,9 +101,7 @@ function scene.start()
             },
             RenderInfo = {
                 mesh = "models/cube_flat.obj",
-                material = {
-                    shininess = 100
-                }
+                material = boidMaterial
             }
         }
 

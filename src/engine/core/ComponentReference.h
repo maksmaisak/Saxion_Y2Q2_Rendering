@@ -30,13 +30,16 @@ namespace en {
 
         inline static void initializeMetatable(LuaState& lua) {
 
-            lua_pushcfunction(lua, ComponentReferenceDetail::indexFunction);
-            lua_setfield(lua, -2, "__index");
-
-            lua_pushcfunction(lua, ComponentReferenceDetail::newindexFunction);
-            lua_setfield(lua, -2, "__newindex");
-
             getMetatable<T>(lua);
+
+            lua_pushvalue(lua, -1);
+            lua_pushcclosure(lua, ComponentReferenceDetail::indexFunction, 1);
+            lua_setfield(lua, -3, "__index");
+
+            lua_pushvalue(lua, -1);
+            lua_pushcclosure(lua, ComponentReferenceDetail::newindexFunction, 1);
+            lua_setfield(lua, -3, "__newindex");
+
             lua_setmetatable(lua, -2);
 
             // Make it use the getters and setters of the metatable of the component type.

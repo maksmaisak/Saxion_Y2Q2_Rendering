@@ -28,6 +28,7 @@ namespace lua {
         template<typename T>
         int onBeforeGarbageCollection(lua_State* L) {
 
+            // If we can get it by reference (true for userdata), do that and call the destructor.
             if constexpr (std::is_reference_v<decltype(lua::check<T>(std::declval<lua_State*>(), 1))>) {
                 //std::cout << "Garbage collection: " << utils::demangle<T>() << std::endl;
                 lua::check<T>(L, 1).~T();
@@ -62,23 +63,25 @@ namespace lua {
 
             inline static void initializeEmptyMetatable(en::LuaState& lua) {
 
-                lua_newtable(lua);
-                lua_setfield(lua, -2, "__getters");
+                const int metatableIndex = lua_gettop(lua);
 
                 lua_newtable(lua);
-                lua_setfield(lua, -2, "__setters");
+                lua_pushvalue(lua, -1);
+                lua_setfield(lua, metatableIndex, "__getters");
+                lua_pushvalue(lua, metatableIndex);
+                lua_pushcclosure(lua, &detail::indexFunction, 2);
+                lua_setfield(lua, metatableIndex, "__index");
 
-                lua_pushcfunction(lua, &detail::indexFunction);
-                lua_setfield(lua, -2, "__index");
-
-                lua_pushcfunction(lua, &detail::newindexFunction);
-                lua_setfield(lua, -2, "__newindex");
+                lua_newtable(lua);
+                lua_pushvalue(lua, -1);
+                lua_setfield(lua, metatableIndex, "__setters");
+                lua_pushcclosure(lua, &detail::newindexFunction, 1);
+                lua_setfield(lua, metatableIndex, "__newindex");
 
                 if constexpr (utils::is_equatable_v<const T>) {
                     lua.setField("__eq", utils::equalityComparer<T>{});
                 }
 
-                // TODO Set __gc for userdata metatables
                 lua.setField("__gc", &onBeforeGarbageCollection<T>);
 
                 InitializeMetatableFunctionOf<T>::initializeMetatable(lua);

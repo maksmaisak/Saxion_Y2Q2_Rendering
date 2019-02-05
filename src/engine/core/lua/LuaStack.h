@@ -85,13 +85,13 @@ namespace lua {
         inline static T& to(lua_State* L, int index = -1) {
 
             void* ptr = lua_touserdata(L, index);
-            return *reinterpret_cast<T*>(ptr);
+            return *static_cast<T*>(ptr);
         }
 
         inline static T& check(lua_State* L, int index = -1) {
 
             void* ptr = luaL_checkudata(L, index, utils::demangle<T>().c_str());
-            return *reinterpret_cast<T*>(ptr);
+            return *static_cast<T*>(ptr);
         }
 
         inline static bool is(lua_State* L, int index = -1) {

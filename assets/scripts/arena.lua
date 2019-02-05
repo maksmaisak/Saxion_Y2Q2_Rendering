@@ -128,6 +128,9 @@ function Game.makeBullet(position, direction, size)
             update = function(self, dt)
                 local tf = self.actor:get("Transform")
                 local rb = self.actor:get("Rigidbody")
+                if not tf or not rb then
+                    print(self.actor.name..": isDestroyed: "..tostring(self.actor.isDestroyed)..", isValid: "..tostring(self.actor.isValid))
+                end
                 tf.position = { tf.position.x, 0, tf.position.z }
                 rb.velocity = { rb.velocity.x, 0, rb.velocity.z }
             end,
@@ -222,8 +225,7 @@ local sceneUpdateCoroutine = coroutine.wrap(function()
     local timeToLoadScene = Game.getTime() + Config.levelRestartDelay or 0
     while Game.getTime() < timeToLoadScene do coroutine.yield() end
 
-    while true do coroutine.yield() end
-    --Game.loadScene("assets/scripts/arena.lua")
+    Game.loadScene("assets/scripts/arena.lua")
 end)
 
 function scene.update(dt)

@@ -3,6 +3,7 @@
 //
 
 #include "MetatableHelper.h"
+#include "LuaState.h"
 
 namespace lua {
 
@@ -47,7 +48,7 @@ namespace lua {
                 // call the getter
                 lua_pushvalue(L, 1); // table
                 lua_pushvalue(L, 2); // key
-                lua_call(L, 2, 1); // getter(table, key)
+                en::LuaState(L).pcall(2, 1); // getter(table, key)
 
                 return 1;
             }
@@ -96,7 +97,7 @@ namespace lua {
 
                 lua_pushvalue(L, 1); // table
                 lua_pushvalue(L, 3); // value
-                lua_call(L, 2, 0);
+                en::LuaState(L).pcall(2, 0);
 
                 return 0;
             }

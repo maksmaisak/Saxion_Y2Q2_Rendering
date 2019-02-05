@@ -30,8 +30,11 @@ namespace lua {
 
             // If we can get it by reference (true for userdata), do that and call the destructor.
             if constexpr (std::is_reference_v<decltype(lua::check<T>(std::declval<lua_State*>(), 1))>) {
+
+                T& userdata = lua::check<T>(L, 1);
+                std::allocator<T> alloc;
+                std::allocator_traits<std::allocator<T>>::destroy(alloc, &userdata);
                 //std::cout << "Garbage collection: " << utils::demangle<T>() << std::endl;
-                lua::check<T>(L, 1).~T();
             }
 
             return 0;
@@ -79,10 +82,10 @@ namespace lua {
                 lua_setfield(lua, metatableIndex, "__newindex");
 
                 if constexpr (utils::is_equatable_v<const T>) {
-                    lua.setField("__eq", utils::equalityComparer<T>{});
+                    lua.setField("__eq", utils::equalityComparer<T>{}, metatableIndex);
                 }
 
-                lua.setField("__gc", &onBeforeGarbageCollection<T>);
+                lua.setField("__gc", &onBeforeGarbageCollection<T>, metatableIndex);
 
                 InitializeMetatableFunctionOf<T>::initializeMetatable(lua);
             }
@@ -128,9 +131,6 @@ namespace lua {
         inline static constexpr bool hasGetter = !std::is_same_v<Getter, NoAccessor>;
         inline static constexpr bool hasSetter = !std::is_same_v<Setter, NoAccessor>;
 
-        using HasGetter = std::negation<std::is_same<Getter, NoAccessor>>;
-        using HasSetter = std::negation<std::is_same<Setter, NoAccessor>>;
-
         // GetterT and SetterT are expected to be versions of Getter and Setter with various cref modifiers.
         template<typename GetterT, typename SetterT>
         inline PropertyWrapper(GetterT&& getter, SetterT&& setter) :
@@ -151,7 +151,7 @@ namespace lua {
     template<typename G, typename S>
     inline void addProperty(lua_State* L, const std::string& name, const PropertyWrapper<G, S>& property) {
 
-        if constexpr (PropertyWrapper<G, S>::HasGetter::value) {
+        if constexpr (PropertyWrapper<G, S>::hasGetter) {
 
             auto popGetters = PopperOnDestruct(L);
             lua_getfield(L, -1, "__getters");
@@ -160,7 +160,7 @@ namespace lua {
             lua_setfield(L, -2, name.c_str());
         }
 
-        if constexpr (PropertyWrapper<G, S>::HasSetter::value) {
+        if constexpr (PropertyWrapper<G, S>::hasSetter) {
 
             auto popSetters = PopperOnDestruct(L);
             lua_getfield(L, -1, "__setters");

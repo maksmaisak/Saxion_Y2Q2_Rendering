@@ -41,7 +41,7 @@ namespace lua {
         template<typename TResult, typename... TArgs>
         static inline void makeClosure(lua_State* l, const std::function<TResult(TArgs...)>& function);
 
-            /// Pushes a C closure out of a given function pointer onto the lua stack.
+        /// Pushes a C closure out of a given function pointer onto the lua stack.
         /// Handles getting the arguments out of the lua stack and pushing the result onto it.
         template<typename TResult, typename... TArgs>
         static inline void makeClosure(lua_State* l, functionPtr<TResult, TArgs...> freeFunction);
@@ -58,12 +58,12 @@ namespace lua {
 
         template<typename TResult, typename TOwner, typename... TArgs>
         static inline void makeClosure(lua_State* l, TResult(TOwner::*memberFunctionConst)(TArgs...) const) {
-            makeClosure(l, reinterpret_cast<memberFunctionPtr<TResult, TOwner, TArgs...>>(memberFunctionConst));
+            makeClosure(l, const_cast<memberFunctionPtr<TResult, TOwner, TArgs...>>(memberFunctionConst));
         }
 
         template<typename TResult, typename TOwner, typename... TArgs>
         static inline void makeClosure(lua_State* l, memberFunctionPtr<TResult, TOwner, TArgs...> const memberFunctionConst, const TOwner* typeInstanceConst) {
-            makeClosure(l, reinterpret_cast<memberFunctionPtr<TResult, TOwner, TArgs...>>(memberFunctionConst), reinterpret_cast<TOwner*>(typeInstanceConst));
+            makeClosure(l, const_cast<memberFunctionPtr<TResult, TOwner, TArgs...>>(memberFunctionConst), const_cast<TOwner*>(typeInstanceConst));
         }
 
     private:
@@ -140,9 +140,7 @@ namespace lua {
     int ClosureHelper::callStdFunction(lua_State* l) {
 
         using TFunction = std::function<TResult(TArgs...)>;
-
-        void* voidPtr = lua_touserdata(l, lua_upvalueindex(1));
-        auto& function = *static_cast<TFunction*>(voidPtr);
+        auto& function = lua::check<TFunction>(l, lua_upvalueindex(1));
         return callWithArgsFromStackAndPushResult(l, std::forward<TFunction>(function), utils::types<TArgs...>{});
     }
 

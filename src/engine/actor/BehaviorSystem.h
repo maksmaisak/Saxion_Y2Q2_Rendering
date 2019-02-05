@@ -43,7 +43,6 @@ namespace en {
                 auto& behavior = m_registry->get<TBehavior>(e);
                 behavior.update(dt);
             }
-            std::cout << std::endl;
         }
 
         inline void draw() override {

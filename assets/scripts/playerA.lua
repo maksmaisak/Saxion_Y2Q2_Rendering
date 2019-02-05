@@ -16,17 +16,13 @@ local oldStart = PlayerAI.start
 function PlayerAI:start()
 
     oldStart(self)
-    self.shootIfReady = coroutine.wrap(function()
 
-        while true do
-
-            while not self:canShoot() do
-                coroutine.yield()
-            end
-
-            coroutine.yield(self:shoot(self.enemyTransform.position, 10))
+    self.shootIfReady = function(self)
+        if self:canShoot() then
+            return self:shoot(self.enemyTransform.position)
         end
-    end)
+        return nil
+    end
 end
 
 function PlayerAI:update(dt)
@@ -42,7 +38,7 @@ function PlayerAI:update(dt)
     self.steering:avoidMovingObjects(movers, minTimeBeforeBulletHit)
 
     if not self.enemy.isDestroyed then
-        self.shootIfReady()
+        self:shootIfReady()
     end
 
     if self.steering.steer:magnitude() < 0.001 then

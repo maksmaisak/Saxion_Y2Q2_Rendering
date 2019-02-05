@@ -3,6 +3,7 @@
 //
 
 #include "ComponentReference.h"
+#include "LuaState.h"
 
 namespace en {
 
@@ -20,7 +21,7 @@ namespace en {
             lua_getfield(L, -1, "__index");
             lua_pushvalue(L, 1);
             lua_pushvalue(L, 2);
-            lua_call(L, 2, 1);
+            LuaState(L).pcall(2, 1);
 
             return 1;
         }
@@ -39,7 +40,7 @@ namespace en {
             lua_pushvalue(L, 1);
             lua_pushvalue(L, 2);
             lua_pushvalue(L, 3);
-            lua_call(L, 3, 0);
+            LuaState(L).pcall(3, 0);
 
             return 0;
         }

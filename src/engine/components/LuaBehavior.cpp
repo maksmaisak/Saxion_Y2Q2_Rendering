@@ -138,7 +138,7 @@ void LuaBehavior::update(float dt) {
     LuaState lua = m_update.getLuaState();
     assert(lua == m_self.getLuaState());
 
-    std::cout << (lua_gettop(lua) > 0 ? getAsString(lua) : "nothing") << std::endl;
+    //std::cout << (lua_gettop(lua) > 0 ? getAsString(lua) : "nothing") << std::endl;
 
     m_update.push();
     m_self.push();

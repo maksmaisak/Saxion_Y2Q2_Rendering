@@ -32,14 +32,10 @@ namespace en {
     int pushByTypeName(lua_State* L) {
 
         auto actor = lua::check<Actor>(L, 1);
+        if (!actor)
+            return 0;
+
         auto name = lua::check<std::string>(L, 2);
-
-        if (!actor || actor.tryGet<Destroy>()) {
-
-            lua_pushnil(L);
-            return 1;
-        }
-
         ComponentsToLua::pushComponentPointerFromActorByTypeName(L, actor, name);
 
         return 1;
@@ -48,8 +44,10 @@ namespace en {
     int addByTypeName(lua_State* L) {
 
         auto actor = lua::check<Actor>(L, 1);
-        auto name = lua::check<std::string>(L, 2);
+        if (!actor)
+            return 0;
 
+        auto name = lua::check<std::string>(L, 2);
         ComponentsToLua::addComponentToActorByTypeName(L, actor, name);
 
         return 1;

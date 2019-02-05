@@ -43,7 +43,6 @@ namespace en {
             lua_setfield(lua, ownMetatableIndex, "__newindex");
 
             lua_pop(lua, 1);
-            //lua_setmetatable(lua, ownMetatableIndex);
         }
 
         inline ComponentReference(EntityRegistry& registry, Entity entity) : m_registry(&registry), m_entity(entity) {

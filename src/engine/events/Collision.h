@@ -14,9 +14,12 @@
 namespace en {
 
     struct Collision {
+
         Hit hit;
         Entity a = nullEntity;
         Entity b = nullEntity;
+
+        inline Collision(const Hit& hit, Entity a, Entity b) : hit(hit), a(a), b(b) {}
     };
 
     template<typename TComponentA, typename TComponentB>

@@ -32,17 +32,22 @@ void PhysicsSystem::update(float dt) {
             addGravity(entity, tf, rb, dt);
 
         constexpr int maxNumSteps = 10;
-        float moveTime = dt;
+        float timeToMove = dt;
         for (int i = 0; i < maxNumSteps; ++i) {
 
             bool didCollide;
-            std::tie(didCollide, moveTime) = move(entity, tf, rb, moveTime, entities);
+            std::tie(didCollide, timeToMove) = move(entity, tf, rb, timeToMove, entities);
             if (didCollide)
                 continue;
 
             break;
         }
     }
+
+    for (Collision& collision : m_detectedCollisions) {
+        Receiver<Collision>::broadcast(collision);
+    }
+    m_detectedCollisions.clear();
 }
 
 std::tuple<bool, float> PhysicsSystem::move(Entity entity, Transform& tf, Rigidbody& rb, float dt, EntitiesView<Transform, Rigidbody>& entities) {
@@ -77,7 +82,7 @@ std::tuple<bool, float> PhysicsSystem::move(Entity entity, Transform& tf, Rigidb
 
             tf.move(movement * hit->timeOfImpact);
 
-            Receiver<Collision>::broadcast({*hit, entity, other});
+            m_detectedCollisions.emplace_back(*hit, entity, other);
             return {true, dt * (1.f - hit->timeOfImpact)};
         }
     }

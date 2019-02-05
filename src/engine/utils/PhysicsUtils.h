@@ -16,7 +16,8 @@ namespace en {
 
         glm::vec3 normal;
         float timeOfImpact = 0.f;
-        Hit(const glm::vec3& normal, float timeOfImpact) : normal(normal), timeOfImpact(timeOfImpact) {}
+
+        inline Hit(const glm::vec3& normal, float timeOfImpact) : normal(normal), timeOfImpact(timeOfImpact) {}
     };
 
     inline std::optional<Hit> sphereVsSphereContinuous(

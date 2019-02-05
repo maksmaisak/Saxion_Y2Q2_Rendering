@@ -7,8 +7,9 @@
 
 #include <typeindex>
 #include <type_traits>
-#include <SFML/Graphics.hpp>
 #include <vector>
+#include <algorithm>
+#include <SFML/Graphics.hpp>
 
 #include "System.h"
 #include "Behavior.h"
@@ -24,6 +25,9 @@ namespace en {
 
         inline void update(float dt) override {
 
+            // If an entity got a component added and removed multiple times, m_notStarted will have duplicates.
+            // Remove them.
+            m_notStarted.erase(std::unique(m_notStarted.begin(), m_notStarted.end()), m_notStarted.end());
             for (Entity e : m_notStarted) {
 
                 auto* behavior = m_registry->tryGet<TBehavior>(e);

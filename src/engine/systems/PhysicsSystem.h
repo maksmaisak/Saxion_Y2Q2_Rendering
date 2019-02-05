@@ -9,11 +9,13 @@
 #include "System.h"
 #include "Engine.h"
 #include "glm.hpp"
+#include "Collision.h"
 
 namespace en {
 
     class Transform;
     class Rigidbody;
+    struct Collision;
 
     class PhysicsSystem : public en::System {
 
@@ -27,6 +29,7 @@ namespace en {
         void addGravity(Entity entity, Transform& tf, Rigidbody& rb, float dt);
 
         glm::vec3 m_gravity;
+        std::vector<Collision> m_detectedCollisions;
     };
 }
 

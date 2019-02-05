@@ -109,14 +109,14 @@ namespace lua {
     void ClosureHelper::makeClosure(lua_State* l, const std::function<TResult(TArgs...)>& function) {
 
         lua::push(l, function);
-        lua_pushcclosure(l, &callStdFunction<TResult, utils::remove_cvref_t<TArgs>...>, 1);
+        lua_pushcclosure(l, &callStdFunction<TResult, TArgs...>, 1);
     }
 
     template<typename TResult, typename... TArgs>
     void ClosureHelper::makeClosure(lua_State* l, functionPtr<TResult, TArgs...> freeFunction) {
 
         lua_pushlightuserdata(l, (void*)freeFunction);
-        lua_pushcclosure(l, &call<TResult, utils::remove_cvref_t<TArgs>...>, 1);
+        lua_pushcclosure(l, &call<TResult, TArgs...>, 1);
     }
 
     template<typename TResult, typename TOwner, typename... TArgs>
@@ -126,22 +126,24 @@ namespace lua {
         // because member function pointers for some types may be bigger than a void*.
         lua::push(l, memberFunction);
         lua_pushlightuserdata(l, typeInstance);
-        lua_pushcclosure(l, &callMember<TResult, TOwner, utils::remove_cvref_t<TArgs>...>, 2);
+        lua_pushcclosure(l, &callMember<TResult, TOwner, TArgs...>, 2);
     }
 
     template<typename TResult, typename TOwner, typename... TArgs>
     void ClosureHelper::makeClosure(lua_State* l, memberFunctionPtr<TResult, TOwner, TArgs...> memberFunction) {
 
         lua::push(l, memberFunction);
-        lua_pushcclosure(l, &callMemberFromStack<TResult, TOwner, utils::remove_cvref_t<TArgs>...>, 1);
+        lua_pushcclosure(l, &callMemberFromStack<TResult, TOwner, TArgs...>, 1);
     }
 
     template<typename TResult, typename... TArgs>
     int ClosureHelper::callStdFunction(lua_State* l) {
 
+        using TFunction = std::function<TResult(TArgs...)>;
+
         void* voidPtr = lua_touserdata(l, lua_upvalueindex(1));
-        auto& function = *static_cast<std::function<TResult(TArgs...)>*>(voidPtr);
-        return callWithArgsFromStackAndPushResult(l, std::forward<std::function<TResult(TArgs...)>>(function), utils::types<TArgs...>{});
+        auto& function = *static_cast<TFunction*>(voidPtr);
+        return callWithArgsFromStackAndPushResult(l, std::forward<TFunction>(function), utils::types<TArgs...>{});
     }
 
     template<typename TResult, typename... TArgs>

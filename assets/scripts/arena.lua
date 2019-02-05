@@ -125,6 +125,12 @@ function Game.makeBullet(position, direction, size)
             color = {1, 0, 0}
         },
         LuaBehavior = {
+            update = function(self, dt)
+                local tf = self.actor:get("Transform")
+                local rb = self.actor:get("Rigidbody")
+                tf.position = { tf.position.x, 0, tf.position.z }
+                rb.velocity = { rb.velocity.x, 0, rb.velocity.z }
+            end,
             onCollision = function(self, collidee)
 
                 local light = self.actor:get("Light")
@@ -216,22 +222,14 @@ local sceneUpdateCoroutine = coroutine.wrap(function()
     local timeToLoadScene = Game.getTime() + Config.levelRestartDelay or 0
     while Game.getTime() < timeToLoadScene do coroutine.yield() end
 
-    Game.loadScene("scripts/arena.lua")
+    while true do coroutine.yield() end
+    --Game.loadScene("assets/scripts/arena.lua")
 end)
 
 function scene.update(dt)
 
     Game.find("PointLight"):get("Light").intensity = math.sin(Game.getTime()) ^ 2
     --Game.find("DirectionalLight"):get("Transform"):rotate(60 * dt, 1, 0, 0)
-
-    for i, bullet in ipairs(Game.bullets) do
-        if (bullet) then
-            local bulletTransform = bullet:get("Transform")
-            local bulletRigidbody = bullet:get("Rigidbody")
-            bulletTransform.position = { bulletTransform.position.x, 0, bulletTransform.position.z }
-            bulletRigidbody.velocity = { bulletRigidbody.velocity.x, 0, bulletRigidbody.velocity.z }
-        end
-    end
 
     sceneUpdateCoroutine()
 end

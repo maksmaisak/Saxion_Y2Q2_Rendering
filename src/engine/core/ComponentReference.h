@@ -30,24 +30,20 @@ namespace en {
 
         inline static void initializeMetatable(LuaState& lua) {
 
+            const int ownMetatableIndex = lua_gettop(lua);
+
             getMetatable<T>(lua);
 
             lua_pushvalue(lua, -1);
             lua_pushcclosure(lua, ComponentReferenceDetail::indexFunction, 1);
-            lua_setfield(lua, -3, "__index");
+            lua_setfield(lua, ownMetatableIndex, "__index");
 
             lua_pushvalue(lua, -1);
             lua_pushcclosure(lua, ComponentReferenceDetail::newindexFunction, 1);
-            lua_setfield(lua, -3, "__newindex");
+            lua_setfield(lua, ownMetatableIndex, "__newindex");
 
-            lua_setmetatable(lua, -2);
-
-            // Make it use the getters and setters of the metatable of the component type.
-            lua_pushnil(lua);
-            lua_setfield(lua, -2, "__getters");
-
-            lua_pushnil(lua);
-            lua_setfield(lua, -2, "__setters");
+            lua_pop(lua, 1);
+            //lua_setmetatable(lua, ownMetatableIndex);
         }
 
         inline ComponentReference(EntityRegistry& registry, Entity entity) : m_registry(&registry), m_entity(entity) {

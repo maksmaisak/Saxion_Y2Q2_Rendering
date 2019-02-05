@@ -75,7 +75,8 @@ void Engine::update(float dt) {
     auto* currentScene = m_sceneManager.getCurrentScene();
     if (currentScene) currentScene->update(dt);
 
-    for (auto& pSystem : m_systems) pSystem->update(dt);
+    for (auto& pSystem : m_systems)
+        pSystem->update(dt);
 
     m_scheduler.update(dt);
 }
@@ -83,7 +84,8 @@ void Engine::update(float dt) {
 void Engine::draw() {
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    for (auto& pSystem : m_systems) pSystem->draw();
+    for (auto& pSystem : m_systems)
+        pSystem->draw();
     m_window.display();
 }
 
@@ -232,7 +234,11 @@ void Engine::initializeLua() {
         lua_setfield(lua, -2, "makeActor");
 
         lua.setField("getTime", [](){return GameTime::now().asSeconds();});
-        lua.setField("loadScene", [this](const std::string path){m_sceneManager.setCurrentScene<LuaScene>("assets/" + path);});
+        lua.setField("loadScene", [this](const std::string& path){
+            m_scheduler.delay(sf::microseconds(0), [=](){
+                m_sceneManager.setCurrentScene<LuaScene>(path);
+            });
+        });
 
         // TODO make addProperty work on both tables and their metatables
         //lua::addProperty(lua, "time", lua::Property<float>([](){return GameTime::now().asSeconds();}));

@@ -15,6 +15,7 @@
 #include "Behavior.h"
 #include "EntityEvents.h"
 #include "Collision.h"
+#include "Destroy.h"
 
 namespace en {
 
@@ -42,6 +43,7 @@ namespace en {
                 auto& behavior = m_registry->get<TBehavior>(e);
                 behavior.update(dt);
             }
+            std::cout << std::endl;
         }
 
         inline void draw() override {
@@ -61,10 +63,12 @@ namespace en {
         inline void receive(const Collision& collision) override {
 
             if (TBehavior* a = m_registry->tryGet<TBehavior>(collision.a))
-                a->onCollision(collision.b);
+                if (!m_registry->tryGet<Destroy>(collision.a))
+                    a->onCollision(collision.b);
 
             if (TBehavior* b = m_registry->tryGet<TBehavior>(collision.b))
-                b->onCollision(collision.a);
+                if (!m_registry->tryGet<Destroy>(collision.b))
+                    b->onCollision(collision.a);
         }
 
         std::vector<Entity> m_notStarted;

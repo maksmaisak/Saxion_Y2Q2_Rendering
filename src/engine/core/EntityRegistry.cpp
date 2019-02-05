@@ -35,7 +35,8 @@ namespace en {
 
     void EntityRegistry::destroy(Entity entity) {
 
-        if (!m_entities.contains(entity)) return;
+        if (!m_entities.contains(entity))
+            return;
 
         Receiver<EntityWillBeDestroyed>::broadcast({entity});
 

@@ -89,8 +89,6 @@ namespace en {
             m_indexToComponent.emplace_back(std::forward<Args>(args)...);
         }
 
-        Receiver<ComponentAdded<TComponent>>::broadcast({entity, m_indexToComponent.back()});
-
         return std::make_tuple(index, std::ref(m_indexToComponent.back()));
     }
 
@@ -99,8 +97,6 @@ namespace en {
 
         const index_type index = ComponentPoolBase::insert(entity);
         m_indexToComponent.push_back(component);
-
-        Receiver<ComponentAdded<TComponent>>::broadcast({entity, m_indexToComponent.back()});
 
         return std::make_tuple(index, std::ref(m_indexToComponent.back()));
     }

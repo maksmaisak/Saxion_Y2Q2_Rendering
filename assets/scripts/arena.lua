@@ -56,7 +56,7 @@ local player2
 local cameraTransform
 
 local borderMaterial = Game.makeMaterial {
-    shininess = 200
+    shininess = 100
 }
 
 local function makeBorders(sideLength)
@@ -96,7 +96,7 @@ local function makeBorders(sideLength)
 end
 
 local bulletMaterial = Game.makeMaterial {
-    shininess = 256,
+    shininess = 100,
     diffuseColor = {0, 0, 0}
 }
 

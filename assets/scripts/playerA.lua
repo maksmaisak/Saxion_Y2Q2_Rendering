@@ -44,7 +44,9 @@ function PlayerAI:update(dt)
     if self.steering.steer:magnitude() < 0.001 then
 
         local enemyPosition = not self.enemy.isDestroyed and self.enemy:get("Transform").position
-        if enemyPosition and Vector.distance(self.transform.position, enemyPosition) > 20 then
+        if Vector.magnitude(self.transform.position) > Config.arenaSize * 0.4 then
+            self.steering:seek({x = 0, y = 0, z = 0})
+        elseif enemyPosition and Vector.distance(self.transform.position, enemyPosition) > 20 then
             self.steering:seek(enemyPosition)
         else
             self.steering:alignVelocity({x = 0, y = 0, z = 0})

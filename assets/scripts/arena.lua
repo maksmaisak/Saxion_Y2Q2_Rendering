@@ -4,7 +4,7 @@
 -- Time: 17:28
 --
 
-local arenaSize = 60
+local arenaSize = Config.arenaSize or 40
 
 local scenery = {
     {
@@ -56,7 +56,7 @@ local player2
 local cameraTransform
 
 local borderMaterial = Game.makeMaterial {
-    shininess = 100
+    shininess = 200
 }
 
 local function makeBorders(sideLength)
@@ -96,7 +96,8 @@ local function makeBorders(sideLength)
 end
 
 local bulletMaterial = Game.makeMaterial {
-    shininess = 256
+    shininess = 256,
+    diffuseColor = {0, 0, 0}
 }
 
 function Game.makeBullet(position, direction, size)
@@ -150,7 +151,7 @@ function Game.makeBullet(position, direction, size)
     }
 
     table.insert(Game.bullets, bullet)
-    if #Game.bullets >= Game.maxNumActiveBullets then
+    if #Game.bullets >= Config.maxNumActiveBullets then
         table.remove(Game.bullets, 1):destroy()
     end
 
@@ -162,7 +163,6 @@ local scene = {}
 function scene.start()
 
     Game.bullets = {}
-    Game.maxNumActiveBullets = 10
 
     Game.makeActors(scenery)
     makeBorders(arenaSize)

@@ -7,9 +7,11 @@
 require('assets/scripts/object')
 require('assets/scripts/vector')
 require('assets/scripts/steering')
+require('math')
 
 AI = Object:new {
-    shootCooldown = Config.ai.shootCooldown
+    shootCooldown = Config.ai.shootCooldown,
+    shootCooldownRandomRange = Config.ai.shootCooldown / 2
 }
 
 function AI:start()
@@ -31,7 +33,7 @@ function AI:start()
         if not self:canShoot() then
             return nil
         end
-        self.timeToShoot = Game.getTime() + self.shootCooldown
+        self.timeToShoot = Game.getTime() + self.shootCooldown + (math.random() - 0.5) * 2 * self.shootCooldownRandomRange
 
         local spawnAheadDistance = 2
         local startPosition = Vector.from(self.transform.position)

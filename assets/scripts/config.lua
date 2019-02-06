@@ -9,6 +9,8 @@ startScene = 'assets/scripts/arena.lua'
 -- custom
 bulletSpeed = 30
 levelRestartDelay = 2
+arenaSize = 60
+maxNumActiveBullets = 10
 players = {
     {
         color = {1, 0, 0},

@@ -32,12 +32,16 @@ return function(o)
 
             if (self:canShoot()) then
                 self:shoot(self.enemyTransform.position)
-                self.timeToShoot = self.timeToShoot + math.random(-1, 1)
             end
         end
 
-        if (self.steering.steer:magnitude() < 0.001) then
-            self.steering:alignVelocity({x = 0, y = 0, z = 0})
+        if self.steering.steer:magnitude() < 0.001 then
+
+            if Vector.magnitude(self.transform.position) > Config.arenaSize * 0.4 then
+                self.steering:seek({x = 0, y = 0, z = 0})
+            else
+                self.steering:alignVelocity({x = 0, y = 0, z = 0})
+            end
         end
 
         self:updateSteering(dt)

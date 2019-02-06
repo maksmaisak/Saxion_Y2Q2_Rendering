@@ -25,6 +25,12 @@ namespace en {
     class Actor;
     class LuaState;
 
+    /// The root object of the entire engine. Manages system execution and owns the various submodules of the engine:
+    /// EntityRegistry: manages entities and their components.
+    /// sf::RenderWindow: the SFML window to which the game renders.
+    /// SceneManager: keeps track of the current scene and loads/unloads new ones.
+    /// LuaState: a wrapper around the lua_State through which interoperation with Lua scripts happens.
+    /// Scheduler: lets you schedule arbitrary functions to be executed at some point in the future.
     class Engine {
 
     public:

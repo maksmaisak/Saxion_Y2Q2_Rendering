@@ -38,7 +38,7 @@ namespace en {
         inline TComponent* tryGet() const {return m_registry->tryGet<TComponent>(m_entity);}
 
         template<typename TComponent>
-        inline TComponent& remove() {return m_registry->remove<TComponent>(m_entity);}
+        inline bool remove() {return m_registry->remove<TComponent>(m_entity);}
 
         void destroy();
 

@@ -23,7 +23,8 @@ namespace en {
     /// Manages entities and components
     /// Create, destroy entities.
     /// Add, modify and remove components.
-    /// Iterate through entities with a given component set.
+    /// Iterate through all entities which have a given set of components:
+    /// for (Entity e : registry.with<Transform, RenderInfo>())
     class EntityRegistry {
 
     public:
@@ -45,12 +46,13 @@ namespace en {
         inline TComponent& add(Entity entity, Args&& ... args);
 
         template<class TComponent>
-        inline TComponent& remove(Entity entity);
+        inline bool remove(Entity entity);
 
+        /// Returns an iterable collection of entities that all have components of the specified types.
         template<typename... TComponent>
         inline EntitiesView<TComponent...> with();
 
-        inline bool isAlive(Entity e) {return m_entities.contains(e);}
+        bool isAlive(Entity e);
 
     private:
 
@@ -95,8 +97,8 @@ namespace en {
     }
 
     template<class TComponent>
-    inline TComponent& EntityRegistry::remove(Entity entity) {
-        getPool<TComponent>(true).remove(entity);
+    inline bool EntityRegistry::remove(Entity entity) {
+        return getPool<TComponent>(true).remove(entity);
     }
 
     template<typename TComponent>

@@ -22,11 +22,9 @@
 
 namespace en {
 
-    using LuaComponentFactoryFunction = std::function<void(Actor&, LuaState&)>;
-    using PushComponentFromActorFunction = std::function<void(Actor&, LuaState&)>;
-    using AddComponentToActorFunction = std::function<void(Actor&, LuaState&)>;
-
     namespace detail {
+
+        using LuaComponentFactoryFunction = std::function<void(Actor&, LuaState&)>;
 
         template<typename T, typename = void>
         struct LuaComponentFactoryFunctionOf {
@@ -63,18 +61,19 @@ namespace en {
         /// Adds a component of a given type from a value at the given index in the lua stack
         static void makeComponent(lua_State* L, Actor& actor, const std::string& componentTypeName, int componentValueIndex = -1);
 
-        static void pushComponentPointerFromActorByTypeName(lua_State* L, Actor& actor, const std::string& componentTypeName);
-        static void addComponentToActorByTypeName(lua_State* L, Actor& actor, const std::string& componentTypeName);
+        static void pushComponentReferenceByTypeName(lua_State* L, Actor& actor, const std::string& componentTypeName);
+        static void addComponentByTypeName(lua_State* L, Actor& actor, const std::string& componentTypeName);
+        static void removeComponentByTypeName(lua_State* L, Actor& actor, const std::string& componentTypeName);
 
         static void printDebugInfo();
 
     private:
 
         struct TypeInfo {
-
-            LuaComponentFactoryFunction addFromLua;
-            PushComponentFromActorFunction pushFromActor;
-            AddComponentToActorFunction addToActor;
+            std::function<void(Actor&, LuaState&)> addFromLua;
+            std::function<void(Actor&, LuaState&)> pushFromActor;
+            std::function<void(Actor&, LuaState&)> addToActor;
+            std::function<void(Actor&, LuaState&)> removeFromActor;
         };
 
         // Doing it this way instead of just having a static field makes sure the map is initialized whenever it's needed.
@@ -82,6 +81,8 @@ namespace en {
             static std::map<std::string, TypeInfo> nameToTypeInfoMap;
             return nameToTypeInfoMap;
         }
+
+        static TypeInfo& getTypeInfoByName(const std::string typeName);
     };
 
     template<typename TComponent>
@@ -91,11 +92,10 @@ namespace en {
 
         explicit inline LuaTypeRequirement(const std::string& name) {
 
-            if (isRegistered) return;
+            if (isRegistered)
+                return;
 
             ComponentsToLua::registerType<TComponent>(name);
-            ComponentsToLua::registerType<TComponent*>(name + " *");
-
             isRegistered = true;
         }
 
@@ -118,26 +118,31 @@ namespace en {
 
         entry.addFromLua = detail::LuaComponentFactoryFunctionOf<T>::get();
 
-        if (!std::is_pointer_v<T>) {
+        entry.pushFromActor = [](Actor& actor, LuaState& lua) {
 
-            entry.pushFromActor = [](Actor& actor, LuaState& lua) {
-
-                T* componentPtr = actor.tryGet<T>();
-                if (componentPtr)
-                    lua::push(lua, ComponentReference<T>(actor.getEngine().getRegistry(), actor));
-                else
-                    lua_pushnil(lua);
-            };
-
-            entry.addToActor = [](Actor& actor, LuaState& lua) {
-
-                if (actor.tryGet<T>())
-                    luaL_error(lua, "Actor %s already has a component of type %s", actor.getName().c_str(), utils::demangle<T>().c_str());
-
-                actor.add<T>();
+            T* componentPtr = actor.tryGet<T>();
+            if (componentPtr)
                 lua::push(lua, ComponentReference<T>(actor.getEngine().getRegistry(), actor));
-            };
-        }
+            else
+                lua_pushnil(lua);
+        };
+
+        entry.addToActor = [](Actor& actor, LuaState& lua) {
+
+            if (actor.tryGet<T>())
+                luaL_error(lua, "Actor %s already has a component of type %s", actor.getName().c_str(), utils::demangle<T>().c_str());
+
+            actor.add<T>();
+            lua::push(lua, ComponentReference<T>(actor.getEngine().getRegistry(), actor));
+        };
+
+        entry.removeFromActor = [](Actor& actor, LuaState& lua) {
+
+            if (!actor.tryGet<T>())
+                return;
+
+            actor.remove<T>();
+        };
     }
 }
 

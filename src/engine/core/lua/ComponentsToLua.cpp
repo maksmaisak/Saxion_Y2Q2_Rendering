@@ -10,6 +10,35 @@
 
 using namespace en;
 
+void ComponentsToLua::pushComponentReferenceByTypeName(lua_State* L, Actor& actor, const std::string& componentTypeName) {
+
+    auto lua = LuaState(L);
+    getTypeInfoByName(componentTypeName).pushFromActor(actor, lua);
+}
+
+void ComponentsToLua::addComponentByTypeName(lua_State* L, Actor& actor, const std::string& componentTypeName) {
+
+    auto lua = LuaState(L);
+    getTypeInfoByName(componentTypeName).addToActor(actor, lua);
+}
+
+void ComponentsToLua::removeComponentByTypeName(lua_State* L, Actor& actor, const std::string& componentTypeName) {
+
+    auto lua = LuaState(L);
+    getTypeInfoByName(componentTypeName).removeFromActor(actor, lua);
+}
+
+ComponentsToLua::TypeInfo& ComponentsToLua::getTypeInfoByName(const std::string typeName) {
+
+    auto& map = getNameToTypeInfoMap();
+    auto it = map.find(typeName);
+    if (it == map.end()) {
+        throw utils::Exception("Unknown component type: " + typeName);
+    }
+
+    return it->second;
+}
+
 void ComponentsToLua::printDebugInfo() {
 
     std::cout << std::endl << "ComponentsToLua:\nRegistered component types:" << std::endl;
@@ -19,36 +48,6 @@ void ComponentsToLua::printDebugInfo() {
     }
 
     std::cout << std::endl;
-}
-
-void ComponentsToLua::pushComponentPointerFromActorByTypeName(lua_State* L, Actor& actor, const std::string& componentTypeName) {
-
-    auto lua = LuaState(L);
-
-    auto& map = getNameToTypeInfoMap();
-    auto it = map.find(componentTypeName);
-    if (it == map.end()) {
-        std::cout << "Unknown component type: " << componentTypeName << std::endl;
-        lua_pushnil(L);
-        return;
-    }
-
-    it->second.pushFromActor(actor, lua);
-}
-
-void ComponentsToLua::addComponentToActorByTypeName(lua_State* L, Actor& actor, const std::string& componentTypeName) {
-
-    auto lua = LuaState(L);
-
-    auto& map = getNameToTypeInfoMap();
-    auto it = map.find(componentTypeName);
-    if (it == map.end()) {
-        std::cout << "Unknown component type: " << componentTypeName << std::endl;
-        lua_pushnil(lua);
-        return;
-    }
-
-    it->second.addToActor(actor, lua);
 }
 
 void ComponentsToLua::makeEntities(lua_State* L, Engine& engine, int index) {
@@ -62,7 +61,8 @@ void ComponentsToLua::makeEntities(lua_State* L, Engine& engine, int index) {
     while (lua_next(L, index)) {
 
         auto popValue = lua::PopperOnDestruct(L);
-        if (!lua_istable(L, -1)) continue;
+        if (!lua_istable(L, -1))
+            continue;
 
         en::Actor actor = makeEntity(L, engine, -1);
         // Save a ref to the entity definition and the actor for adding components later.
@@ -147,7 +147,7 @@ void ComponentsToLua::makeComponent(lua_State* L, Actor& actor, const std::strin
     if (lua_istable(L, -1)) {
 
         // TODO make the addFromLua function push the component pointer onto the stack to avoid a second string lookup here.
-        pushComponentPointerFromActorByTypeName(L, actor, componentTypeName);
+        pushComponentReferenceByTypeName(L, actor, componentTypeName);
         auto popComponentPointer = PopperOnDestruct(L);
         int componentPointerIndex = lua_gettop(L);
 

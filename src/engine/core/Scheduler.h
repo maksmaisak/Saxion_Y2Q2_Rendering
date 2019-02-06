@@ -11,7 +11,7 @@
 #include <queue>
 #include <SFML/System.hpp>
 
-/// Schedules operations to be done at a specific time (WiP)
+/// Schedules operations to be done at a specific time
 class Scheduler {
 
 public:

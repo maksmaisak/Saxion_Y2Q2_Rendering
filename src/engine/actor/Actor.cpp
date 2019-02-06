@@ -36,27 +36,40 @@ namespace en {
             return 0;
 
         auto name = lua::check<std::string>(L, 2);
-        ComponentsToLua::pushComponentPointerFromActorByTypeName(L, actor, name);
+        ComponentsToLua::pushComponentReferenceByTypeName(L, actor, name);
 
         return 1;
     }
 
     int addByTypeName(lua_State* L) {
 
-        auto actor = lua::check<Actor>(L, 1);
+        auto& actor = lua::check<Actor>(L, 1);
         if (!actor)
             return 0;
 
         auto name = lua::check<std::string>(L, 2);
-        ComponentsToLua::addComponentToActorByTypeName(L, actor, name);
+        ComponentsToLua::addComponentByTypeName(L, actor, name);
 
         return 1;
+    }
+
+    int removeByTypeName(lua_State* L) {
+
+        auto& actor = lua::check<Actor>(L, 1);
+        if (!actor)
+            return 0;
+
+        auto name = lua::check<std::string>(L, 2);
+        ComponentsToLua::removeComponentByTypeName(L, actor, name);
+
+        return 0;
     }
 
     void Actor::initializeMetatable(LuaState& lua) {
 
         lua.setField("get", &pushByTypeName);
         lua.setField("add", &addByTypeName);
+        lua.setField("remove", &removeByTypeName);
         lua.setField("destroyImmediate", &Actor::destroy);
         lua.setField("destroy", [](Actor& actor){
             if (actor && !actor.tryGet<Destroy>())
@@ -77,6 +90,7 @@ namespace en {
                 }
             }
         ));
+
 
         lua::addProperty(lua, "isValid", lua::readonlyProperty([](Actor& actor) -> bool {
             return actor;

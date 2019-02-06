@@ -37,8 +37,8 @@ local function getAcceleration(i, boid, acceleration)
     local numSeparationBoids = 0
 
     local separation = Vector:new()
-    local cohesion = Vector:new()
-    local alignment = Vector:new()
+    local cohesion   = Vector:new()
+    local alignment  = Vector:new()
     for j, other in ipairs(boids) do
 
         if i ~= j then
@@ -48,14 +48,14 @@ local function getAcceleration(i, boid, acceleration)
             local sqrDistance = away:sqrMagnitude()
             if (sqrDistance > 0.001) then
 
-                if (sqrDistance < neighborhoodDistance ^ 2) then
+                if (sqrDistance < neighborhoodDistance * neighborhoodDistance) then
 
                     cohesion:add(otherPosition)
                     alignment:add(other.velocity)
                     numNeighbors = numNeighbors + 1
                 end
 
-                if (sqrDistance < desiredSeparationDistance ^ 2) then
+                if (sqrDistance < desiredSeparationDistance * desiredSeparationDistance) then
 
                     separation:add(away / sqrDistance);
                     numSeparationBoids = numSeparationBoids + 1
@@ -85,7 +85,7 @@ local function getAcceleration(i, boid, acceleration)
     return acceleration
 end
 
-local boidMaterial = {shininess = 100}
+local boidMaterial = Game.makeMaterial { shininess = 100 }
 
 function scene.start()
 

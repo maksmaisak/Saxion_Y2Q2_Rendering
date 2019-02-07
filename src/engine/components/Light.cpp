@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <GL/glew.h>
 #include "ComponentReference.h"
+#include "Transform.h"
 
 using namespace en;
 
@@ -70,8 +71,10 @@ Light::Light(Kind kind) {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, DepthMapResolution.x, DepthMapResolution.y, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+        float borderColor[] = {1, 1, 1, 1};
+        glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
     }
     glBindTexture(GL_TEXTURE_2D, 0);
 
@@ -124,4 +127,18 @@ GLuint Light::getFramebufferId() const {
 
 GLuint Light::getDepthMapId() const {
     return m_depthMap;
+}
+
+glm::mat4 Light::getProjectionMatrix() const {
+
+    return glm::ortho(
+        -20.f, 20.f,
+        -20.f, 20.f,
+        1.f, 100.f
+    );
+}
+
+glm::mat4 Light::getViewMatrix(const Transform& tf) const {
+
+    return glm::lookAt(tf.getForward() * 10, {0, 0, 0}, {0, 1, 0});
 }

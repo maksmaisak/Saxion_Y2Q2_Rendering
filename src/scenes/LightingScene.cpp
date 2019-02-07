@@ -131,7 +131,7 @@ void LightingScene::open() {
     }
 
     auto plane = engine.makeActor("Plane");
-    plane.add<en::Transform>().move({0, -1, 0}).setLocalScale({3, 3, 3});
+    plane.add<en::Transform>().move({0, -1, 0}).setLocalScale(glm::vec3(100));
     {
         auto mesh = en::Resources<Mesh>::get(config::MODEL_PATH + "plane.obj");
         auto material = std::make_shared<en::Material>("lit");

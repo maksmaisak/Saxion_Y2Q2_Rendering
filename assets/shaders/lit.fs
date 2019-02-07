@@ -112,19 +112,18 @@ vec3 CalculateDirectionalLightContribution(int i, DirectionalLight light, vec3 n
 
     float shadowMultiplier = CalculateShadowMultiplier(directionalLightspacePosition[i], light.depthMap, 1 - normalDotDirection);
     return ambient + shadowMultiplier * (diffuse + specular) * light.color;
-    vec3 projected = (directionalLightspacePosition[i].xyz / directionalLightspacePosition[i].w) * 0.5 + 0.5;
-    float closestDepth = texture(light.depthMap, projected.xy).r;
-    return texture(light.depthMap, projected.xy).rgb;// light.color * shadowMultiplier;
 }
 
 float CalculateShadowMultiplier(vec4 lightspacePosition, sampler2D depthMap, float biasMultiplier) {
 
     vec3 projected = (lightspacePosition.xyz / lightspacePosition.w) * 0.5 + 0.5;
     float closestDepth = texture(depthMap, projected.xy).r;
-    float thisDepth = projected.z;
+    float currentDepth = projected.z;
+    if (currentDepth > 1.f)
+        return 1;
 
     float bias = max(0.002 * biasMultiplier, 0.001);
-    return thisDepth > (closestDepth + bias) ? 0 : 1;
+    return currentDepth > (closestDepth + bias) ? 0 : 1;
 }
 
 vec3 CalculatePointLightContribution(PointLight light, vec3 normal, vec3 viewDirection, vec3 materialDiffuse, vec3 materialSpecular) {

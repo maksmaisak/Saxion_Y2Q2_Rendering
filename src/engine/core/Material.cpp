@@ -312,9 +312,9 @@ void Material::setUniformDirectionalLight(
     }
 
     if (locations.lightspaceMatrix != -1) {
-        auto lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, 1.f, 75.f);
-        auto lightView = glm::lookAt(tf.getForward() * 10, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
-        gl::setUniform(locations.lightspaceMatrix, lightProjection * lightView);
+        glm::mat4 lightProjectionMatrix = light.getProjectionMatrix();
+        glm::mat4 lightViewMatrix = light.getViewMatrix(tf);
+        gl::setUniform(locations.lightspaceMatrix, lightProjectionMatrix * lightViewMatrix);
     }
 }
 

@@ -11,6 +11,8 @@
 
 namespace en {
 
+    class Transform;
+
     class Light final {
 
         LUA_TYPE(Light);
@@ -65,6 +67,8 @@ namespace en {
         void setKind(Kind kind);
         GLuint getFramebufferId() const;
         GLuint getDepthMapId() const;
+        glm::mat4 getProjectionMatrix() const;
+        glm::mat4 getViewMatrix(const Transform& tf) const;
 
     private:
 

@@ -25,11 +25,11 @@ namespace en {
         return entity;
     }
 
-    bool EntityRegistry::isAlive(Entity e) {
+    bool EntityRegistry::isAlive(Entity e) const {
         return m_entities.contains(e);
     }
 
-    Entity EntityRegistry::findByName(const std::string& name) {
+    Entity EntityRegistry::findByName(const std::string& name) const {
 
         auto range = with<Name>();
         auto end = range.end();

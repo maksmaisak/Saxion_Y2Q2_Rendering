@@ -34,7 +34,7 @@ namespace en {
         void destroy(Entity entity);
         void destroyAll();
 
-        en::Entity findByName(const std::string& name);
+        en::Entity findByName(const std::string& name) const;
 
         template<class TComponent>
         inline TComponent& get(Entity entity) const;
@@ -50,9 +50,9 @@ namespace en {
 
         /// Returns an iterable collection of entities that all have components of the specified types.
         template<typename... TComponent>
-        inline EntitiesView<TComponent...> with();
+        inline EntitiesView<TComponent...> with() const;
 
-        bool isAlive(Entity e);
+        bool isAlive(Entity e) const;
 
     private:
 
@@ -91,7 +91,7 @@ namespace en {
     }
 
     template<typename... TComponent>
-    inline EntitiesView<TComponent...> EntityRegistry::with() {
+    inline EntitiesView<TComponent...> EntityRegistry::with() const {
 
         return EntitiesView<TComponent...>(getPool<TComponent>()...);
     }

@@ -154,7 +154,7 @@ std::string testFreeFunction() {
 int makeActors(lua_State* L) {
 
     luaL_checktype(L, 1, LUA_TTABLE);
-    Engine& engine = *lua::to<Engine*>(L, lua_upvalueindex(1));
+    Engine& engine = *lua::check<Engine*>(L, lua_upvalueindex(1));
     ComponentsToLua::makeEntities(L, engine, 1);
 
     return 0;
@@ -221,7 +221,8 @@ void Engine::initializeLua() {
         lua.setField("testMemberFunction", &Engine::testMemberFunction, this);
         lua.setField("find", [this](const std::string& name) -> std::optional<Actor> {
             Actor actor = findByName(name);
-            if (actor) return std::make_optional(actor);
+            if (actor)
+                return std::make_optional(actor);
             return std::nullopt;
         });
 
@@ -277,7 +278,8 @@ void Engine::processWindowEvents() {
                 break;
 
             case sf::Event::KeyPressed:
-                if (event.key.code == sf::Keyboard::Escape) shouldExit = true;
+                if (event.key.code == sf::Keyboard::Escape)
+                    shouldExit = true;
                 break;
 
             case sf::Event::Resized:
@@ -298,8 +300,8 @@ void Engine::processWindowEvents() {
     }
 }
 
-Actor Engine::actor(Entity entity) {
-    return Actor(*this, entity);
+Actor Engine::actor(Entity entity) const {
+    return Actor(*const_cast<Engine*>(this), entity);
 }
 
 Actor Engine::makeActor() {
@@ -310,6 +312,6 @@ Actor Engine::makeActor(const std::string& name) {
     return actor(m_registry.makeEntity(name));
 }
 
-Actor Engine::findByName(const std::string& name) {
+Actor Engine::findByName(const std::string& name) const {
     return actor(m_registry.findByName(name));
 }

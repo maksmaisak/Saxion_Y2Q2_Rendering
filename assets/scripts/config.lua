@@ -18,7 +18,7 @@ players = {
     },
     {
         color = {0, 0, 1},
-        ai = 'assets/scripts/playerB.lua'
+        ai = 'assets/scripts/playerA.lua'
     }
 }
 ai = {

@@ -51,10 +51,10 @@ namespace en {
         inline LuaState& getLuaState()         { return *m_lua; }
         inline float getFps()                  { return m_fps; }
 
-        Actor actor(Entity entity);
+        Actor actor(Entity entity) const;
         Actor makeActor();
         Actor makeActor(const std::string& name);
-        Actor findByName(const std::string& name);
+        Actor findByName(const std::string& name) const;
 
         template<typename TSystem, typename... Args>
         TSystem& addSystem(Args&& ... args);

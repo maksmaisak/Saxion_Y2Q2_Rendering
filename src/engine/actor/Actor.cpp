@@ -91,7 +91,6 @@ namespace en {
             }
         ));
 
-
         lua::addProperty(lua, "isValid", lua::readonlyProperty([](Actor& actor) -> bool {
             return actor;
         }));

@@ -61,11 +61,10 @@ void Material::render(Engine* engine, Mesh* mesh,
 ) {
     m_shader->use();
 
+    m_numTexturesInUse = 0;
     setBuiltinUniforms(engine, modelMatrix, viewMatrix, perspectiveMatrix);
     setCustomUniforms();
-
-    const auto& a = m_attributeLocations;
-    mesh->streamToOpenGL(a.vertex, a.normal, a.uv);
+    mesh->streamToOpenGL(m_attributeLocations.vertex, m_attributeLocations.normal, m_attributeLocations.uv);
 }
 
 inline bool valid(GLint location) {return location != -1;}
@@ -145,26 +144,33 @@ void Material::setCustomUniformsOfType(const Material::LocationToUniformValue<T>
 template<>
 void Material::setCustomUniformsOfType<std::shared_ptr<Texture>>(const Material::LocationToUniformValue<std::shared_ptr<Texture>>& values) {
 
-    GLenum i = 0;
+    GLenum i = m_numTexturesInUse;
     for (auto& [location, value] : values) {
-
-        glActiveTexture(GL_TEXTURE0 + i);
-        glBindTexture(GL_TEXTURE_2D, value->getId());
-        glUniform1i(location, i);
-
-        i += 1;
-        if (i > GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS) {
-
-            // TODO have materials (and maybe other resources) have a name to display in these error messages.
-            std::cout << "Too many textures for this material." << std::endl;
+        if (!setUniformTexture(location, value->getId()))
             break;
-        }
     }
 }
 
 void Material::setCustomUniforms() {
 
     std::apply([this](auto&&... args){(setCustomUniformsOfType(args), ...);}, m_uniformValues);
+}
+
+bool Material::setUniformTexture(GLint uniformLocation, GLuint textureId) {
+
+    if (m_numTexturesInUse >= GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS) {
+
+        // TODO have materials (and maybe other resources) have a name to display in these error messages.
+        std::cout << "Too many textures for this material: " << m_numTexturesInUse << "/" << GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS << std::endl;
+        return false;
+    }
+
+    glActiveTexture(GL_TEXTURE0 + m_numTexturesInUse);
+    glBindTexture(GL_TEXTURE_2D, textureId);
+    glUniform1i(uniformLocation, m_numTexturesInUse);
+
+    m_numTexturesInUse += 1;
+    return true;
 }
 
 Material::BuiltinUniformLocations Material::cacheBuiltinUniformLocations() {
@@ -217,9 +223,11 @@ Material::BuiltinUniformLocations Material::cacheBuiltinUniformLocations() {
         locations.falloffLinear    = m_shader->getUniformLocation(prefix + "falloffLinear");
         locations.falloffQuadratic = m_shader->getUniformLocation(prefix + "falloffQuadratic");
 
+        locations.depthMap = m_shader->getUniformLocation(prefix + "depthMap");
+        locations.lightspaceMatrix = m_shader->getUniformLocation("directionalLightspaceMatrix[" + std::to_string(i) + "]");
+
         m_numSupportedDirectionalLights = i + 1;
     }
-
     // Spot lights
     u.numSpotLights = m_shader->getUniformLocation("numSpotLights");
     for (int i = 0; i < MAX_NUM_SPOT_LIGHTS; ++i) {
@@ -290,7 +298,7 @@ void Material::setUniformDirectionalLight(
     const Transform& tf
 ) {
     if (valid(locations.direction))
-        gl::setUniform(locations.direction, glm::normalize(glm::vec3(tf.getWorldTransform()[2])));
+        gl::setUniform(locations.direction, tf.getForward());
 
     const Light::Settings& settings = light.getSettings();
     gl::setUniform(locations.color       , settings.color * settings.intensity);
@@ -298,6 +306,16 @@ void Material::setUniformDirectionalLight(
     gl::setUniform(locations.falloffConstant , settings.falloff.constant);
     gl::setUniform(locations.falloffLinear   , settings.falloff.linear);
     gl::setUniform(locations.falloffQuadratic, settings.falloff.quadratic);
+
+    if (locations.depthMap != -1) {
+        setUniformTexture(locations.depthMap, light.getDepthMapId());
+    }
+
+    if (locations.lightspaceMatrix != -1) {
+        auto lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, 1.f, 75.f);
+        auto lightView = glm::lookAt(tf.getForward() * 10, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
+        gl::setUniform(locations.lightspaceMatrix, lightProjection * lightView);
+    }
 }
 
 void Material::setUniformSpotLight(

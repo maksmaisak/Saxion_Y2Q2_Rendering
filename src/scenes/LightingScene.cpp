@@ -43,6 +43,7 @@ void LightingScene::open() {
     if (AnimateLightProperties) ambientLight.add<LightPropertyAnimator>();
 
     auto directionalLight = engine.makeActor("DirectionalLight");
+    directionalLight.add<RotatingBehavior>(glm::vec3(0, 1, 0), glm::radians(10.f));
     directionalLight.add<en::Transform>()
         .setLocalRotation(glm::toQuat(glm::orientate4(glm::radians(glm::vec3(-45,0,-90)))));
     {

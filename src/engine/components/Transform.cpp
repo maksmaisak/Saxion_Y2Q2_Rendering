@@ -152,7 +152,7 @@ namespace en {
     }
 
     glm::vec3 Transform::getForward() const {
-        return glm::vec3(getWorldTransform()[2]);
+        return glm::normalize(glm::vec3(getWorldTransform()[2]));
     }
 
     void Transform::initializeMetatable(LuaState& lua) {

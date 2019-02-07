@@ -121,8 +121,8 @@ namespace en {
                 continue;
 
             auto& lightTransform = m_registry->get<Transform>(lightEntity);
-            glm::mat4 lightProjectionMatrix = glm::ortho(-10.0, 10.0, -10.0, 10.0);
-            glm::mat4 lightViewMatrix = glm::lookAt(-lightTransform.getForward() * 10, {0, 0, 0}, {0, 1, 0});
+            glm::mat4 lightProjectionMatrix = glm::ortho(-10.f, 10.f, -10.f, 10.f, 1.f, 75.f);
+            glm::mat4 lightViewMatrix = glm::lookAt(lightTransform.getForward() * 10, {0, 0, 0}, {0, 1, 0});
 
             checkRenderingError();
             glViewport(0, 0, Light::DepthMapResolution.x, Light::DepthMapResolution.y);

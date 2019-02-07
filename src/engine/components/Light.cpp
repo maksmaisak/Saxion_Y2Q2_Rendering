@@ -9,6 +9,7 @@
 #include <GL/glew.h>
 #include "ComponentReference.h"
 #include "Transform.h"
+#include "GLHelpers.h"
 
 using namespace en;
 
@@ -60,33 +61,32 @@ void Light::initializeMetatable(LuaState& lua) {
     ));
 }
 
-Light::Light(Kind kind) {
+Light::Light(Kind kind) : m_kind(kind) {
 
-    m_kind = kind;
+    makeDepthMapTexture();
+    attachDepthMapToFramebuffer();
+}
 
-    // Make the depth map texture
-    glGenTextures(1, &m_depthMap);
-    glBindTexture(GL_TEXTURE_2D, m_depthMap);
-    {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, DepthMapResolution.x, DepthMapResolution.y, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-        float borderColor[] = {1, 1, 1, 1};
-        glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
-    }
-    glBindTexture(GL_TEXTURE_2D, 0);
+Light::Light(Light&& other) : m_kind(other.m_kind), m_fbo(other.m_fbo), m_depthMap(other.m_depthMap), m_settings(other.m_settings) {
 
-    // Make the framebuffer
-    glGenFramebuffers(1, &m_fbo);
-    glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
-    {
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depthMap, 0);
-        glDrawBuffer(GL_NONE);
-        glReadBuffer(GL_NONE);
-    }
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    other.m_fbo = 0;
+    other.m_depthMap = 0;
+}
+
+Light& Light::operator=(Light&& other) {
+
+    glDeleteTextures(1, &m_depthMap);
+    glDeleteFramebuffers(1, &m_fbo);
+
+    m_settings = other.m_settings;
+    m_kind = other.m_kind;
+    m_fbo = other.m_fbo;
+    m_depthMap = other.m_depthMap;
+
+    other.m_fbo = 0;
+    other.m_depthMap = 0;
+
+    return *this;
 }
 
 Light::~Light() {
@@ -113,12 +113,16 @@ Light::Kind Light::getKind() const {
 
 void Light::setKind(Light::Kind kind) {
 
-    if (kind != m_kind) {
-
-        // TODO change the depth map to a cubemap or a flat texture depending on the light kind.
-    }
+    bool isDifferentDepthMapNeeded = (kind == Kind::DIRECTIONAL) != (m_kind == Kind::DIRECTIONAL);
 
     m_kind = kind;
+
+    if (isDifferentDepthMapNeeded) {
+
+        glDeleteTextures(1, &m_depthMap);
+        makeDepthMapTexture();
+        attachDepthMapToFramebuffer();
+    }
 }
 
 GLuint Light::getFramebufferId() const {
@@ -141,4 +145,68 @@ glm::mat4 Light::getProjectionMatrix() const {
 glm::mat4 Light::getViewMatrix(const Transform& tf) const {
 
     return glm::lookAt(tf.getForward() * 10, {0, 0, 0}, {0, 1, 0});
+}
+
+void Light::makeDepthMapTexture() {
+
+    glCheckError();
+
+    if (m_depthMap != 0)
+        glDeleteTextures(1, &m_depthMap);
+
+    glGenTextures(1, &m_depthMap);
+    if (m_kind == Kind::DIRECTIONAL) {
+
+        glBindTexture(GL_TEXTURE_2D, m_depthMap);
+        {
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, DepthMapResolution.x, DepthMapResolution.y, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+            float borderColor[] = {1, 1, 1, 1};
+            glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+        }
+        glBindTexture(GL_TEXTURE_2D, 0);
+
+    } else {
+
+        glBindTexture(GL_TEXTURE_CUBE_MAP, m_depthMap);
+        {
+            for (GLenum i = 0; i < 6; ++i)
+                glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_DEPTH_COMPONENT, DepthMapResolution.x, DepthMapResolution.y, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
+
+            glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+            glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+            glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+            glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+            glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+        }
+        glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+    }
+
+    glCheckError();
+}
+
+void Light::attachDepthMapToFramebuffer() {
+
+    glCheckError();
+
+    if (m_fbo != 0)
+        glDeleteFramebuffers(1, &m_fbo);
+
+    glGenFramebuffers(1, &m_fbo);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+    {
+        if (m_kind == Kind::DIRECTIONAL) {
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depthMap, 0);
+        } else {
+            glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, m_depthMap, 0);
+        }
+        glDrawBuffer(GL_NONE);
+        glReadBuffer(GL_NONE);
+    }
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    glCheckError();
 }

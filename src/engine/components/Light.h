@@ -56,8 +56,8 @@ namespace en {
         ~Light();
         Light(const Light& other) = delete;
         Light& operator=(const Light& other) = delete;
-        Light(Light&& light) = default;
-        Light& operator=(Light&& light) = default;
+        Light(Light&& other);
+        Light& operator=(Light&& other);
 
         Settings& getSettings();
         const Settings& getSettings() const;
@@ -77,6 +77,9 @@ namespace en {
 
         GLuint m_fbo = 0;
         GLuint m_depthMap = 0;
+
+        void makeDepthMapTexture();
+        void attachDepthMapToFramebuffer();
     };
 
     struct FalloffFunctions {

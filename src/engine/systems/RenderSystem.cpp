@@ -17,13 +17,6 @@
 
 namespace en {
 
-    void checkRenderingError() {
-        if (glCheckError() == GL_NO_ERROR)
-            return;
-
-        std::cout << "";
-    }
-
     void checkRenderingError(const Actor& actor) {
 
         if (glCheckError() == GL_NO_ERROR)
@@ -113,7 +106,7 @@ namespace en {
 
         auto material = Resources<Material>::get("depth");
 
-        checkRenderingError();
+        glCheckError();
         for (Entity lightEntity : m_registry->with<Transform, Light>()) {
 
             auto& light = m_registry->get<Light>(lightEntity);
@@ -124,15 +117,15 @@ namespace en {
             glm::mat4 lightProjectionMatrix = light.getProjectionMatrix();
             glm::mat4 lightViewMatrix = light.getViewMatrix(lightTransform);
 
-            checkRenderingError();
+            glCheckError();
             glViewport(0, 0, Light::DepthMapResolution.x, Light::DepthMapResolution.y);
-            checkRenderingError();
+            glCheckError();
             glBindFramebuffer(GL_FRAMEBUFFER, light.getFramebufferId());
-            checkRenderingError();
+            glCheckError();
             {
-                checkRenderingError();
+                glCheckError();
                 glClear(GL_DEPTH_BUFFER_BIT);
-                checkRenderingError();
+                glCheckError();
                 for (Entity e : m_registry->with<Transform, RenderInfo>()) {
 
                     Mesh* mesh = m_registry->get<RenderInfo>(e).mesh.get();
@@ -142,17 +135,17 @@ namespace en {
                     checkRenderingError(m_engine->actor(e));
                 }
             }
-            checkRenderingError();
+            glCheckError();
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
-            checkRenderingError();
+            glCheckError();
         }
-        checkRenderingError();
+        glCheckError();
 
         auto size = m_engine->getWindow().getSize();
         glViewport(0, 0, size.x, size.y);
-        checkRenderingError();
+        glCheckError();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        checkRenderingError();
+        glCheckError();
     }
 
     void GLAPIENTRY

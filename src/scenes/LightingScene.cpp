@@ -36,7 +36,7 @@ void LightingScene::open() {
     auto ambientLight = engine.makeActor("AmbientLight");
     ambientLight.add<en::Transform>();
     {
-        auto& l = ambientLight.add<en::Light>();
+        auto& l = ambientLight.add<en::Light>().getSettings();
         l.color = {0,0,0};
         l.colorAmbient = {0, 0, 0.2};
     }
@@ -46,8 +46,7 @@ void LightingScene::open() {
     directionalLight.add<en::Transform>()
         .setLocalRotation(glm::toQuat(glm::orientate4(glm::radians(glm::vec3(-45,0,-90)))));
     {
-        auto& l = directionalLight.add<en::Light>();
-        l.kind = en::Light::Kind::DIRECTIONAL;
+        auto& l = directionalLight.add<en::Light>(en::Light::Kind::DIRECTIONAL).getSettings();
         l.intensity = 0.4f;
     }
     if (AnimateLightProperties) directionalLight.add<LightPropertyAnimator>();
@@ -72,8 +71,7 @@ void LightingScene::open() {
             child.add<en::RenderInfo>(mesh, material);
         }
 
-        auto& l = spotLight.add<en::Light>();
-        l.kind  = en::Light::Kind::SPOT;
+        auto& l = spotLight.add<en::Light>(en::Light::Kind::SPOT).getSettings();
         l.color = spotLightColor;
         l.spotlightInnerCutoff = glm::cos(glm::radians(20.f));
         l.spotlightOuterCutoff = glm::cos(glm::radians(45.f));
@@ -100,7 +98,7 @@ void LightingScene::open() {
         lightMaterial->setUniformValue("diffuseColor", lightColor);
 
         light.add<en::RenderInfo>(lightMesh, lightMaterial);
-        light.add<en::Light>().color = lightColor;
+        light.add<en::Light>().getSettings().color = lightColor;
         if (AnimateLightProperties) light.add<LightPropertyAnimator>();
     }
 

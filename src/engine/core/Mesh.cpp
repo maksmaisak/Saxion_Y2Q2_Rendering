@@ -236,15 +236,11 @@ void Mesh::streamToOpenGL(GLint pVerticesAttrib, GLint pNormalsAttrib, GLint pUV
 
 	glDrawElements(GL_TRIANGLES, _indices.size(), GL_UNSIGNED_INT, (GLvoid*)0);
 
-	if (pUVsAttrib != -1) glDisableVertexAttribArray(pUVsAttrib);
-	if (pNormalsAttrib != -1) glDisableVertexAttribArray(pNormalsAttrib);
+	if (pUVsAttrib      != -1) glDisableVertexAttribArray(pUVsAttrib);
+	if (pNormalsAttrib  != -1) glDisableVertexAttribArray(pNormalsAttrib);
 	if (pVerticesAttrib != -1) glDisableVertexAttribArray(pVerticesAttrib);
 
 	glBindVertexArray(0);
-
-	// no current buffer, to avoid mishaps, very important for performance
-	// REVISION: no need to unbind, unbinding the vao does that.
-	//glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 void Mesh::drawDebugInfo(const glm::mat4& pModelMatrix, const glm::mat4& pViewMatrix, const glm::mat4& pProjectionMatrix) {

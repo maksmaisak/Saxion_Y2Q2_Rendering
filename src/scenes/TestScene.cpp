@@ -113,7 +113,7 @@ void addRingItems(en::Engine& engine, en::Entity parent, std::size_t numItems = 
 
         if (i % 2 == 0) {
 
-            object.add<en::Light>().intensity = 2.f;
+            object.add<en::Light>().getSettings().intensity = 2.f;
             object.add<en::RenderInfo>(sphereMesh, sphereMaterial);
 
         } else {
@@ -184,8 +184,7 @@ void TestScene::open() {
     directionalLight.add<en::Transform>()
         .setLocalRotation(glm::toQuat(glm::orientate3(glm::radians(glm::vec3(-45, 0, 90)))));
     {
-        auto& l = directionalLight.add<en::Light>();
-        l.kind = en::Light::Kind::DIRECTIONAL;
+        auto& l = directionalLight.add<en::Light>(en::Light::Kind::DIRECTIONAL).getSettings();
         l.colorAmbient = glm::vec3(0.1);
         l.color = glm::vec3(0.2);
     }

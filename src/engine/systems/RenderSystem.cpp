@@ -11,8 +11,28 @@
 #include "GLHelpers.h"
 #include "Font.h"
 #include "GameTime.h"
+#include "Resources.h"
+#include "Material.h"
+#include "Exception.h"
 
 namespace en {
+
+    void checkRenderingError() {
+        if (glCheckError() == GL_NO_ERROR)
+            return;
+
+        std::cout << "";
+    }
+
+    void checkRenderingError(const Actor& actor) {
+
+        if (glCheckError() == GL_NO_ERROR)
+            return;
+
+        auto* namePtr = actor.tryGet<en::Name>();
+        std::string name = namePtr ? namePtr->value : "unnamed";
+        std::cerr << "Error while rendering " << name << std::endl;
+    }
 
     RenderSystem::RenderSystem(bool displayMeshDebugInfo) :
         m_displayMeshDebugInfo(displayMeshDebugInfo) {}
@@ -52,6 +72,8 @@ namespace en {
             std::cerr << "Uncaught openGL error(s) before rendering." << std::endl;
         }
 
+        updateDepthMaps();
+
         Actor mainCamera = getMainCamera();
         if (mainCamera) {
 
@@ -64,15 +86,10 @@ namespace en {
                 if (!renderInfo.material || !renderInfo.mesh)
                     continue;
 
-                glm::mat4 matrixModel = m_registry->get<Transform>(e).getWorldTransform();
+                const glm::mat4& matrixModel = m_registry->get<Transform>(e).getWorldTransform();
                 renderInfo.material->render(m_engine, renderInfo.mesh.get(), matrixModel, matrixView, matrixProjection);
 
-                if (glCheckError() != GL_NO_ERROR) {
-
-                    auto* namePtr = m_registry->tryGet<en::Name>(e);
-                    std::string name = namePtr ? namePtr->value : "unnamed";
-                    std::cerr << "Error while rendering " << name << std::endl;
-                }
+                checkRenderingError(m_engine->actor(e));
 
                 if (m_displayMeshDebugInfo) {
                     renderInfo.mesh->drawDebugInfo(matrixModel, matrixView, matrixProjection);
@@ -90,6 +107,52 @@ namespace en {
 
         Entity entity = m_registry->with<Transform, Camera>().tryGetOne();
         return m_engine->actor(entity);
+    }
+
+    void RenderSystem::updateDepthMaps() {
+
+        auto material = Resources<Material>::get("depth");
+
+        checkRenderingError();
+        for (Entity lightEntity : m_registry->with<Transform, Light>()) {
+
+            auto& light = m_registry->get<Light>(lightEntity);
+            if (light.getKind() != Light::Kind::DIRECTIONAL)
+                continue;
+
+            auto& lightTransform = m_registry->get<Transform>(lightEntity);
+            glm::mat4 lightProjectionMatrix = glm::ortho(-10.0, 10.0, -10.0, 10.0);
+            glm::mat4 lightViewMatrix = glm::lookAt(-lightTransform.getForward() * 10, {0, 0, 0}, {0, 1, 0});
+
+            checkRenderingError();
+            glViewport(0, 0, Light::DepthMapResolution.x, Light::DepthMapResolution.y);
+            checkRenderingError();
+            glBindFramebuffer(GL_FRAMEBUFFER, light.getFramebufferId());
+            checkRenderingError();
+            {
+                checkRenderingError();
+                glClear(GL_DEPTH_BUFFER_BIT);
+                checkRenderingError();
+                for (Entity e : m_registry->with<Transform, RenderInfo>()) {
+
+                    Mesh* mesh = m_registry->get<RenderInfo>(e).mesh.get();
+                    const glm::mat4& modelTransform = m_registry->get<Transform>(e).getWorldTransform();
+                    material->render(m_engine, mesh, modelTransform, lightViewMatrix, lightProjectionMatrix);
+
+                    checkRenderingError(m_engine->actor(e));
+                }
+            }
+            checkRenderingError();
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+            checkRenderingError();
+        }
+        checkRenderingError();
+
+        auto size = m_engine->getWindow().getSize();
+        glViewport(0, 0, size.x, size.y);
+        checkRenderingError();
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        checkRenderingError();
     }
 
     void GLAPIENTRY

@@ -134,6 +134,8 @@ namespace en {
     }
 
     glm::vec3 Transform::getWorldPosition() const {
+        auto x = getWorldTransform()[3];
+
         return glm::vec3(getWorldTransform()[3]);
     }
 
@@ -147,6 +149,10 @@ namespace en {
         glm::decompose(getWorldTransform(), scale, orientation, translation, skew, perspective);
 
         return orientation;
+    }
+
+    glm::vec3 Transform::getForward() const {
+        return glm::vec3(getWorldTransform()[2]);
     }
 
     void Transform::initializeMetatable(LuaState& lua) {

@@ -11,6 +11,9 @@
 #include "DebugHud.hpp"
 
 namespace en {
+
+    class ShaderProgram;
+
     class RenderSystem : public System {
 
     public:
@@ -20,6 +23,7 @@ namespace en {
 
     private:
         Actor getMainCamera();
+        void updateDepthMaps();
 
         std::unique_ptr<DebugHud> m_debugHud;
         bool m_displayMeshDebugInfo = false;

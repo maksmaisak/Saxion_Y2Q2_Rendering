@@ -8,7 +8,10 @@
 
 void LightPropertyAnimator::start() {
 
-    m_initialLight = actor().get<en::Light>();
+    auto& light = actor().get<en::Light>();
+    m_initialLightSettings = light.getSettings();
+    m_initialLightKind = light.getKind();
+
     m_startTime = GameTime::now();
 }
 
@@ -23,13 +26,14 @@ void LightPropertyAnimator::update(float dt) {
         return glm::abs(glm::rotate(color, time, {1, 1, 1}));
     };
 
-    light.color = rotateColor(m_initialLight.color);
-    light.colorAmbient = rotateColor(m_initialLight.colorAmbient);
-    light.spotlightInnerCutoff = m_initialLight.spotlightInnerCutoff * sinTime;
-    light.spotlightOuterCutoff = m_initialLight.spotlightOuterCutoff * sinTime;
+    auto& settings = light.getSettings();
+    settings.color = rotateColor(m_initialLightSettings.color);
+    settings.colorAmbient = rotateColor(m_initialLightSettings.colorAmbient);
+    settings.spotlightInnerCutoff = m_initialLightSettings.spotlightInnerCutoff * sinTime;
+    settings.spotlightOuterCutoff = m_initialLightSettings.spotlightOuterCutoff * sinTime;
+    settings.falloff.linear    = glm::abs(sinTime);
+    settings.falloff.quadratic = 1.f - glm::abs(sinTime);
 
-    light.falloff.linear    = glm::abs(sinTime);
-    light.falloff.quadratic = 1.f - glm::abs(sinTime);
-
-    light.kind = (en::Light::Kind)(((int)m_initialLight.kind + (int)(time / 4.f)) % (int)en::Light::Kind::COUNT);
+    auto kind = (en::Light::Kind)(((int)m_initialLightKind + (int)(time / 4.f)) % (int)en::Light::Kind::COUNT);
+    light.setKind(kind);
 }

@@ -28,7 +28,10 @@ namespace en {
     }
 
     RenderSystem::RenderSystem(bool displayMeshDebugInfo) :
-        m_displayMeshDebugInfo(displayMeshDebugInfo) {}
+        m_displayMeshDebugInfo(displayMeshDebugInfo),
+        m_depthShaderDirectional(Resources<ShaderProgram>::get("depthDirectional")),
+        m_depthShaderPositional(Resources<ShaderProgram>::get("depthPositional"))
+        {}
 
     void enableDebug();
 
@@ -104,48 +107,110 @@ namespace en {
 
     void RenderSystem::updateDepthMaps() {
 
-        auto material = Resources<Material>::get("depth");
-
-        glCheckError();
         for (Entity lightEntity : m_registry->with<Transform, Light>()) {
 
             auto& light = m_registry->get<Light>(lightEntity);
-            if (light.getKind() != Light::Kind::DIRECTIONAL)
-                continue;
-
             auto& lightTransform = m_registry->get<Transform>(lightEntity);
-            glm::mat4 lightProjectionMatrix = light.getProjectionMatrix();
-            glm::mat4 lightViewMatrix = light.getViewMatrix(lightTransform);
-
-            glCheckError();
-            glViewport(0, 0, Light::DepthMapResolution.x, Light::DepthMapResolution.y);
-            glCheckError();
-            glBindFramebuffer(GL_FRAMEBUFFER, light.getFramebufferId());
-            glCheckError();
-            {
-                glCheckError();
-                glClear(GL_DEPTH_BUFFER_BIT);
-                glCheckError();
-                for (Entity e : m_registry->with<Transform, RenderInfo>()) {
-
-                    Mesh* mesh = m_registry->get<RenderInfo>(e).mesh.get();
-                    const glm::mat4& modelTransform = m_registry->get<Transform>(e).getWorldTransform();
-                    material->render(m_engine, mesh, modelTransform, lightViewMatrix, lightProjectionMatrix);
-
-                    checkRenderingError(m_engine->actor(e));
-                }
+            if (light.getKind() == Light::Kind::DIRECTIONAL) {
+                updateDepthMapDirectionalLight(light, lightTransform);
+            } else {
+                updateDepthMapPositionalLight(light, lightTransform);
             }
-            glCheckError();
-            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
             glCheckError();
         }
-        glCheckError();
 
         auto size = m_engine->getWindow().getSize();
         glViewport(0, 0, size.x, size.y);
-        glCheckError();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glCheckError();
+    }
+
+    void RenderSystem::updateDepthMapDirectionalLight(const Light& light, const Transform& lightTransform) {
+
+        glm::mat4 lightProjectionMatrix = light.getProjectionMatrix();
+        glm::mat4 lightViewMatrix = light.getViewMatrix(lightTransform);
+        glm::mat4 lightspaceMatrix = lightProjectionMatrix * lightViewMatrix;
+        m_depthShaderDirectional->use();
+        m_depthShaderDirectional->setUniformValue("matrixPV", lightspaceMatrix);
+
+        glViewport(0, 0, Light::DepthMapResolution.x, Light::DepthMapResolution.y);
+        glBindFramebuffer(GL_FRAMEBUFFER, light.getFramebufferId());
+        glClear(GL_DEPTH_BUFFER_BIT);
+        for (Entity e : m_registry->with<Transform, RenderInfo>()) {
+
+            Mesh* mesh = m_registry->get<RenderInfo>(e).mesh.get();
+            if (!mesh)
+                continue;
+            const glm::mat4& modelTransform = m_registry->get<Transform>(e).getWorldTransform();
+            m_depthShaderDirectional->setUniformValue("matrixModel", modelTransform);
+            mesh->streamToOpenGL(
+                m_depthShaderDirectional->getAttribLocation("vertex"),
+                m_depthShaderDirectional->getAttribLocation("normal"),
+                m_depthShaderDirectional->getAttribLocation("uv")
+            );
+
+            checkRenderingError(m_engine->actor(e));
+        }
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    }
+
+    void RenderSystem::updateDepthMapPositionalLight(const Light& light, const Transform& lightTransform) {
+
+        float nearPlaneDistance = 1.f;
+        float farPlaneDistance = 20.f;
+        glm::mat4 lightProjectionMatrix = glm::perspective(
+            glm::radians(90.f),
+            (float)Light::DepthMapResolution.x / (float)Light::DepthMapResolution.y,
+            nearPlaneDistance,
+            farPlaneDistance
+        );
+
+        glm::vec3 lightPosition = lightTransform.getWorldPosition();
+        glm::mat4 pvMatrices[] = {
+            lightProjectionMatrix * glm::lookAt(lightPosition, lightPosition + glm::vec3( 1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f)),
+            lightProjectionMatrix * glm::lookAt(lightPosition, lightPosition + glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f)),
+            lightProjectionMatrix * glm::lookAt(lightPosition, lightPosition + glm::vec3( 0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f)),
+            lightProjectionMatrix * glm::lookAt(lightPosition, lightPosition + glm::vec3( 0.0f,-1.0f, 0.0f), glm::vec3(0.0f, 0.0f,-1.0f)),
+            lightProjectionMatrix * glm::lookAt(lightPosition, lightPosition + glm::vec3( 0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 0.0f)),
+            lightProjectionMatrix * glm::lookAt(lightPosition, lightPosition + glm::vec3( 0.0f, 0.0f,-1.0f), glm::vec3(0.0f, 0.0f, 0.0f))
+        };
+
+        m_depthShaderPositional->use();
+
+        glCheckError();
+        for (unsigned int i = 0; i < 6; ++i) {
+            m_depthShaderPositional->setUniformValue("matrixPV[" + std::to_string(i) + "]", pvMatrices[i]);
+            glCheckError();
+        }
+        glCheckError();
+        m_depthShaderPositional->setUniformValue("lightPosition", lightPosition);
+        glCheckError();
+        m_depthShaderPositional->setUniformValue("farPlaneDistance", farPlaneDistance);
+
+        glCheckError();
+        glViewport(0, 0, Light::DepthMapResolution.x, Light::DepthMapResolution.y);
+        glCheckError();
+        glBindFramebuffer(GL_FRAMEBUFFER, light.getFramebufferId());
+        glCheckError();
+        glClear(GL_DEPTH_BUFFER_BIT);
+        glCheckError();
+        for (Entity e : m_registry->with<Transform, RenderInfo>()) {
+
+            Mesh* mesh = m_registry->get<RenderInfo>(e).mesh.get();
+            if (!mesh)
+                continue;
+            const glm::mat4& modelTransform = m_registry->get<Transform>(e).getWorldTransform();
+            m_depthShaderPositional->setUniformValue("matrixModel", modelTransform);
+            glCheckError();
+            mesh->streamToOpenGL(
+                m_depthShaderPositional->getAttribLocation("vertex"),
+                m_depthShaderPositional->getAttribLocation("normal"),
+                m_depthShaderPositional->getAttribLocation("uv")
+            );
+            glCheckError();
+        }
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
     void GLAPIENTRY

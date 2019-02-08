@@ -13,6 +13,8 @@
 namespace en {
 
     class ShaderProgram;
+    class Light;
+    class Transform;
 
     class RenderSystem : public System {
 
@@ -24,6 +26,12 @@ namespace en {
     private:
         Actor getMainCamera();
         void updateDepthMaps();
+
+        void updateDepthMapDirectionalLight(const Light& light, const Transform& lightTransform);
+        void updateDepthMapPositionalLight(const Light& light, const Transform& lightTransform);
+
+        std::shared_ptr<ShaderProgram> m_depthShaderDirectional;
+        std::shared_ptr<ShaderProgram> m_depthShaderPositional;
 
         std::unique_ptr<DebugHud> m_debugHud;
         bool m_displayMeshDebugInfo = false;

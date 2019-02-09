@@ -167,7 +167,7 @@ bool Material::setUniformTexture(GLint uniformLocation, GLuint textureId, GLenum
     glBindTexture(textureTarget, textureId);
     glUniform1i(uniformLocation, m_numTexturesInUse);
 
-    std::cout << "Set texture to uniform. Texture unit: " << m_numTexturesInUse << ", textureId: " << textureId << ", textureTarget: " << textureTarget << ", uniform location: " << uniformLocation << std::endl;
+    //std::cout << "Set texture to uniform. Texture unit: " << m_numTexturesInUse << ", textureId: " << textureId << ", textureTarget: " << textureTarget << ", uniform location: " << uniformLocation << std::endl;
 
     m_numTexturesInUse += 1;
     return true;

@@ -16,12 +16,49 @@ namespace en {
 
     class ComponentPoolBase {
 
-        static_assert(std::is_unsigned_v<en::Entity>, "Entity must be and unsigned integer type.");
+        static_assert(std::is_unsigned_v<Entity>, "Entity must be an unsigned integer type.");
 
     public:
-        using const_iterator = std::vector<en::Entity>::const_iterator;
-        using iterator = const_iterator;
-        using index_type = std::vector<en::Entity>::size_type;
+        using index_type = std::vector<Entity>::size_type;
+
+        class iterator {
+
+        public:
+
+            // Typedefs required to qualify as an Iterator.
+            using difference_type   = index_type;
+            using value_type        = const Entity;
+            using pointer           = value_type*;
+            using reference         = value_type&;
+            using iterator_category = std::forward_iterator_tag;
+
+            inline iterator(const std::vector<Entity>* entities, index_type index) : m_entities(entities), m_index(index) {}
+
+            inline bool operator==(const iterator &other) const {
+                return other.m_index == m_index;
+            }
+
+            inline bool operator!=(const iterator &other) const {
+                return other.m_index != m_index;
+            }
+
+            inline iterator& operator++() {
+                return --m_index, *this;
+            }
+
+            inline pointer operator->() const {
+                return &(*m_entities)[m_index - 1];
+            }
+
+            inline reference operator*() const {
+                return *operator->();
+            }
+
+        private:
+            const std::vector<Entity>* m_entities;
+            index_type m_index;
+        };
+        using const_iterator = iterator;
 
         const index_type nullIndex = std::numeric_limits<index_type>::max();
 
@@ -32,8 +69,8 @@ namespace en {
         bool remove(en::Entity entity);
         virtual void clear();
 
-        inline const_iterator cbegin() const {return m_indexToEntity.cbegin();}
-        inline const_iterator cend()   const {return m_indexToEntity.cend();  }
+        inline const_iterator cbegin() const {return {&m_indexToEntity, m_indexToEntity.size()};}
+        inline const_iterator cend()   const {return {&m_indexToEntity, 0};}
         inline iterator begin()        const {return cbegin();}
         inline iterator end()          const {return cend();  }
 

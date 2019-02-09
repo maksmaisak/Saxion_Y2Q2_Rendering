@@ -105,9 +105,9 @@ function scene.start()
             mesh = "models/sphere2.obj",
             material = {}
         },
-        Light = {
-			intensity = 5
-		}
+--        Light = {
+--			intensity = 5
+--		}
     }
 
     local actor2 = Game.makeActor {

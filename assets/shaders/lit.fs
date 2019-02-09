@@ -51,7 +51,7 @@ struct SpotLight {
 };
 
 uniform DirectionalLight directionalLights[NUM_DIRECTIONAL_LIGHTS];
-uniform sampler2D directionalDepthMaps[NUM_DIRECTIONAL_LIGHTS];
+uniform sampler2DShadow directionalDepthMaps[NUM_DIRECTIONAL_LIGHTS];
 uniform int numDirectionalLights = 0;
 
 uniform PointLight pointLights[NUM_POINT_LIGHTS];
@@ -179,9 +179,8 @@ float CalculateDirectionalShadowMultiplier(int i, float biasMultiplier) {
     if (currentDepth > 1.f)
         return 1;
 
-    float closestDepth = texture(directionalDepthMaps[0], projected.xy).r;
     float bias = max(0.002 * biasMultiplier, 0.001);
-    return currentDepth > (closestDepth + bias) ? 0 : 1;
+    return texture(directionalDepthMaps[0], vec3(projected.xy, currentDepth - bias));
 }
 
 float CalculatePointShadowMultiplier(int i, vec3 fromLight, float distance, float biasMultiplier) {

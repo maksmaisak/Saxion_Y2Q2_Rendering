@@ -5,6 +5,8 @@
 #ifndef SAXION_Y2Q2_RENDERING_META_H
 #define SAXION_Y2Q2_RENDERING_META_H
 
+#include <functional>
+
 namespace utils {
 
     /// An aide for automatic template parameter deduction.

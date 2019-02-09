@@ -98,26 +98,23 @@ function scene.start()
     local actor2 = Game.makeActor {
         Name = "Light2",
         Transform = {
-            position = {5, 3, 0},
+            position = {3, 3, 0},
             scale = {0.1, 0.1, 0.1}
         },
         RenderInfo = {
             mesh = "models/sphere2.obj",
             material = {}
         },
-        Light = {}
+        Light = {
+			intensity = 5
+		}
     }
 
     local actor2 = Game.makeActor {
         Name = "LightDirectional",
         Transform = {
-            position = {5, 3, 0},
             scale = {0.1, 0.1, 0.1},
             rotation = {-45, 0, 0}
-        },
-        RenderInfo = {
-            mesh = "models/sphere2.obj",
-            material = {}
         },
         Light = {
             kind = "directional",

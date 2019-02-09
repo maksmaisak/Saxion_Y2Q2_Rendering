@@ -189,5 +189,5 @@ float CalculatePointShadowMultiplier(int i, vec3 fromLight, float distance, floa
     float bias = max(0.1 * biasMultiplier, 0.05);
     float currentDepth = distance;
 
-    return texture(pointDepthMaps[0], vec4(fromLight, (currentDepth - bias) / pointLights[i].farPlaneDistance));
+    return texture(pointDepthMaps[i], vec4(fromLight, (currentDepth - bias) / pointLights[i].farPlaneDistance));
 }

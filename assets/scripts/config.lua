@@ -4,7 +4,7 @@ width  = 1920
 height = 1200
 fullscreen = false
 framerateCap = 240
-startScene = 'assets/scripts/arena.lua'
+startScene = 'assets/scripts/luaScene.lua'
 
 -- custom
 bulletSpeed = 30

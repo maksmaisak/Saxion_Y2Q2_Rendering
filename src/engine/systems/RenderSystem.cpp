@@ -31,7 +31,7 @@ void checkRenderingError(const Actor& actor) {
 RenderSystem::RenderSystem(bool displayMeshDebugInfo) :
     m_displayMeshDebugInfo(displayMeshDebugInfo),
     m_directionalDepthShader(Resources<ShaderProgram>::get("depthDirectional")),
-    m_positionalDepthShader(Resources<ShaderProgram>::get("depthPositional"))
+    m_positionalDepthShader (Resources<ShaderProgram>::get("depthPositional"))
 {
 
     m_directionalDepthShaderAttribLocations.vertex = m_directionalDepthShader->getAttribLocation("vertex");
@@ -186,30 +186,30 @@ std::tuple<float, glm::vec3, std::array<glm::mat4, 6>> getDirectionalLightUnifor
         farPlaneDistance,
         lightPosition,
         {
-            lightProjectionMatrix * glm::lookAt(lightPosition, lightPosition + glm::vec3( 1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f)),
-            lightProjectionMatrix * glm::lookAt(lightPosition, lightPosition + glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f)),
+            lightProjectionMatrix * glm::lookAt(lightPosition, lightPosition + glm::vec3( 1.0f, 0.0f, 0.0f), glm::vec3(0.0f,-1.0f, 0.0f)),
+            lightProjectionMatrix * glm::lookAt(lightPosition, lightPosition + glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f,-1.0f, 0.0f)),
             lightProjectionMatrix * glm::lookAt(lightPosition, lightPosition + glm::vec3( 0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f)),
             lightProjectionMatrix * glm::lookAt(lightPosition, lightPosition + glm::vec3( 0.0f,-1.0f, 0.0f), glm::vec3(0.0f, 0.0f,-1.0f)),
-            lightProjectionMatrix * glm::lookAt(lightPosition, lightPosition + glm::vec3( 0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 0.0f)),
-            lightProjectionMatrix * glm::lookAt(lightPosition, lightPosition + glm::vec3( 0.0f, 0.0f,-1.0f), glm::vec3(0.0f, 0.0f, 0.0f))
+            lightProjectionMatrix * glm::lookAt(lightPosition, lightPosition + glm::vec3( 0.0f, 0.0f, 1.0f), glm::vec3(0.0f,-1.0f, 0.0f)),
+            lightProjectionMatrix * glm::lookAt(lightPosition, lightPosition + glm::vec3( 0.0f, 0.0f,-1.0f), glm::vec3(0.0f,-1.0f, 0.0f))
         }
     };
 }
 
 void RenderSystem::updateDepthMapPositionalLight(const Light& light, const Transform& lightTransform) {
 
+    glViewport(0, 0, Light::DepthMapResolution.x, Light::DepthMapResolution.y);
+    glBindFramebuffer(GL_FRAMEBUFFER, light.getFramebufferId());
+    glClear(GL_DEPTH_BUFFER_BIT);
+
     m_positionalDepthShader->use();
 
     auto [farPlaneDistance, lightPosition, pvMatrices] = getDirectionalLightUniforms(light, lightTransform);
-
     for (unsigned int i = 0; i < 6; ++i)
         m_positionalDepthShader->setUniformValue("matrixPV[" + std::to_string(i) + "]", pvMatrices[i]);
     m_positionalDepthShader->setUniformValue("lightPosition", lightPosition);
     m_positionalDepthShader->setUniformValue("farPlaneDistance", farPlaneDistance);
 
-    glViewport(0, 0, Light::DepthMapResolution.x, Light::DepthMapResolution.y);
-    glBindFramebuffer(GL_FRAMEBUFFER, light.getFramebufferId());
-    glClear(GL_DEPTH_BUFFER_BIT);
     for (Entity e : m_registry->with<Transform, RenderInfo>()) {
 
         Mesh* mesh = m_registry->get<RenderInfo>(e).mesh.get();
@@ -224,7 +224,9 @@ void RenderSystem::updateDepthMapPositionalLight(const Light& light, const Trans
             m_positionalDepthShaderAttribLocations.uv
         );
     }
+
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glCheckError();
 }
 
 void GLAPIENTRY
@@ -248,7 +250,7 @@ messageCallback(
 
 void enableDebug() {
 
-    //glEnable(GL_DEBUG_OUTPUT);
-    //glCheckError();
-    //glDebugMessageCallback(messageCallback, 0);
+    glEnable(GL_DEBUG_OUTPUT);
+    glCheckError();
+    glDebugMessageCallback(messageCallback, 0);
 }

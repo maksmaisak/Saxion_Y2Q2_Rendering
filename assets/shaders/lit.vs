@@ -1,4 +1,4 @@
-#version 330
+#version 410
 
 const int NUM_DIRECTIONAL_LIGHTS = 4;
 

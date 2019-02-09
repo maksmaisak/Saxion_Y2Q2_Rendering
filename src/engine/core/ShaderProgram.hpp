@@ -71,7 +71,7 @@ namespace en {
 
 		GLint location = getUniformLocation(name);
 		if (location == -1)
-			return;
+			throw "No such uniform!";
 
 		gl::setUniform(location, std::forward<T>(value));
 	}

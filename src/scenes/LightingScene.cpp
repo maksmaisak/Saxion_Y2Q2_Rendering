@@ -22,7 +22,7 @@
 #include <glm/gtx/euler_angles.hpp>
 
 constexpr bool AnimateLightProperties = false;
-constexpr int NumRotatingLights = 4;
+constexpr int NumRotatingLights = 1;
 
 void LightingScene::open() {
 

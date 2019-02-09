@@ -60,7 +60,6 @@ void Material::render(Engine* engine, Mesh* mesh,
     const glm::mat4& perspectiveMatrix
 ) {
     m_shader->use();
-
     m_numTexturesInUse = 0;
     setBuiltinUniforms(engine, modelMatrix, viewMatrix, perspectiveMatrix);
     setCustomUniforms();
@@ -144,7 +143,6 @@ void Material::setCustomUniformsOfType(const Material::LocationToUniformValue<T>
 template<>
 void Material::setCustomUniformsOfType<std::shared_ptr<Texture>>(const Material::LocationToUniformValue<std::shared_ptr<Texture>>& values) {
 
-    GLenum i = m_numTexturesInUse;
     for (auto& [location, value] : values) {
         if (!setUniformTexture(location, value->getId()))
             break;
@@ -156,7 +154,7 @@ void Material::setCustomUniforms() {
     std::apply([this](auto&&... args){(setCustomUniformsOfType(args), ...);}, m_uniformValues);
 }
 
-bool Material::setUniformTexture(GLint uniformLocation, GLuint textureId) {
+bool Material::setUniformTexture(GLint uniformLocation, GLuint textureId, GLenum textureTarget) {
 
     if (m_numTexturesInUse >= GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS) {
 
@@ -166,8 +164,10 @@ bool Material::setUniformTexture(GLint uniformLocation, GLuint textureId) {
     }
 
     glActiveTexture(GL_TEXTURE0 + m_numTexturesInUse);
-    glBindTexture(GL_TEXTURE_2D, textureId);
+    glBindTexture(textureTarget, textureId);
     glUniform1i(uniformLocation, m_numTexturesInUse);
+
+    std::cout << "Set texture to uniform. Texture unit: " << m_numTexturesInUse << ", textureId: " << textureId << ", textureTarget: " << textureTarget << ", uniform location: " << uniformLocation << std::endl;
 
     m_numTexturesInUse += 1;
     return true;
@@ -202,6 +202,8 @@ Material::BuiltinUniformLocations Material::cacheBuiltinUniformLocations() {
         locations.falloffConstant  = m_shader->getUniformLocation(prefix + "falloffConstant");
         locations.falloffLinear    = m_shader->getUniformLocation(prefix + "falloffLinear");
         locations.falloffQuadratic = m_shader->getUniformLocation(prefix + "falloffQuadratic");
+        locations.farPlaneDistance = m_shader->getUniformLocation(prefix + "farPlaneDistance");
+        locations.depthMap = m_shader->getUniformLocation("pointDepthMaps[" + std::to_string(i) + "]");
 
         m_numSupportedPointLights = i + 1;
     }
@@ -223,8 +225,8 @@ Material::BuiltinUniformLocations Material::cacheBuiltinUniformLocations() {
         locations.falloffLinear    = m_shader->getUniformLocation(prefix + "falloffLinear");
         locations.falloffQuadratic = m_shader->getUniformLocation(prefix + "falloffQuadratic");
 
-        locations.depthMap = m_shader->getUniformLocation(prefix + "depthMap");
         locations.lightspaceMatrix = m_shader->getUniformLocation("directionalLightspaceMatrix[" + std::to_string(i) + "]");
+        locations.depthMap = m_shader->getUniformLocation("directionalDepthMaps[" + std::to_string(i) + "]");
 
         m_numSupportedDirectionalLights = i + 1;
     }
@@ -290,6 +292,11 @@ void Material::setUniformsPointLight(
     gl::setUniform(locations.falloffConstant , settings.falloff.constant);
     gl::setUniform(locations.falloffLinear   , settings.falloff.linear);
     gl::setUniform(locations.falloffQuadratic, settings.falloff.quadratic);
+
+    gl::setUniform(locations.farPlaneDistance, 20.f);
+    if (valid(locations.depthMap)) {
+        setUniformTexture(locations.depthMap, light.getDepthMapId(), GL_TEXTURE_CUBE_MAP);
+    }
 }
 
 void Material::setUniformDirectionalLight(
@@ -307,11 +314,11 @@ void Material::setUniformDirectionalLight(
     gl::setUniform(locations.falloffLinear   , settings.falloff.linear);
     gl::setUniform(locations.falloffQuadratic, settings.falloff.quadratic);
 
-    if (locations.depthMap != -1) {
+    if (valid(locations.depthMap)) {
         setUniformTexture(locations.depthMap, light.getDepthMapId());
     }
 
-    if (locations.lightspaceMatrix != -1) {
+    if (valid(locations.lightspaceMatrix)) {
         glm::mat4 lightProjectionMatrix = light.getProjectionMatrix();
         glm::mat4 lightViewMatrix = light.getViewMatrix(tf);
         gl::setUniform(locations.lightspaceMatrix, lightProjectionMatrix * lightViewMatrix);

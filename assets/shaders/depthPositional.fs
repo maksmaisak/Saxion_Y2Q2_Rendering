@@ -1,4 +1,4 @@
-#version 330 core
+#version 330
 
 in vec4 worldspacePosition;
 
@@ -7,5 +7,5 @@ uniform float farPlaneDistance;
 
 void main() {
 
-    gl_FragDepth = length(worldspacePosition.xyz - lightPosition) / farPlaneDistance;
+   gl_FragDepth = length(worldspacePosition.xyz - lightPosition) / farPlaneDistance;
 }

@@ -1,4 +1,4 @@
-#version 330
+#version 400
 
 const int NUM_DIRECTIONAL_LIGHTS = 4;
 const int NUM_POINT_LIGHTS = 10;
@@ -19,8 +19,6 @@ struct DirectionalLight {
     float falloffConstant;
     float falloffLinear;
     float falloffQuadratic;
-
-    sampler2D depthMap;
 };
 
 struct PointLight {
@@ -33,6 +31,8 @@ struct PointLight {
     float falloffConstant;
     float falloffLinear;
     float falloffQuadratic;
+
+    float farPlaneDistance;
 };
 
 struct SpotLight {
@@ -51,12 +51,14 @@ struct SpotLight {
 };
 
 uniform DirectionalLight directionalLights[NUM_DIRECTIONAL_LIGHTS];
+uniform sampler2D directionalDepthMaps[NUM_DIRECTIONAL_LIGHTS];
 uniform int numDirectionalLights = 0;
 
-uniform PointLight pointLights[10];
+uniform PointLight pointLights[NUM_POINT_LIGHTS];
+uniform samplerCubeShadow pointDepthMaps[NUM_POINT_LIGHTS];
 uniform int numPointLights = 0;
 
-uniform SpotLight spotLights[4];
+uniform SpotLight spotLights[NUM_SPOT_LIGHTS];
 uniform int numSpotLights = 0;
 
 uniform vec3 viewPosition;
@@ -70,10 +72,11 @@ uniform float shininess = 1;
 
 out vec4 fragmentColor;
 
-vec3 CalculateDirectionalLightContribution(int i, DirectionalLight light, vec3 normal, vec3 viewDirection, vec3 materialDiffuse, vec3 materialSpecular);
-vec3 CalculatePointLightContribution(PointLight light, vec3 normal, vec3 viewDirection, vec3 materialDiffuse, vec3 materialSpecular);
+vec3 CalculateDirectionalLightContribution(int i, vec3 normal, vec3 viewDirection, vec3 materialDiffuse, vec3 materialSpecular);
+vec3 CalculatePointLightContribution(int i, vec3 normal, vec3 viewDirection, vec3 materialDiffuse, vec3 materialSpecular);
 vec3 CalculateSpotLightContribution(SpotLight light, vec3 normal, vec3 viewDirection, vec3 materialDiffuse, vec3 materialSpecular);
-float CalculateShadowMultiplier(vec4 lightspacePosition, sampler2D depthMap, float biasMultiplier);
+float CalculateDirectionalShadowMultiplier(int i, float biasMultiplier);
+float CalculatePointShadowMultiplier(int i, vec3 fromLight, float distance, float biasMultiplier);
 
 void main() {
 
@@ -84,12 +87,23 @@ void main() {
 
     vec3 color = vec3(0,0,0);
 
+//    for (int i = 0; i < numDirectionalLights; ++i) {
+//        color += directionalLights[i].color * texture(directionalDepthMaps[i], vec2(0.5)).rgb;
+//        color += vec3(0.1);
+//    }
+//
+//    for (int i = 0; i < numPointLights; i++) {
+//        color += pointLights[i].color * texture(pointDepthMaps[i], vec4(worldPosition - pointLights[i].position, length(worldPosition - pointLights[i].position) / pointLights[i].farPlaneDistance));
+//    }
+//    color += pointLights[0].color * texture(pointDepthMaps[0], vec4(worldPosition - pointLights[0].position, length(worldPosition - pointLights[0].position) / pointLights[0].farPlaneDistance));
+//    color += pointLights[1].color * texture(pointDepthMaps[1], vec4(worldPosition - pointLights[1].position, length(worldPosition - pointLights[1].position) / pointLights[1].farPlaneDistance));
+
     for (int i = 0; i < numDirectionalLights; ++i) {
-        color += CalculateDirectionalLightContribution(i, directionalLights[i], normal, viewDirection, materialDiffuse, materialSpecular);
+        color += CalculateDirectionalLightContribution(i, normal, viewDirection, materialDiffuse, materialSpecular);
     }
 
     for (int i = 0; i < numPointLights; ++i) {
-        color += CalculatePointLightContribution(pointLights[i], normal, viewDirection, materialDiffuse, materialSpecular);
+        color += CalculatePointLightContribution(i, normal, viewDirection, materialDiffuse, materialSpecular);
     }
 
     for (int i = 0; i < numSpotLights; ++i) {
@@ -99,34 +113,25 @@ void main() {
 	fragmentColor = vec4(color, 1);
 }
 
-vec3 CalculateDirectionalLightContribution(int i, DirectionalLight light, vec3 normal, vec3 viewDirection, vec3 materialDiffuse, vec3 materialSpecular) {
+vec3 CalculateDirectionalLightContribution(int i, vec3 normal, vec3 viewDirection, vec3 materialDiffuse, vec3 materialSpecular) {
 
-    float normalDotDirection = dot(normal, light.direction);
+    DirectionalLight light = directionalLights[i];
 
     vec3 ambient = light.colorAmbient * materialDiffuse;
 
-    vec3 diffuse = max(0, dot(normal, light.direction)) * materialDiffuse;
+    float normalDotDirection = dot(normal, light.direction);
+    vec3 diffuse = max(0, normalDotDirection) * materialDiffuse;
 
     vec3 reflectedDirection = reflect(-light.direction, normal);
     vec3 specular = pow(max(0, dot(reflectedDirection, viewDirection)), shininess) * materialSpecular;
 
-    float shadowMultiplier = CalculateShadowMultiplier(directionalLightspacePosition[i], light.depthMap, 1 - normalDotDirection);
+    float shadowMultiplier = CalculateDirectionalShadowMultiplier(i, 1 - normalDotDirection);
     return ambient + shadowMultiplier * (diffuse + specular) * light.color;
 }
 
-float CalculateShadowMultiplier(vec4 lightspacePosition, sampler2D depthMap, float biasMultiplier) {
+vec3 CalculatePointLightContribution(int i, vec3 normal, vec3 viewDirection, vec3 materialDiffuse, vec3 materialSpecular) {
 
-    vec3 projected = (lightspacePosition.xyz / lightspacePosition.w) * 0.5 + 0.5;
-    float closestDepth = texture(depthMap, projected.xy).r;
-    float currentDepth = projected.z;
-    if (currentDepth > 1.f)
-        return 1;
-
-    float bias = max(0.002 * biasMultiplier, 0.001);
-    return currentDepth > (closestDepth + bias) ? 0 : 1;
-}
-
-vec3 CalculatePointLightContribution(PointLight light, vec3 normal, vec3 viewDirection, vec3 materialDiffuse, vec3 materialSpecular) {
+    PointLight light = pointLights[i];
 
     vec3 ambient = light.colorAmbient * materialDiffuse;
 
@@ -134,14 +139,17 @@ vec3 CalculatePointLightContribution(PointLight light, vec3 normal, vec3 viewDir
     float distance = length(delta);
     vec3 lightDirection = delta / distance;
 
-    vec3 diffuse = max(0, dot(normal, lightDirection)) * light.color * materialDiffuse;
+    float normalDotDirection = dot(normal, lightDirection);
+    vec3 diffuse = max(0, normalDotDirection) * materialDiffuse;
 
     vec3 reflectedDirection = reflect(-lightDirection, normal);
-    vec3 specular = pow(max(0, dot(reflectedDirection, viewDirection)), shininess) * light.color * materialSpecular;
+    vec3 specular = pow(max(0, dot(reflectedDirection, viewDirection)), shininess) * materialSpecular;
 
     float attenuation = 1.f / (light.falloffConstant + light.falloffLinear * distance + light.falloffQuadratic * distance * distance);
-
-    return ambient + attenuation * (diffuse + specular);
+    float shadowMultiplier = CalculatePointShadowMultiplier(i, -delta, distance, 1 - normalDotDirection);
+    //return texture(depthMap, -delta).r * vec3(1);
+    //return shadowMultiplier * vec3(1) / numPointLights;
+    return ambient + shadowMultiplier * attenuation * (diffuse + specular) * light.color;
 }
 
 vec3 CalculateSpotLightContribution(SpotLight light, vec3 normal, vec3 viewDirection, vec3 materialDiffuse, vec3 materialSpecular) {
@@ -161,4 +169,25 @@ vec3 CalculateSpotLightContribution(SpotLight light, vec3 normal, vec3 viewDirec
     attenuation *= smoothstep(light.outerCutoff, light.innerCutoff, dot(-lightDirection, light.direction));
 
     return ambient + attenuation * (diffuse + specular);
+}
+
+float CalculateDirectionalShadowMultiplier(int i, float biasMultiplier) {
+
+    vec4 lightspacePosition = directionalLightspacePosition[i];
+    vec3 projected = (lightspacePosition.xyz / lightspacePosition.w) * 0.5 + 0.5;
+    float currentDepth = projected.z;
+    if (currentDepth > 1.f)
+        return 1;
+
+    float closestDepth = texture(directionalDepthMaps[0], projected.xy).r;
+    float bias = max(0.002 * biasMultiplier, 0.001);
+    return currentDepth > (closestDepth + bias) ? 0 : 1;
+}
+
+float CalculatePointShadowMultiplier(int i, vec3 fromLight, float distance, float biasMultiplier) {
+
+    float bias = max(0.1 * biasMultiplier, 0.05);
+    float currentDepth = distance;
+
+    return texture(pointDepthMaps[0], vec4(fromLight, (currentDepth - bias) / pointLights[i].farPlaneDistance));
 }

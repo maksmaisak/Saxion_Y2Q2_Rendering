@@ -102,7 +102,7 @@ void Engine::initializeWindow(sf::RenderWindow& window) {
     std::string windowTitle = lua.tryGetField<std::string>("windowTitle").value_or("Game");
     lua_pop(lua, 1);
 
-    auto contextSettings = sf::ContextSettings(24, 8, 8, 3, 3);
+    auto contextSettings = sf::ContextSettings(24, 8, 8, 4, 5, sf::ContextSettings::Attribute::Core | sf::ContextSettings::Attribute::Debug);
     window.create(sf::VideoMode(width, height), windowTitle, fullscreen ? sf::Style::Fullscreen : sf::Style::Default, contextSettings);
     window.setVerticalSyncEnabled(vsync);
     window.setActive(true);

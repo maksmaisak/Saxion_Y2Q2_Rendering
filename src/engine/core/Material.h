@@ -84,6 +84,9 @@ namespace en {
                 GLint falloffLinear    = -1;
                 GLint falloffQuadratic = -1;
 
+                GLint depthMap = -1;
+                GLint farPlaneDistance = -1;
+
             } pointLights[MAX_NUM_POINT_LIGHTS];
 
             GLint numDirectionalLights = -1;
@@ -160,7 +163,7 @@ namespace en {
         void setUniformDirectionalLight(const BuiltinUniformLocations::DirectionalLightLocations& locations, const Light& light, const Transform& tf);
         void setUniformSpotLight(const BuiltinUniformLocations::SpotLightLocations& locations, const Light& light, const Transform& tf);
 
-        bool setUniformTexture(GLint uniformLocation, GLuint textureId);
+        bool setUniformTexture(GLint uniformLocation, GLuint textureId, GLenum textureTarget = GL_TEXTURE_2D);
     };
 
     template<typename T>

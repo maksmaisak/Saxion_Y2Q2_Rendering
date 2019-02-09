@@ -1,4 +1,4 @@
-#version 330 core
+#version 330
 
 layout(triangles) in;
 layout(triangle_strip, max_vertices=18) out;
@@ -14,7 +14,7 @@ void main() {
 
         for (int i = 0; i < 3; ++i) {
             worldspacePosition = gl_in[i].gl_Position;
-            gl_Position = matrixPV[face] * gl_Position;
+            gl_Position = matrixPV[face] * worldspacePosition;
             EmitVertex();
         }
         EndPrimitive();

@@ -43,6 +43,7 @@ namespace en {
 
         glm::vec3 getWorldPosition() const;
         glm::quat getWorldRotation() const;
+        glm::vec3 getForward() const;
 
         // TODO add setWorldPosition/Rotation
         Transform& setLocalPosition(const glm::vec3& localPosition);

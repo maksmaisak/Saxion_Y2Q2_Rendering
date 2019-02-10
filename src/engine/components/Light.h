@@ -7,15 +7,15 @@
 
 #include "ComponentsToLua.h"
 #include "glm.hpp"
+#include <GL/glew.h>
 
 namespace en {
 
-    struct Light {
+    class Light final {
 
         LUA_TYPE(Light);
 
-        static void addFromLua(Actor& actor, LuaState& lua);
-        static void initializeMetatable(LuaState& lua);
+    public:
 
         enum class Kind {
 
@@ -26,22 +26,31 @@ namespace en {
             COUNT
         };
 
-        struct Falloff {
+        static void addFromLua(Actor& actor, LuaState& lua);
+        static void initializeMetatable(LuaState& lua);
 
+        explicit Light(Kind kind = Kind::POINT);
+
+        struct Falloff {
             float constant  = 1;
             float linear    = 0;
             float quadratic = 1;
         };
 
-        Kind kind = Kind::POINT;
         glm::vec3 colorAmbient = {0, 0, 0};
         glm::vec3 color = {1, 1, 1};
         float intensity = 1;
         Falloff falloff = {1, 0, 1};
 
-        // cos of angle in radius
+        Kind kind = Kind::POINT;
+        // cos of angle in radians. For spotlights only.
         float spotlightInnerCutoff = glm::cos(glm::radians(40.f));
         float spotlightOuterCutoff = glm::cos(glm::radians(50.f));
+
+        // Shadowmapping data
+        float nearPlaneDistance = 0.1f;
+        float farPlaneDistance = 100.f;
+        glm::mat4 matrixPV; // The P*V matrix for directional shadowmapping
     };
 
     struct FalloffFunctions {

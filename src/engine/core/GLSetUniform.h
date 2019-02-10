@@ -17,37 +17,37 @@ namespace gl {
     void setUniform(GLint location, const T& value);
 
     template<>
-    void setUniform<GLint>(GLint location, const GLint& value) {
+    inline void setUniform<GLint>(GLint location, const GLint& value) {
         glUniform1i(location, value);
     }
 
     template<>
-    void setUniform<GLuint>(GLint location, const GLuint& value) {
+    inline void setUniform<GLuint>(GLint location, const GLuint& value) {
         glUniform1ui(location, value);
     }
 
     template<>
-    void setUniform<GLfloat>(GLint location, const GLfloat& value) {
+    inline void setUniform<GLfloat>(GLint location, const GLfloat& value) {
         glUniform1f(location, value);
     }
 
     template<>
-    void setUniform<glm::vec2>(GLint location, const glm::vec2& value) {
+    inline void setUniform<glm::vec2>(GLint location, const glm::vec2& value) {
         glUniform2fv(location, 1, glm::value_ptr(value));
     }
 
     template<>
-    void setUniform<glm::vec3>(GLint location, const glm::vec3& value) {
+    inline void setUniform<glm::vec3>(GLint location, const glm::vec3& value) {
         glUniform3fv(location, 1, glm::value_ptr(value));
     }
 
     template<>
-    void setUniform<glm::vec4>(GLint location, const glm::vec4& value) {
+    inline void setUniform<glm::vec4>(GLint location, const glm::vec4& value) {
         glUniform4fv(location, 1, glm::value_ptr(value));
     }
 
     template<>
-    void setUniform<glm::mat4>(GLint location, const glm::mat4& value) {
+    inline void setUniform<glm::mat4>(GLint location, const glm::mat4& value) {
         glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(value));
     }
 }

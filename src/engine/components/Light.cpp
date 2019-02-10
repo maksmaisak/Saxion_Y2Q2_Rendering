@@ -6,12 +6,19 @@
 #include <map>
 #include <string>
 #include <algorithm>
+#include <GL/glew.h>
+#include "ComponentReference.h"
+#include "Transform.h"
+#include "GLHelpers.h"
 
 using namespace en;
 
-void setKind(Light& light, const std::optional<std::string>& kindName) {
+Light::Kind readKind(LuaState& lua) {
 
-    if (!kindName) return;
+    std::optional<std::string> kindName = lua.tryGetField<std::string>("kind");
+
+    if (!kindName)
+        return Light::Kind::POINT;
 
     static const std::map<std::string, Light::Kind> kinds = {
         {"DIRECTIONAL", Light::Kind::DIRECTIONAL},
@@ -24,20 +31,23 @@ void setKind(Light& light, const std::optional<std::string>& kindName) {
 
     auto it = kinds.find(name);
     if (it != kinds.end()) {
-        light.kind = it->second;
+        return it->second;
     }
+
+    return Light::Kind::POINT;
 }
 
 void Light::addFromLua(Actor& actor, LuaState& lua) {
 
-    auto& light = actor.add<Light>();
     luaL_checktype(lua, -1, LUA_TTABLE);
-    setKind(light, lua.tryGetField<std::string>("kind"));
+    actor.add<Light>(readKind(lua));
 }
 
 void Light::initializeMetatable(LuaState& lua) {
 
-    lua::addProperty(lua, "intensity"   , property(&Light::intensity));
-    lua::addProperty(lua, "color"       , property(&Light::color));
-    lua::addProperty(lua, "colorAmbient", property(&Light::colorAmbient));
+    lua::addProperty(lua, "intensity", property(&Light::intensity));
+    lua::addProperty(lua, "color", property(&Light::color));
+    lua::addProperty(lua, "ambientColor", property(&Light::colorAmbient));
 }
+
+Light::Light(Kind kind) : kind(kind) {}

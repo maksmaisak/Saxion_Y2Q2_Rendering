@@ -9,17 +9,14 @@
 #include <iostream>
 #include <string>
 
-inline GLenum glCheckError_(const char *file, int line)
-{
+inline GLenum glCheckError_(const char *file, int line) {
     GLenum lastErrorCode = GL_NO_ERROR;
     GLenum errorCode;
-    while ((errorCode = glGetError()) != GL_NO_ERROR)
-    {
+    while ((errorCode = glGetError()) != GL_NO_ERROR) {
         lastErrorCode = errorCode;
 
         std::string error;
-        switch (errorCode)
-        {
+        switch (errorCode) {
             case GL_INVALID_ENUM:                  error = "INVALID_ENUM"; break;
             case GL_INVALID_VALUE:                 error = "INVALID_VALUE"; break;
             case GL_INVALID_OPERATION:             error = "INVALID_OPERATION"; break;

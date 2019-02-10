@@ -10,8 +10,6 @@
 #include <memory>
 #include "Mesh.hpp"
 #include "AbstractMaterial.hpp"
-#include "TextureMaterial.hpp"
-
 #include "ComponentsToLua.h"
 
 namespace en {

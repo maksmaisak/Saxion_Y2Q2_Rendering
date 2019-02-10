@@ -4,6 +4,7 @@
 
 #include "RenderSystem.h"
 #include <iostream>
+#include <tuple>
 #include "components/RenderInfo.h"
 #include "components/Transform.h"
 #include "components/Camera.h"
@@ -11,110 +12,266 @@
 #include "GLHelpers.h"
 #include "Font.h"
 #include "GameTime.h"
+#include "Resources.h"
+#include "Material.h"
+#include "Exception.h"
 
-namespace en {
+using namespace en;
 
-    RenderSystem::RenderSystem(bool displayMeshDebugInfo) :
-        m_displayMeshDebugInfo(displayMeshDebugInfo) {}
+void checkRenderingError(const Actor& actor) {
 
-    void enableDebug();
+    if (glCheckError() == GL_NO_ERROR)
+        return;
 
-    void RenderSystem::start() {
+    auto* namePtr = actor.tryGet<en::Name>();
+    std::string name = namePtr ? namePtr->value : "unnamed";
+    std::cerr << "Error while rendering " << name << std::endl;
+}
 
-        glEnable(GL_DEPTH_TEST);
+RenderSystem::RenderSystem(bool displayMeshDebugInfo) :
+    m_displayMeshDebugInfo(displayMeshDebugInfo),
+    m_directionalDepthShader(Resources<ShaderProgram>::get("depthDirectional")),
+    m_positionalDepthShader (Resources<ShaderProgram>::get("depthPositional")),
+    m_depthMaps(4, {1024, 1024}, 10, {512, 512})
+{}
 
-        // Counterclockwise vertex order
-        glFrontFace(GL_CCW);
+void enableDebug();
 
-        // Enable back face culling
-        glEnable(GL_CULL_FACE);
-        glCullFace(GL_BACK);
+void RenderSystem::start() {
 
-        // Set the default blend mode
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_DEPTH_TEST);
 
-        //glClearColor((float)0x2d / 0xff, (float)0x6b / 0xff, (float)0xce / 0xff, 1.0f);
-        glClearColor(0, 0, 0, 1);
+    // Counterclockwise vertex order
+    glFrontFace(GL_CCW);
 
-        // Convert ouput from fragment shaders from linear to sRGB
-        glEnable(GL_FRAMEBUFFER_SRGB);
+    // Enable back face culling
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
 
-        // Disable byte-alignment restriction
-        glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    // Set the default blend mode
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-        m_debugHud = std::make_unique<DebugHud>(&m_engine->getWindow());
+    //glClearColor((float)0x2d / 0xff, (float)0x6b / 0xff, (float)0xce / 0xff, 1.0f);
+    glClearColor(0, 0, 0, 1);
+
+    // Convert ouput from fragment shaders from linear to sRGB
+    glEnable(GL_FRAMEBUFFER_SRGB);
+
+    // Disable byte-alignment restriction
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+    glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+
+    m_debugHud = std::make_unique<DebugHud>(&m_engine->getWindow());
+}
+
+void RenderSystem::draw() {
+
+    if (glCheckError() != GL_NO_ERROR) {
+        std::cerr << "Uncaught openGL error(s) before rendering." << std::endl;
     }
 
-    void RenderSystem::draw() {
+    updateDepthMaps();
 
-        if (glCheckError() != GL_NO_ERROR) {
-            std::cerr << "Uncaught openGL error(s) before rendering." << std::endl;
-        }
+    Actor mainCamera = getMainCamera();
+    if (mainCamera) {
 
-        Actor mainCamera = getMainCamera();
-        if (mainCamera) {
+        glm::mat4 matrixView = glm::inverse(mainCamera.get<Transform>().getWorldTransform());
+        glm::mat4 matrixProjection = mainCamera.get<Camera>().projectionMatrix;
 
-            glm::mat4 matrixView = glm::inverse(mainCamera.get<Transform>().getWorldTransform());
-            glm::mat4 matrixProjection = mainCamera.get<Camera>().projectionMatrix;
+        for (Entity e : m_registry->with<Transform, RenderInfo>()) {
 
-            for (Entity e : m_registry->with<Transform, RenderInfo>()) {
+            auto& renderInfo = m_registry->get<RenderInfo>(e);
+            if (!renderInfo.material || !renderInfo.mesh)
+                continue;
 
-                auto& renderInfo = m_registry->get<RenderInfo>(e);
-                if (!renderInfo.material || !renderInfo.mesh)
-                    continue;
+            const glm::mat4& matrixModel = m_registry->get<Transform>(e).getWorldTransform();
+            renderInfo.material->render(renderInfo.mesh.get(), m_engine, &m_depthMaps, matrixModel, matrixView, matrixProjection);
 
-                glm::mat4 matrixModel = m_registry->get<Transform>(e).getWorldTransform();
-                renderInfo.material->render(m_engine, renderInfo.mesh.get(), matrixModel, matrixView, matrixProjection);
+            checkRenderingError(m_engine->actor(e));
 
-                if (glCheckError() != GL_NO_ERROR) {
-
-                    auto* namePtr = m_registry->tryGet<en::Name>(e);
-                    std::string name = namePtr ? namePtr->value : "unnamed";
-                    std::cerr << "Error while rendering " << name << std::endl;
-                }
-
-                if (m_displayMeshDebugInfo) {
-                    renderInfo.mesh->drawDebugInfo(matrixModel, matrixView, matrixProjection);
-                }
+            if (m_displayMeshDebugInfo) {
+                renderInfo.mesh->drawDebugInfo(matrixModel, matrixView, matrixProjection);
             }
         }
-
-        std::string debugInfo = std::string("FPS:") + std::to_string((int)m_engine->getFps());
-        auto font = Resources<Font>::get(config::FONT_PATH + "arial.ttf");
-        auto windowSize = m_engine->getWindow().getSize();
-        font->render(debugInfo, {0.f, 0.f}, 1.f, glm::ortho(0.f, (float)windowSize.x, 0.f, (float)windowSize.y));
     }
 
-    Actor RenderSystem::getMainCamera() {
+    std::string debugInfo = std::string("FPS:") + std::to_string((int)m_engine->getFps());
+    auto font = Resources<Font>::get(config::FONT_PATH + "arial.ttf");
+    auto windowSize = m_engine->getWindow().getSize();
+    font->render(debugInfo, {0.f, 0.f}, 1.f, glm::ortho(0.f, (float)windowSize.x, 0.f, (float)windowSize.y));
+}
 
-        Entity entity = m_registry->with<Transform, Camera>().tryGetOne();
-        return m_engine->actor(entity);
+Actor RenderSystem::getMainCamera() {
+
+    Entity entity = m_registry->with<Transform, Camera>().tryGetOne();
+    return m_engine->actor(entity);
+}
+
+void RenderSystem::updateDepthMaps() {
+
+    std::vector<Entity> directionalLights;
+    std::vector<Entity> pointLights;
+
+    for (Entity lightEntity : m_registry->with<Transform, Light>()) {
+
+        auto& light = m_registry->get<Light>(lightEntity);
+        if (light.kind == Light::Kind::DIRECTIONAL)
+            directionalLights.push_back(lightEntity);
+        else
+            pointLights.push_back(lightEntity);
     }
 
-    void GLAPIENTRY
-    messageCallback(
-        GLenum source,
-        GLenum type,
-        GLuint id,
-        GLenum severity,
-        GLsizei length,
-        const GLchar* message,
-        const void* userParam
-    )
-    {
-        fprintf(
-            stderr,
-            "GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n",
-            (type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""),
-            type, severity, message
-        );
+    updateDepthMapsDirectionalLights(directionalLights);
+    updateDepthMapsPositionalLights(pointLights);
+
+    auto size = m_engine->getWindow().getSize();
+    glViewport(0, 0, size.x, size.y);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glCheckError();
+}
+
+glm::mat4 getDirectionalLightspaceTransform(const Light& light, const Transform& lightTransform) {
+
+    glm::mat4 lightProjectionMatrix = glm::ortho(
+        -20.f, 20.f,
+        -20.f, 20.f,
+        light.nearPlaneDistance, light.farPlaneDistance
+    );
+
+    glm::mat4 lightViewMatrix = glm::lookAt(lightTransform.getForward() * 10, {0, 0, 0}, {0, 1, 0});
+
+    return lightProjectionMatrix * lightViewMatrix;
+}
+
+void RenderSystem::updateDepthMapsDirectionalLights(const std::vector<Entity>& directionalLights) {
+
+    glViewport(0, 0, m_depthMaps.getDirectionalMapResolution().x,  m_depthMaps.getDirectionalMapResolution().y);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_depthMaps.getDirectionalMapsFramebufferId());
+    glClear(GL_DEPTH_BUFFER_BIT);
+
+    m_directionalDepthShader->use();
+    int i = 0;
+    for (Entity e : directionalLights) {
+
+        if (i >= m_depthMaps.getMaxNumDirectionalLights())
+            break;
+
+        auto& light = m_registry->get<Light>(e);
+        auto& tf = m_registry->get<Transform>(e);
+        light.matrixPV = getDirectionalLightspaceTransform(light, tf);
+        m_directionalDepthShader->setUniformValue("matrixPV[" + std::to_string(i) + "]", light.matrixPV);
+
+        i += 1;
+    }
+    m_directionalDepthShader->setUniformValue("numLights", i);
+
+    for (Entity e : m_registry->with<Transform, RenderInfo>()) {
+
+        Mesh* mesh = m_registry->get<RenderInfo>(e).mesh.get();
+        if (!mesh)
+            continue;
+        const glm::mat4& modelTransform = m_registry->get<Transform>(e).getWorldTransform();
+        m_directionalDepthShader->setUniformValue("matrixModel", modelTransform);
+        mesh->streamToOpenGL(0, -1, -1);
+
+        checkRenderingError(m_engine->actor(e));
+    }
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+std::tuple<float, glm::vec3, std::array<glm::mat4, 6>> getPointLightUniforms(const DepthMaps& depthMaps, const Light& light, const Transform& lightTransform) {
+
+    float nearPlaneDistance = light.nearPlaneDistance;
+    float farPlaneDistance  = light.farPlaneDistance;
+    glm::mat4 lightProjectionMatrix = glm::perspective(
+        glm::radians(90.f),
+        (float)depthMaps.getCubemapResolution().x / (float)depthMaps.getCubemapResolution().y,
+        nearPlaneDistance,
+        farPlaneDistance
+    );
+
+    glm::vec3 lightPosition = lightTransform.getWorldPosition();
+
+    return {
+        farPlaneDistance,
+        lightPosition,
+        {
+            lightProjectionMatrix * glm::lookAt(lightPosition, lightPosition + glm::vec3( 1.0f, 0.0f, 0.0f), glm::vec3(0.0f,-1.0f, 0.0f)),
+            lightProjectionMatrix * glm::lookAt(lightPosition, lightPosition + glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f,-1.0f, 0.0f)),
+            lightProjectionMatrix * glm::lookAt(lightPosition, lightPosition + glm::vec3( 0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f)),
+            lightProjectionMatrix * glm::lookAt(lightPosition, lightPosition + glm::vec3( 0.0f,-1.0f, 0.0f), glm::vec3(0.0f, 0.0f,-1.0f)),
+            lightProjectionMatrix * glm::lookAt(lightPosition, lightPosition + glm::vec3( 0.0f, 0.0f, 1.0f), glm::vec3(0.0f,-1.0f, 0.0f)),
+            lightProjectionMatrix * glm::lookAt(lightPosition, lightPosition + glm::vec3( 0.0f, 0.0f,-1.0f), glm::vec3(0.0f,-1.0f, 0.0f))
+        }
+    };
+}
+
+void RenderSystem::updateDepthMapsPositionalLights(const std::vector<Entity>& pointLights) {
+
+    glViewport(0, 0, m_depthMaps.getCubemapResolution().x, m_depthMaps.getCubemapResolution().y);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_depthMaps.getCubemapsFramebufferId());
+    glClear(GL_DEPTH_BUFFER_BIT);
+
+    m_positionalDepthShader->use();
+
+    int i = 0;
+    for (Entity e : pointLights) {
+
+        auto& light = m_registry->get<Light>(e);
+        auto& tf = m_registry->get<Transform>(e);
+        auto [farPlaneDistance, lightPosition, pvMatrices] = getPointLightUniforms(m_depthMaps, light, tf);
+
+        for (unsigned int face = 0; face < 6; ++face)
+            m_positionalDepthShader->setUniformValue("matrixPV[" + std::to_string(i * 6 + face) + "]", pvMatrices[face]);
+        std::string prefix = "lights[" + std::to_string(i) + "].";
+        m_positionalDepthShader->setUniformValue(prefix + "position", lightPosition);
+        m_positionalDepthShader->setUniformValue(prefix + "farPlaneDistance", farPlaneDistance);
+
+        if (++i >= m_depthMaps.getMaxNumPositionalLights())
+            break;
+    }
+    m_positionalDepthShader->setUniformValue("numLights", i);
+
+    for (Entity e : m_registry->with<Transform, RenderInfo>()) {
+
+        Mesh* mesh = m_registry->get<RenderInfo>(e).mesh.get();
+        if (!mesh)
+            continue;
+
+        const glm::mat4& modelTransform = m_registry->get<Transform>(e).getWorldTransform();
+        m_positionalDepthShader->setUniformValue("matrixModel", modelTransform);
+        mesh->streamToOpenGL(0, -1, -1);
+        glCheckError();
     }
 
-    void enableDebug() {
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glCheckError();
+}
 
-        //glEnable(GL_DEBUG_OUTPUT);
-        //glCheckError();
-        //glDebugMessageCallback(messageCallback, 0);
-    }
+void GLAPIENTRY
+messageCallback(
+    GLenum source,
+    GLenum type,
+    GLuint id,
+    GLenum severity,
+    GLsizei length,
+    const GLchar* message,
+    const void* userParam
+)
+{
+    fprintf(
+        stderr,
+        "GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n",
+        (type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""),
+        type, severity, message
+    );
+}
+
+void enableDebug() {
+
+    glEnable(GL_DEBUG_OUTPUT);
+    glCheckError();
+    glDebugMessageCallback(messageCallback, 0);
 }

@@ -7,11 +7,11 @@
 
 /// A wrapper around a texture id.
 /// Manages the lifetime of said id.
-class Texture {
+class Texture final {
 
 public:
 	Texture(const std::string& path, GLint internalFormat = GL_SRGB_ALPHA);
-	virtual ~Texture();
+	~Texture();
 	Texture(const Texture&) = delete;
 	Texture(Texture&&) = delete;
 	Texture& operator=(const Texture&) = delete;

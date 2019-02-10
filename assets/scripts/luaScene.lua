@@ -4,7 +4,16 @@
 -- Time: 20:15
 --
 
-local scene = {
+local planeRenderInfo = {
+    mesh = "models/plane.obj",
+    material = Game.makeMaterial {
+        diffuse = "textures/land.jpg",
+        specularColor = {0.05, 0.08, 0.05},
+        shininess = 10
+    }
+}
+
+local scenery = {
     {
         Name = "camera",
         Transform = {
@@ -14,23 +23,62 @@ local scene = {
         CameraOrbitBehavior = {
             target   = "head",
             distance =  10,
-            minTilt  = -15,
+            minTilt  = -60,
             maxTilt  =  60,
         }
     },
     {
         Name = "plane",
         Transform = {
-            position = { x = 0, y = 0, z = 0 },
-            scale    = { x = 5, y = 5, z = 5 }
+            position = { x = 0 , y = 0 , z = 0 },
+            scale    = { x = 10, y = 10, z = 10 }
         },
-        RenderInfo = {
-            mesh = "models/plane.obj",
-            material = {
-                diffuse = "textures/land.jpg",
-                shininess = 10
-            }
+        RenderInfo = planeRenderInfo
+    },
+    {
+        Name = "wallXP",
+        Transform = {
+            position = { 10, 10, 0 },
+            scale    = { 10, 10, 10 },
+            rotation = { 0, 0, 90}
         },
+        RenderInfo = planeRenderInfo
+    },
+    {
+        Name = "wallXN",
+        Transform = {
+            position = { -10, 10, 0 },
+            scale    = { 10, 10, 10 },
+            rotation = { 0, 0, -90}
+        },
+        RenderInfo = planeRenderInfo
+    },
+    {
+        Name = "wallZP",
+        Transform = {
+            position = { 0, 10, 10 },
+            scale    = { 10, 10, 10 },
+            rotation = { -90, 0, 0 }
+        },
+        RenderInfo = planeRenderInfo
+    },
+    {
+        Name = "wallZN",
+        Transform = {
+            position = { 0, 10, -10 },
+            scale    = { 10, 10, 10 },
+            rotation = { 90, 0, 0 }
+        },
+        RenderInfo = planeRenderInfo
+    },
+    {
+        Name = "ceiling",
+        Transform = {
+            position = { 0, 20, 0 },
+            scale    = { 10, 10, 10 },
+            rotation = { 180, 0, 0 }
+        },
+        RenderInfo = planeRenderInfo
     },
     {
         Name = "cube",
@@ -75,46 +123,72 @@ local scene = {
     }
 }
 
-local didStart = false
+local scene = {}
 
-local function start()
+function scene.start()
 
-    local actor = Game.makeActor("Light")
-    actor:add("Transform"):move(-5, 3, 0)
-    actor:add("Light")
+    Game.makeActors(scenery)
 
-    local actor2 = Game.makeActor("Light")
-    actor2:add("Transform"):move(5, 3, 0)
-    actor2:add("Light")
+    Game.makeActor {
+        Name = "Light",
+        Transform = {
+            scale = {0.1, 0.1, 0.1}
+        },
+        RenderInfo = {
+            mesh = "models/sphere2.obj",
+            material = {}
+        },
+        Light = {
+            intensity = 10
+        }
+    }
+
+    Game.makeActor {
+        Name = "Light2",
+        Transform = {
+            position = {3, 2, 0},
+            scale = {0.1, 0.1, 0.1}
+        },
+        RenderInfo = {
+            mesh = "models/sphere2.obj",
+            material = {}
+        },
+        Light = {
+			intensity = 10
+		}
+    }
+
+    Game.makeActor {
+        Name = "LightDirectional",
+        Transform = {
+            scale = {0.1, 0.1, 0.1},
+            rotation = {-45, 0, 0}
+        },
+        Light = {
+            kind = "directional",
+            ambientColor = {0, 0, 0},
+            intensity = 0.1
+        }
+    }
+
+    Game.makeActor {
+        Name = "LightDirectional2",
+        Transform = {
+            scale = {0.1, 0.1, 0.1},
+            rotation = {0, 0, 0}
+        },
+        Light = {
+            kind = "directional",
+            ambientColor = {0, 0, 0},
+            intensity = 0.1
+        }
+    }
 end
 
 function scene.update(dt)
 
-    if (not didStart) then
-        start()
-        didStart = true
-    end
-
-    print(Game.testValue)
-    print(Game.testFreeFunction())
-    print(Game.testMemberFunction())
-
-    local head = Game.find("head")
-    if (head) then
-        print(head.isValid)
-        print(head.name)
-        print(head:get("Transform"))
-        print(head:get("RenderInfo"))
-        print(head:get("Rigidbody"))
-        --head:getTransform():move(0, dt, 0)
-        --head:getTransform():rotate(10 * dt, 0, 1, 0)
-    end
-
-    local actor = Game.makeActor("name")
-    print(actor:get("Transform"))
-    actor:add("Transform")
-    print(actor:get("Transform"))
-    print(actor:get("Transform") == actor:get("Transform"))
+    Game.find("Light"):get("Transform").position = {-4, 3 + 2 * math.sin(Game.getTime()), 0}
+    --Game.find("LightDirectional"):get("Transform"):rotate(45 * dt, 1, 0, 0);
 end
 
 return scene

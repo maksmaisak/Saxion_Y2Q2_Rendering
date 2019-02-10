@@ -54,24 +54,26 @@ Material::Material(LuaState& lua) : Material((luaL_checktype(lua, -1, LUA_TTABLE
     }
 }
 
-void Material::render(Engine* engine, Mesh* mesh,
+void Material::render(
+    Mesh* mesh,
+    en::Engine* engine,
+    en::DepthMaps* depthMaps,
     const glm::mat4& modelMatrix,
     const glm::mat4& viewMatrix,
     const glm::mat4& perspectiveMatrix
 ) {
     m_shader->use();
-
-    setBuiltinUniforms(engine, modelMatrix, viewMatrix, perspectiveMatrix);
+    m_numTexturesInUse = 0;
+    setBuiltinUniforms(engine, depthMaps, modelMatrix, viewMatrix, perspectiveMatrix);
     setCustomUniforms();
-
-    const auto& a = m_attributeLocations;
-    mesh->streamToOpenGL(a.vertex, a.normal, a.uv);
+    mesh->streamToOpenGL(m_attributeLocations.vertex, m_attributeLocations.normal, m_attributeLocations.uv);
 }
 
 inline bool valid(GLint location) {return location != -1;}
 
 void Material::setBuiltinUniforms(
     Engine* engine,
+    DepthMaps* depthMaps,
     const glm::mat4& modelMatrix,
     const glm::mat4& viewMatrix,
     const glm::mat4& perspectiveMatrix
@@ -92,6 +94,12 @@ void Material::setBuiltinUniforms(
 
     if (valid(u.viewPosition))
         gl::setUniform(u.viewPosition, glm::vec3(glm::inverse(viewMatrix)[3]));
+
+    if (valid(u.directionalDepthMaps))
+        setUniformTexture(u.directionalDepthMaps, depthMaps->getDirectionalMapsTextureId(), GL_TEXTURE_2D_ARRAY);
+
+    if (valid(u.depthCubemaps))
+        setUniformTexture(u.depthCubemaps, depthMaps->getCubemapsTextureId(), GL_TEXTURE_CUBE_MAP_ARRAY);
 
     auto& registry = engine->getRegistry();
 
@@ -145,29 +153,34 @@ void Material::setCustomUniformsOfType(const Material::LocationToUniformValue<T>
 template<>
 void Material::setCustomUniformsOfType<std::shared_ptr<Texture>>(const Material::LocationToUniformValue<std::shared_ptr<Texture>>& values) {
 
-    GLenum i = 0;
     for (auto& [location, value] : values) {
-
-        // Activate texture slot i
-        glActiveTexture(GL_TEXTURE0 + i);
-        // Bind the texture to the current active slot
-        glBindTexture(GL_TEXTURE_2D, value->getId());
-        // Tell the shader the texture slot for the diffuse texture is slot i
-        glUniform1i(location, i);
-
-        i += 1;
-        if (i > GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS) {
-
-            // TODO have materials (and maybe other resources) have a name to display in these error messages.
-            std::cout << "Too many textures for this material." << std::endl;
+        if (!setUniformTexture(location, value->getId()))
             break;
-        }
     }
 }
 
 void Material::setCustomUniforms() {
 
     std::apply([this](auto&&... args){(setCustomUniformsOfType(args), ...);}, m_uniformValues);
+}
+
+bool Material::setUniformTexture(GLint uniformLocation, GLuint textureId, GLenum textureTarget) {
+
+    if (m_numTexturesInUse >= GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS) {
+
+        // TODO have materials (and maybe other resources) have a name to display in these error messages.
+        std::cout << "Too many textures for this material: " << m_numTexturesInUse << "/" << GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS << std::endl;
+        return false;
+    }
+
+    glActiveTexture(GL_TEXTURE0 + m_numTexturesInUse);
+    glBindTexture(textureTarget, textureId);
+    glUniform1i(uniformLocation, m_numTexturesInUse);
+
+    //std::cout << "Set texture to uniform. Texture unit: " << m_numTexturesInUse << ", textureId: " << textureId << ", textureTarget: " << textureTarget << ", uniform location: " << uniformLocation << std::endl;
+
+    m_numTexturesInUse += 1;
+    return true;
 }
 
 Material::BuiltinUniformLocations Material::cacheBuiltinUniformLocations() {
@@ -178,10 +191,10 @@ Material::BuiltinUniformLocations Material::cacheBuiltinUniformLocations() {
     u.view       = m_shader->getUniformLocation("matrixView");
     u.projection = m_shader->getUniformLocation("matrixProjection");
     u.pvm        = m_shader->getUniformLocation("matrixPVM");
-
-    u.time = m_shader->getUniformLocation("time");
-
+    u.time       = m_shader->getUniformLocation("time");
     u.viewPosition = m_shader->getUniformLocation("viewPosition");
+    u.directionalDepthMaps = m_shader->getUniformLocation("directionalDepthMaps");
+    u.depthCubemaps = m_shader->getUniformLocation("depthCubeMaps");
 
     // Point lights
     u.numPointLights = m_shader->getUniformLocation("numPointLights");
@@ -199,6 +212,7 @@ Material::BuiltinUniformLocations Material::cacheBuiltinUniformLocations() {
         locations.falloffConstant  = m_shader->getUniformLocation(prefix + "falloffConstant");
         locations.falloffLinear    = m_shader->getUniformLocation(prefix + "falloffLinear");
         locations.falloffQuadratic = m_shader->getUniformLocation(prefix + "falloffQuadratic");
+        locations.farPlaneDistance = m_shader->getUniformLocation(prefix + "farPlaneDistance");
 
         m_numSupportedPointLights = i + 1;
     }
@@ -219,10 +233,10 @@ Material::BuiltinUniformLocations Material::cacheBuiltinUniformLocations() {
         locations.falloffConstant  = m_shader->getUniformLocation(prefix + "falloffConstant");
         locations.falloffLinear    = m_shader->getUniformLocation(prefix + "falloffLinear");
         locations.falloffQuadratic = m_shader->getUniformLocation(prefix + "falloffQuadratic");
+        locations.lightspaceMatrix = m_shader->getUniformLocation("directionalLightspaceMatrix[" + std::to_string(i) + "]");
 
         m_numSupportedDirectionalLights = i + 1;
     }
-
     // Spot lights
     u.numSpotLights = m_shader->getUniformLocation("numSpotLights");
     for (int i = 0; i < MAX_NUM_SPOT_LIGHTS; ++i) {
@@ -265,7 +279,6 @@ void Material::detectAllUniforms() {
 
     //std::cout << "Uniforms: " << std::endl;
     for (auto& info : uniforms) {
-
         //std::cout << info.location << " : " << info.name << std::endl;
         m_uniforms[info.name] = info;
     }
@@ -285,6 +298,8 @@ void Material::setUniformsPointLight(
     gl::setUniform(locations.falloffConstant , light.falloff.constant);
     gl::setUniform(locations.falloffLinear   , light.falloff.linear);
     gl::setUniform(locations.falloffQuadratic, light.falloff.quadratic);
+
+    gl::setUniform(locations.farPlaneDistance, light.farPlaneDistance);
 }
 
 void Material::setUniformDirectionalLight(
@@ -293,13 +308,17 @@ void Material::setUniformDirectionalLight(
     const Transform& tf
 ) {
     if (valid(locations.direction))
-        gl::setUniform(locations.direction, glm::normalize(glm::vec3(tf.getWorldTransform()[2])));
+        gl::setUniform(locations.direction, tf.getForward());
 
     gl::setUniform(locations.color       , light.color * light.intensity);
     gl::setUniform(locations.colorAmbient, light.colorAmbient * light.intensity);
     gl::setUniform(locations.falloffConstant , light.falloff.constant);
     gl::setUniform(locations.falloffLinear   , light.falloff.linear);
     gl::setUniform(locations.falloffQuadratic, light.falloff.quadratic);
+
+    if (valid(locations.lightspaceMatrix)) {
+        gl::setUniform(locations.lightspaceMatrix, light.matrixPV);
+    }
 }
 
 void Material::setUniformSpotLight(

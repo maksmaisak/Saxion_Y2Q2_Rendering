@@ -3,8 +3,8 @@
 #include <string>
 #include <fstream>
 
-#include "engine/core/Mesh.hpp"
 #include "Mesh.hpp"
+#include "GLHelpers.h"
 
 
 Mesh::Mesh() : _indexBufferId(0), _vertexBufferId(0), _normalBufferId(0), _uvBufferId(0), _vertices(), _normals(), _uvs(), _indices() {
@@ -235,16 +235,15 @@ void Mesh::streamToOpenGL(GLint pVerticesAttrib, GLint pNormalsAttrib, GLint pUV
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _indexBufferId);
 
 	glDrawElements(GL_TRIANGLES, _indices.size(), GL_UNSIGNED_INT, (GLvoid*)0);
+	if (glCheckError()) {
+		std::cout << "";
+	}
 
-	if (pUVsAttrib != -1) glDisableVertexAttribArray(pUVsAttrib);
-	if (pNormalsAttrib != -1) glDisableVertexAttribArray(pNormalsAttrib);
+	if (pUVsAttrib      != -1) glDisableVertexAttribArray(pUVsAttrib);
+	if (pNormalsAttrib  != -1) glDisableVertexAttribArray(pNormalsAttrib);
 	if (pVerticesAttrib != -1) glDisableVertexAttribArray(pVerticesAttrib);
 
 	glBindVertexArray(0);
-
-	// no current buffer, to avoid mishaps, very important for performance
-	// REVISION: no need to unbind, unbinding the vao does that.
-	//glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 void Mesh::drawDebugInfo(const glm::mat4& pModelMatrix, const glm::mat4& pViewMatrix, const glm::mat4& pProjectionMatrix) {

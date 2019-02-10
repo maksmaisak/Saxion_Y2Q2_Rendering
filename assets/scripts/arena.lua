@@ -26,7 +26,7 @@ local scenery = {
         Light = {
             intensity = 0.1,
             color = {0, 0, 1},
-            colorAmbient = {1, 1, 1},
+            ambientColor = {0.5, 0.5, 0.5},
             kind = "DIRECTIONAL"
         },
         Transform = {
@@ -83,7 +83,7 @@ local function makeBorders(sideLength)
         }
     end
 
-    local radius = 4
+    local radius = 10
     local step = radius * 1
 
     for x = -halfSideLength,halfSideLength,step do
@@ -122,7 +122,7 @@ function Game.makeBullet(position, direction, size)
             material = bulletMaterial
         },
         Light = {
-            intensity = 1,
+            intensity = 8,
             color = {1, 0, 0}
         },
         LuaBehavior = {
@@ -151,7 +151,7 @@ function Game.makeBullet(position, direction, size)
     }
 
     table.insert(Game.bullets, bullet)
-    if #Game.bullets >= Config.maxNumActiveBullets then
+    if #Game.bullets > Config.maxNumActiveBullets then
         table.remove(Game.bullets, 1):destroy()
     end
 

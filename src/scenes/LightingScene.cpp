@@ -17,7 +17,6 @@
 #include "Mesh.hpp"
 #include "Texture.hpp"
 #include "Material.h"
-#include "ColorMaterial.hpp"
 #include "glm.hpp"
 #include <glm/gtx/euler_angles.hpp>
 
@@ -38,17 +37,17 @@ void LightingScene::open() {
     {
         auto& l = ambientLight.add<en::Light>();
         l.color = {0,0,0};
-        l.colorAmbient = {0, 0, 0.2};
+        l.colorAmbient = {0, 0, 0.1};
     }
     if (AnimateLightProperties) ambientLight.add<LightPropertyAnimator>();
 
     auto directionalLight = engine.makeActor("DirectionalLight");
+    directionalLight.add<RotatingBehavior>(glm::vec3(0, 1, 0), glm::radians(10.f));
     directionalLight.add<en::Transform>()
         .setLocalRotation(glm::toQuat(glm::orientate4(glm::radians(glm::vec3(-45,0,-90)))));
     {
-        auto& l = directionalLight.add<en::Light>();
-        l.kind = en::Light::Kind::DIRECTIONAL;
-        l.intensity = 0.4f;
+        auto& l = directionalLight.add<en::Light>(en::Light::Kind::DIRECTIONAL);
+        l.intensity = 0.2f;
     }
     if (AnimateLightProperties) directionalLight.add<LightPropertyAnimator>();
 
@@ -72,8 +71,7 @@ void LightingScene::open() {
             child.add<en::RenderInfo>(mesh, material);
         }
 
-        auto& l = spotLight.add<en::Light>();
-        l.kind  = en::Light::Kind::SPOT;
+        auto& l = spotLight.add<en::Light>(en::Light::Kind::SPOT);
         l.color = spotLightColor;
         l.spotlightInnerCutoff = glm::cos(glm::radians(20.f));
         l.spotlightOuterCutoff = glm::cos(glm::radians(45.f));
@@ -132,7 +130,7 @@ void LightingScene::open() {
     }
 
     auto plane = engine.makeActor("Plane");
-    plane.add<en::Transform>().move({0, -1, 0}).setLocalScale({3, 3, 3});
+    plane.add<en::Transform>().move({0, -1, 0}).setLocalScale(glm::vec3(5));
     {
         auto mesh = en::Resources<Mesh>::get(config::MODEL_PATH + "plane.obj");
         auto material = std::make_shared<en::Material>("lit");

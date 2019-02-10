@@ -27,7 +27,6 @@ void LightPropertyAnimator::update(float dt) {
     light.colorAmbient = rotateColor(m_initialLight.colorAmbient);
     light.spotlightInnerCutoff = m_initialLight.spotlightInnerCutoff * sinTime;
     light.spotlightOuterCutoff = m_initialLight.spotlightOuterCutoff * sinTime;
-
     light.falloff.linear    = glm::abs(sinTime);
     light.falloff.quadratic = 1.f - glm::abs(sinTime);
 

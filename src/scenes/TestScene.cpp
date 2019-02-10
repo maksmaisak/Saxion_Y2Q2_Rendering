@@ -7,9 +7,7 @@
 #include "Mesh.hpp"
 #include "Texture.hpp"
 #include "Resources.h"
-#include "TextureMaterial.hpp"
 #include "WobblingMaterial.h"
-#include "ColorMaterial.hpp"
 #include "mge/config.hpp"
 
 #include "components/Transform.h"
@@ -33,7 +31,7 @@ void makeFloorFromSpheres(en::Engine& engine, float sideLength, int numSpheresPe
     material->setUniformValue("diffuseMap", en::Textures::get(config::TEXTURE_PATH + "bricks.jpg"));
     material->setUniformValue("diffuseColor", glm::vec3(1));
     material->setUniformValue("specularMap", en::Textures::white());
-    material->setUniformValue("specularColor", glm::vec3(0.));
+    material->setUniformValue("specularColor", glm::vec3(0));
 
     for (int y = 0; y < numSpheresPerSide; ++y) {
         for (int x = 0; x < numSpheresPerSide; ++x) {
@@ -184,8 +182,7 @@ void TestScene::open() {
     directionalLight.add<en::Transform>()
         .setLocalRotation(glm::toQuat(glm::orientate3(glm::radians(glm::vec3(-45, 0, 90)))));
     {
-        auto& l = directionalLight.add<en::Light>();
-        l.kind = en::Light::Kind::DIRECTIONAL;
+        auto& l = directionalLight.add<en::Light>(en::Light::Kind::DIRECTIONAL);
         l.colorAmbient = glm::vec3(0.1);
         l.color = glm::vec3(0.2);
     }

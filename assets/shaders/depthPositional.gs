@@ -12,13 +12,10 @@ uniform int numLights = 0;
 
 out vec4 worldspacePosition;
 flat out int lightIndex;
-flat out int layerFace;
 
 void main() {
 
     for (int layer = 0; layer < numLights; ++layer) {
-
-        lightIndex = layer;
 
         for (int face = 0; face < 6; ++face) {
 
@@ -27,7 +24,7 @@ void main() {
             for (int i = 0; i < 3; ++i) {
 
                 worldspacePosition = gl_in[i].gl_Position;
-                layerFace = gl_Layer;
+                lightIndex = layer;
                 gl_Position = matrixPV[gl_Layer] * worldspacePosition;
                 EmitVertex();
             }

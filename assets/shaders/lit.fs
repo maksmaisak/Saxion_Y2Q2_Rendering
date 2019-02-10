@@ -186,5 +186,6 @@ float CalculateDirectionalShadowMultiplier(int i, float biasMultiplier) {
 float CalculatePointShadowMultiplier(int i, vec3 fromLight, float distance, float biasMultiplier) {
 
     float bias = max(0.1 * biasMultiplier, 0.05);
-    return texture(depthCubeMaps, vec4(fromLight, i), (distance - bias) / pointLights[i].farPlaneDistance);
+    float value = texture(depthCubeMaps, vec4(fromLight, i), (distance - bias) / pointLights[i].farPlaneDistance);
+    return value;
 }

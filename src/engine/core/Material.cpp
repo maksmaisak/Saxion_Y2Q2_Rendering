@@ -299,7 +299,7 @@ void Material::setUniformsPointLight(
     gl::setUniform(locations.falloffLinear   , settings.falloff.linear);
     gl::setUniform(locations.falloffQuadratic, settings.falloff.quadratic);
 
-    gl::setUniform(locations.farPlaneDistance, 20.f);
+    gl::setUniform(locations.farPlaneDistance, 40.f);
 }
 
 void Material::setUniformDirectionalLight(

@@ -14,7 +14,7 @@ namespace en {
     class DepthMaps final {
 
     public:
-        inline static const glm::vec<2, GLsizei> CUBEMAP_RESOLUTION = {1024, 1024};
+        inline static const glm::vec<2, GLsizei> CUBEMAP_RESOLUTION = {512, 512};
         inline static const std::size_t MAX_NUM_LIGHTS = 10;
 
         DepthMaps();

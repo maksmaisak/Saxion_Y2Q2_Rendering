@@ -20,11 +20,11 @@ void main() {
         for (int face = 0; face < 6; ++face) {
 
             gl_Layer = layer * 6 + face;
+            lightIndex = layer;
 
             for (int i = 0; i < 3; ++i) {
 
                 worldspacePosition = gl_in[i].gl_Position;
-                lightIndex = layer;
                 gl_Position = matrixPV[gl_Layer] * worldspacePosition;
                 EmitVertex();
             }

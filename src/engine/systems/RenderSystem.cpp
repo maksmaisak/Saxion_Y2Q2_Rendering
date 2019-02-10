@@ -69,6 +69,8 @@ void RenderSystem::start() {
     // Disable byte-alignment restriction
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
+    glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+
     m_debugHud = std::make_unique<DebugHud>(&m_engine->getWindow());
 }
 
@@ -135,7 +137,7 @@ void RenderSystem::updateDepthMaps() {
         glCheckError();
     }
 
-    //updateDepthMapsDirectionalLights(directionalLights);
+    updateDepthMapsDirectionalLights(directionalLights);
     updateDepthMapsPositionalLights(pointLights);
 
     auto size = m_engine->getWindow().getSize();
@@ -179,11 +181,11 @@ void RenderSystem::updateDepthMapDirectionalLight(const Light& light, const Tran
 
 std::tuple<float, glm::vec3, std::array<glm::mat4, 6>> getPointLightUniforms(const Light& light, const Transform& lightTransform) {
 
-    float nearPlaneDistance = 0.1f;
-    float farPlaneDistance = 20.f;
+    float nearPlaneDistance = 1.f;
+    float farPlaneDistance = 40.f;
     glm::mat4 lightProjectionMatrix = glm::perspective(
         glm::radians(90.f),
-        (float)Light::DepthMapResolution.x / (float)Light::DepthMapResolution.y,
+        (float)DepthMaps::CUBEMAP_RESOLUTION.x / (float)DepthMaps::CUBEMAP_RESOLUTION.y,
         nearPlaneDistance,
         farPlaneDistance
     );
@@ -204,48 +206,13 @@ std::tuple<float, glm::vec3, std::array<glm::mat4, 6>> getPointLightUniforms(con
     };
 }
 
-void RenderSystem::updateDepthMapPositionalLight(const Light& light, const Transform& lightTransform) {
-
-    glViewport(0, 0, Light::DepthMapResolution.x, Light::DepthMapResolution.y);
-    glBindFramebuffer(GL_FRAMEBUFFER, light.getFramebufferId());
-    glClear(GL_DEPTH_BUFFER_BIT);
-
-    m_positionalDepthShader->use();
-
-    auto [farPlaneDistance, lightPosition, pvMatrices] = getPointLightUniforms(light, lightTransform);
-    for (unsigned int i = 0; i < 6; ++i)
-        m_positionalDepthShader->setUniformValue("matrixPV[" + std::to_string(i) + "]", pvMatrices[i]);
-    m_positionalDepthShader->setUniformValue("lightPosition", lightPosition);
-    m_positionalDepthShader->setUniformValue("farPlaneDistance", farPlaneDistance);
-
-    for (Entity e : m_registry->with<Transform, RenderInfo>()) {
-
-        Mesh* mesh = m_registry->get<RenderInfo>(e).mesh.get();
-        if (!mesh)
-            continue;
-
-        const glm::mat4& modelTransform = m_registry->get<Transform>(e).getWorldTransform();
-        m_positionalDepthShader->setUniformValue("matrixModel", modelTransform);
-        glCheckError();
-        mesh->streamToOpenGL(
-            m_positionalDepthShaderAttribLocations.vertex,
-            m_positionalDepthShaderAttribLocations.normal,
-            m_positionalDepthShaderAttribLocations.uv
-        );
-        glCheckError();
-    }
-
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glCheckError();
-}
-
 void RenderSystem::updateDepthMapsDirectionalLights(const std::vector<Entity>& directionalLights) {
 
 }
 
 void RenderSystem::updateDepthMapsPositionalLights(const std::vector<Entity>& pointLights) {
 
-    glViewport(0, 0, Light::DepthMapResolution.x, Light::DepthMapResolution.y);
+    glViewport(0, 0, DepthMaps::CUBEMAP_RESOLUTION.x, DepthMaps::CUBEMAP_RESOLUTION.y);
     glBindFramebuffer(GL_FRAMEBUFFER, m_depthMaps.getCubemapsFramebufferId());
     glClear(GL_DEPTH_BUFFER_BIT);
 

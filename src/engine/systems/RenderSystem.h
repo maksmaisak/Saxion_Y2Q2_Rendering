@@ -32,7 +32,6 @@ namespace en {
         void updateDepthMaps();
 
         void updateDepthMapDirectionalLight(const Light& light, const Transform& lightTransform);
-        void updateDepthMapPositionalLight(const Light& light, const Transform& lightTransform);
 
         void updateDepthMapsDirectionalLights(const std::vector<Entity>& directionalLights);
         void updateDepthMapsPositionalLights(const std::vector<Entity>& pointLights);

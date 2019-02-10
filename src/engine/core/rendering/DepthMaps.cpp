@@ -82,8 +82,15 @@ std::tuple<GLuint, GLuint> makeDirectionalDepthMaps(const glm::vec<2, GLsizei> r
     return {texture, fbo};
 }
 
-DepthMaps::DepthMaps() {
-
+DepthMaps::DepthMaps(
+    GLsizei maxNumDirectionalLights, Resolution directionalMapResolution,
+    GLsizei maxNumPositionalLights , Resolution cubemapResolution
+) :
+    m_maxNumDirectionalLights(maxNumDirectionalLights),
+    m_directionalMapResoltuion(directionalMapResolution),
+    m_maxNumPositionalLights(maxNumPositionalLights),
+    m_cubemapResolution(cubemapResolution)
+{
     std::tie(m_cubemapsTexture, m_cubemapsFBO) = makeDepthCubemaps(m_cubemapResolution, m_maxNumPositionalLights);
     std::tie(m_directionalMapsTexture, m_directionalMapsFBO) = makeDirectionalDepthMaps(m_directionalMapResoltuion, m_maxNumDirectionalLights);
 }

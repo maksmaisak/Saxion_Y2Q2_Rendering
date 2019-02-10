@@ -31,7 +31,8 @@ void checkRenderingError(const Actor& actor) {
 RenderSystem::RenderSystem(bool displayMeshDebugInfo) :
     m_displayMeshDebugInfo(displayMeshDebugInfo),
     m_directionalDepthShader(Resources<ShaderProgram>::get("depthDirectional")),
-    m_positionalDepthShader (Resources<ShaderProgram>::get("depthPositional"))
+    m_positionalDepthShader (Resources<ShaderProgram>::get("depthPositional")),
+    m_depthMaps(4, {1024, 1024}, 10, {512, 512})
 {}
 
 void enableDebug();

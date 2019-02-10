@@ -16,7 +16,12 @@ namespace en {
     public:
         using Resolution = glm::vec<2, GLsizei>;
 
-        DepthMaps();
+        explicit DepthMaps(
+            GLsizei maxNumDirectionalLights = 4,
+            Resolution directionalMapResolution = {1024, 1024},
+            GLsizei maxNumPositionalLights = 10,
+            Resolution cubemapResolution = {512, 512}
+        );
         ~DepthMaps();
         DepthMaps(const DepthMaps& other) = delete;
         DepthMaps& operator=(const DepthMaps& other) = delete;
@@ -35,13 +40,13 @@ namespace en {
 
     private:
 
-        Resolution m_cubemapResolution = {512, 512};
-        GLsizei m_maxNumPositionalLights = 10;
+        Resolution m_cubemapResolution;
+        GLsizei m_maxNumPositionalLights;
         GLuint m_cubemapsFBO     = 0;
         GLuint m_cubemapsTexture = 0;
 
-        Resolution m_directionalMapResoltuion = {1024, 1024};
-        GLsizei m_maxNumDirectionalLights = 4;
+        Resolution m_directionalMapResoltuion;
+        GLsizei m_maxNumDirectionalLights;
         GLuint m_directionalMapsFBO     = 0;
         GLuint m_directionalMapsTexture = 0;
     };

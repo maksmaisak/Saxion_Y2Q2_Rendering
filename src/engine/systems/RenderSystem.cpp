@@ -181,8 +181,8 @@ void RenderSystem::updateDepthMapDirectionalLight(const Light& light, const Tran
 
 std::tuple<float, glm::vec3, std::array<glm::mat4, 6>> getPointLightUniforms(const Light& light, const Transform& lightTransform) {
 
-    float nearPlaneDistance = 1.f;
-    float farPlaneDistance = 40.f;
+    float nearPlaneDistance = light.getSettings().nearPlaneDistance;
+    float farPlaneDistance  = light.getSettings().farPlaneDistance;
     glm::mat4 lightProjectionMatrix = glm::perspective(
         glm::radians(90.f),
         (float)DepthMaps::CUBEMAP_RESOLUTION.x / (float)DepthMaps::CUBEMAP_RESOLUTION.y,

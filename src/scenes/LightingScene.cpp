@@ -21,7 +21,7 @@
 #include <glm/gtx/euler_angles.hpp>
 
 constexpr bool AnimateLightProperties = false;
-constexpr int NumRotatingLights = 1;
+constexpr int NumRotatingLights = 4;
 
 void LightingScene::open() {
 
@@ -37,7 +37,7 @@ void LightingScene::open() {
     {
         auto& l = ambientLight.add<en::Light>().getSettings();
         l.color = {0,0,0};
-        l.colorAmbient = {0, 0, 0.2};
+        l.colorAmbient = {0, 0, 0.1};
     }
     if (AnimateLightProperties) ambientLight.add<LightPropertyAnimator>();
 
@@ -47,7 +47,7 @@ void LightingScene::open() {
         .setLocalRotation(glm::toQuat(glm::orientate4(glm::radians(glm::vec3(-45,0,-90)))));
     {
         auto& l = directionalLight.add<en::Light>(en::Light::Kind::DIRECTIONAL).getSettings();
-        l.intensity = 0.4f;
+        l.intensity = 0.2f;
     }
     if (AnimateLightProperties) directionalLight.add<LightPropertyAnimator>();
 
@@ -130,7 +130,7 @@ void LightingScene::open() {
     }
 
     auto plane = engine.makeActor("Plane");
-    plane.add<en::Transform>().move({0, -1, 0}).setLocalScale(glm::vec3(100));
+    plane.add<en::Transform>().move({0, -1, 0}).setLocalScale(glm::vec3(5));
     {
         auto mesh = en::Resources<Mesh>::get(config::MODEL_PATH + "plane.obj");
         auto material = std::make_shared<en::Material>("lit");

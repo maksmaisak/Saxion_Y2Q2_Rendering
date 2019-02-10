@@ -47,6 +47,9 @@ namespace en {
             // cos of angle in radius
             float spotlightInnerCutoff = glm::cos(glm::radians(40.f));
             float spotlightOuterCutoff = glm::cos(glm::radians(50.f));
+
+            float nearPlaneDistance = 0.1f;
+            float farPlaneDistance = 100.f;
         };
 
         static void addFromLua(Actor& actor, LuaState& lua);

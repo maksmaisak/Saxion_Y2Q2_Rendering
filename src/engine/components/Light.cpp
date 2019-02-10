@@ -138,7 +138,7 @@ glm::mat4 Light::getProjectionMatrix() const {
     return glm::ortho(
         -20.f, 20.f,
         -20.f, 20.f,
-        1.f, 100.f
+        m_settings.nearPlaneDistance, m_settings.farPlaneDistance
     );
 }
 

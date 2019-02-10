@@ -129,7 +129,7 @@ function scene.start()
 
     Game.makeActors(scenery)
 
-    local actor = Game.makeActor {
+    Game.makeActor {
         Name = "Light",
         Transform = {
             scale = {0.1, 0.1, 0.1}
@@ -143,7 +143,7 @@ function scene.start()
         }
     }
 
-    local actor2 = Game.makeActor {
+    Game.makeActor {
         Name = "Light2",
         Transform = {
             position = {3, 2, 0},
@@ -158,11 +158,24 @@ function scene.start()
 		}
     }
 
-    local actor2 = Game.makeActor {
+    Game.makeActor {
         Name = "LightDirectional",
         Transform = {
             scale = {0.1, 0.1, 0.1},
             rotation = {-45, 0, 0}
+        },
+        Light = {
+            kind = "directional",
+            colorAmbient = {0, 0, 0},
+            intensity = 0.1
+        }
+    }
+
+    Game.makeActor {
+        Name = "LightDirectional2",
+        Transform = {
+            scale = {0.1, 0.1, 0.1},
+            rotation = {0, 0, 0}
         },
         Light = {
             kind = "directional",

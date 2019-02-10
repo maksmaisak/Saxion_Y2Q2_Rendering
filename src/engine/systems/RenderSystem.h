@@ -17,8 +17,6 @@
 namespace en {
 
     class ShaderProgram;
-    class Light;
-    class Transform;
 
     class RenderSystem : public System {
 
@@ -30,9 +28,6 @@ namespace en {
     private:
         Actor getMainCamera();
         void updateDepthMaps();
-
-        void updateDepthMapDirectionalLight(const Light& light, const Transform& lightTransform);
-
         void updateDepthMapsDirectionalLights(const std::vector<Entity>& directionalLights);
         void updateDepthMapsPositionalLights(const std::vector<Entity>& pointLights);
 
@@ -40,15 +35,6 @@ namespace en {
 
         std::shared_ptr<ShaderProgram> m_directionalDepthShader;
         std::shared_ptr<ShaderProgram> m_positionalDepthShader;
-
-        struct AttributeLocations {
-            GLint vertex = -1;
-            GLint normal = -1;
-            GLint uv = -1;
-        };
-
-        AttributeLocations m_directionalDepthShaderAttribLocations;
-        AttributeLocations m_positionalDepthShaderAttribLocations;
 
         std::unique_ptr<DebugHud> m_debugHud;
         bool m_displayMeshDebugInfo = false;

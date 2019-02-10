@@ -51,7 +51,7 @@ struct SpotLight {
 };
 
 uniform DirectionalLight directionalLights[NUM_DIRECTIONAL_LIGHTS];
-uniform sampler2DShadow directionalDepthMaps[NUM_DIRECTIONAL_LIGHTS];
+uniform sampler2DArrayShadow directionalDepthMaps;
 uniform int numDirectionalLights = 0;
 
 uniform PointLight pointLights[NUM_POINT_LIGHTS];
@@ -86,17 +86,6 @@ void main() {
     vec3 materialSpecular = specularColor * vec3(texture(specularMap, texCoords));
 
     vec3 color = vec3(0,0,0);
-
-//    for (int i = 0; i < numDirectionalLights; ++i) {
-//        color += directionalLights[i].color * texture(directionalDepthMaps[i], vec2(0.5)).rgb;
-//        color += vec3(0.1);
-//    }
-//
-//    for (int i = 0; i < numPointLights; i++) {
-//        color += pointLights[i].color * texture(pointDepthMaps[i], vec4(worldPosition - pointLights[i].position, length(worldPosition - pointLights[i].position) / pointLights[i].farPlaneDistance));
-//    }
-//    color += pointLights[0].color * texture(pointDepthMaps[0], vec4(worldPosition - pointLights[0].position, length(worldPosition - pointLights[0].position) / pointLights[0].farPlaneDistance));
-//    color += pointLights[1].color * texture(pointDepthMaps[1], vec4(worldPosition - pointLights[1].position, length(worldPosition - pointLights[1].position) / pointLights[1].farPlaneDistance));
 
     for (int i = 0; i < numDirectionalLights; ++i) {
         color += CalculateDirectionalLightContribution(i, normal, viewDirection, materialDiffuse, materialSpecular);
@@ -180,12 +169,11 @@ float CalculateDirectionalShadowMultiplier(int i, float biasMultiplier) {
         return 1;
 
     float bias = max(0.002 * biasMultiplier, 0.001);
-    return texture(directionalDepthMaps[0], vec3(projected.xy, currentDepth - bias));
+    return texture(directionalDepthMaps, vec4(projected.xy, i, currentDepth - bias));
 }
 
 float CalculatePointShadowMultiplier(int i, vec3 fromLight, float distance, float biasMultiplier) {
 
     float bias = max(0.1 * biasMultiplier, 0.05);
-    float value = texture(depthCubeMaps, vec4(fromLight, i), (distance - bias) / pointLights[i].farPlaneDistance);
-    return value;
+    return texture(depthCubeMaps, vec4(fromLight, i), (distance - bias) / pointLights[i].farPlaneDistance);
 }

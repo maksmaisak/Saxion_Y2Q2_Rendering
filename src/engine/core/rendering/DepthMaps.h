@@ -14,19 +14,36 @@ namespace en {
     class DepthMaps final {
 
     public:
-        inline static const glm::vec<2, GLsizei> CUBEMAP_RESOLUTION = {512, 512};
-        inline static const std::size_t MAX_NUM_LIGHTS = 10;
+        using Resolution = glm::vec<2, GLsizei>;
 
         DepthMaps();
         ~DepthMaps();
+        DepthMaps(const DepthMaps& other) = delete;
+        DepthMaps& operator=(const DepthMaps& other) = delete;
+        DepthMaps(DepthMaps&& other) = delete;
+        DepthMaps& operator=(DepthMaps&& other) = delete;
 
+        Resolution getCubemapResolution() const;
+        GLsizei getMaxNumPositionalLights() const;
         GLuint getCubemapsFramebufferId() const;
         GLuint getCubemapsTextureId() const;
 
+        Resolution getDirectionalMapResolution() const;
+        GLsizei getMaxNumDirectionalLights() const;
+        GLuint getDirectionalMapsFramebufferId() const;
+        GLuint getDirectionalMapsTextureId() const;
+
     private:
 
-        GLuint m_cubemapsFBO = 0;
+        Resolution m_cubemapResolution = {512, 512};
+        GLsizei m_maxNumPositionalLights = 10;
+        GLuint m_cubemapsFBO     = 0;
         GLuint m_cubemapsTexture = 0;
+
+        Resolution m_directionalMapResoltuion = {1024, 1024};
+        GLsizei m_maxNumDirectionalLights = 4;
+        GLuint m_directionalMapsFBO     = 0;
+        GLuint m_directionalMapsTexture = 0;
     };
 }
 

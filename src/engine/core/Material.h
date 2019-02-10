@@ -75,6 +75,7 @@ namespace en {
             GLint viewPosition = -1;
 
             GLint depthCubemaps = -1;
+            GLint directionalDepthMaps = -1;
 
             GLint numPointLights = -1;
             struct PointLightLocations {
@@ -104,7 +105,6 @@ namespace en {
                 GLint falloffLinear    = -1;
                 GLint falloffQuadratic = -1;
 
-                GLint depthMap = -1;
                 GLint lightspaceMatrix = -1;
 
             } directionalLights[MAX_NUM_DIRECTIONAL_LIGHTS];

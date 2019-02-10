@@ -95,9 +95,11 @@ void Material::setBuiltinUniforms(
     if (valid(u.viewPosition))
         gl::setUniform(u.viewPosition, glm::vec3(glm::inverse(viewMatrix)[3]));
 
-    if (valid(u.depthCubemaps)) {
+    if (valid(u.directionalDepthMaps))
+        setUniformTexture(u.directionalDepthMaps, depthMaps->getDirectionalMapsTextureId(), GL_TEXTURE_2D_ARRAY);
+
+    if (valid(u.depthCubemaps))
         setUniformTexture(u.depthCubemaps, depthMaps->getCubemapsTextureId(), GL_TEXTURE_CUBE_MAP_ARRAY);
-    }
 
     auto& registry = engine->getRegistry();
 
@@ -191,6 +193,7 @@ Material::BuiltinUniformLocations Material::cacheBuiltinUniformLocations() {
     u.pvm        = m_shader->getUniformLocation("matrixPVM");
     u.time       = m_shader->getUniformLocation("time");
     u.viewPosition = m_shader->getUniformLocation("viewPosition");
+    u.directionalDepthMaps = m_shader->getUniformLocation("directionalDepthMaps");
     u.depthCubemaps = m_shader->getUniformLocation("depthCubeMaps");
 
     // Point lights
@@ -230,9 +233,7 @@ Material::BuiltinUniformLocations Material::cacheBuiltinUniformLocations() {
         locations.falloffConstant  = m_shader->getUniformLocation(prefix + "falloffConstant");
         locations.falloffLinear    = m_shader->getUniformLocation(prefix + "falloffLinear");
         locations.falloffQuadratic = m_shader->getUniformLocation(prefix + "falloffQuadratic");
-
         locations.lightspaceMatrix = m_shader->getUniformLocation("directionalLightspaceMatrix[" + std::to_string(i) + "]");
-        locations.depthMap = m_shader->getUniformLocation("directionalDepthMaps[" + std::to_string(i) + "]");
 
         m_numSupportedDirectionalLights = i + 1;
     }
@@ -316,10 +317,6 @@ void Material::setUniformDirectionalLight(
     gl::setUniform(locations.falloffConstant , settings.falloff.constant);
     gl::setUniform(locations.falloffLinear   , settings.falloff.linear);
     gl::setUniform(locations.falloffQuadratic, settings.falloff.quadratic);
-
-    if (valid(locations.depthMap)) {
-        setUniformTexture(locations.depthMap, light.getDepthMapId());
-    }
 
     if (valid(locations.lightspaceMatrix)) {
         glm::mat4 lightProjectionMatrix = light.getProjectionMatrix();

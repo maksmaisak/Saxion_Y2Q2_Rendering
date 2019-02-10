@@ -5,13 +5,14 @@ const int MAX_NUM_LIGHTS = 12;
 const int MAX_NUM_PV_MATRICES = 6 * MAX_NUM_LIGHTS;
 
 layout(triangles) in;
-layout(triangle_strip, max_vertices=216) out; //12 * MAX_NUM_LIGHTS. Identifiers in layouts are unsupported
+layout(triangle_strip, max_vertices=216) out; //18 * MAX_NUM_LIGHTS. Identifiers in layouts are unsupported
 
 uniform mat4 matrixPV[MAX_NUM_PV_MATRICES];
 uniform int numLights = 0;
 
 out vec4 worldspacePosition;
 flat out int lightIndex;
+flat out int layerFace;
 
 void main() {
 
@@ -24,7 +25,9 @@ void main() {
             gl_Layer = layer * 6 + face;
 
             for (int i = 0; i < 3; ++i) {
+
                 worldspacePosition = gl_in[i].gl_Position;
+                layerFace = gl_Layer;
                 gl_Position = matrixPV[gl_Layer] * worldspacePosition;
                 EmitVertex();
             }

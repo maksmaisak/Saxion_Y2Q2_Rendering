@@ -4,6 +4,15 @@
 -- Time: 20:15
 --
 
+local planeRenderInfo = {
+    mesh = "models/plane.obj",
+    material = Game.makeMaterial {
+        diffuse = "textures/land.jpg",
+        specularColor = {0.05, 0.08, 0.05},
+        shininess = 10
+    }
+}
+
 local scenery = {
     {
         Name = "camera",
@@ -14,7 +23,7 @@ local scenery = {
         CameraOrbitBehavior = {
             target   = "head",
             distance =  10,
-            minTilt  = -15,
+            minTilt  = -60,
             maxTilt  =  60,
         }
     },
@@ -24,13 +33,52 @@ local scenery = {
             position = { x = 0 , y = 0 , z = 0 },
             scale    = { x = 10, y = 10, z = 10 }
         },
-        RenderInfo = {
-            mesh = "models/plane.obj",
-            material = {
-                diffuse = "textures/land.jpg",
-                shininess = 10
-            }
+        RenderInfo = planeRenderInfo
+    },
+    {
+        Name = "wallXP",
+        Transform = {
+            position = { 10, 10, 0 },
+            scale    = { 10, 10, 10 },
+            rotation = { 0, 0, 90}
         },
+        RenderInfo = planeRenderInfo
+    },
+    {
+        Name = "wallXN",
+        Transform = {
+            position = { -10, 10, 0 },
+            scale    = { 10, 10, 10 },
+            rotation = { 0, 0, -90}
+        },
+        RenderInfo = planeRenderInfo
+    },
+    {
+        Name = "wallZP",
+        Transform = {
+            position = { 0, 10, 10 },
+            scale    = { 10, 10, 10 },
+            rotation = { -90, 0, 0 }
+        },
+        RenderInfo = planeRenderInfo
+    },
+    {
+        Name = "wallZN",
+        Transform = {
+            position = { 0, 10, -10 },
+            scale    = { 10, 10, 10 },
+            rotation = { 90, 0, 0 }
+        },
+        RenderInfo = planeRenderInfo
+    },
+    {
+        Name = "ceiling",
+        Transform = {
+            position = { 0, 20, 0 },
+            scale    = { 10, 10, 10 },
+            rotation = { 180, 0, 0 }
+        },
+        RenderInfo = planeRenderInfo
     },
     {
         Name = "cube",
@@ -91,23 +139,23 @@ function scene.start()
             material = {}
         },
         Light = {
-            intensity = 5
+            intensity = 10
         }
     }
 
     local actor2 = Game.makeActor {
         Name = "Light2",
         Transform = {
-            position = {3, 3, 0},
+            position = {3, 2, 0},
             scale = {0.1, 0.1, 0.1}
         },
         RenderInfo = {
             mesh = "models/sphere2.obj",
             material = {}
         },
---        Light = {
---			intensity = 5
---		}
+        Light = {
+			intensity = 10
+		}
     }
 
     local actor2 = Game.makeActor {
@@ -118,6 +166,7 @@ function scene.start()
         },
         Light = {
             kind = "directional",
+            colorAmbient = {0, 0, 0},
             intensity = 0.1
         }
     }
@@ -125,7 +174,7 @@ end
 
 function scene.update(dt)
 
-    Game.find("Light"):get("Transform").position = {-4, 3 + math.sin(Game.getTime()), 0}
+    Game.find("Light"):get("Transform").position = {-4, 3 + 2 * math.sin(Game.getTime()), 0}
     --Game.find("LightDirectional"):get("Transform"):rotate(45 * dt, 1, 0, 0);
 end
 

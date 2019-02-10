@@ -31,7 +31,7 @@ void makeFloorFromSpheres(en::Engine& engine, float sideLength, int numSpheresPe
     material->setUniformValue("diffuseMap", en::Textures::get(config::TEXTURE_PATH + "bricks.jpg"));
     material->setUniformValue("diffuseColor", glm::vec3(1));
     material->setUniformValue("specularMap", en::Textures::white());
-    material->setUniformValue("specularColor", glm::vec3(0.));
+    material->setUniformValue("specularColor", glm::vec3(0));
 
     for (int y = 0; y < numSpheresPerSide; ++y) {
         for (int x = 0; x < numSpheresPerSide; ++x) {

@@ -35,7 +35,7 @@ void TerrainScene::open() {
         //.rotate(glm::radians(-180.f), glm::vec3(0, 1, 0));
         //.rotate(glm::radians(-90.f), glm::vec3(0, 1, 0));
     {
-        auto& l = directionalLight.add<en::Light>(en::Light::Kind::DIRECTIONAL).getSettings();
+        auto& l = directionalLight.add<en::Light>(en::Light::Kind::DIRECTIONAL);
         l.colorAmbient = {0.1, 0.1, 0.1};
         l.intensity = 1.f;
     }

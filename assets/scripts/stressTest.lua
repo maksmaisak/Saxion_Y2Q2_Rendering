@@ -157,7 +157,7 @@ function scene.start()
         Light = {
             intensity = 0.1,
             color = {0, 0, 1},
-            colorAmbient = {1, 1, 1},
+            ambientColor = {1, 1, 1},
             kind = "DIRECTIONAL"
         },
         Transform = {

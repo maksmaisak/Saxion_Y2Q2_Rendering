@@ -11,15 +11,11 @@
 
 namespace en {
 
-    class Transform;
-
     class Light final {
 
         LUA_TYPE(Light);
 
     public:
-
-        inline static const glm::vec<2, GLsizei> DepthMapResolution = {1024, 1024};
 
         enum class Kind {
 
@@ -30,66 +26,38 @@ namespace en {
             COUNT
         };
 
-        struct Settings {
-
-            struct Falloff {
-
-                float constant  = 1;
-                float linear    = 0;
-                float quadratic = 1;
-            };
-
-            glm::vec3 colorAmbient = {0, 0, 0};
-            glm::vec3 color = {1, 1, 1};
-            float intensity = 1;
-            Falloff falloff = {1, 0, 1};
-
-            // cos of angle in radius
-            float spotlightInnerCutoff = glm::cos(glm::radians(40.f));
-            float spotlightOuterCutoff = glm::cos(glm::radians(50.f));
-
-            float nearPlaneDistance = 0.1f;
-            float farPlaneDistance = 100.f;
-        };
-
         static void addFromLua(Actor& actor, LuaState& lua);
         static void initializeMetatable(LuaState& lua);
 
-        Light(Kind kind = Kind::POINT);
-        ~Light();
-        Light(const Light& other) = delete;
-        Light& operator=(const Light& other) = delete;
-        Light(Light&& other);
-        Light& operator=(Light&& other);
+        explicit Light(Kind kind = Kind::POINT);
 
-        Settings& getSettings();
-        const Settings& getSettings() const;
-        void setSettings(Settings& settings);
+        struct Falloff {
+            float constant  = 1;
+            float linear    = 0;
+            float quadratic = 1;
+        };
 
-        Kind getKind() const;
-        void setKind(Kind kind);
-        GLuint getFramebufferId() const;
-        GLuint getDepthMapId() const;
-        glm::mat4 getProjectionMatrix() const;
-        glm::mat4 getViewMatrix(const Transform& tf) const;
+        glm::vec3 colorAmbient = {0, 0, 0};
+        glm::vec3 color = {1, 1, 1};
+        float intensity = 1;
+        Falloff falloff = {1, 0, 1};
 
-    private:
+        Kind kind = Kind::POINT;
+        // cos of angle in radians. For spotlights only.
+        float spotlightInnerCutoff = glm::cos(glm::radians(40.f));
+        float spotlightOuterCutoff = glm::cos(glm::radians(50.f));
 
-        Kind m_kind = Kind::POINT;
-        Settings m_settings;
-
-        GLuint m_fbo = 0;
-        GLuint m_depthMap = 0;
-
-        void makeDepthMapTexture();
-        void attachDepthMapToFramebuffer();
+        // Shadowmapping data
+        float nearPlaneDistance = 0.1f;
+        float farPlaneDistance = 100.f;
+        glm::mat4 matrixPV; // The P*V matrix for directional shadowmapping
     };
 
     struct FalloffFunctions {
 
-        static constexpr Light::Settings::Falloff Constant  = {1, 0, 0};
-        static constexpr Light::Settings::Falloff Linear    = {1, 1, 0};
-        static constexpr Light::Settings::Falloff Quadratic = {1, 0, 1};
+        static constexpr Light::Falloff Constant  = {1, 0, 0};
+        static constexpr Light::Falloff Linear    = {1, 1, 0};
+        static constexpr Light::Falloff Quadratic = {1, 0, 1};
     };
 }
 

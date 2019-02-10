@@ -114,7 +114,7 @@ void Material::setBuiltinUniforms(
         auto& light = registry.get<Light>(e);
         auto& tf = registry.get<Transform>(e);
 
-        switch (light.getKind()) {
+        switch (light.kind) {
             case Light::Kind::POINT:
                 if (numPointLights >= m_numSupportedPointLights)
                     break;
@@ -293,14 +293,13 @@ void Material::setUniformsPointLight(
     if (valid(locations.position))
         gl::setUniform(locations.position, tf.getWorldPosition());
 
-    const Light::Settings& settings = light.getSettings();
-    gl::setUniform(locations.color       , settings.color * settings.intensity);
-    gl::setUniform(locations.colorAmbient, settings.colorAmbient * settings.intensity);
-    gl::setUniform(locations.falloffConstant , settings.falloff.constant);
-    gl::setUniform(locations.falloffLinear   , settings.falloff.linear);
-    gl::setUniform(locations.falloffQuadratic, settings.falloff.quadratic);
+    gl::setUniform(locations.color       , light.color * light.intensity);
+    gl::setUniform(locations.colorAmbient, light.colorAmbient * light.intensity);
+    gl::setUniform(locations.falloffConstant , light.falloff.constant);
+    gl::setUniform(locations.falloffLinear   , light.falloff.linear);
+    gl::setUniform(locations.falloffQuadratic, light.falloff.quadratic);
 
-    gl::setUniform(locations.farPlaneDistance, light.getSettings().farPlaneDistance);
+    gl::setUniform(locations.farPlaneDistance, light.farPlaneDistance);
 }
 
 void Material::setUniformDirectionalLight(
@@ -311,17 +310,14 @@ void Material::setUniformDirectionalLight(
     if (valid(locations.direction))
         gl::setUniform(locations.direction, tf.getForward());
 
-    const Light::Settings& settings = light.getSettings();
-    gl::setUniform(locations.color       , settings.color * settings.intensity);
-    gl::setUniform(locations.colorAmbient, settings.colorAmbient * settings.intensity);
-    gl::setUniform(locations.falloffConstant , settings.falloff.constant);
-    gl::setUniform(locations.falloffLinear   , settings.falloff.linear);
-    gl::setUniform(locations.falloffQuadratic, settings.falloff.quadratic);
+    gl::setUniform(locations.color       , light.color * light.intensity);
+    gl::setUniform(locations.colorAmbient, light.colorAmbient * light.intensity);
+    gl::setUniform(locations.falloffConstant , light.falloff.constant);
+    gl::setUniform(locations.falloffLinear   , light.falloff.linear);
+    gl::setUniform(locations.falloffQuadratic, light.falloff.quadratic);
 
     if (valid(locations.lightspaceMatrix)) {
-        glm::mat4 lightProjectionMatrix = light.getProjectionMatrix();
-        glm::mat4 lightViewMatrix = light.getViewMatrix(tf);
-        gl::setUniform(locations.lightspaceMatrix, lightProjectionMatrix * lightViewMatrix);
+        gl::setUniform(locations.lightspaceMatrix, light.matrixPV);
     }
 }
 
@@ -336,12 +332,11 @@ void Material::setUniformSpotLight(
     if (valid(locations.direction))
         gl::setUniform(locations.direction, glm::normalize(glm::vec3(tf.getWorldTransform()[2])));
 
-    const Light::Settings& settings = light.getSettings();
-    gl::setUniform(locations.color       , settings.color * settings.intensity);
-    gl::setUniform(locations.colorAmbient, settings.colorAmbient * settings.intensity);
-    gl::setUniform(locations.falloffConstant , settings.falloff.constant);
-    gl::setUniform(locations.falloffLinear   , settings.falloff.linear);
-    gl::setUniform(locations.falloffQuadratic, settings.falloff.quadratic);
-    gl::setUniform(locations.innerCutoff, settings.spotlightInnerCutoff);
-    gl::setUniform(locations.outerCutoff, glm::min(settings.spotlightInnerCutoff, settings.spotlightOuterCutoff));
+    gl::setUniform(locations.color       , light.color * light.intensity);
+    gl::setUniform(locations.colorAmbient, light.colorAmbient * light.intensity);
+    gl::setUniform(locations.falloffConstant , light.falloff.constant);
+    gl::setUniform(locations.falloffLinear   , light.falloff.linear);
+    gl::setUniform(locations.falloffQuadratic, light.falloff.quadratic);
+    gl::setUniform(locations.innerCutoff, light.spotlightInnerCutoff);
+    gl::setUniform(locations.outerCutoff, glm::min(light.spotlightInnerCutoff, light.spotlightOuterCutoff));
 }

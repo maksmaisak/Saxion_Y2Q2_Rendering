@@ -19,8 +19,7 @@ public:
     void update(float dt) override;
 
 private:
-    en::Light::Settings m_initialLightSettings;
-    en::Light::Kind m_initialLightKind;
+    en::Light m_initialLight;
     sf::Time m_startTime;
 };
 

@@ -26,7 +26,7 @@ local scenery = {
         Light = {
             intensity = 0.1,
             color = {0, 0, 1},
-            colorAmbient = {0.5, 0.5, 0.5},
+            ambientColor = {0.5, 0.5, 0.5},
             kind = "DIRECTIONAL"
         },
         Transform = {

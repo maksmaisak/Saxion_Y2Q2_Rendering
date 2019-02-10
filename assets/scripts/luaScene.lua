@@ -166,7 +166,7 @@ function scene.start()
         },
         Light = {
             kind = "directional",
-            colorAmbient = {0, 0, 0},
+            ambientColor = {0, 0, 0},
             intensity = 0.1
         }
     }
@@ -179,7 +179,7 @@ function scene.start()
         },
         Light = {
             kind = "directional",
-            colorAmbient = {0, 0, 0},
+            ambientColor = {0, 0, 0},
             intensity = 0.1
         }
     }

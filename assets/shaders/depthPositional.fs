@@ -1,11 +1,19 @@
 #version 330
 
-in vec4 worldspacePosition;
+const int MAX_NUM_LIGHTS = 12;
 
-uniform vec3 lightPosition;
-uniform float farPlaneDistance;
+in vec4 worldspacePosition;
+flat in int lightIndex;
+
+struct LightInfo {
+
+    vec3 position;
+    float farPlaneDistance;
+};
+
+uniform LightInfo lights[MAX_NUM_LIGHTS];
 
 void main() {
 
-   gl_FragDepth = length(worldspacePosition.xyz - lightPosition) / farPlaneDistance;
+   gl_FragDepth = length(worldspacePosition.xyz - lights[lightIndex].position) / lights[lightIndex].farPlaneDistance;
 }

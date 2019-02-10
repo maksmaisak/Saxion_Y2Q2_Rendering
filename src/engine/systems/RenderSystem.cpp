@@ -93,7 +93,7 @@ void RenderSystem::draw() {
                 continue;
 
             const glm::mat4& matrixModel = m_registry->get<Transform>(e).getWorldTransform();
-            renderInfo.material->render(m_engine, renderInfo.mesh.get(), matrixModel, matrixView, matrixProjection);
+            renderInfo.material->render(renderInfo.mesh.get(), m_engine, &m_depthMaps, matrixModel, matrixView, matrixProjection);
 
             checkRenderingError(m_engine->actor(e));
 
@@ -117,18 +117,26 @@ Actor RenderSystem::getMainCamera() {
 
 void RenderSystem::updateDepthMaps() {
 
+    std::vector<Entity> directionalLights;
+    std::vector<Entity> pointLights;
+
     for (Entity lightEntity : m_registry->with<Transform, Light>()) {
 
         auto& light = m_registry->get<Light>(lightEntity);
         auto& lightTransform = m_registry->get<Transform>(lightEntity);
         if (light.getKind() == Light::Kind::DIRECTIONAL) {
             updateDepthMapDirectionalLight(light, lightTransform);
+            directionalLights.push_back(lightEntity);
         } else {
-            updateDepthMapPositionalLight(light, lightTransform);
+            //updateDepthMapPositionalLight(light, lightTransform);
+            pointLights.push_back(lightEntity);
         }
 
         glCheckError();
     }
+
+    //updateDepthMapsDirectionalLights(directionalLights);
+    updateDepthMapsPositionalLights(pointLights);
 
     auto size = m_engine->getWindow().getSize();
     glViewport(0, 0, size.x, size.y);
@@ -169,7 +177,7 @@ void RenderSystem::updateDepthMapDirectionalLight(const Light& light, const Tran
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-std::tuple<float, glm::vec3, std::array<glm::mat4, 6>> getDirectionalLightUniforms(const Light& light, const Transform& lightTransform) {
+std::tuple<float, glm::vec3, std::array<glm::mat4, 6>> getPointLightUniforms(const Light& light, const Transform& lightTransform) {
 
     float nearPlaneDistance = 1.f;
     float farPlaneDistance = 20.f;
@@ -204,7 +212,7 @@ void RenderSystem::updateDepthMapPositionalLight(const Light& light, const Trans
 
     m_positionalDepthShader->use();
 
-    auto [farPlaneDistance, lightPosition, pvMatrices] = getDirectionalLightUniforms(light, lightTransform);
+    auto [farPlaneDistance, lightPosition, pvMatrices] = getPointLightUniforms(light, lightTransform);
     for (unsigned int i = 0; i < 6; ++i)
         m_positionalDepthShader->setUniformValue("matrixPV[" + std::to_string(i) + "]", pvMatrices[i]);
     m_positionalDepthShader->setUniformValue("lightPosition", lightPosition);
@@ -218,11 +226,65 @@ void RenderSystem::updateDepthMapPositionalLight(const Light& light, const Trans
 
         const glm::mat4& modelTransform = m_registry->get<Transform>(e).getWorldTransform();
         m_positionalDepthShader->setUniformValue("matrixModel", modelTransform);
+        glCheckError();
         mesh->streamToOpenGL(
             m_positionalDepthShaderAttribLocations.vertex,
             m_positionalDepthShaderAttribLocations.normal,
             m_positionalDepthShaderAttribLocations.uv
         );
+        glCheckError();
+    }
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glCheckError();
+}
+
+void RenderSystem::updateDepthMapsDirectionalLights(const std::vector<Entity>& directionalLights) {
+
+}
+
+void RenderSystem::updateDepthMapsPositionalLights(const std::vector<Entity>& pointLights) {
+
+    glViewport(0, 0, Light::DepthMapResolution.x, Light::DepthMapResolution.y);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_depthMaps.getCubemapsFramebufferId());
+    glClear(GL_DEPTH_BUFFER_BIT);
+
+    m_positionalDepthShader->use();
+
+    int maxNumCubemaps = 10;
+    int i = 0;
+    for (Entity e : pointLights) {
+
+        auto& light = m_registry->get<Light>(e);
+        auto& tf = m_registry->get<Transform>(e);
+        auto [farPlaneDistance, lightPosition, pvMatrices] = getPointLightUniforms(light, tf);
+
+        for (unsigned int face = 0; face < 6; ++face)
+            m_positionalDepthShader->setUniformValue("matrixPV[" + std::to_string(i * 6 + face) + "]", pvMatrices[face]);
+        std::string prefix = "lights[" + std::to_string(i) + "].";
+        m_positionalDepthShader->setUniformValue(prefix + "position", lightPosition);
+        m_positionalDepthShader->setUniformValue(prefix + "farPlaneDistance", farPlaneDistance);
+
+        if (++i >= maxNumCubemaps)
+            break;
+    }
+    m_positionalDepthShader->setUniformValue("numLights", i);
+
+    for (Entity e : m_registry->with<Transform, RenderInfo>()) {
+
+        Mesh* mesh = m_registry->get<RenderInfo>(e).mesh.get();
+        if (!mesh)
+            continue;
+
+        const glm::mat4& modelTransform = m_registry->get<Transform>(e).getWorldTransform();
+        m_positionalDepthShader->setUniformValue("matrixModel", modelTransform);
+        glCheckError();
+        mesh->streamToOpenGL(
+            m_positionalDepthShaderAttribLocations.vertex,
+            m_positionalDepthShaderAttribLocations.normal,
+            m_positionalDepthShaderAttribLocations.uv
+        );
+        glCheckError();
     }
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);

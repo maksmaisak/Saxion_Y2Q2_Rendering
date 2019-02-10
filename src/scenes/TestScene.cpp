@@ -7,9 +7,7 @@
 #include "Mesh.hpp"
 #include "Texture.hpp"
 #include "Resources.h"
-#include "TextureMaterial.hpp"
 #include "WobblingMaterial.h"
-#include "ColorMaterial.hpp"
 #include "mge/config.hpp"
 
 #include "components/Transform.h"

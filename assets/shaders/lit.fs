@@ -55,7 +55,7 @@ uniform sampler2DShadow directionalDepthMaps[NUM_DIRECTIONAL_LIGHTS];
 uniform int numDirectionalLights = 0;
 
 uniform PointLight pointLights[NUM_POINT_LIGHTS];
-uniform samplerCubeShadow pointDepthMaps[NUM_POINT_LIGHTS];
+uniform samplerCubeArrayShadow depthCubeMaps;
 uniform int numPointLights = 0;
 
 uniform SpotLight spotLights[NUM_SPOT_LIGHTS];
@@ -188,5 +188,5 @@ float CalculatePointShadowMultiplier(int i, vec3 fromLight, float distance, floa
     float bias = max(0.1 * biasMultiplier, 0.05);
     float currentDepth = distance;
 
-    return texture(pointDepthMaps[0], vec4(fromLight, (currentDepth - bias) / pointLights[i].farPlaneDistance));
+    return texture(depthCubeMaps, vec4(fromLight, i), (currentDepth - bias) / pointLights[i].farPlaneDistance);
 }

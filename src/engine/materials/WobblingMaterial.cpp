@@ -7,7 +7,6 @@
 
 #include "WobblingMaterial.h"
 #include "mge/config.hpp"
-#include "mge/core/GameObject.hpp"
 #include "engine/core/Mesh.hpp"
 #include "engine/core/ShaderProgram.hpp"
 
@@ -24,7 +23,7 @@ void WobblingMaterial::setDiffuseTexture(std::shared_ptr<Texture> pDiffuseTextur
     m_diffuseTexture = pDiffuseTexture;
 }
 
-void WobblingMaterial::render(en::Engine* pEngine, Mesh* pMesh, const glm::mat4& pModelMatrix, const glm::mat4& pViewMatrix, const glm::mat4& pProjectionMatrix) {
+void WobblingMaterial::render(Mesh* mesh, en::Engine* engine, en::DepthMaps* depthMaps, const glm::mat4& pModelMatrix, const glm::mat4& pViewMatrix, const glm::mat4& pProjectionMatrix) {
 
     m_shader->use();
 
@@ -45,7 +44,7 @@ void WobblingMaterial::render(en::Engine* pEngine, Mesh* pMesh, const glm::mat4&
     glUniform1i(m_shader->getUniformLocation("diffuseTexture"), 0);
 
     //now inform mesh of where to stream its data
-    pMesh->streamToOpenGL(
+    mesh->streamToOpenGL(
         m_shader->getAttribLocation("vertex"),
         m_shader->getAttribLocation("normal"),
         m_shader->getAttribLocation("uv")

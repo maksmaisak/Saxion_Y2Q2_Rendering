@@ -6,10 +6,13 @@
 #define SAXION_Y2Q1_CPP_RENDERSYSTEM_H
 
 #include <memory>
+#include <vector>
 #include <GL/glew.h>
+#include "Entity.h"
 #include "System.h"
 #include "Engine.h"
 #include "DebugHud.hpp"
+#include "DepthMaps.h"
 
 namespace en {
 
@@ -30,6 +33,11 @@ namespace en {
 
         void updateDepthMapDirectionalLight(const Light& light, const Transform& lightTransform);
         void updateDepthMapPositionalLight(const Light& light, const Transform& lightTransform);
+
+        void updateDepthMapsDirectionalLights(const std::vector<Entity>& directionalLights);
+        void updateDepthMapsPositionalLights(const std::vector<Entity>& pointLights);
+
+        DepthMaps m_depthMaps;
 
         std::shared_ptr<ShaderProgram> m_directionalDepthShader;
         std::shared_ptr<ShaderProgram> m_positionalDepthShader;

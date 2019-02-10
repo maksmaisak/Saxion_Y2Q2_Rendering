@@ -54,14 +54,17 @@ Material::Material(LuaState& lua) : Material((luaL_checktype(lua, -1, LUA_TTABLE
     }
 }
 
-void Material::render(Engine* engine, Mesh* mesh,
+void Material::render(
+    Mesh* mesh,
+    en::Engine* engine,
+    en::DepthMaps* depthMaps,
     const glm::mat4& modelMatrix,
     const glm::mat4& viewMatrix,
     const glm::mat4& perspectiveMatrix
 ) {
     m_shader->use();
     m_numTexturesInUse = 0;
-    setBuiltinUniforms(engine, modelMatrix, viewMatrix, perspectiveMatrix);
+    setBuiltinUniforms(engine, depthMaps, modelMatrix, viewMatrix, perspectiveMatrix);
     setCustomUniforms();
     mesh->streamToOpenGL(m_attributeLocations.vertex, m_attributeLocations.normal, m_attributeLocations.uv);
 }
@@ -70,6 +73,7 @@ inline bool valid(GLint location) {return location != -1;}
 
 void Material::setBuiltinUniforms(
     Engine* engine,
+    DepthMaps* depthMaps,
     const glm::mat4& modelMatrix,
     const glm::mat4& viewMatrix,
     const glm::mat4& perspectiveMatrix
@@ -90,6 +94,10 @@ void Material::setBuiltinUniforms(
 
     if (valid(u.viewPosition))
         gl::setUniform(u.viewPosition, glm::vec3(glm::inverse(viewMatrix)[3]));
+
+    if (valid(u.depthCubemaps)) {
+        setUniformTexture(u.depthCubemaps, depthMaps->getCubemapsTextureId(), GL_TEXTURE_CUBE_MAP_ARRAY);
+    }
 
     auto& registry = engine->getRegistry();
 
@@ -181,10 +189,9 @@ Material::BuiltinUniformLocations Material::cacheBuiltinUniformLocations() {
     u.view       = m_shader->getUniformLocation("matrixView");
     u.projection = m_shader->getUniformLocation("matrixProjection");
     u.pvm        = m_shader->getUniformLocation("matrixPVM");
-
-    u.time = m_shader->getUniformLocation("time");
-
+    u.time       = m_shader->getUniformLocation("time");
     u.viewPosition = m_shader->getUniformLocation("viewPosition");
+    u.depthCubemaps = m_shader->getUniformLocation("depthCubeMaps");
 
     // Point lights
     u.numPointLights = m_shader->getUniformLocation("numPointLights");
@@ -203,7 +210,6 @@ Material::BuiltinUniformLocations Material::cacheBuiltinUniformLocations() {
         locations.falloffLinear    = m_shader->getUniformLocation(prefix + "falloffLinear");
         locations.falloffQuadratic = m_shader->getUniformLocation(prefix + "falloffQuadratic");
         locations.farPlaneDistance = m_shader->getUniformLocation(prefix + "farPlaneDistance");
-        locations.depthMap = m_shader->getUniformLocation("pointDepthMaps[" + std::to_string(i) + "]");
 
         m_numSupportedPointLights = i + 1;
     }
@@ -270,12 +276,12 @@ void Material::detectAllUniforms() {
 
     std::vector<UniformInfo> uniforms = m_shader->getAllUniforms();
 
-    std::cout << "Uniforms: " << std::endl;
+    //std::cout << "Uniforms: " << std::endl;
     for (auto& info : uniforms) {
-        std::cout << info.location << " : " << info.name << std::endl;
+        //std::cout << info.location << " : " << info.name << std::endl;
         m_uniforms[info.name] = info;
     }
-    std::cout << std::endl;
+    //std::cout << std::endl;
 }
 
 void Material::setUniformsPointLight(
@@ -294,9 +300,6 @@ void Material::setUniformsPointLight(
     gl::setUniform(locations.falloffQuadratic, settings.falloff.quadratic);
 
     gl::setUniform(locations.farPlaneDistance, 20.f);
-    if (valid(locations.depthMap)) {
-        setUniformTexture(locations.depthMap, light.getDepthMapId(), GL_TEXTURE_CUBE_MAP);
-    }
 }
 
 void Material::setUniformDirectionalLight(

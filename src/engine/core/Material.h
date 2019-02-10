@@ -33,7 +33,9 @@ namespace en {
         /// Makes a material from the table on top of stack in the given lua state
         explicit Material(LuaState& lua);
 
-        void render(Engine* engine, Mesh* mesh,
+        void render(Mesh* mesh,
+            en::Engine* pEngine,
+            en::DepthMaps* depthMaps,
             const glm::mat4& modelMatrix,
             const glm::mat4& viewMatrix,
             const glm::mat4& perspectiveMatrix
@@ -72,6 +74,8 @@ namespace en {
 
             GLint viewPosition = -1;
 
+            GLint depthCubemaps = -1;
+
             GLint numPointLights = -1;
             struct PointLightLocations {
 
@@ -84,7 +88,6 @@ namespace en {
                 GLint falloffLinear    = -1;
                 GLint falloffQuadratic = -1;
 
-                GLint depthMap = -1;
                 GLint farPlaneDistance = -1;
 
             } pointLights[MAX_NUM_POINT_LIGHTS];
@@ -153,7 +156,7 @@ namespace en {
         BuiltinUniformLocations cacheBuiltinUniformLocations();
         AttributeLocations cacheAttributeLocations();
 
-        void setBuiltinUniforms(Engine* engine, const glm::mat4& modelMatrix, const glm::mat4& viewMatrix, const glm::mat4& perspectiveMatrix);
+        void setBuiltinUniforms(Engine* engine, DepthMaps* depthMaps, const glm::mat4& modelMatrix, const glm::mat4& viewMatrix, const glm::mat4& perspectiveMatrix);
         void setCustomUniforms();
 
         template<typename T>

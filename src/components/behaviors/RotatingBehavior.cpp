@@ -1,6 +1,5 @@
-#include "mge/behaviours/RotatingBehavior.hpp"
-#include "mge/core/GameObject.hpp"
-#include "components/Transform.h"
+#include "RotatingBehavior.hpp"
+#include "Transform.h"
 
 RotatingBehavior::RotatingBehavior(en::Actor actor, const glm::vec3& rotationAxis, float rotationSpeed)
 	: Behavior(actor), m_rotationAxis(rotationAxis), m_rotationSpeed(rotationSpeed) {}

@@ -17,7 +17,6 @@
 #include "Mesh.hpp"
 #include "Texture.hpp"
 #include "Material.h"
-#include "ColorMaterial.hpp"
 #include "glm.hpp"
 #include <glm/gtx/euler_angles.hpp>
 

@@ -242,10 +242,8 @@ void Mesh::streamToOpenGL(GLint pVerticesAttrib, GLint pNormalsAttrib, GLint pUV
 	if (pUVsAttrib      != -1) glDisableVertexAttribArray(pUVsAttrib);
 	if (pNormalsAttrib  != -1) glDisableVertexAttribArray(pNormalsAttrib);
 	if (pVerticesAttrib != -1) glDisableVertexAttribArray(pVerticesAttrib);
-	glCheckError();
 
 	glBindVertexArray(0);
-	glCheckError();
 }
 
 void Mesh::drawDebugInfo(const glm::mat4& pModelMatrix, const glm::mat4& pViewMatrix, const glm::mat4& pProjectionMatrix) {

@@ -9,6 +9,9 @@
 #include <exception>
 #include <type_traits>
 #include <cassert>
+#include <memory>
+
+
 
 namespace en {
 

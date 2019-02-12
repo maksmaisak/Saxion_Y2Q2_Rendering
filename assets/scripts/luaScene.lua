@@ -189,6 +189,12 @@ function scene.update(dt)
 
     Game.find("Light"):get("Transform").position = {-4, 3 + 2 * math.sin(Game.getTime()), 0}
     --Game.find("LightDirectional"):get("Transform"):rotate(45 * dt, 1, 0, 0);
+
+    if (Game.keyboard.isDown("Up")) then
+        Game.find("Light2"):get("Transform"):move(0, 2 * dt, 0)
+    elseif (Game.keyboard.isDown("Down")) then
+        Game.find("Light2"):get("Transform"):move(0, -2 * dt, 0)
+    end
 end
 
 return scene

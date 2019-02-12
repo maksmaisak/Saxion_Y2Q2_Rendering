@@ -21,6 +21,7 @@
 #include "ClosureHelper.h"
 #include "Resources.h"
 #include "Material.h"
+#include "KeyboardHelper.h"
 
 using namespace en;
 
@@ -245,6 +246,13 @@ void Engine::initializeLua() {
         //lua::addProperty(lua, "time", lua::Property<float>([](){return GameTime::now().asSeconds();}));
 
         lua.setField("makeMaterial", &makeMaterial);
+
+        lua_pushvalue(lua, -1);
+        lua_newtable(lua);
+        {
+            lua.setField("isDown", &utils::KeyboardHelper::isDown);
+        }
+        lua_setfield(lua, -2, "keyboard");
     }
     lua_setglobal(lua, "Game");
 

@@ -4,7 +4,7 @@ width  = 1920
 height = 1200
 fullscreen = false
 framerateCap = 60
-startScene = 'assets/scripts/luaScene.lua'
+startScene = 'assets/scripts/scenes/level.lua'
 
 -- custom
 bulletSpeed = 30

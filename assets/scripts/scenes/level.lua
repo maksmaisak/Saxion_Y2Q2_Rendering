@@ -101,18 +101,15 @@ function scene.start()
     }
 end
 
-local wasUpPressed = false
 
 function scene.update()
 
-    if not wasUpPressed and Game.keyboard.isDown("up") then
+    if Game.keyboard.isDown("up") then
         if player.gridPosition.y < gridSize.y then
             player.gridPosition.y = player.gridPosition.y + 1
             player.transform.position = getPlayerPositionFromGridPosition(player.gridPosition)
         end
     end
-
-    wasUpPressed = Game.keyboard.isDown("up")
 end
 
 return scene

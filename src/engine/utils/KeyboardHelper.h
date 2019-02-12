@@ -13,6 +13,9 @@ namespace utils {
 
     public:
         static bool isDown(const std::string& keyName);
+        static bool isHeld(const std::string& keyName);
+        static bool isUp(const std::string& keyName);
+        static void update();
     };
 }
 

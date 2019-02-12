@@ -137,7 +137,7 @@ local function makeKey(gridPosition, key)
         Name = "Key."..gridPosition.x.."."..gridPosition.y,
         Transform = {
             position = position,
-            scale = {0.9 * 0.5, 0.5, 0.9 * 0.5}
+            scale = {0.9 * 0.5, 0.2, 0.9 * 0.5}
         },
         RenderInfo = {
             mesh = "models/cube_flat.obj",

@@ -87,10 +87,13 @@ function scene.start()
         {
             Name = "Camera",
             Transform = {
-                position = {0, 12, 5},
-                rotation = {-70, 0, 0}
+                position = {8, 12, 8},
+                rotation = {-45, 45, 0}
             },
-            Camera = {}
+            Camera = {
+                isOrthographic = true,
+                orthographicHalfSize = 8
+            }
         },
         {
             Name = "DirectionalLight",
@@ -98,7 +101,17 @@ function scene.start()
                 rotation = {-70, 0, 0}
             },
             Light = {
-                kind = "directional"
+                kind = "directional",
+                intensity = 0.1
+            }
+        },
+        {
+            Name = "PointLight",
+            Transform = {
+                position = {0, 2, 0}
+            },
+            Light = {
+                intensity = 2
             }
         }
     }

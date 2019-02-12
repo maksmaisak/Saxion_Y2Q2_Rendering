@@ -15,11 +15,18 @@ for x = 1,gridSize.x do
     end
 end
 
+grid[1][2].isObstacle = true
+grid[5][5].isObstacle = true
+
 local playerStartPosition = {x = 2, y = 3}
 local player
 
 local tileMaterial = Game.makeMaterial {
     shininess = 100
+}
+
+local obstacleMaterial = Game.makeMaterial {
+	diffuseColor = {0.8, 0.3, 0.2}
 }
 
 local function makeTile(x, y, tile)
@@ -45,6 +52,29 @@ local function makeTile(x, y, tile)
     }
 end
 
+local function makeObstacle(x, y, tile)
+
+	local xNorm = (x - 1) / gridSize.x
+    local yNorm = (y - 1) / gridSize.y
+    local position = {
+        x = (xNorm - 0.5) * gridSize.x,
+        y = 1,
+        z = (yNorm - 0.5) * gridSize.y
+    }
+
+    return Game.makeActor {
+        Name = "Tile."..x.."."..y,
+        Transform = {
+            position = position,
+            scale = {0.9 * 0.5, 0.5, 0.9 * 0.5}
+        },
+        RenderInfo = {
+            mesh = "models/cube_flat.obj",
+            material = obstacleMaterial
+        }
+	}
+end
+
 local function getPlayerPositionFromGridPosition(gridPosition)
     return Vector.from {0, 1, 0} + grid[gridPosition.x or 1][gridPosition.y or 1].tile:get("Transform").position
 end
@@ -57,15 +87,15 @@ function scene.start()
         {
             Name = "Camera",
             Transform = {
-                position = {8, 12, 8},
-                rotation = {-45, 45, 0}
+                position = {0, 12, 5},
+                rotation = {-70, 0, 0}
             },
             Camera = {}
         },
         {
             Name = "DirectionalLight",
             Transform = {
-                rotation = {-30, 0, 0}
+                rotation = {-70, 0, 0}
             },
             Light = {
                 kind = "directional"
@@ -77,6 +107,9 @@ function scene.start()
     for x = 1,gridSize.x do
         for y = 1,gridSize.y do
             grid[x][y].tile = makeTile(x, y, grid[x][y])
+			if grid[x][y].isObstacle then
+				makeObstacle(x, y, grid[x][y])
+			end
         end
     end
 
@@ -130,9 +163,11 @@ function scene.update()
         nextPosition.y = 1
     end
 
-    player.gridPosition.x = nextPosition.x
-    player.gridPosition.y = nextPosition.y
-    player.transform.position = getPlayerPositionFromGridPosition(player.gridPosition)
+	if not grid[nextPosition.x][nextPosition.y].isObstacle then
+		player.gridPosition.x = nextPosition.x
+		player.gridPosition.y = nextPosition.y
+		player.transform.position = getPlayerPositionFromGridPosition(player.gridPosition)
+	end
 end
 
 return scene

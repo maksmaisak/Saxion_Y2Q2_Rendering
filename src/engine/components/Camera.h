@@ -14,10 +14,11 @@ namespace en {
 
         LUA_TYPE(Camera)
 
-        static void initializeMetatable(Actor&, LuaState&);
+        static void initializeMetatable(LuaState&);
 
         bool isOrthographic = false;
         float fov = 60.f;
+        float orthographicHalfSize = 5;
         float nearPlaneDistance = 0.1f;
         float farPlaneDistance  = 1000.f;
     };

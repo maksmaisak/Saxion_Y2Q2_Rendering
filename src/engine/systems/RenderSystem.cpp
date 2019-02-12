@@ -69,6 +69,21 @@ void RenderSystem::start() {
 glm::mat4 getProjectionMatrix(Engine& engine, Camera& camera) {
 
     auto size = engine.getWindow().getSize();
+    float aspectRatio = (float)size.x / size.y;
+
+    if (camera.isOrthographic) {
+
+        glm::vec2 halfSize = {
+            camera.orthographicHalfSize * aspectRatio,
+            camera.orthographicHalfSize
+        };
+
+        return glm::ortho(
+            -halfSize.x, halfSize.x,
+            -halfSize.y, halfSize.y,
+            camera.nearPlaneDistance, camera.farPlaneDistance
+        );
+    }
 
     return glm::perspective(
         glm::radians(camera.fov),

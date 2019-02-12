@@ -119,7 +119,7 @@ class NameToKeyMap : public std::map<std::string, sf::Keyboard::Key> {
 public:
     NameToKeyMap() {
 
-        for (int i = 0; i < names.size(); ++i) {
+        for (std::size_t i = 0; i < names.size(); ++i) {
             std::string name = names[i];
             std::transform(name.begin(), name.end(), name.begin(), ::toupper);
             emplace(name, (sf::Keyboard::Key)i);

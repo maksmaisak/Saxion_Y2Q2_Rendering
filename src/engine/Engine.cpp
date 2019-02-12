@@ -80,6 +80,8 @@ void Engine::update(float dt) {
         pSystem->update(dt);
 
     m_scheduler.update(dt);
+
+    utils::KeyboardHelper::update();
 }
 
 void Engine::draw() {
@@ -250,7 +252,9 @@ void Engine::initializeLua() {
         lua_pushvalue(lua, -1);
         lua_newtable(lua);
         {
+            lua.setField("isHeld", &utils::KeyboardHelper::isHeld);
             lua.setField("isDown", &utils::KeyboardHelper::isDown);
+            lua.setField("isUp"  , &utils::KeyboardHelper::isUp);
         }
         lua_setfield(lua, -2, "keyboard");
     }

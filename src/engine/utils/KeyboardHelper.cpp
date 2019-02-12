@@ -125,18 +125,49 @@ public:
             emplace(name, (sf::Keyboard::Key)i);
         }
     }
+} nameToKey;
+
+std::vector<bool> wasHeld = std::vector<bool>(sf::Keyboard::KeyCount, false);
+
+class ButtonPressState : public std::vector<bool> {
+
+public:
+    ButtonPressState() : std::vector<bool>(sf::Keyboard::KeyCount, false) {}
 };
 
-NameToKeyMap nameToKey;
-
-bool KeyboardHelper::isDown(const std::string& keyName) {
+sf::Keyboard::Key getKeyCode(const std::string& keyName) {
 
     std::string uppercaseKeyName = keyName;
     std::transform(uppercaseKeyName.begin(), uppercaseKeyName.end(), uppercaseKeyName.begin(), ::toupper);
 
     auto it = nameToKey.find(uppercaseKeyName);
     if (it == nameToKey.end())
-        return false;
+        return sf::Keyboard::Key::Unknown;
 
-    return sf::Keyboard::isKeyPressed(it->second);
+    return it->second;
+}
+
+bool KeyboardHelper::isHeld(const std::string& keyName) {
+
+    const sf::Keyboard::Key keyCode = getKeyCode(keyName);
+    return sf::Keyboard::isKeyPressed(keyCode);
+}
+
+bool KeyboardHelper::isDown(const std::string& keyName) {
+
+    const sf::Keyboard::Key keyCode = getKeyCode(keyName);
+    return !wasHeld[keyCode] && sf::Keyboard::isKeyPressed(keyCode);
+}
+
+bool KeyboardHelper::isUp(const std::string& keyName) {
+
+    const sf::Keyboard::Key keyCode = getKeyCode(keyName);
+    return wasHeld[keyCode] && !sf::Keyboard::isKeyPressed(keyCode);
+}
+
+void KeyboardHelper::update() {
+
+    for (int i = 0; i < sf::Keyboard::Key::KeyCount; ++i) {
+        wasHeld[i] = sf::Keyboard::isKeyPressed((sf::Keyboard::Key)i);
+    }
 }

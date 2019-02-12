@@ -101,15 +101,38 @@ function scene.start()
     }
 end
 
-
 function scene.update()
 
-    if Game.keyboard.isDown("up") then
-        if player.gridPosition.y < gridSize.y then
-            player.gridPosition.y = player.gridPosition.y + 1
-            player.transform.position = getPlayerPositionFromGridPosition(player.gridPosition)
-        end
+    local input = {x = 0, y = 0 }
+    if Game.keyboard.isDown("left" ) then input.x = input.x + 1 end
+    if Game.keyboard.isDown("right") then input.x = input.x - 1 end
+    if Game.keyboard.isDown("up"   ) then input.y = input.y + 1 end
+    if Game.keyboard.isDown("down" ) then input.y = input.y - 1 end
+
+    if (input.x ~= 0 and input.y ~= 0) then
+        input.y = 0
     end
+
+    local nextPosition = {
+        x = player.gridPosition.x - input.x,
+        y = player.gridPosition.y - input.y
+    }
+
+    if nextPosition.x > gridSize.x then
+        nextPosition.x = gridSize.x
+    elseif nextPosition.x < 1 then
+        nextPosition.x = 1
+    end
+
+    if nextPosition.y > gridSize.y then
+        nextPosition.y = gridSize.y
+    elseif nextPosition.y < 1 then
+        nextPosition.y = 1
+    end
+
+    player.gridPosition.x = nextPosition.x
+    player.gridPosition.y = nextPosition.y
+    player.transform.position = getPlayerPositionFromGridPosition(player.gridPosition)
 end
 
 return scene

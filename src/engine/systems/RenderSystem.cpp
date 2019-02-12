@@ -66,6 +66,18 @@ void RenderSystem::start() {
     m_debugHud = std::make_unique<DebugHud>(&m_engine->getWindow());
 }
 
+glm::mat4 getProjectionMatrix(Engine& engine, Camera& camera) {
+
+    auto size = engine.getWindow().getSize();
+
+    return glm::perspective(
+        glm::radians(camera.fov),
+        (float)size.x / size.y,
+        camera.nearPlaneDistance,
+        camera.farPlaneDistance
+    );
+}
+
 void RenderSystem::draw() {
 
     if (glCheckError() != GL_NO_ERROR) {
@@ -78,7 +90,7 @@ void RenderSystem::draw() {
     if (mainCamera) {
 
         glm::mat4 matrixView = glm::inverse(mainCamera.get<Transform>().getWorldTransform());
-        glm::mat4 matrixProjection = mainCamera.get<Camera>().projectionMatrix;
+        glm::mat4 matrixProjection = getProjectionMatrix(*m_engine, mainCamera.get<Camera>());
 
         for (Entity e : m_registry->with<Transform, RenderInfo>()) {
 
@@ -147,7 +159,7 @@ glm::mat4 getDirectionalLightspaceTransform(const Light& light, const Transform&
 
 void RenderSystem::updateDepthMapsDirectionalLights(const std::vector<Entity>& directionalLights) {
 
-    glViewport(0, 0, m_depthMaps.getDirectionalMapResolution().x,  m_depthMaps.getDirectionalMapResolution().y);
+    glViewport(0, 0, m_depthMaps.getDirectionalMapResolution().x, m_depthMaps.getDirectionalMapResolution().y);
     glBindFramebuffer(GL_FRAMEBUFFER, m_depthMaps.getDirectionalMapsFramebufferId());
     glClear(GL_DEPTH_BUFFER_BIT);
 

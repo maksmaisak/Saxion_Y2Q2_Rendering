@@ -14,8 +14,12 @@ namespace en {
 
         LUA_TYPE(Camera)
 
-        // TODO Camera settings. field-of-view etc. Lazy-evaluate this out of settings.
-        glm::mat4 projectionMatrix = glm::perspective(glm::radians(60.0f), 4.0f / 3.0f, 0.1f, 1000.0f);
+        static void initializeMetatable(Actor&, LuaState&);
+
+        bool isOrthographic = false;
+        float fov = 60.f;
+        float nearPlaneDistance = 0.1f;
+        float farPlaneDistance  = 1000.f;
     };
 }
 

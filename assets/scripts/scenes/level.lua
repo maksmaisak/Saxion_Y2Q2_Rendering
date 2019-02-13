@@ -17,6 +17,7 @@ end
 
 grid[1][2].isObstacle = true
 grid[5][5].isObstacle = true
+grid[3][3].isButton = true
 
 local playerStartPosition = {x = 2, y = 3}
 local player
@@ -26,8 +27,9 @@ local droppedKeysGrid = {}
 for x = 1,gridSize.x do
     droppedKeysGrid[x] = {}
     for y = 1,gridSize.y do
-        droppedKeysGrid[x][y] = {}
-		droppedKeysGrid[x][y].keys = {up = nil, down = nil, left = nil, right = nil }
+        droppedKeysGrid[x][y]				= {}
+		droppedKeysGrid[x][y].keys			= {up = nil, down = nil, left = nil, right = nil }
+		droppedKeysGrid[x][y].hasKeyDropped = {up = false, down = false, left = false, right = false}
     end
 end
 
@@ -46,14 +48,14 @@ local function getGridAt(gridPosition)
 	return grid[gridPosition.x][gridPosition.y]
 end
 
-local function getDroppedKeysAt(gridPosition)
+local function getDroppedKeysGridAt(gridPosition)
 	return droppedKeysGrid[gridPosition.x][gridPosition.y]
 end
 
 local function calculateYOffset(gridPosition)
 	local yOffset = 0.0
 
-	for k, v in pairs(getDroppedKeysAt(gridPosition).keys) do
+	for k, v in pairs(getDroppedKeysGridAt(gridPosition).keys) do
 		
 		for m, p in pairs(v) do
 			if(p) then
@@ -151,25 +153,141 @@ local function makeKey(gridPosition, key)
 	}
 end
 
+local function makeButton(gridPosition, color)
+	local xNorm = (gridPosition.x - 1) / gridSize.x
+    local yNorm = (gridPosition.y - 1) / gridSize.y
+    local position = {
+        x = (xNorm - 0.5) * gridSize.x,
+        y = 0.8,
+        z = (yNorm - 0.5) * gridSize.y
+    }
+
+	return Game.makeActor {
+		Name = "Key."..gridPosition.x.."."..gridPosition.y,
+		Transform = {
+			position = position,
+			scale = {0.9 * 0.5, 0.2, 0.9 * 0.5}
+		},
+		RenderInfo = {
+			mesh = "models/cube_flat.obj",
+			material = {
+				diffuseColor = color
+			}
+		}
+	}
+end
+
+local function makeGoal(gridPosition, color)
+	local xNorm = (gridPosition.x - 1) / gridSize.x
+    local yNorm = (gridPosition.y - 1) / gridSize.y
+    local position = {
+        x = (xNorm - 0.5) * gridSize.x,
+        y = 0.6,
+        z = (yNorm - 0.5) * gridSize.y
+    }
+
+	return Game.makeActor {
+		Name = "Key."..gridPosition.x.."."..gridPosition.y,
+		Transform = {
+			position = position,
+			scale = {0.9 * 0.5, 0.5, 0.9 * 0.5}
+		},
+		RenderInfo = {
+			mesh = "models/cube_flat.obj",
+			material = {
+				diffuseColor = color
+			}
+		}
+	}
+end
+
+local function activateGoal(gridPosition)
+	local goal = getGridAt(gridPosition).goal
+	if not goal.isEnabled then
+		return
+	end
+
+	if goal.isActivated then
+		return
+	end
+
+	goal.isActivated = true
+	Game.loadScene("assets/scripts/scenes/level.lua")
+	print("activating goal")
+end
+
+
+local function activateButton(gridPosition)
+	local button = getGridAt(gridPosition).button
+
+	if(button.isActivated) then
+		return
+	end
+
+	button.isActivated				= true
+	button.actionTarget.isEnabled	= true
+
+	local buttonPosition		= button.transform.position
+	buttonPosition.y			= buttonPosition.y - 0.5
+	button.transform.position	= buttonPosition
+
+	local actionTargetPosition = button.actionTarget.transform.position
+	actionTargetPosition.y = actionTargetPosition.y + 0.5
+
+	button.actionTarget.transform.position = actionTargetPosition
+	print("Button activated")
+end
+
+local function disableButton(gridPosition)
+	local button = getGridAt(gridPosition).button
+
+	if(not button.isActivated) then
+		return
+	end
+
+	-- if there is one key left on the droppable button don't do the animation
+	for k, v in pairs(getDroppedKeysGridAt(gridPosition).hasKeyDropped) do
+		if(v == true) then
+			return
+		end
+	end
+
+	button.isActivated				= false
+	button.actionTarget.isEnabled	= false
+
+	local buttonPosition		= button.transform.position
+	buttonPosition.y			= buttonPosition.y + 0.5
+	button.transform.position	= buttonPosition
+
+	local actionTargetPosition = button.actionTarget.transform.position
+	actionTargetPosition.y = actionTargetPosition.y - 0.5
+
+	button.actionTarget.transform.position = actionTargetPosition
+
+	print("Button Deactivated")
+end
+
 local function blockKey(key)
-	print(key.." button blocked")
+	print(key.." key blocked")
 	disabledKeys[key] = true
-	getGridAt(player.gridPosition).hasKeyDropped[key] = true
+	getDroppedKeysGridAt(player.gridPosition).hasKeyDropped[key] = true
 
 	local pair = {}
 	pair[key] = makeKey(player.gridPosition, key)
 
-	local tempArray = getDroppedKeysAt(player.gridPosition).keys
-	getDroppedKeysAt(player.gridPosition).keys [#tempArray+1] = pair
+	local tempArray = getDroppedKeysGridAt(player.gridPosition).keys
+	getDroppedKeysGridAt(player.gridPosition).keys [#tempArray+1] = pair
+
+	player.transform.position = getPlayerPositionFromGridPosition(player.gridPosition)
 end
 
 local function unblockKey(key)
-	print(key.." button unblocked")
+	print(key.." key unblocked")
 
 	disabledKeys[key] = false
-	getGridAt(player.gridPosition).hasKeyDropped[key] = false
+	getDroppedKeysGridAt(player.gridPosition).hasKeyDropped[key] = false
 
-	for k, v in pairs(getDroppedKeysAt(player.gridPosition).keys) do
+	for k, v in pairs(getDroppedKeysGridAt(player.gridPosition).keys) do
 		local currentActor = v[key]
 		if(currentActor ~= nil) then
 			currentActor:destroy()
@@ -181,7 +299,7 @@ local function unblockKey(key)
 
 	local index = 0
 
-	for k, v in pairs(getDroppedKeysAt(player.gridPosition).keys) do
+	for k, v in pairs(getDroppedKeysGridAt(player.gridPosition).keys) do
 		for m, p in pairs(v) do
 			if (p) then
 				local xNorm = (player.gridPosition.x - 1) / gridSize.x
@@ -199,7 +317,7 @@ local function unblockKey(key)
 		end
 	end
 
-	
+	player.transform.position = getPlayerPositionFromGridPosition(player.gridPosition)
 end
 
 local scene = {}
@@ -244,9 +362,29 @@ function scene.start()
         for y = 1,gridSize.y do
 			local gridPosition = { x = x, y = y}
             grid[x][y].tile = makeTile(gridPosition)
-			grid[x][y].hasKeyDropped = {up = false, down = false, left = false, right = false}
 			if grid[x][y].isObstacle then
 				makeObstacle(gridPosition)
+			end
+			if grid[x][y].isButton then
+
+				local buttonActor =  makeButton(gridPosition, {1, 0.2, 0.5})
+				local actionTargetPosition = { x = 8, y= 8}
+				local actionTargetActor = makeGoal(actionTargetPosition, {0, 0, 1})
+
+				grid[x][y].button = {
+					actor = buttonActor,
+					transform = buttonActor:get("Transform"),
+					actionTarget = {
+						actor = actionTargetActor,
+						transform = actionTargetActor:get("Transform"),
+						isEnabled = false,
+						isActivated = false
+					},
+					isActivated = false
+				}
+
+				grid[actionTargetPosition.x][actionTargetPosition.y].isGoal = true
+				grid[actionTargetPosition.x][actionTargetPosition.y].goal = grid[x][y].button.actionTarget
 			end
         end
     end
@@ -268,7 +406,8 @@ function scene.start()
     player = {
         actor = playerActor,
         transform = playerActor:get("Transform"),
-        gridPosition = {x = playerStartPosition.x, y = playerStartPosition.y}
+        gridPosition = { x = playerStartPosition.x, y = playerStartPosition.y },
+		lastPosition = { x = playerStartPosition.x, y = playerStartPosition.y }
     }
 end
 
@@ -287,12 +426,17 @@ function scene.update()
         input.y = 0
     end
 
+	if Game.keyboard.isDown("r") then
+		Game.loadScene("assets/scripts/scenes/level.lua")
+		return
+	end
+
 	if Game.keyboard.isHeld("LShift") or Game.keyboard.isHeld("RShift") then
 		for key, value in pairs(inputKeys) do
 			if(Game.keyboard.isDown(key)) then
-				if (not getGridAt(player.gridPosition).hasKeyDropped[key]) and not disabledKeys[key] then
+				if (not getDroppedKeysGridAt(player.gridPosition).hasKeyDropped[key]) and not disabledKeys[key] then
 					blockKey(key)
-				elseif getGridAt(player.gridPosition).hasKeyDropped[key] and disabledKeys[key] then
+				elseif getDroppedKeysGridAt(player.gridPosition).hasKeyDropped[key] and disabledKeys[key] then
 					unblockKey(key)
 				end
 				input = {x = 0, y = 0}
@@ -317,10 +461,31 @@ function scene.update()
         nextPosition.y = 1
     end
 
-	if not grid[nextPosition.x][nextPosition.y].isObstacle then
-		player.gridPosition.x = nextPosition.x
-		player.gridPosition.y = nextPosition.y
-		player.transform.position = getPlayerPositionFromGridPosition(player.gridPosition)
+	if not getGridAt(nextPosition).isObstacle then
+		if nextPosition.x ~= player.gridPosition.x or nextPosition.y ~= player.gridPosition.y then
+			player.lastPosition.x = player.gridPosition.x
+			player.lastPosition.y = player.gridPosition.y
+
+			player.gridPosition.x = nextPosition.x
+			player.gridPosition.y = nextPosition.y
+
+			if getGridAt(player.gridPosition).isButton then
+				activateButton(player.gridPosition)
+			end
+
+			-- if the tile changed then we gotta check if there was a button and disable it
+			if player.lastPosition.x ~= player.gridPosition.x or player.lastPosition.y ~= player.gridPosition.y then
+				if(getGridAt(player.lastPosition).isButton) then
+					disableButton(player.lastPosition)
+				end
+			end
+
+			if getGridAt(player.gridPosition).isGoal then
+				activateGoal(player.gridPosition)
+			end
+
+			player.transform.position = getPlayerPositionFromGridPosition(player.gridPosition)
+		end
 	end
 end
 

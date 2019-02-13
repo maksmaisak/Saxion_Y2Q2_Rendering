@@ -34,7 +34,7 @@ RenderSystem::RenderSystem(bool displayMeshDebugInfo) :
     m_directionalDepthShader(Resources<ShaderProgram>::get("depthDirectional")),
     m_positionalDepthShader (Resources<ShaderProgram>::get("depthPositional")),
     m_depthMaps(4, {1024, 1024}, 10, {512, 512}),
-    m_vertexRenderer(6)
+    m_vertexRenderer(4096)
 {}
 
 void enableDebug();
@@ -102,7 +102,7 @@ void RenderSystem::draw() {
     }
 
     updateDepthMaps();
-    //renderEntities();
+    renderEntities();
     renderUI();
     renderDebug();
 }
@@ -173,14 +173,14 @@ void RenderSystem::renderUI() {
         glm::vec2 min = {0.4, 0.4};
         glm::vec2 max = {0.6, 0.6};
 
-        std::vector<glm::vec3> vertices = {
-            {min.x, max.y, 0.f},
-            {min.x, min.y, 0.f},
-            {max.x, min.y, 0.f},
+        std::vector<Vertex> vertices = {
+            {{min.x, max.y, 1}, {0, 1}},
+            {{min.x, min.y, 1}, {0, 0}},
+            {{max.x, min.y, 1}, {1, 0}},
 
-            {min.x, max.y, 0.f},
-            {max.x, min.y, 0.f},
-            {max.x, max.y, 0.f},
+            {{min.x, max.y, 1}, {0, 1}},
+            {{max.x, min.y, 1}, {1, 0}},
+            {{max.x, max.y, 1}, {1, 1}},
         };
 
         sprite.material->use(m_engine, &m_depthMaps, glm::mat4(1), glm::mat4(1), matrixProjection);

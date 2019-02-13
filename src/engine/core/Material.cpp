@@ -54,18 +54,28 @@ Material::Material(LuaState& lua) : Material((luaL_checktype(lua, -1, LUA_TTABLE
     }
 }
 
-void Material::render(
-    Mesh* mesh,
-    en::Engine* engine,
-    en::DepthMaps* depthMaps,
+void Material::use(
+    Engine* engine,
+    DepthMaps* depthMaps,
     const glm::mat4& modelMatrix,
     const glm::mat4& viewMatrix,
-    const glm::mat4& perspectiveMatrix
+    const glm::mat4& projectionMatrix
 ) {
     m_shader->use();
     m_numTexturesInUse = 0;
-    setBuiltinUniforms(engine, depthMaps, modelMatrix, viewMatrix, perspectiveMatrix);
+    setBuiltinUniforms(engine, depthMaps, modelMatrix, viewMatrix, projectionMatrix);
     setCustomUniforms();
+}
+
+void Material::render(
+    Mesh* mesh,
+    Engine* engine,
+    DepthMaps* depthMaps,
+    const glm::mat4& modelMatrix,
+    const glm::mat4& viewMatrix,
+    const glm::mat4& projectionMatrix
+) {
+    use(engine, depthMaps, modelMatrix, viewMatrix, projectionMatrix);
     mesh->streamToOpenGL(m_attributeLocations.vertex, m_attributeLocations.normal, m_attributeLocations.uv);
 }
 
@@ -95,10 +105,10 @@ void Material::setBuiltinUniforms(
     if (valid(u.viewPosition))
         gl::setUniform(u.viewPosition, glm::vec3(glm::inverse(viewMatrix)[3]));
 
-    if (valid(u.directionalDepthMaps))
+    if (depthMaps && valid(u.directionalDepthMaps))
         setUniformTexture(u.directionalDepthMaps, depthMaps->getDirectionalMapsTextureId(), GL_TEXTURE_2D_ARRAY);
 
-    if (valid(u.depthCubemaps))
+    if (depthMaps && valid(u.depthCubemaps))
         setUniformTexture(u.depthCubemaps, depthMaps->getCubemapsTextureId(), GL_TEXTURE_CUBE_MAP_ARRAY);
 
     auto& registry = engine->getRegistry();

@@ -114,10 +114,9 @@ Font::~Font() {
     // TODO delete textures, vao, vbo, font face.
 }
 
-// TODO This renders each character in a separate draw call, with each character having its own thing. Use a texture atlas instead and do one draw call per text.
+// TODO This renders each character in a separate draw call. Use a texture atlas instead and do one draw call per text.
 void Font::render(const std::string& text, glm::vec<2, GLfloat> pos, GLfloat scale, const glm::mat4& projection) {
     
-    // Activate corresponding render state
     m_shader->use();
 
     glUniform3f(m_shader->getUniformLocation("textColor"), 1.f, 1.f, 1.f);

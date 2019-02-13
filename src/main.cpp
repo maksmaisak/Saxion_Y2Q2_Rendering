@@ -11,6 +11,8 @@
 
 #include "components/RenderInfo.h"
 #include "components/Camera.h"
+#include "components/Sprite.h"
+#include "components/Transform.h"
 
 #include "TestScene.h"
 #include "LightingScene.h"
@@ -44,6 +46,13 @@ int main() {
     //engine->getSceneManager().setCurrentScene<TestScene>();     // Assignment 2
     //engine->getSceneManager().setCurrentScene<LightingScene>(); // Assignment 3
     //engine->getSceneManager().setCurrentScene<TerrainScene>();  // Assignment 4
+
+    en::Actor actor = engine->makeActor("Something");
+    actor.add<en::Transform>();
+    auto material = std::make_shared<en::Material>("sprite");
+    //material->setUniformValue("diffuseColor", glm::vec3(1, 1, 0));
+    material->setUniformValue("spriteTexture", en::Textures::get(config::TEXTURE_PATH + "bricks.jpg"));
+    actor.add<en::Sprite>(material);
 
     engine->run();
 

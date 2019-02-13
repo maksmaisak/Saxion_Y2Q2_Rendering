@@ -33,12 +33,20 @@ namespace en {
         /// Makes a material from the table on top of stack in the given lua state
         explicit Material(LuaState& lua);
 
-        void render(Mesh* mesh,
-            en::Engine* pEngine,
-            en::DepthMaps* depthMaps,
+        void use(
+             Engine* engine,
+             DepthMaps* depthMaps,
+             const glm::mat4& modelMatrix,
+             const glm::mat4& viewMatrix,
+             const glm::mat4& projectionMatrix
+        );
+        void render(
+            Mesh* mesh,
+            Engine* engine,
+            DepthMaps* depthMaps,
             const glm::mat4& modelMatrix,
             const glm::mat4& viewMatrix,
-            const glm::mat4& perspectiveMatrix
+            const glm::mat4& projectionMatrix
         ) override;
 
         template<typename T>

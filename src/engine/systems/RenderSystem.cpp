@@ -9,6 +9,7 @@
 #include "components/Transform.h"
 #include "components/Camera.h"
 #include "components/Name.h"
+#include "components/Sprite.h"
 #include "GLHelpers.h"
 #include "Font.h"
 #include "GameTime.h"
@@ -32,7 +33,8 @@ RenderSystem::RenderSystem(bool displayMeshDebugInfo) :
     m_displayMeshDebugInfo(displayMeshDebugInfo),
     m_directionalDepthShader(Resources<ShaderProgram>::get("depthDirectional")),
     m_positionalDepthShader (Resources<ShaderProgram>::get("depthPositional")),
-    m_depthMaps(4, {1024, 1024}, 10, {512, 512})
+    m_depthMaps(4, {1024, 1024}, 10, {512, 512}),
+    m_vertexRenderer(6)
 {}
 
 void enableDebug();
@@ -100,40 +102,9 @@ void RenderSystem::draw() {
     }
 
     updateDepthMaps();
-
-    Actor mainCamera = getMainCamera();
-    if (mainCamera) {
-
-        glm::mat4 matrixView = glm::inverse(mainCamera.get<Transform>().getWorldTransform());
-        glm::mat4 matrixProjection = getProjectionMatrix(*m_engine, mainCamera.get<Camera>());
-
-        for (Entity e : m_registry->with<Transform, RenderInfo>()) {
-
-            auto& renderInfo = m_registry->get<RenderInfo>(e);
-            if (!renderInfo.material || !renderInfo.mesh)
-                continue;
-
-            const glm::mat4& matrixModel = m_registry->get<Transform>(e).getWorldTransform();
-            renderInfo.material->render(renderInfo.mesh.get(), m_engine, &m_depthMaps, matrixModel, matrixView, matrixProjection);
-
-            checkRenderingError(m_engine->actor(e));
-
-            if (m_displayMeshDebugInfo) {
-                renderInfo.mesh->drawDebugInfo(matrixModel, matrixView, matrixProjection);
-            }
-        }
-    }
-
-    std::string debugInfo = std::string("FPS:") + std::to_string((int)m_engine->getFps());
-    auto font = Resources<Font>::get(config::FONT_PATH + "arial.ttf");
-    auto windowSize = m_engine->getWindow().getSize();
-    font->render(debugInfo, {0.f, 0.f}, 1.f, glm::ortho(0.f, (float)windowSize.x, 0.f, (float)windowSize.y));
-}
-
-Actor RenderSystem::getMainCamera() {
-
-    Entity entity = m_registry->with<Transform, Camera>().tryGetOne();
-    return m_engine->actor(entity);
+    //renderEntities();
+    renderUI();
+    renderDebug();
 }
 
 void RenderSystem::updateDepthMaps() {
@@ -157,6 +128,78 @@ void RenderSystem::updateDepthMaps() {
     glViewport(0, 0, size.x, size.y);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glCheckError();
+}
+
+void RenderSystem::renderEntities() {
+
+    Actor mainCamera = getMainCamera();
+    if (!mainCamera)
+        return;
+
+    glm::mat4 matrixView = glm::inverse(mainCamera.get<Transform>().getWorldTransform());
+    glm::mat4 matrixProjection = getProjectionMatrix(*m_engine, mainCamera.get<Camera>());
+
+    for (Entity e : m_registry->with<Transform, RenderInfo>()) {
+
+        auto& renderInfo = m_registry->get<RenderInfo>(e);
+        if (!renderInfo.material || !renderInfo.mesh)
+            continue;
+
+        const glm::mat4& matrixModel = m_registry->get<Transform>(e).getWorldTransform();
+        renderInfo.material->render(renderInfo.mesh.get(), m_engine, &m_depthMaps, matrixModel, matrixView, matrixProjection);
+
+        checkRenderingError(m_engine->actor(e));
+
+        if (m_displayMeshDebugInfo) {
+            renderInfo.mesh->drawDebugInfo(matrixModel, matrixView, matrixProjection);
+        }
+    }
+}
+
+void RenderSystem::renderUI() {
+
+    auto windowSize = m_engine->getWindow().getSize();
+    //glm::mat4 matrixProjection = glm::ortho(0.f, (float)windowSize.x, 0.f, (float)windowSize.y);
+    glm::mat4 matrixProjection = glm::ortho(0.f, 1.f, 0.f, 1.f);
+
+    for (Entity e : m_registry->with<Transform, Sprite>()) {
+
+        auto& sprite = m_registry->get<Sprite>(e);
+        if (!sprite.isEnabled || !sprite.material)
+            continue;
+
+        auto& tf = m_registry->get<Transform>(e);
+        glm::vec3 position = tf.getWorldPosition();
+        glm::vec2 min = {0.4, 0.4};
+        glm::vec2 max = {0.6, 0.6};
+
+        std::vector<glm::vec3> vertices = {
+            {min.x, max.y, 0.f},
+            {min.x, min.y, 0.f},
+            {max.x, min.y, 0.f},
+
+            {min.x, max.y, 0.f},
+            {max.x, min.y, 0.f},
+            {max.x, max.y, 0.f},
+        };
+
+        sprite.material->use(m_engine, &m_depthMaps, glm::mat4(1), glm::mat4(1), matrixProjection);
+        m_vertexRenderer.renderVertices(vertices);
+    }
+}
+
+void RenderSystem::renderDebug() {
+
+    std::string debugInfo = std::string("FPS:") + std::to_string((int)m_engine->getFps());
+    auto font = Resources<Font>::get(config::FONT_PATH + "arial.ttf");
+    auto windowSize = m_engine->getWindow().getSize();
+    font->render(debugInfo, {0.f, 0.f}, 1.f, glm::ortho(0.f, (float)windowSize.x, 0.f, (float)windowSize.y));
+}
+
+Actor RenderSystem::getMainCamera() {
+
+    Entity entity = m_registry->with<Transform, Camera>().tryGetOne();
+    return m_engine->actor(entity);
 }
 
 glm::mat4 getDirectionalLightspaceTransform(const Light& light, const Transform& lightTransform) {

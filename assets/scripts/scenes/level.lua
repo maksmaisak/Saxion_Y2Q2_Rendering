@@ -26,8 +26,9 @@ local droppedKeysGrid = {}
 for x = 1,gridSize.x do
     droppedKeysGrid[x] = {}
     for y = 1,gridSize.y do
-        droppedKeysGrid[x][y] = {}
-		droppedKeysGrid[x][y].keys = {up = nil, down = nil, left = nil, right = nil }
+        droppedKeysGrid[x][y]				= {}
+		droppedKeysGrid[x][y].keys			= {up = nil, down = nil, left = nil, right = nil }
+		droppedKeysGrid[x][y].hasKeyDropped = {up = false, down = false, left = false, right = false}
     end
 end
 
@@ -46,14 +47,14 @@ local function getGridAt(gridPosition)
 	return grid[gridPosition.x][gridPosition.y]
 end
 
-local function getDroppedKeysAt(gridPosition)
+local function getDroppedKeysGridAt(gridPosition)
 	return droppedKeysGrid[gridPosition.x][gridPosition.y]
 end
 
 local function calculateYOffset(gridPosition)
 	local yOffset = 0.0
 
-	for k, v in pairs(getDroppedKeysAt(gridPosition).keys) do
+	for k, v in pairs(getDroppedKeysGridAt(gridPosition).keys) do
 		
 		for m, p in pairs(v) do
 			if(p) then
@@ -154,22 +155,22 @@ end
 local function blockKey(key)
 	print(key.." button blocked")
 	disabledKeys[key] = true
-	getGridAt(player.gridPosition).hasKeyDropped[key] = true
+	getDroppedKeysGridAt(player.gridPosition).hasKeyDropped[key] = true
 
 	local pair = {}
 	pair[key] = makeKey(player.gridPosition, key)
 
-	local tempArray = getDroppedKeysAt(player.gridPosition).keys
-	getDroppedKeysAt(player.gridPosition).keys [#tempArray+1] = pair
+	local tempArray = getDroppedKeysGridAt(player.gridPosition).keys
+	getDroppedKeysGridAt(player.gridPosition).keys [#tempArray+1] = pair
 end
 
 local function unblockKey(key)
 	print(key.." button unblocked")
 
 	disabledKeys[key] = false
-	getGridAt(player.gridPosition).hasKeyDropped[key] = false
+	getDroppedKeysGridAt(player.gridPosition).hasKeyDropped[key] = false
 
-	for k, v in pairs(getDroppedKeysAt(player.gridPosition).keys) do
+	for k, v in pairs(getDroppedKeysGridAt(player.gridPosition).keys) do
 		local currentActor = v[key]
 		if(currentActor ~= nil) then
 			currentActor:destroy()
@@ -181,7 +182,7 @@ local function unblockKey(key)
 
 	local index = 0
 
-	for k, v in pairs(getDroppedKeysAt(player.gridPosition).keys) do
+	for k, v in pairs(getDroppedKeysGridAt(player.gridPosition).keys) do
 		for m, p in pairs(v) do
 			if (p) then
 				local xNorm = (player.gridPosition.x - 1) / gridSize.x
@@ -244,7 +245,6 @@ function scene.start()
         for y = 1,gridSize.y do
 			local gridPosition = { x = x, y = y}
             grid[x][y].tile = makeTile(gridPosition)
-			grid[x][y].hasKeyDropped = {up = false, down = false, left = false, right = false}
 			if grid[x][y].isObstacle then
 				makeObstacle(gridPosition)
 			end
@@ -290,9 +290,9 @@ function scene.update()
 	if Game.keyboard.isHeld("LShift") or Game.keyboard.isHeld("RShift") then
 		for key, value in pairs(inputKeys) do
 			if(Game.keyboard.isDown(key)) then
-				if (not getGridAt(player.gridPosition).hasKeyDropped[key]) and not disabledKeys[key] then
+				if (not getDroppedKeysGridAt(player.gridPosition).hasKeyDropped[key]) and not disabledKeys[key] then
 					blockKey(key)
-				elseif getGridAt(player.gridPosition).hasKeyDropped[key] and disabledKeys[key] then
+				elseif getDroppedKeysGridAt(player.gridPosition).hasKeyDropped[key] and disabledKeys[key] then
 					unblockKey(key)
 				end
 				input = {x = 0, y = 0}

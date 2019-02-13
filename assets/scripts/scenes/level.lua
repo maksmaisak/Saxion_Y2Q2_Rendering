@@ -53,9 +53,12 @@ end
 local function calculateYOffset(gridPosition)
 	local yOffset = 0.0
 
-	for key, value in pairs(getDroppedKeysAt(gridPosition).keys) do
-		if(value ~= nil) then
-			yOffset = yOffset + 2 * value:get("Transform").scale.y
+	for k, v in pairs(getDroppedKeysAt(gridPosition).keys) do
+		
+		for m, p in pairs(v) do
+			if(p) then
+				yOffset = yOffset + 2 * p:get("Transform").scale.y
+			end
 		end
 	end
 
@@ -152,7 +155,12 @@ local function blockKey(key)
 	print(key.." button blocked")
 	disabledKeys[key] = true
 	getGridAt(player.gridPosition).hasKeyDropped[key] = true
-	getDroppedKeysAt(player.gridPosition).keys[key] = makeKey(player.gridPosition, key)
+
+	local pair = {}
+	pair[key] = makeKey(player.gridPosition, key)
+
+	local tempArray = getDroppedKeysAt(player.gridPosition).keys
+	getDroppedKeysAt(player.gridPosition).keys [#tempArray+1] = pair
 end
 
 local function unblockKey(key)
@@ -160,24 +168,34 @@ local function unblockKey(key)
 
 	disabledKeys[key] = false
 	getGridAt(player.gridPosition).hasKeyDropped[key] = false
-	getDroppedKeysAt(player.gridPosition).keys[key]:destroy()
-	getDroppedKeysAt(player.gridPosition).keys[key] = nil
+
+	for k, v in pairs(getDroppedKeysAt(player.gridPosition).keys) do
+		local currentActor = v[key]
+		if(currentActor ~= nil) then
+			currentActor:destroy()
+			currentActor = nil
+			v[key] = nil
+			break
+		end
+	end
 
 	local index = 0
 
-	for key, value in pairs(getDroppedKeysAt(player.gridPosition).keys) do
-		if(value ~= nil) then
-			local xNorm = (player.gridPosition.x - 1) / gridSize.x
-			local yNorm = (player.gridPosition.y - 1) / gridSize.y
+	for k, v in pairs(getDroppedKeysAt(player.gridPosition).keys) do
+		for m, p in pairs(v) do
+			if (p) then
+				local xNorm = (player.gridPosition.x - 1) / gridSize.x
+				local yNorm = (player.gridPosition.y - 1) / gridSize.y
 
-			local position = {
-				x = (xNorm - 0.5) * gridSize.x,
-				y = 1 + (index * 2 * value:get("Transform").scale.y),
-				z = (yNorm - 0.5) * gridSize.y
-			}
+				local position = {
+					x = (xNorm - 0.5) * gridSize.x,
+					y = 1 + (index * 2 * p:get("Transform").scale.y),
+					z = (yNorm - 0.5) * gridSize.y
+				}
 
-			index = index + 1
-			value:get("Transform").position = position 
+				index = index + 1
+				p:get("Transform").position = position 
+			end
 		end
 	end
 

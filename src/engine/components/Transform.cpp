@@ -6,6 +6,8 @@
 #include <glm/gtx/quaternion.hpp>
 #include <glm/gtx/vector_query.hpp>
 #include <glm/gtx/matrix_decompose.hpp>
+#include <optional>
+#include <variant>
 
 namespace en {
 
@@ -181,5 +183,57 @@ namespace en {
             [](ComponentReference<Transform> tf) {return tf->getLocalScale();},
             [](ComponentReference<Transform> tf, const glm::vec3& scale) {return tf->setLocalScale(scale), tf;}
         ));
+
+        lua::addProperty(lua, "parent", lua::property(
+            [](ComponentReference<Transform> ref) -> std::optional<Actor> {
+
+                Transform& tf = *ref;
+                if (isNullEntity(tf.m_parent))
+                    return std::nullopt;
+
+                return std::make_optional(ref->m_engine->actor(ref->m_parent));
+            },
+            [](ComponentReference<Transform> ref, std::variant<std::string, Actor> arg) {
+
+                Transform& tf = *ref;
+
+                if (auto* parentName = std::get_if<std::string>(&arg)) {
+                    Entity parent = ref->m_engine->findByName(*parentName);
+                    tf.setParent(parent);
+                } else if (auto* actor = std::get_if<Actor>(&arg)) {
+                    tf.setParent(*actor);
+                }
+
+                return 0;
+            }
+        ));
+    }
+
+    void addChildrenFromLua(Actor& actor, Transform& transform, LuaState& lua) {
+
+        lua_getfield(lua, -1, "children");
+        auto pop = PopperOnDestruct(lua);
+
+        if (lua_isnil(lua, -1))
+            return;
+
+        std::vector<Actor> children = ComponentsToLua::makeEntities(lua, actor.getEngine(), -1);
+        for (Actor& child : children) {
+            auto* childTransform = child.tryGet<Transform>();
+            if (childTransform) {
+                childTransform->setParent(actor);
+            }
+        }
+    }
+
+    Transform& Transform::addFromLua(Actor& actor, LuaState& lua) {
+
+        auto& transform = actor.add<Transform>();
+
+        int tableIndex = lua_gettop(lua);
+        luaL_checktype(lua, tableIndex, LUA_TTABLE);
+        addChildrenFromLua(actor, transform, lua);
+
+        return transform;
     }
 }

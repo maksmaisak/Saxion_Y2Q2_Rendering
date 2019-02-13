@@ -9,11 +9,13 @@
 #include <lua.hpp>
 #include <string>
 #include <optional>
+#include <variant>
 #include <iostream>
 
 #include "Demangle.h"
 #include "Meta.h"
 #include "glm.hpp"
+#include "Exception.h"
 
 namespace lua {
 
@@ -202,14 +204,16 @@ namespace lua {
 
     template<typename T>
     struct TypeAdapter<std::optional<T>> {
+
         static bool is(lua_State* L, int index = -1) {
             return lua_isnil(L, index) || lua::is<T>(L, index);
         }
         static std::optional<T> to (lua_State* L, int index = -1) {
             return lua_isnil(L, index) ? std::nullopt : lua::to<T>(L, index);
         }
-        static lua_CFunction check(lua_State* L, int index = -1) {
-            if (!is(L, index)) luaL_error(L, "Bad argument #%d, expected %s, got %s", index, utils::demangle<T>().c_str(), luaL_typename(L, index));
+        static std::optional<T> check(lua_State* L, int index = -1) {
+            if (!is(L, index))
+                luaL_error(L, "Bad argument #%d, expected %s or nil, got %s", index, utils::demangle<T>().c_str(), luaL_typename(L, index));
             return to(L, index);
         }
         static void push(lua_State* L, const std::optional<T>& value) {
@@ -217,6 +221,57 @@ namespace lua {
                 lua::push(L, *value);
             else
                 lua_pushnil(L);
+        }
+    };
+
+    template<typename... Types>
+    struct TypeAdapter<std::variant<Types...>> {
+
+        using V = std::variant<Types...>;
+        using VSize = std::variant_size<V>;
+
+        static bool is(lua_State* L, int index = -1) {
+            return (lua::is<Types>(L, index) || ...);
+        }
+
+        template <std::size_t I>
+        static V toImpl(std::integral_constant<std::size_t, I>, lua_State* L, int index) {
+
+            using PotentialT = std::variant_alternative_t<I - 1, V>;
+            if (lua::is<PotentialT>(L, index))
+                return V(std::in_place_index<I - 1>, lua::to<PotentialT>(L, index));
+
+            if constexpr (I - 1 > 0)
+                return toImpl(std::integral_constant<std::size_t, I - 1>(), L, index);
+
+            return check(L, index);
+        }
+
+        static V to(lua_State* L, int index = -1) {
+            return toImpl(std::integral_constant<std::size_t, VSize::value>(), L, index);
+        }
+
+        static V check(lua_State* L, int index = -1) {
+            if (!is(L, index))
+                luaL_error(L, "Bad argument #%d, expected one of %s, got %s", index, ((utils::demangle<Types>() + ", ") + ...).c_str(), luaL_typename(L, index));
+            return to(L, index);
+        }
+
+        template <std::size_t I>
+        static void pushImpl(std::integral_constant<std::size_t, I>, lua_State* L, const V& variant) {
+
+            using ValueT = std::variant_alternative_t<I - 1, V>;
+            if (auto* value = std::get_if<ValueT>(variant)) {
+                lua::push<ValueT>(&value);
+                return;
+            }
+
+            if constexpr (I - 1 > 0)
+                pushImpl(std::integral_constant<std::size_t, I - 1>(), L, index);
+        }
+
+        static void push(lua_State* L, const V& variant) {
+            pushImpl(std::integral_constant<std::size_t, VSize::value>(), L, index);
         }
     };
 

@@ -29,6 +29,7 @@ namespace en {
     public:
 
         static void initializeMetatable(LuaState& lua);
+        static Transform& addFromLua(Actor& actor, LuaState& lua);
 
         Transform() = default;
 
@@ -62,6 +63,7 @@ namespace en {
         void removeChild(Entity child);
 
         EntityRegistry* m_registry = nullptr;
+        Engine* m_engine = nullptr;
         Entity m_entity = en::nullEntity;
         Entity m_parent = en::nullEntity;
         std::vector<Entity> m_children;

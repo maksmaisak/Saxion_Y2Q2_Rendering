@@ -104,7 +104,7 @@ local function makeObstacle(gridPosition)
     }
 
     return Game.makeActor {
-        Name = "Tile."..gridPosition.x.."."..gridPosition.y,
+        Name = "Obstacle."..gridPosition.x.."."..gridPosition.y,
         Transform = {
             position = position,
             scale = {0.9 * 0.5, 0.5, 0.9 * 0.5}
@@ -113,7 +113,7 @@ local function makeObstacle(gridPosition)
             mesh = "models/cube_flat.obj",
             material = obstacleMaterial
         }
-	}
+    }
 end
 
 local function makeKey(gridPosition, key)
@@ -199,7 +199,6 @@ local function unblockKey(key)
 		end
 	end
 
-	
 end
 
 local scene = {}
@@ -272,6 +271,24 @@ function scene.start()
     }
 end
 
+local function wobbleGrid()
+
+    require('math')
+    for x = 1,gridSize.x do
+        for y = 1,gridSize.y do
+            local xNorm = (x - 1) / gridSize.x
+            local yNorm = (y - 1) / gridSize.y
+            local position = {
+                x = (xNorm - 0.5) * gridSize.x,
+                y = 1,
+                z = (yNorm - 0.5) * gridSize.y
+            }
+
+            grid[x][y].tile:get("Transform").position = Vector.from({0, -1 + math.sin(xNorm * (1 - yNorm) * 2 * 3.14 + Game.getTime()), 0}):add(position)
+        end
+    end
+end
+
 function scene.update()
 
     local input = {x = 0, y = 0 }
@@ -321,7 +338,9 @@ function scene.update()
 		player.gridPosition.x = nextPosition.x
 		player.gridPosition.y = nextPosition.y
 		player.transform.position = getPlayerPositionFromGridPosition(player.gridPosition)
-	end
+    end
+
+    --wobbleGrid()
 end
 
 return scene

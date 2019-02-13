@@ -156,7 +156,11 @@ namespace lua {
             auto popGetters = PopperOnDestruct(L);
             lua_getfield(L, -1, "__getters");
 
-            ClosureHelper::makeClosure(L, property.getGetter());
+            if constexpr (std::is_convertible_v<G, lua_CFunction>)
+                lua_pushcfunction(L, property.getGetter());
+            else
+                ClosureHelper::makeClosure(L, property.getGetter());
+
             lua_setfield(L, -2, name.c_str());
         }
 
@@ -165,7 +169,11 @@ namespace lua {
             auto popSetters = PopperOnDestruct(L);
             lua_getfield(L, -1, "__setters");
 
-            ClosureHelper::makeClosure(L, property.getSetter());
+            if constexpr (std::is_convertible_v<S, lua_CFunction>)
+                lua_pushcfunction(L, property.getSetter());
+            else
+                ClosureHelper::makeClosure(L, property.getSetter());
+
             lua_setfield(L, -2, name.c_str());
         }
     }

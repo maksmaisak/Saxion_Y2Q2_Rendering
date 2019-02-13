@@ -54,7 +54,7 @@ namespace en {
         /// First creates all the entities and assigns their names, if provided.
         /// Then adds all other components to them.
         /// This is necessary to make sure findByName works during component initialization.
-        static void makeEntities(lua_State* L, Engine& engine, int index = -1);
+        static std::vector<Actor> makeEntities(lua_State* L, Engine& engine, int index = -1);
         static Actor makeEntity(lua_State* L, Engine& engine, int index = -1);
         static void addComponents(lua_State* L, Actor& actor, int index = -1);
 

@@ -5,6 +5,8 @@
 #include "RenderSystem.h"
 #include <iostream>
 #include <tuple>
+#include <string>
+#include <sstream>
 #include "components/RenderInfo.h"
 #include "components/Transform.h"
 #include "components/Camera.h"
@@ -233,10 +235,13 @@ void RenderSystem::renderDebug() {
 
     glDisable(GL_DEPTH_TEST);
 
-    std::string debugInfo = std::string("FPS:") + std::to_string((int)m_engine->getFps());
+    std::stringstream s;
+    s << "fps:" << glm::iround(m_engine->getFps()) << " frame: " << m_engine->getFrameTimeMicroseconds() / 1000.0 << "ms";
+    std::string debugInfo = s.str();
+
     auto font = Resources<Font>::get(config::FONT_PATH + "arial.ttf");
     auto windowSize = m_engine->getWindow().getSize();
-    font->render(debugInfo, {0.f, 0.f}, 1.f, glm::ortho(0.f, (float)windowSize.x, 0.f, (float)windowSize.y));
+    font->render(debugInfo, {0.f, 0.f}, 0.5f, glm::ortho(0.f, (float)windowSize.x, 0.f, (float)windowSize.y));
 
     glEnable(GL_DEPTH_TEST);
 }

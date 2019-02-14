@@ -49,7 +49,8 @@ namespace en {
         inline sf::RenderWindow& getWindow()   { return m_window; }
         inline SceneManager& getSceneManager() { return m_sceneManager; }
         inline LuaState& getLuaState()         { return *m_lua; }
-        inline float getFps()                  { return m_fps; }
+        inline double getFps()                 { return m_fps; }
+        inline long getFrameTimeMicroseconds() { return m_frameTimeMicroseconds; }
 
         Actor actor(Entity entity) const;
         Actor makeActor();
@@ -80,7 +81,8 @@ namespace en {
         utils::CustomTypeMap<struct Dummy, bool> m_behaviorSystemPresence;
 
         unsigned int m_framerateCap = 240;
-        float m_fps = 0.f;
+        double m_fps = 0.f;
+        long m_frameTimeMicroseconds = 0;
 
         void printGLContextVersionInfo();
         void initializeGlew();

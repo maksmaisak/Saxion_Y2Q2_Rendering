@@ -13,6 +13,7 @@ namespace en {
     struct UIRect {
 
         LUA_TYPE(UIRect);
+        static void initializeMetatable(LuaState& lua);
 
         glm::vec2 anchorMin = {0, 0};
         glm::vec2 anchorMax = {1, 1};

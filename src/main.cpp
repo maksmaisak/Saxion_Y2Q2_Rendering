@@ -48,28 +48,6 @@ int main() {
     //engine->getSceneManager().setCurrentScene<LightingScene>(); // Assignment 3
     //engine->getSceneManager().setCurrentScene<TerrainScene>();  // Assignment 4
 
-    auto parent = engine->makeActor("Parent");
-    parent.add<en::Transform>();
-    parent.add<en::UIRect>(glm::vec2(0.4f), glm::vec2(0.8f));
-
-    auto child1 = engine->makeActor("Child2");
-    child1.add<en::Transform>().setParent(parent);
-    child1.add<en::UIRect>();
-    {
-        auto material = std::make_shared<en::Material>("sprite");
-        material->setUniformValue("spriteTexture", en::Textures::get(config::TEXTURE_PATH + "bricks.jpg"));
-        child1.add<en::Sprite>(material);
-    }
-
-    auto child2 = engine->makeActor("Child2");
-    child2.add<en::Transform>().setParent(child1);
-    child2.add<en::UIRect>(glm::vec2(0.4f), glm::vec2(0.8));
-    {
-        auto material = std::make_shared<en::Material>("sprite");
-        material->setUniformValue("spriteTexture", en::Textures::get(config::TEXTURE_PATH + "runicfloor.png"));
-        child2.add<en::Sprite>(material);
-    }
-
     engine->run();
 
     return 0;

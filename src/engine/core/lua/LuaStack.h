@@ -275,60 +275,70 @@ namespace lua {
         }
     };
 
-    template<>
-    struct TypeAdapter<glm::vec3> {
+    template<glm::length_t Length, typename T, glm::qualifier Q>
+    struct TypeAdapter<glm::vec<Length, T, Q>> {
+
+        using TVec = glm::vec<Length, T, Q>;
+
+        struct Keys {
+            std::string key1;
+            std::string key2;
+            int key3;
+        };
+
+        inline static const Keys keys[] = {
+            {"x", "r", 1},
+            {"y", "g", 2},
+            {"z", "b", 3},
+            {"w", "a", 4}
+        };
 
         static bool is(lua_State* L, int index = -1) {
             return lua_istable(L, index);
         }
 
-        static glm::vec3 check(lua_State* L, int index = -1) {
+        static TVec check(lua_State* L, int index = -1) {
             if (!is(L, index)) luaL_error(L, "Bad argument #%d, expected %s, got %s", index, utils::demangle<glm::vec3>().c_str(), luaL_typename(L, index));
             return to(L, index);
         }
 
-        static float tryGetValue(lua_State* L, const std::string& key1, const std::string& key2, int key3) {
+        static T tryGetValue(lua_State* L, const Keys& keys) {
 
-            auto opt1 = lua::tryGetField<float>(L, key1);
+            auto opt1 = lua::tryGetField<T>(L, keys.key1);
             if (opt1)
                 return *opt1;
 
-            auto opt2 = lua::tryGetField<float>(L, key2);
+            auto opt2 = lua::tryGetField<T>(L, keys.key2);
             if (opt2)
                 return *opt2;
 
-            auto opt3 = lua::tryGetField<float>(L, key3);
+            auto opt3 = lua::tryGetField<T>(L, keys.key3);
             if (opt3)
                 return *opt3;
 
-            return 0.f;
+            return static_cast<T>(0);
         }
 
-        static glm::vec3 to(lua_State* L, int index = -1) {
+        static TVec to(lua_State* L, int index = -1) {
 
-            glm::vec3 result = {
-                tryGetValue(L, "x", "r", 1),
-                tryGetValue(L, "y", "g", 2),
-                tryGetValue(L, "z", "b", 3)
-            };
+            TVec vec;
+            for (std::size_t i = 0; i < Length; ++i) {
+                vec[i] = tryGetValue(L, keys[i]);
+            }
 
             //std::cout << "received: (" << result.x << ", " << result.y << ", " << result.z << ")\n";
 
-            return result;
+            return vec;
         }
 
-        static void push(lua_State* L, const glm::vec3& value) {
+        static void push(lua_State* L, const TVec& value) {
 
             lua_createtable(L, 0, 3);
 
-            lua::push(L, value.x);
-            lua_setfield(L, -2, "x");
-
-            lua::push(L, value.y);
-            lua_setfield(L, -2, "y");
-
-            lua::push(L, value.z);
-            lua_setfield(L, -2, "z");
+            for (std::size_t i = 0; i < Length; ++i) {
+                lua::push(L, value[i]);
+                lua_setfield(L, -2, keys[i].key1.c_str());
+            }
         }
     };
 }

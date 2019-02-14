@@ -262,7 +262,7 @@ void Engine::initializeLua() {
 
     ComponentsToLua::printDebugInfo();
 
-    if (lua.doFileInNewEnvironment("assets/scripts/config.lua")) {
+    if (lua.doFileInNewEnvironment(config::SCRIPT_PATH + "config.lua")) {
         lua_setglobal(lua, "Config");
     }
 

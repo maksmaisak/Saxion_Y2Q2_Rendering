@@ -166,13 +166,6 @@ void RenderSystem::renderUI() {
     glm::mat4 matrixProjection = glm::ortho(0.f, windowSize.x, 0.f, windowSize.y);
     //glm::mat4 matrixProjection = glm::ortho(0.f, 1.f, 0.f, 1.f);
 
-//    for (Entity e : m_registry->with<Transform, UIRect>()) {
-//
-//        auto& tf = m_registry->get<Transform>(e);
-//        if (tf.getParent() != nullEntity)
-//            continue;
-//    }
-
     glm::vec2 parentMin = {0, 0};
     glm::vec2 parentMax = windowSize;
 
@@ -212,7 +205,8 @@ void RenderSystem::renderUIRects(const std::vector<Entity>& children, glm::vec2 
 
 void RenderSystem::renderUIRect(Entity entity, glm::vec2 min, glm::vec2 max) {
 
-    if (auto* sprite = m_registry->tryGet<Sprite>(entity)) {
+    auto* sprite = m_registry->tryGet<Sprite>(entity);
+    if (sprite && sprite->isEnabled && sprite->material) {
 
         std::vector<Vertex> vertices = {
             {{min.x, max.y, 0}, {0, 1}},
@@ -223,9 +217,6 @@ void RenderSystem::renderUIRect(Entity entity, glm::vec2 min, glm::vec2 max) {
             {{max.x, min.y, 0}, {1, 0}},
             {{max.x, max.y, 0}, {1, 1}},
         };
-
-        if (!sprite->isEnabled || !sprite->material)
-            return;
 
         glm::vec2 size = getWindowSize();
         sprite->material->use(m_engine, &m_depthMaps, glm::mat4(1), glm::mat4(1), glm::ortho(0.f, size.x, 0.f, size.y));

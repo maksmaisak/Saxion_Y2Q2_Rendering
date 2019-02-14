@@ -30,9 +30,17 @@ Material::Material(std::shared_ptr<ShaderProgram> shader) : m_shader(std::move(s
     detectAllUniforms();
 }
 
-Material::Material(LuaState& lua) : Material((luaL_checktype(lua, -1, LUA_TTABLE), lua.tryGetField<std::string>("shader").value_or("lit"))) {
+std::string getShaderNameFromLua(LuaState& lua) {
 
-    std::string shaderName = lua.tryGetField<std::string>("shader").value_or("lit");
+    if (!lua_istable(lua, -1) && !lua_isuserdata(lua, -1))
+        luaL_error(lua, "Can't make a material out of given %s", luaL_typename(lua, -1));
+
+    return lua.tryGetField<std::string>("shader").value_or("lit");
+}
+
+Material::Material(LuaState& lua) : Material(getShaderNameFromLua(lua)) {
+
+    std::string shaderName = getShaderNameFromLua(lua);
 
     if (shaderName == "lit") {
 
@@ -51,6 +59,14 @@ Material::Material(LuaState& lua) : Material((luaL_checktype(lua, -1, LUA_TTABLE
             setUniformValue("specularMap", Textures::get(config::ASSETS_PATH + *specularPath));
         else
             setUniformValue("specularMap", Textures::white());
+
+    } else if (shaderName == "sprite") {
+
+        std::optional<std::string> diffusePath = lua.tryGetField<std::string>("texture");
+        if (diffusePath)
+            setUniformValue("spriteTexture", Textures::get(config::ASSETS_PATH + *diffusePath));
+        else
+            setUniformValue("spriteTexture", Textures::white());
     }
 }
 

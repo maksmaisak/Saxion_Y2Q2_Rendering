@@ -28,7 +28,7 @@ void ComponentsToLua::removeComponentByTypeName(lua_State* L, Actor& actor, cons
     getTypeInfoByName(componentTypeName).removeFromActor(actor, lua);
 }
 
-ComponentsToLua::TypeInfo& ComponentsToLua::getTypeInfoByName(const std::string typeName) {
+ComponentsToLua::TypeInfo& ComponentsToLua::getTypeInfoByName(const std::string& typeName) {
 
     auto& map = getNameToTypeInfoMap();
     auto it = map.find(typeName);

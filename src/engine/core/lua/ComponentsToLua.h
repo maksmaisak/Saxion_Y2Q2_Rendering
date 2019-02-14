@@ -82,7 +82,7 @@ namespace en {
             return nameToTypeInfoMap;
         }
 
-        static TypeInfo& getTypeInfoByName(const std::string typeName);
+        static TypeInfo& getTypeInfoByName(const std::string& typeName);
     };
 
     template<typename TComponent>

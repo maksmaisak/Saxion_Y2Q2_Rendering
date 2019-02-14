@@ -1,7 +1,7 @@
 --
 -- User: maks
--- Date: 30/12/18
--- Time: 20:15
+-- Date: 2019-02-14
+-- Time: 13:16
 --
 
 local planeRenderInfo = {
@@ -153,8 +153,8 @@ function scene.start()
             material = {}
         },
         Light = {
-			intensity = 10
-		}
+            intensity = 10
+        }
     }
 
     Game.makeActor {
@@ -180,6 +180,54 @@ function scene.start()
             kind = "directional",
             ambientColor = {0, 0, 0},
             intensity = 0.1
+        }
+    }
+
+    Game.makeActor {
+        Name = "UIParent",
+        Transform = {
+            children = {
+                {
+                    Transform = {},
+                    UIRect = {
+                        anchorMin = {0.5, 0.5},
+                        anchorMax = {1, 1}
+                    },
+                    Sprite = {
+                        material = {
+                            shader = "sprite",
+                            texture = "textures/runicfloor.png"
+                        }
+                    }
+                }
+            }
+        },
+        UIRect = {
+            anchorMin = {0, 0},
+            anchorMax = {0.2, 0.2}
+        },
+        Sprite = {
+            material = {
+                shader = "sprite",
+                texture = "textures/bricks.jpg"
+            }
+        }
+    }
+
+    Game.makeActor {
+        Name = "Child",
+        Transform = {
+            parent = "UIParent"
+        },
+        UIRect = {
+            anchorMin = {0, 0.75},
+            anchorMax = {0.5, 1}
+        },
+        Sprite = {
+            material = {
+                shader = "sprite",
+                texture = "textures/land.jpg"
+            }
         }
     }
 end

@@ -15,10 +15,13 @@ namespace en {
         LUA_TYPE(UIRect);
         static void initializeMetatable(LuaState& lua);
 
+        // In normalized coordinates [0..1]
         glm::vec2 anchorMin = {0, 0};
         glm::vec2 anchorMax = {1, 1};
 
-        glm::vec2 size;
+        // In pixels
+        glm::vec2 offsetMin = {0, 0};
+        glm::vec2 offsetMax = {0, 0};
     };
 }
 

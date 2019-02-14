@@ -157,6 +157,13 @@ void RenderSystem::renderEntities() {
     }
 }
 
+std::tuple<glm::vec2, glm::vec2> getBounds(UIRect& rect, const glm::vec2& parentMin, const glm::vec2& parentMax) {
+
+    const glm::vec2 min = glm::lerp(parentMin, parentMax, rect.anchorMin) + rect.offsetMin;
+    const glm::vec2 max = glm::lerp(parentMin, parentMax, rect.anchorMax) + rect.offsetMax;
+    return {min, max};
+}
+
 void RenderSystem::renderUI() {
 
     glDisable(GL_DEPTH_TEST);
@@ -176,8 +183,8 @@ void RenderSystem::renderUI() {
             continue;
 
         auto& rect = m_registry->get<UIRect>(e);
-        glm::vec2 min = glm::lerp(parentMin, parentMax, rect.anchorMin);
-        glm::vec2 max = glm::lerp(parentMin, parentMax, rect.anchorMax);
+
+        auto[min, max] = getBounds(rect, parentMin, parentMax);
         renderUIRect(e, min, max);
         renderUIRects(tf.getChildren(), min, max);
     }
@@ -193,10 +200,8 @@ void RenderSystem::renderUIRects(const std::vector<Entity>& children, glm::vec2 
         if (!rect)
             continue;
 
-        glm::vec2 min = glm::lerp(parentMin, parentMax, rect->anchorMin);
-        glm::vec2 max = glm::lerp(parentMin, parentMax, rect->anchorMax);
+        auto[min, max] = getBounds(*rect, parentMin, parentMax);
         renderUIRect(e, min, max);
-
         if (auto* tf = m_registry->tryGet<Transform>(e)) {
             renderUIRects(tf->getChildren(), min, max);
         }
@@ -226,10 +231,14 @@ void RenderSystem::renderUIRect(Entity entity, glm::vec2 min, glm::vec2 max) {
 
 void RenderSystem::renderDebug() {
 
+    glDisable(GL_DEPTH_TEST);
+
     std::string debugInfo = std::string("FPS:") + std::to_string((int)m_engine->getFps());
     auto font = Resources<Font>::get(config::FONT_PATH + "arial.ttf");
     auto windowSize = m_engine->getWindow().getSize();
     font->render(debugInfo, {0.f, 0.f}, 1.f, glm::ortho(0.f, (float)windowSize.x, 0.f, (float)windowSize.y));
+
+    glEnable(GL_DEPTH_TEST);
 }
 
 Actor RenderSystem::getMainCamera() {

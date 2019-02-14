@@ -184,7 +184,7 @@ function scene.start()
     }
 
     Game.makeActor {
-        Name = "UIParent",
+        Name = "Panel",
         Transform = {
             children = {
                 {
@@ -204,7 +204,9 @@ function scene.start()
         },
         UIRect = {
             anchorMin = {0, 0},
-            anchorMax = {0.2, 0.2}
+            anchorMax = {1, 1},
+            offsetMin = { 100,  200},
+            offsetMax = {-100, -100}
         },
         Sprite = {
             material = {
@@ -217,7 +219,7 @@ function scene.start()
     Game.makeActor {
         Name = "Child",
         Transform = {
-            parent = "UIParent"
+            parent = "Panel"
         },
         UIRect = {
             anchorMin = {0, 0.75},
@@ -227,6 +229,23 @@ function scene.start()
             material = {
                 shader = "sprite",
                 texture = "textures/land.jpg"
+            }
+        }
+    }
+
+    Game.makeActor {
+        Name = "PanelBottom",
+        Transform = {},
+        UIRect = {
+            anchorMin = {0, 0},
+            anchorMax = {1, 0},
+            offsetMin = {50 , 0},
+            offsetMax = {-50, 100}
+        },
+        Sprite = {
+            material = {
+                shader = "sprite",
+                texture = "textures/black.png"
             }
         }
     }

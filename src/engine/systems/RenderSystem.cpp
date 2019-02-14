@@ -16,6 +16,7 @@
 #include "Resources.h"
 #include "Material.h"
 #include "Exception.h"
+#include "UIRect.h"
 
 using namespace en;
 
@@ -158,32 +159,76 @@ void RenderSystem::renderEntities() {
 
 void RenderSystem::renderUI() {
 
-    auto windowSize = m_engine->getWindow().getSize();
-    //glm::mat4 matrixProjection = glm::ortho(0.f, (float)windowSize.x, 0.f, (float)windowSize.y);
-    glm::mat4 matrixProjection = glm::ortho(0.f, 1.f, 0.f, 1.f);
+    glDisable(GL_DEPTH_TEST);
 
-    for (Entity e : m_registry->with<Transform, Sprite>()) {
+    sf::Vector2u windowSizeSf = m_engine->getWindow().getSize();
+    auto windowSize = glm::vec2(windowSizeSf.x, windowSizeSf.y);
+    glm::mat4 matrixProjection = glm::ortho(0.f, windowSize.x, 0.f, windowSize.y);
+    //glm::mat4 matrixProjection = glm::ortho(0.f, 1.f, 0.f, 1.f);
 
-        auto& sprite = m_registry->get<Sprite>(e);
-        if (!sprite.isEnabled || !sprite.material)
-            continue;
+//    for (Entity e : m_registry->with<Transform, UIRect>()) {
+//
+//        auto& tf = m_registry->get<Transform>(e);
+//        if (tf.getParent() != nullEntity)
+//            continue;
+//    }
+
+    glm::vec2 parentMin = {0, 0};
+    glm::vec2 parentMax = windowSize;
+
+    for (Entity e : m_registry->with<Transform, UIRect>()) {
 
         auto& tf = m_registry->get<Transform>(e);
-        glm::vec3 position = tf.getWorldPosition();
-        glm::vec2 min = {0.4, 0.4};
-        glm::vec2 max = {0.6, 0.6};
+        if (tf.getParent())
+            continue;
+
+        auto& rect = m_registry->get<UIRect>(e);
+        glm::vec2 min = glm::lerp(parentMin, parentMax, rect.anchorMin);
+        glm::vec2 max = glm::lerp(parentMin, parentMax, rect.anchorMax);
+        renderUIRect(e, min, max);
+        renderUIRects(tf.getChildren(), min, max);
+    }
+
+    glEnable(GL_DEPTH_TEST);
+}
+
+void RenderSystem::renderUIRects(const std::vector<Entity>& children, glm::vec2 parentMin, glm::vec2 parentMax) {
+
+    for (Entity e : children) {
+
+        auto* rect = m_registry->tryGet<UIRect>(e);
+        if (!rect)
+            continue;
+
+        glm::vec2 min = glm::lerp(parentMin, parentMax, rect->anchorMin);
+        glm::vec2 max = glm::lerp(parentMin, parentMax, rect->anchorMax);
+        renderUIRect(e, min, max);
+
+        if (auto* tf = m_registry->tryGet<Transform>(e)) {
+            renderUIRects(tf->getChildren(), min, max);
+        }
+    }
+}
+
+void RenderSystem::renderUIRect(Entity entity, glm::vec2 min, glm::vec2 max) {
+
+    if (auto* sprite = m_registry->tryGet<Sprite>(entity)) {
 
         std::vector<Vertex> vertices = {
-            {{min.x, max.y, 1}, {0, 1}},
-            {{min.x, min.y, 1}, {0, 0}},
-            {{max.x, min.y, 1}, {1, 0}},
+            {{min.x, max.y, 0}, {0, 1}},
+            {{min.x, min.y, 0}, {0, 0}},
+            {{max.x, min.y, 0}, {1, 0}},
 
-            {{min.x, max.y, 1}, {0, 1}},
-            {{max.x, min.y, 1}, {1, 0}},
-            {{max.x, max.y, 1}, {1, 1}},
+            {{min.x, max.y, 0}, {0, 1}},
+            {{max.x, min.y, 0}, {1, 0}},
+            {{max.x, max.y, 0}, {1, 1}},
         };
 
-        sprite.material->use(m_engine, &m_depthMaps, glm::mat4(1), glm::mat4(1), matrixProjection);
+        if (!sprite->isEnabled || !sprite->material)
+            return;
+
+        glm::vec2 size = getWindowSize();
+        sprite->material->use(m_engine, &m_depthMaps, glm::mat4(1), glm::mat4(1), glm::ortho(0.f, size.x, 0.f, size.y));
         m_vertexRenderer.renderVertices(vertices);
     }
 }
@@ -318,6 +363,12 @@ void RenderSystem::updateDepthMapsPositionalLights(const std::vector<Entity>& po
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glCheckError();
+}
+
+glm::vec2 RenderSystem::getWindowSize() {
+
+    sf::Vector2u windowSizeSf = m_engine->getWindow().getSize();
+    return glm::vec2(windowSizeSf.x, windowSizeSf.y);
 }
 
 void GLAPIENTRY

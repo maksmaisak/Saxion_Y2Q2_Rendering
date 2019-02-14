@@ -1,7 +1,6 @@
 #include <iostream>
 #include <fstream>
 #include <optional>
-#include "engine/core/ShaderProgram.hpp"
 #include "ShaderProgram.hpp"
 #include "GLHelpers.h"
 

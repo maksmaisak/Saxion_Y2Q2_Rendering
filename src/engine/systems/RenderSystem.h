@@ -35,6 +35,9 @@ namespace en {
         Actor getMainCamera();
         void updateDepthMapsDirectionalLights(const std::vector<Entity>& directionalLights);
         void updateDepthMapsPositionalLights(const std::vector<Entity>& pointLights);
+        void renderUIRects(const std::vector<Entity>& rects, glm::vec2 parentMin, glm::vec2 parentMax);
+        void renderUIRect(Entity entity, glm::vec2 min, glm::vec2 max);
+        glm::vec2 getWindowSize();
 
         DepthMaps m_depthMaps;
         std::shared_ptr<ShaderProgram> m_directionalDepthShader;

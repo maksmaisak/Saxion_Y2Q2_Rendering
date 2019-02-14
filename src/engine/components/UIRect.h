@@ -24,6 +24,9 @@ namespace en {
         glm::vec2 offsetMax = {0, 0};
 
         bool isEnabled = true;
+
+        bool isMouseOver = false;
+        bool wasMouseOver = false;
     };
 }
 

@@ -20,15 +20,24 @@ namespace en {
         Receiver()  { m_receivers.insert(this); }
         ~Receiver() { m_receivers.erase(this);  }
 
+        template<typename... Args>
+        inline static void broadcast(Args&&... args) {
+            broadcastInternal(TMessage{args...});
+        }
+
         inline static void broadcast(const TMessage& info) {
-            for (Receiver<TMessage>* receiver : m_receivers) {
-                receiver->receive(info);
-            }
+            broadcastInternal(info);
         }
 
         virtual void receive(const TMessage& info) = 0;
 
     private:
+        inline static void broadcastInternal(const TMessage& info) {
+            for (Receiver<TMessage>* receiver : m_receivers) {
+                receiver->receive(info);
+            }
+        }
+
         static std::set<Receiver*> m_receivers;
     };
 

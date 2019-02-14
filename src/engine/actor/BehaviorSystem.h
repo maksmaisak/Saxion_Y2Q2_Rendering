@@ -15,12 +15,13 @@
 #include "Behavior.h"
 #include "EntityEvents.h"
 #include "Collision.h"
+#include "UIEvents.h"
 #include "Destroy.h"
 
 namespace en {
 
     template<typename TBehavior>
-    class BehaviorSystem : public System, Receiver<ComponentAdded<TBehavior>>, Receiver<Collision> {
+    class BehaviorSystem : public System, Receiver<ComponentAdded<TBehavior>, Collision, MouseEnter, MouseOver, MouseLeave, MouseClick, MouseHold, MouseUp> {
 
         static_assert(std::is_base_of_v<Behavior, TBehavior>);
 
@@ -61,13 +62,33 @@ namespace en {
 
         inline void receive(const Collision& collision) override {
 
-            if (TBehavior* a = m_registry->tryGet<TBehavior>(collision.a))
-                if (!m_registry->tryGet<Destroy>(collision.a))
-                    a->onCollision(collision.b);
+            if (TBehavior* a = getBehaviorForCallback(collision.a))
+                a->onCollision(collision.b);
 
-            if (TBehavior* b = m_registry->tryGet<TBehavior>(collision.b))
-                if (!m_registry->tryGet<Destroy>(collision.b))
-                    b->onCollision(collision.a);
+            if (TBehavior* b = getBehaviorForCallback(collision.b))
+                b->onCollision(collision.a);
+        }
+
+        inline void receive(const MouseEnter& info) override {forwardEvent(info.entity, info);}
+        inline void receive(const MouseOver&  info) override {forwardEvent(info.entity, info);}
+        inline void receive(const MouseLeave& info) override {forwardEvent(info.entity, info);}
+        inline void receive(const MouseClick& info) override {forwardEvent(info.entity, info);}
+        inline void receive(const MouseHold&  info) override {forwardEvent(info.entity, info);}
+        inline void receive(const MouseUp&    info) override {forwardEvent(info.entity, info);}
+
+        template<typename TEvent>
+        inline void forwardEvent(Entity e, const TEvent& event) {
+            if (auto* behavior = getBehaviorForCallback(e))
+                behavior->on(event);
+        }
+
+        inline TBehavior* getBehaviorForCallback(Entity e) {
+
+            if (auto* behavior = m_registry->tryGet<TBehavior>(e))
+                if (!m_registry->tryGet<Destroy>(e))
+                    return behavior;
+
+            return nullptr;
         }
 
         std::vector<Entity> m_notStarted;

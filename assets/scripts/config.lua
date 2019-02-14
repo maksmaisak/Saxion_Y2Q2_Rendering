@@ -11,6 +11,7 @@ bulletSpeed = 30
 levelRestartDelay = 2
 arenaSize = 60
 maxNumActiveBullets = 10
+player = 'assets/scripts/player.lua'
 players = {
     {
         color = {1, 0, 0},

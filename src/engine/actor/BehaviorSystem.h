@@ -21,7 +21,7 @@
 namespace en {
 
     template<typename TBehavior>
-    class BehaviorSystem : public System, Receiver<ComponentAdded<TBehavior>, Collision, MouseEnter, MouseOver, MouseLeave, MouseClick, MouseHold, MouseUp> {
+    class BehaviorSystem : public System, Receiver<ComponentAdded<TBehavior>, Collision, MouseEnter, MouseOver, MouseLeave, MouseDown, MouseHold, MouseUp> {
 
         static_assert(std::is_base_of_v<Behavior, TBehavior>);
 
@@ -72,7 +72,7 @@ namespace en {
         inline void receive(const MouseEnter& info) override {forwardEvent(info.entity, info);}
         inline void receive(const MouseOver&  info) override {forwardEvent(info.entity, info);}
         inline void receive(const MouseLeave& info) override {forwardEvent(info.entity, info);}
-        inline void receive(const MouseClick& info) override {forwardEvent(info.entity, info);}
+        inline void receive(const MouseDown&  info) override {forwardEvent(info.entity, info);}
         inline void receive(const MouseHold&  info) override {forwardEvent(info.entity, info);}
         inline void receive(const MouseUp&    info) override {forwardEvent(info.entity, info);}
 

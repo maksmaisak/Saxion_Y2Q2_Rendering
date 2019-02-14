@@ -34,7 +34,7 @@ namespace en {
         virtual void on(const MouseEnter&) {};
         virtual void on(const MouseOver&)  {};
         virtual void on(const MouseLeave&) {};
-        virtual void on(const MouseClick&) {};
+        virtual void on(const MouseDown&) {};
         virtual void on(const MouseHold&)  {};
         virtual void on(const MouseUp&)    {};
 

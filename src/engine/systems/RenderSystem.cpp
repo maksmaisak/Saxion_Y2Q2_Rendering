@@ -189,6 +189,8 @@ void RenderSystem::renderUI() {
             continue;
 
         auto[min, max] = getBounds(rect, parentMin, parentMax);
+        rect.computedMin = min;
+        rect.computedMax = max;
         renderUIRect(e, min, max);
         renderUIRects(tf.getChildren(), min, max);
     }
@@ -205,6 +207,8 @@ void RenderSystem::renderUIRects(const std::vector<Entity>& children, glm::vec2 
             continue;
 
         auto[min, max] = getBounds(*rect, parentMin, parentMax);
+        rect->computedMin = min;
+        rect->computedMax = max;
         renderUIRect(e, min, max);
         if (auto* tf = m_registry->tryGet<Transform>(e)) {
             renderUIRects(tf->getChildren(), min, max);
@@ -238,7 +242,7 @@ void RenderSystem::renderDebug() {
     glDisable(GL_DEPTH_TEST);
 
     std::stringstream s;
-    s << "fps:" << glm::iround(m_engine->getFps()) << " frame: " << m_engine->getFrameTimeMicroseconds() / 1000.0 << "ms";
+    s << "fps: " << glm::iround(m_engine->getFps()) << " frame: " << m_engine->getFrameTimeMicroseconds() / 1000.0 << "ms";
     std::string debugInfo = s.str();
 
     auto font = Resources<Font>::get(config::FONT_PATH + "arial.ttf");

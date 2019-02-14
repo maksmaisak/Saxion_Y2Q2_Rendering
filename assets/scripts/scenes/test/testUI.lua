@@ -198,6 +198,14 @@ function scene.start()
                             shader = "sprite",
                             texture = "textures/runicfloor.png"
                         }
+                    },
+                    LuaBehavior = {
+                        onMouseEnter = function(self)
+                            self.actor:get("Sprite").isEnabled = false
+                        end,
+                        onMouseLeave = function(self)
+                            self.actor:get("Sprite").isEnabled = true
+                        end
                     }
                 }
             }
@@ -247,6 +255,11 @@ function scene.start()
                 shader = "sprite",
                 texture = "textures/black.png"
             }
+        },
+        LuaBehavior = {
+            update = function(self)
+                self.actor:get("Sprite").isEnabled = not self.actor:get("UIRect").isMouseOver
+            end
         }
     }
 end
@@ -262,7 +275,7 @@ function scene.update(dt)
         Game.find("Light2"):get("Transform"):move(0, -2 * dt, 0)
     end
 
-    Game.find("Panel"):get("UIRect").isEnabled = math.fmod(Game.getTime(), 2) < 1
+    --Game.find("Panel"):get("UIRect").isEnabled = math.fmod(Game.getTime(), 2) < 1
 end
 
 return scene

@@ -13,7 +13,6 @@ namespace en {
     class UIEventSystem : public System {
 
     public:
-        void start() override;
         void update(float dt) override;
     };
 }

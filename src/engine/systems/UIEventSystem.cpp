@@ -12,10 +12,6 @@
 
 using namespace en;
 
-void UIEventSystem::start() {
-
-}
-
 void UIEventSystem::update(float dt) {
 
     constexpr std::size_t numButtons = 5;
@@ -27,9 +23,15 @@ void UIEventSystem::update(float dt) {
         sf::Mouse::isButtonPressed(sf::Mouse::Button::XButton2),
     };
 
+    sf::RenderWindow& window = m_engine->getWindow();
+    sf::Vector2i temp = sf::Mouse::getPosition(window);
+    glm::vec2 mousePosition = {temp.x, window.getSize().y - temp.y};
+
     for (Entity e : m_registry->with<UIRect>()) {
 
         auto& rect = m_registry->get<UIRect>(e);
+        rect.wasMouseOver = rect.isMouseOver;
+        rect.isMouseOver = glm::all(glm::lessThan(rect.computedMin, mousePosition)) && glm::all(glm::lessThan(mousePosition, rect.computedMax));
 
         if (rect.isMouseOver && !rect.wasMouseOver)
             Receiver<MouseEnter>::broadcast(e);
@@ -43,7 +45,7 @@ void UIEventSystem::update(float dt) {
         for (int i = 0; i < numButtons; ++i) {
 
             if (isMouseButtonDown[i])
-                Receiver<MouseClick>::broadcast(e, i + 1);
+                Receiver<MouseDown>::broadcast(e, i + 1);
         }
     }
 }

@@ -5,6 +5,7 @@
 #include <cassert>
 #include <iostream>
 #include <utility>
+#include <map>
 #include "engine/components/Transform.h"
 #include "engine/components/Light.h"
 #include "Material.h"
@@ -38,36 +39,47 @@ std::string getShaderNameFromLua(LuaState& lua) {
     return lua.tryGetField<std::string>("shader").value_or("lit");
 }
 
+std::shared_ptr<Texture> getTextureFromLua(LuaState& lua, const std::string& fieldName, const std::shared_ptr<Texture>& defaultTexture = Textures::white()) {
+
+    std::optional<std::string> path = lua.tryGetField<std::string>(fieldName);
+    if (path)
+        return Textures::get(config::ASSETS_PATH + *path);
+    else
+        return defaultTexture;
+}
+
+// Readers of properties for different shaders.
+static std::map<std::string, std::function<void(LuaState&, Material&)>> readers = {
+    {
+        "lit",
+        [](LuaState& lua, Material& m){
+
+            m.setUniformValue("diffuseColor" , lua.tryGetField<glm::vec3>("diffuseColor").value_or(glm::vec3(1, 1, 1)));
+            m.setUniformValue("specularColor", lua.tryGetField<glm::vec3>("specularColor").value_or(glm::vec3(1, 1, 1)));
+            m.setUniformValue("shininess"    , lua.tryGetField<float>("shininess").value_or(10.f));
+
+            m.setUniformValue("diffuseMap" , getTextureFromLua(lua, "diffuse"));
+            m.setUniformValue("specularMap", getTextureFromLua(lua, "specular"));
+        }
+    },
+    {
+        "sprite",
+        [](LuaState& lua, Material& m){
+            m.setUniformValue("spriteTexture", getTextureFromLua(lua, "texture"));
+        }
+    }
+};
+
 Material::Material(LuaState& lua) : Material(getShaderNameFromLua(lua)) {
 
     std::string shaderName = getShaderNameFromLua(lua);
 
-    if (shaderName == "lit") {
+    auto it = readers.find(shaderName);
+    if (it == readers.end())
+        return;
 
-        setUniformValue("diffuseColor" , lua.tryGetField<glm::vec3>("diffuseColor").value_or(glm::vec3(1, 1, 1)));
-        setUniformValue("specularColor", lua.tryGetField<glm::vec3>("specularColor").value_or(glm::vec3(1, 1, 1)));
-        setUniformValue("shininess"    , lua.tryGetField<float>("shininess").value_or(10.f));
-
-        std::optional<std::string> diffusePath = lua.tryGetField<std::string>("diffuse");
-        if (diffusePath)
-            setUniformValue("diffuseMap", Textures::get(config::ASSETS_PATH + *diffusePath));
-        else
-            setUniformValue("diffuseMap", Textures::white());
-
-        std::optional<std::string> specularPath = lua.tryGetField<std::string>("specular");
-        if (specularPath)
-            setUniformValue("specularMap", Textures::get(config::ASSETS_PATH + *specularPath));
-        else
-            setUniformValue("specularMap", Textures::white());
-
-    } else if (shaderName == "sprite") {
-
-        std::optional<std::string> diffusePath = lua.tryGetField<std::string>("texture");
-        if (diffusePath)
-            setUniformValue("spriteTexture", Textures::get(config::ASSETS_PATH + *diffusePath));
-        else
-            setUniformValue("spriteTexture", Textures::white());
-    }
+    auto& read = it->second;
+    read(lua, *this);
 }
 
 void Material::use(

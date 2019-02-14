@@ -12,4 +12,5 @@ void UIRect::initializeMetatable(LuaState& lua) {
     lua::addProperty(lua, "anchorMax", lua::property(&UIRect::anchorMax));
     lua::addProperty(lua, "offsetMin", lua::property(&UIRect::offsetMin));
     lua::addProperty(lua, "offsetMax", lua::property(&UIRect::offsetMax));
+    lua::addProperty(lua, "isEnabled", lua::property(&UIRect::isEnabled));
 }

@@ -22,6 +22,8 @@ namespace en {
         // In pixels
         glm::vec2 offsetMin = {0, 0};
         glm::vec2 offsetMax = {0, 0};
+
+        bool isEnabled = true;
     };
 }
 

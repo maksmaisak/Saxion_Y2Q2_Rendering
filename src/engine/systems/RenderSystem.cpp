@@ -145,7 +145,7 @@ void RenderSystem::renderEntities() {
     for (Entity e : m_registry->with<Transform, RenderInfo>()) {
 
         auto& renderInfo = m_registry->get<RenderInfo>(e);
-        if (!renderInfo.material || !renderInfo.mesh)
+        if (!renderInfo.isEnabled || !renderInfo.material || !renderInfo.mesh)
             continue;
 
         const glm::mat4& matrixModel = m_registry->get<Transform>(e).getWorldTransform();
@@ -185,6 +185,8 @@ void RenderSystem::renderUI() {
             continue;
 
         auto& rect = m_registry->get<UIRect>(e);
+        if (!rect.isEnabled)
+            continue;
 
         auto[min, max] = getBounds(rect, parentMin, parentMax);
         renderUIRect(e, min, max);
@@ -199,7 +201,7 @@ void RenderSystem::renderUIRects(const std::vector<Entity>& children, glm::vec2 
     for (Entity e : children) {
 
         auto* rect = m_registry->tryGet<UIRect>(e);
-        if (!rect)
+        if (!rect || !rect->isEnabled)
             continue;
 
         auto[min, max] = getBounds(*rect, parentMin, parentMax);

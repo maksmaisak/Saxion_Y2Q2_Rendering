@@ -261,6 +261,8 @@ function scene.update(dt)
     elseif (Game.keyboard.isHeld("Down")) then
         Game.find("Light2"):get("Transform"):move(0, -2 * dt, 0)
     end
+
+    Game.find("Panel"):get("UIRect").isEnabled = math.fmod(Game.getTime(), 2) < 1
 end
 
 return scene

@@ -1,6 +1,6 @@
 require('assets/scripts/vector')
 require('assets/scripts/object')
-require('assets/scripts/map')
+require('assets/scripts/level/map')
 
 Player = Object:new {
 	startPosition	= { x = 1, y = 1 },
@@ -63,7 +63,9 @@ function Player:activateGoal(gridPosition)
 	end
 
 	goal.isActivated = true
-	Game.loadScene("assets/scripts/scenes/level.lua")
+	Game.loadScene(Level:new {
+		definitionPath = self.level.definition.nextLevelDefinitionPath
+	})
 	print("activating goal")
 end
 
@@ -195,7 +197,7 @@ function Player:update()
     end
 
 	if Game.keyboard.isDown("r") then
-		Game.loadScene("assets/scripts/scenes/level.lua")
+		Game.loadScene("assets/scripts/scenes/level1.lua")
 		return
 	end
 

@@ -1,3 +1,5 @@
+require ('assets/scripts/level/level')
+
 local scenery = {
 	{
 		Name = "camera",
@@ -47,7 +49,10 @@ function scene:start()
 		LuaBehavior = {
 			onMouseDown = function(self, button)
 				if button == 1 then
-					Game.loadScene("assets/scripts/scenes/level.lua")
+					print("start")
+					Game.loadScene(Level:new {
+						definitionPath = Config.firstLevelDefinition
+					})
 				end
 			end
 		}

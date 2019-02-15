@@ -166,6 +166,18 @@ std::tuple<glm::vec2, glm::vec2> getBounds(UIRect& rect, const glm::vec2& parent
     return {min, max};
 }
 
+void updateUIRect(Engine& engine, EntityRegistry& registry, Entity e, const glm::vec2& parentMin, const glm::vec2& parentMax) {
+
+    auto& rect = registry.get<UIRect>(e);
+    auto[min, max] = getBounds(rect, parentMin, parentMax);
+    rect.computedMin = min;
+    rect.computedMax = max;
+
+    if (auto* tf = registry.tryGet<Transform>(e))
+        for (Entity child : tf->getChildren())
+            updateUIRect(engine, registry, child, min, max);
+}
+
 void RenderSystem::renderUI() {
 
     glDisable(GL_DEPTH_TEST);
@@ -178,49 +190,27 @@ void RenderSystem::renderUI() {
     glm::vec2 parentMin = {0, 0};
     glm::vec2 parentMax = windowSize;
 
-    for (Entity e : m_registry->with<Transform, UIRect>()) {
+    for (Entity e : m_registry->with<Transform, UIRect>())
+        if (!m_registry->get<Transform>(e).getParent())
+            updateUIRect(*m_engine, *m_registry, e, {0, 0}, windowSize);
 
-        auto& tf = m_registry->get<Transform>(e);
-        if (tf.getParent())
-            continue;
-
-        auto& rect = m_registry->get<UIRect>(e);
-        if (!rect.isEnabled)
-            continue;
-
-        auto[min, max] = getBounds(rect, parentMin, parentMax);
-        rect.computedMin = min;
-        rect.computedMax = max;
-        renderUIRect(e, min, max);
-        renderUIRects(tf.getChildren(), min, max);
-    }
+    for (Entity e : m_registry->with<Transform, UIRect>())
+        if (!m_registry->get<Transform>(e).getParent())
+            renderUIRect(e, m_registry->get<UIRect>(e));
 
     glEnable(GL_DEPTH_TEST);
 }
 
-void RenderSystem::renderUIRects(const std::vector<Entity>& children, glm::vec2 parentMin, glm::vec2 parentMax) {
+void RenderSystem::renderUIRect(Entity e, UIRect& rect) {
 
-    for (Entity e : children) {
+    if (!rect.isEnabled)
+        return;
 
-        auto* rect = m_registry->tryGet<UIRect>(e);
-        if (!rect || !rect->isEnabled)
-            continue;
-
-        auto[min, max] = getBounds(*rect, parentMin, parentMax);
-        rect->computedMin = min;
-        rect->computedMax = max;
-        renderUIRect(e, min, max);
-        if (auto* tf = m_registry->tryGet<Transform>(e)) {
-            renderUIRects(tf->getChildren(), min, max);
-        }
-    }
-}
-
-void RenderSystem::renderUIRect(Entity entity, glm::vec2 min, glm::vec2 max) {
-
-    auto* sprite = m_registry->tryGet<Sprite>(entity);
+    auto* sprite = m_registry->tryGet<Sprite>(e);
     if (sprite && sprite->isEnabled && sprite->material) {
 
+        const glm::vec2& min = rect.computedMin;
+        const glm::vec2& max = rect.computedMax;
         std::vector<Vertex> vertices = {
             {{min.x, max.y, 0}, {0, 1}},
             {{min.x, min.y, 0}, {0, 0}},
@@ -235,6 +225,11 @@ void RenderSystem::renderUIRect(Entity entity, glm::vec2 min, glm::vec2 max) {
         sprite->material->use(m_engine, &m_depthMaps, glm::mat4(1), glm::mat4(1), glm::ortho(0.f, size.x, 0.f, size.y));
         m_vertexRenderer.renderVertices(vertices);
     }
+
+    if (auto* tf = m_registry->tryGet<Transform>(e))
+        for (Entity child : tf->getChildren())
+            if (auto* childRect = m_registry->tryGet<UIRect>(child))
+                renderUIRect(child, *childRect);
 }
 
 void RenderSystem::renderDebug() {

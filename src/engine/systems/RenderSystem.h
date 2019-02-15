@@ -18,6 +18,8 @@
 namespace en {
 
     class ShaderProgram;
+    class UIRect;
+    class Transform;
 
     class RenderSystem : public System {
 
@@ -35,8 +37,7 @@ namespace en {
         Actor getMainCamera();
         void updateDepthMapsDirectionalLights(const std::vector<Entity>& directionalLights);
         void updateDepthMapsPositionalLights(const std::vector<Entity>& pointLights);
-        void renderUIRects(const std::vector<Entity>& rects, glm::vec2 parentMin, glm::vec2 parentMax);
-        void renderUIRect(Entity entity, glm::vec2 min, glm::vec2 max);
+        void renderUIRect(Entity entity, UIRect& rect);
         glm::vec2 getWindowSize();
 
         DepthMaps m_depthMaps;

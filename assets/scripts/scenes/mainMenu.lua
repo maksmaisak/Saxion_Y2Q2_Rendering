@@ -8,10 +8,10 @@ local scenery = {
 	}
 }
 
-local scene ={}
+local scene = {}
 
-function scene.start()
-
+function scene:start()
+	
 	Game.makeActors(scenery)
 
 	Game.makeActor {

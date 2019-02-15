@@ -31,12 +31,12 @@ function scene.start()
 
 	Game.makeActor {
 		Name = "StartButton",
-		Transform = {},
+		Transform = {
+			parent = "MainPanel"
+		},
 		UIRect = {
-			ancorMin	= {0.5,0.5},
-			anchorMax	= {0.5,0.5},
-			offsetMin	= {200,200},
-			offsetMax	= {100,100},
+			anchorMin	= {0.4, 0.75},
+			anchorMax	= {0.6, 0.85},
 		},
 		Sprite = {
 			material = {
@@ -44,7 +44,65 @@ function scene.start()
 				texture = "textures/runicfloor.png"
 			}
 		},
+		LuaBehavior = {
+			onMouseDown = function(self, button)
+				if button == 1 then
+					Game.loadScene("assets/scripts/scenes/level.lua")
+				end
+			end
+		}
+	}
 
+	Game.makeActor {
+		Name = "ChoseLevelButton",
+		Transform = {
+			parent = "MainPanel"
+		},
+		UIRect = {
+			anchorMin = {0.4, 0.6},
+			anchorMax = {0.6, 0.7}
+		},
+		Sprite = {
+			material = {
+				shader	= "sprite",
+				texture = "textures/runicfloor.png"
+			}
+		},
+		LuaBehavior = {
+			onMouseDown = function(self, button)
+				if button == 1 then
+					self.actor:get("Sprite").isEnabled					= false
+					Game.find("StartButton"):get("Sprite").isEnabled	= false
+					Game.find("CreditsButton"):get("Sprite").isEnabled	= false
+				end
+			end
+		}
+	}
+
+	Game.makeActor {
+		Name = "CreditsButton",
+		Transform = {
+			parent = "MainPanel"
+		},
+		UIRect = {
+			anchorMin = {0.4, 0.45},
+			anchorMax = {0.6, 0.55}
+		},
+		Sprite = {
+			material = {
+				shader	= "sprite",
+				texture = "textures/runicfloor.png"
+			}
+		},
+		LuaBehavior = {
+			onMouseDown = function(self, button)
+				if button == 1 then
+					self.actor:get("Sprite").isEnabled						= false
+					Game.find("StartButton"):get("Sprite").isEnabled		= false
+					Game.find("ChoseLevelButton"):get("Sprite").isEnabled	= false
+				end
+			end
+		}
 	}
 end
 

@@ -11,11 +11,15 @@
 
 #include "components/RenderInfo.h"
 #include "components/Camera.h"
+#include "components/Sprite.h"
+#include "components/Transform.h"
+#include "components/UIRect.h"
 
 #include "TestScene.h"
 #include "LightingScene.h"
 #include "TerrainScene.h"
 #include "LuaScene.h"
+#include "UIEventSystem.h"
 
 int main() {
 
@@ -27,6 +31,7 @@ int main() {
     {
         engine->addSystem<en::TransformHierarchySystem>();
         engine->addSystem<en::RenderSystem>(false);
+        engine->addSystem<en::UIEventSystem>();
 
         engine->addSystem<en::PhysicsSystem>().setGravity({0, -9.8, 0});
 

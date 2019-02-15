@@ -211,6 +211,9 @@ namespace en {
 
     void addChildrenFromLua(Actor& actor, Transform& transform, LuaState& lua) {
 
+        if (!lua_istable(lua, -1) && !lua_isuserdata(lua, -1))
+            return;
+
         lua_getfield(lua, -1, "children");
         auto pop = PopperOnDestruct(lua);
 
@@ -229,11 +232,7 @@ namespace en {
     Transform& Transform::addFromLua(Actor& actor, LuaState& lua) {
 
         auto& transform = actor.add<Transform>();
-
-        int tableIndex = lua_gettop(lua);
-        luaL_checktype(lua, tableIndex, LUA_TTABLE);
         addChildrenFromLua(actor, transform, lua);
-
         return transform;
     }
 }

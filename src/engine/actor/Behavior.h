@@ -10,6 +10,7 @@
 #include "Entity.h"
 #include "EntityRegistry.h"
 #include "ActorDecl.h"
+#include "UIEvents.h"
 
 namespace en {
 
@@ -29,6 +30,13 @@ namespace en {
         virtual void update(float dt) {};
         virtual void draw() {};
         virtual void onCollision(Entity other) {};
+
+        virtual void on(const MouseEnter&) {};
+        virtual void on(const MouseOver&)  {};
+        virtual void on(const MouseLeave&) {};
+        virtual void on(const MouseDown&) {};
+        virtual void on(const MouseHold&)  {};
+        virtual void on(const MouseUp&)    {};
 
     protected:
         Actor m_actor;

@@ -27,6 +27,13 @@ namespace en {
         void update(float dt) override;
         void onCollision(Entity other) override;
 
+        void on(const MouseEnter& enter) override;
+        void on(const MouseOver& over) override;
+        void on(const MouseLeave& leave) override;
+        void on(const MouseDown& down) override;
+        void on(const MouseHold& hold) override;
+        void on(const MouseUp& up) override;
+
     private:
 
         static int indexFunction(lua_State*);
@@ -37,6 +44,13 @@ namespace en {
         LuaReference m_start;
         LuaReference m_update;
         LuaReference m_onCollision;
+
+        LuaReference m_onMouseEnter;
+        LuaReference m_onMouseOver;
+        LuaReference m_onMouseLeave;
+        LuaReference m_onMouseDown;
+        LuaReference m_onMouseHold;
+        LuaReference m_onMouseUp;
     };
 }
 

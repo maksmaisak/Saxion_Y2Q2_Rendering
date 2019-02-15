@@ -3,8 +3,8 @@
 width  = 800
 height = 600
 fullscreen = false
-framerateCap = 60
-startScene = 'assets/scripts/scenes/level.lua'
+framerateCap = 240
+startScene = 'assets/scripts/scenes/test/testUI.lua'
 
 -- custom
 bulletSpeed = 30

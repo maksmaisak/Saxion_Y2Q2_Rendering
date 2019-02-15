@@ -104,7 +104,6 @@ LuaBehavior::LuaBehavior(en::Actor actor) : Behavior(actor) {}
 LuaBehavior::LuaBehavior(Actor actor, LuaReference&& table) : LuaBehavior(actor) {
 
     m_self = std::move(table);
-
     LuaState lua = m_self.getLuaState();
 
     m_self.push();
@@ -114,48 +113,63 @@ LuaBehavior::LuaBehavior(Actor actor, LuaReference&& table) : LuaBehavior(actor)
     m_update = getFunctionFromTable(lua, "update");
     m_onCollision = getFunctionFromTable(lua, "onCollision");
 
+    m_onMouseEnter = getFunctionFromTable(lua, "onMouseEnter");
+    m_onMouseOver  = getFunctionFromTable(lua, "onMouseOver" );
+    m_onMouseLeave = getFunctionFromTable(lua, "onMouseLeave");
+    m_onMouseDown  = getFunctionFromTable(lua, "onMouseDown" );
+    m_onMouseHold  = getFunctionFromTable(lua, "onMouseHold" );
+    m_onMouseUp    = getFunctionFromTable(lua, "onMouseUp"   );
+
     lua.setField("actor", actor);
 }
 
-void LuaBehavior::start() {
+template<typename... Args>
+void callCallbackFunction(const LuaReference& self, const LuaReference& func, Args&&... args) {
 
-    if (!m_start || !m_self)
+    if (!self || !func)
         return;
 
-    LuaState lua = m_start.getLuaState();
-    assert(lua == m_self.getLuaState());
+    LuaState lua = func.getLuaState();
+    assert(lua == self.getLuaState());
 
-    m_start.push();
-    m_self.push();
-    lua.pcall(1, 0);
+    func.push();
+    self.push();
+    (lua.push(std::forward<Args>(args)), ...);
+    lua.pcall(1 + sizeof...(Args), 0);
+}
+
+void LuaBehavior::start() {
+    callCallbackFunction(m_self, m_start);
 }
 
 void LuaBehavior::update(float dt) {
-
-    if (!m_update || !m_self)
-        return;
-
-    LuaState lua = m_update.getLuaState();
-    assert(lua == m_self.getLuaState());
-
-    //std::cout << (lua_gettop(lua) > 0 ? getAsString(lua) : "nothing") << std::endl;
-
-    m_update.push();
-    m_self.push();
-    lua.push(dt);
-    lua.pcall(2, 0);
+    callCallbackFunction(m_self, m_update, dt);
 }
 
 void LuaBehavior::onCollision(Entity other) {
+    callCallbackFunction(m_self, m_onCollision, m_engine->actor(other));
+}
 
-    if (!m_onCollision || !m_self)
-        return;
+void LuaBehavior::on(const MouseEnter& enter) {
+    callCallbackFunction(m_self, m_onMouseEnter);
+}
 
-    LuaState lua = m_onCollision.getLuaState();
-    assert(lua == m_self.getLuaState());
+void LuaBehavior::on(const MouseOver& over) {
+    callCallbackFunction(m_self, m_onMouseOver);
+}
 
-    m_onCollision.push();
-    m_self.push();
-    lua.push(m_engine->actor(other));
-    lua.pcall(2, 0);
+void LuaBehavior::on(const MouseLeave& leave) {
+    callCallbackFunction(m_self, m_onMouseLeave);
+}
+
+void LuaBehavior::on(const MouseDown& down) {
+    callCallbackFunction(m_self, m_onMouseDown, down.button);
+}
+
+void LuaBehavior::on(const MouseHold& hold) {
+    callCallbackFunction(m_self, m_onMouseHold, hold.button);
+}
+
+void LuaBehavior::on(const MouseUp& up) {
+    callCallbackFunction(m_self, m_onMouseUp, up.button);
 }

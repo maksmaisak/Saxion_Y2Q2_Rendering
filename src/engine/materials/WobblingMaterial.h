@@ -8,10 +8,9 @@
 #include <memory>
 #include "GL/glew.h"
 #include "AbstractMaterial.hpp"
-#include "engine/core/Texture.hpp"
+#include "Texture.hpp"
 
-class WobblingMaterial : public AbstractMaterial
-{
+class WobblingMaterial : public AbstractMaterial {
 public:
     explicit WobblingMaterial(std::shared_ptr<Texture> _diffuseTexture);
     explicit WobblingMaterial(const std::string& filename);

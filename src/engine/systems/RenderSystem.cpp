@@ -5,16 +5,20 @@
 #include "RenderSystem.h"
 #include <iostream>
 #include <tuple>
+#include <string>
+#include <sstream>
 #include "components/RenderInfo.h"
 #include "components/Transform.h"
 #include "components/Camera.h"
 #include "components/Name.h"
+#include "components/Sprite.h"
 #include "GLHelpers.h"
 #include "Font.h"
 #include "GameTime.h"
 #include "Resources.h"
 #include "Material.h"
 #include "Exception.h"
+#include "UIRect.h"
 
 using namespace en;
 
@@ -32,7 +36,8 @@ RenderSystem::RenderSystem(bool displayMeshDebugInfo) :
     m_displayMeshDebugInfo(displayMeshDebugInfo),
     m_directionalDepthShader(Resources<ShaderProgram>::get("depthDirectional")),
     m_positionalDepthShader (Resources<ShaderProgram>::get("depthPositional")),
-    m_depthMaps(4, {1024, 1024}, 10, {512, 512})
+    m_depthMaps(4, {1024, 1024}, 10, {512, 512}),
+    m_vertexRenderer(4096)
 {}
 
 void enableDebug();
@@ -100,40 +105,9 @@ void RenderSystem::draw() {
     }
 
     updateDepthMaps();
-
-    Actor mainCamera = getMainCamera();
-    if (mainCamera) {
-
-        glm::mat4 matrixView = glm::inverse(mainCamera.get<Transform>().getWorldTransform());
-        glm::mat4 matrixProjection = getProjectionMatrix(*m_engine, mainCamera.get<Camera>());
-
-        for (Entity e : m_registry->with<Transform, RenderInfo>()) {
-
-            auto& renderInfo = m_registry->get<RenderInfo>(e);
-            if (!renderInfo.material || !renderInfo.mesh)
-                continue;
-
-            const glm::mat4& matrixModel = m_registry->get<Transform>(e).getWorldTransform();
-            renderInfo.material->render(renderInfo.mesh.get(), m_engine, &m_depthMaps, matrixModel, matrixView, matrixProjection);
-
-            checkRenderingError(m_engine->actor(e));
-
-            if (m_displayMeshDebugInfo) {
-                renderInfo.mesh->drawDebugInfo(matrixModel, matrixView, matrixProjection);
-            }
-        }
-    }
-
-    std::string debugInfo = std::string("FPS:") + std::to_string((int)m_engine->getFps());
-    auto font = Resources<Font>::get(config::FONT_PATH + "arial.ttf");
-    auto windowSize = m_engine->getWindow().getSize();
-    font->render(debugInfo, {0.f, 0.f}, 1.f, glm::ortho(0.f, (float)windowSize.x, 0.f, (float)windowSize.y));
-}
-
-Actor RenderSystem::getMainCamera() {
-
-    Entity entity = m_registry->with<Transform, Camera>().tryGetOne();
-    return m_engine->actor(entity);
+    renderEntities();
+    renderUI();
+    renderDebug();
 }
 
 void RenderSystem::updateDepthMaps() {
@@ -157,6 +131,126 @@ void RenderSystem::updateDepthMaps() {
     glViewport(0, 0, size.x, size.y);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glCheckError();
+}
+
+void RenderSystem::renderEntities() {
+
+    Actor mainCamera = getMainCamera();
+    if (!mainCamera)
+        return;
+
+    glm::mat4 matrixView = glm::inverse(mainCamera.get<Transform>().getWorldTransform());
+    glm::mat4 matrixProjection = getProjectionMatrix(*m_engine, mainCamera.get<Camera>());
+
+    for (Entity e : m_registry->with<Transform, RenderInfo>()) {
+
+        auto& renderInfo = m_registry->get<RenderInfo>(e);
+        if (!renderInfo.isEnabled || !renderInfo.material || !renderInfo.mesh)
+            continue;
+
+        const glm::mat4& matrixModel = m_registry->get<Transform>(e).getWorldTransform();
+        renderInfo.material->render(renderInfo.mesh.get(), m_engine, &m_depthMaps, matrixModel, matrixView, matrixProjection);
+
+        checkRenderingError(m_engine->actor(e));
+
+        if (m_displayMeshDebugInfo) {
+            renderInfo.mesh->drawDebugInfo(matrixModel, matrixView, matrixProjection);
+        }
+    }
+}
+
+std::tuple<glm::vec2, glm::vec2> getBounds(UIRect& rect, const glm::vec2& parentMin, const glm::vec2& parentMax) {
+
+    const glm::vec2 min = glm::lerp(parentMin, parentMax, rect.anchorMin) + rect.offsetMin;
+    const glm::vec2 max = glm::lerp(parentMin, parentMax, rect.anchorMax) + rect.offsetMax;
+    return {min, max};
+}
+
+void updateUIRect(Engine& engine, EntityRegistry& registry, Entity e, const glm::vec2& parentMin, const glm::vec2& parentMax) {
+
+    auto& rect = registry.get<UIRect>(e);
+    auto[min, max] = getBounds(rect, parentMin, parentMax);
+    rect.computedMin = min;
+    rect.computedMax = max;
+
+    if (auto* tf = registry.tryGet<Transform>(e))
+        for (Entity child : tf->getChildren())
+            updateUIRect(engine, registry, child, min, max);
+}
+
+void RenderSystem::renderUI() {
+
+    glDisable(GL_DEPTH_TEST);
+
+    sf::Vector2u windowSizeSf = m_engine->getWindow().getSize();
+    auto windowSize = glm::vec2(windowSizeSf.x, windowSizeSf.y);
+    glm::mat4 matrixProjection = glm::ortho(0.f, windowSize.x, 0.f, windowSize.y);
+    //glm::mat4 matrixProjection = glm::ortho(0.f, 1.f, 0.f, 1.f);
+
+    glm::vec2 parentMin = {0, 0};
+    glm::vec2 parentMax = windowSize;
+
+    for (Entity e : m_registry->with<Transform, UIRect>())
+        if (!m_registry->get<Transform>(e).getParent())
+            updateUIRect(*m_engine, *m_registry, e, {0, 0}, windowSize);
+
+    for (Entity e : m_registry->with<Transform, UIRect>())
+        if (!m_registry->get<Transform>(e).getParent())
+            renderUIRect(e, m_registry->get<UIRect>(e));
+
+    glEnable(GL_DEPTH_TEST);
+}
+
+void RenderSystem::renderUIRect(Entity e, UIRect& rect) {
+
+    if (!rect.isEnabled)
+        return;
+
+    auto* sprite = m_registry->tryGet<Sprite>(e);
+    if (sprite && sprite->isEnabled && sprite->material) {
+
+        const glm::vec2& min = rect.computedMin;
+        const glm::vec2& max = rect.computedMax;
+        std::vector<Vertex> vertices = {
+            {{min.x, max.y, 0}, {0, 1}},
+            {{min.x, min.y, 0}, {0, 0}},
+            {{max.x, min.y, 0}, {1, 0}},
+
+            {{min.x, max.y, 0}, {0, 1}},
+            {{max.x, min.y, 0}, {1, 0}},
+            {{max.x, max.y, 0}, {1, 1}},
+        };
+
+        glm::vec2 size = getWindowSize();
+        sprite->material->use(m_engine, &m_depthMaps, glm::mat4(1), glm::mat4(1), glm::ortho(0.f, size.x, 0.f, size.y));
+        m_vertexRenderer.renderVertices(vertices);
+    }
+
+    if (auto* tf = m_registry->tryGet<Transform>(e))
+        for (Entity child : tf->getChildren())
+            if (auto* childRect = m_registry->tryGet<UIRect>(child))
+                renderUIRect(child, *childRect);
+}
+
+void RenderSystem::renderDebug() {
+
+    glDisable(GL_DEPTH_TEST);
+
+    std::stringstream s;
+    s << "fps: " << glm::iround(m_engine->getFps()) << " frame: " << m_engine->getFrameTimeMicroseconds() / 1000.0 << "ms";
+    std::string debugInfo = s.str();
+
+    auto font = Resources<Font>::get(config::FONT_PATH + "arial.ttf");
+    auto windowSize = m_engine->getWindow().getSize();
+    font->render(debugInfo, {0.f, 0.f}, 0.5f, glm::ortho(0.f, (float)windowSize.x, 0.f, (float)windowSize.y));
+
+    glEnable(GL_DEPTH_TEST);
+}
+
+Actor RenderSystem::getMainCamera() {
+
+    Entity entity = m_registry->with<Transform, Camera>().tryGetOne();
+    return m_engine->actor(entity);
 }
 
 glm::mat4 getDirectionalLightspaceTransform(const Light& light, const Transform& lightTransform) {
@@ -275,6 +369,12 @@ void RenderSystem::updateDepthMapsPositionalLights(const std::vector<Entity>& po
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glCheckError();
+}
+
+glm::vec2 RenderSystem::getWindowSize() {
+
+    sf::Vector2u windowSizeSf = m_engine->getWindow().getSize();
+    return glm::vec2(windowSizeSf.x, windowSizeSf.y);
 }
 
 void GLAPIENTRY

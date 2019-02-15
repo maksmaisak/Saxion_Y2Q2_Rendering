@@ -22,6 +22,7 @@
 #include "Resources.h"
 #include "Material.h"
 #include "KeyboardHelper.h"
+#include "MouseHelper.h"
 
 using namespace en;
 
@@ -44,11 +45,10 @@ void Engine::run() {
     sf::Clock fixedUpdateClock;
     sf::Time fixedUpdateLag = sf::Time::Zero;
 
-    sf::Clock drawClock;
-    sf::Time timeSinceLastDraw = sf::Time::Zero;
-
     const float timestepFixedSeconds = TimestepFixed.asSeconds();
-    const sf::Time timestepDraw = sf::seconds(1.f / m_framerateCap);
+    const sf::Time timestepDraw = sf::microseconds((sf::Int64)(1000000.0 / m_framerateCap));
+
+    sf::Clock drawClock;
 
     while (m_window.isOpen()) {
 
@@ -59,9 +59,12 @@ void Engine::run() {
         }
 
         if (drawClock.getElapsedTime() >= timestepDraw) {
-            m_fps = 1.f / drawClock.getElapsedTime().asSeconds();
+
+            m_fps = (float)(1000000.0 / drawClock.restart().asMicroseconds());
+            auto frameClock = sf::Clock();
             draw();
-            drawClock.restart();
+            m_frameTimeMicroseconds = frameClock.getElapsedTime().asMicroseconds();
+
         } else {
             do sf::sleep(sf::microseconds(1));
             while (drawClock.getElapsedTime() < timestepDraw && fixedUpdateLag + fixedUpdateClock.getElapsedTime() < TimestepFixed);
@@ -82,6 +85,7 @@ void Engine::update(float dt) {
     m_scheduler.update(dt);
 
     utils::KeyboardHelper::update();
+    utils::MouseHelper::update();
 }
 
 void Engine::draw() {
@@ -89,6 +93,7 @@ void Engine::draw() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     for (auto& pSystem : m_systems)
         pSystem->draw();
+
     m_window.display();
 }
 
@@ -98,16 +103,17 @@ void Engine::initializeWindow(sf::RenderWindow& window) {
 
     auto& lua = getLuaState();
     lua_getglobal(lua, "Config");
+    auto popConfig = lua::PopperOnDestruct(lua);
     unsigned int width      = lua.tryGetField<unsigned int>("width").value_or(800);
     unsigned int height     = lua.tryGetField<unsigned int>("height").value_or(600);
     bool vsync              = lua.tryGetField<bool>("vsync").value_or(true);
     bool fullscreen         = lua.tryGetField<bool>("fullscreen").value_or(false);
     std::string windowTitle = lua.tryGetField<std::string>("windowTitle").value_or("Game");
-    lua_pop(lua, 1);
 
     auto contextSettings = sf::ContextSettings(24, 8, 8, 4, 5, sf::ContextSettings::Attribute::Core | sf::ContextSettings::Attribute::Debug);
     window.create(sf::VideoMode(width, height), windowTitle, fullscreen ? sf::Style::Fullscreen : sf::Style::Default, contextSettings);
     window.setVerticalSyncEnabled(vsync);
+    window.setFramerateLimit(0);
     window.setActive(true);
 
     std::cout << "Window initialized." << std::endl << std::endl;
@@ -262,7 +268,7 @@ void Engine::initializeLua() {
 
     ComponentsToLua::printDebugInfo();
 
-    if (lua.doFileInNewEnvironment("assets/scripts/config.lua")) {
+    if (lua.doFileInNewEnvironment(config::SCRIPT_PATH + "config.lua")) {
         lua_setglobal(lua, "Config");
     }
 

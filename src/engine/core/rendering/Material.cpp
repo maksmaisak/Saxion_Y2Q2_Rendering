@@ -5,6 +5,7 @@
 #include <cassert>
 #include <iostream>
 #include <utility>
+#include <map>
 #include "engine/components/Transform.h"
 #include "engine/components/Light.h"
 #include "Material.h"
@@ -30,42 +31,79 @@ Material::Material(std::shared_ptr<ShaderProgram> shader) : m_shader(std::move(s
     detectAllUniforms();
 }
 
-Material::Material(LuaState& lua) : Material((luaL_checktype(lua, -1, LUA_TTABLE), lua.tryGetField<std::string>("shader").value_or("lit"))) {
+std::string getShaderNameFromLua(LuaState& lua) {
 
-    std::string shaderName = lua.tryGetField<std::string>("shader").value_or("lit");
+    if (!lua_istable(lua, -1) && !lua_isuserdata(lua, -1))
+        luaL_error(lua, "Can't make a material out of given %s", luaL_typename(lua, -1));
 
-    if (shaderName == "lit") {
+    return lua.tryGetField<std::string>("shader").value_or("lit");
+}
 
-        setUniformValue("diffuseColor" , lua.tryGetField<glm::vec3>("diffuseColor").value_or(glm::vec3(1, 1, 1)));
-        setUniformValue("specularColor", lua.tryGetField<glm::vec3>("specularColor").value_or(glm::vec3(1, 1, 1)));
-        setUniformValue("shininess"    , lua.tryGetField<float>("shininess").value_or(10.f));
+std::shared_ptr<Texture> getTextureFromLua(LuaState& lua, const std::string& fieldName, const std::shared_ptr<Texture>& defaultTexture = Textures::white()) {
 
-        std::optional<std::string> diffusePath = lua.tryGetField<std::string>("diffuse");
-        if (diffusePath)
-            setUniformValue("diffuseMap", Textures::get(config::ASSETS_PATH + *diffusePath));
-        else
-            setUniformValue("diffuseMap", Textures::white());
+    std::optional<std::string> path = lua.tryGetField<std::string>(fieldName);
+    if (path)
+        return Textures::get(config::ASSETS_PATH + *path);
+    else
+        return defaultTexture;
+}
 
-        std::optional<std::string> specularPath = lua.tryGetField<std::string>("specular");
-        if (specularPath)
-            setUniformValue("specularMap", Textures::get(config::ASSETS_PATH + *specularPath));
-        else
-            setUniformValue("specularMap", Textures::white());
+// Readers of properties for different shaders.
+static std::map<std::string, std::function<void(LuaState&, Material&)>> readers = {
+    {
+        "lit",
+        [](LuaState& lua, Material& m){
+
+            m.setUniformValue("diffuseColor" , lua.tryGetField<glm::vec3>("diffuseColor").value_or(glm::vec3(1, 1, 1)));
+            m.setUniformValue("specularColor", lua.tryGetField<glm::vec3>("specularColor").value_or(glm::vec3(1, 1, 1)));
+            m.setUniformValue("shininess"    , lua.tryGetField<float>("shininess").value_or(10.f));
+
+            m.setUniformValue("diffuseMap" , getTextureFromLua(lua, "diffuse"));
+            m.setUniformValue("specularMap", getTextureFromLua(lua, "specular"));
+        }
+    },
+    {
+        "sprite",
+        [](LuaState& lua, Material& m){
+            m.setUniformValue("spriteTexture", getTextureFromLua(lua, "texture"));
+        }
     }
+};
+
+Material::Material(LuaState& lua) : Material(getShaderNameFromLua(lua)) {
+
+    std::string shaderName = getShaderNameFromLua(lua);
+
+    auto it = readers.find(shaderName);
+    if (it == readers.end())
+        return;
+
+    auto& read = it->second;
+    read(lua, *this);
+}
+
+void Material::use(
+    Engine* engine,
+    DepthMaps* depthMaps,
+    const glm::mat4& modelMatrix,
+    const glm::mat4& viewMatrix,
+    const glm::mat4& projectionMatrix
+) {
+    m_shader->use();
+    m_numTexturesInUse = 0;
+    setBuiltinUniforms(engine, depthMaps, modelMatrix, viewMatrix, projectionMatrix);
+    setCustomUniforms();
 }
 
 void Material::render(
     Mesh* mesh,
-    en::Engine* engine,
-    en::DepthMaps* depthMaps,
+    Engine* engine,
+    DepthMaps* depthMaps,
     const glm::mat4& modelMatrix,
     const glm::mat4& viewMatrix,
-    const glm::mat4& perspectiveMatrix
+    const glm::mat4& projectionMatrix
 ) {
-    m_shader->use();
-    m_numTexturesInUse = 0;
-    setBuiltinUniforms(engine, depthMaps, modelMatrix, viewMatrix, perspectiveMatrix);
-    setCustomUniforms();
+    use(engine, depthMaps, modelMatrix, viewMatrix, projectionMatrix);
     mesh->streamToOpenGL(m_attributeLocations.vertex, m_attributeLocations.normal, m_attributeLocations.uv);
 }
 
@@ -95,10 +133,10 @@ void Material::setBuiltinUniforms(
     if (valid(u.viewPosition))
         gl::setUniform(u.viewPosition, glm::vec3(glm::inverse(viewMatrix)[3]));
 
-    if (valid(u.directionalDepthMaps))
+    if (depthMaps && valid(u.directionalDepthMaps))
         setUniformTexture(u.directionalDepthMaps, depthMaps->getDirectionalMapsTextureId(), GL_TEXTURE_2D_ARRAY);
 
-    if (valid(u.depthCubemaps))
+    if (depthMaps && valid(u.depthCubemaps))
         setUniformTexture(u.depthCubemaps, depthMaps->getCubemapsTextureId(), GL_TEXTURE_CUBE_MAP_ARRAY);
 
     auto& registry = engine->getRegistry();

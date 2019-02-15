@@ -22,6 +22,8 @@ namespace en {
 
         std::shared_ptr<Mesh> mesh;
         std::shared_ptr<AbstractMaterial> material;
+
+        bool isEnabled = true;
     };
 }
 

@@ -1,7 +1,7 @@
 --
 -- User: maks
--- Date: 30/12/18
--- Time: 20:15
+-- Date: 2019-02-14
+-- Time: 13:16
 --
 
 local planeRenderInfo = {
@@ -153,8 +153,8 @@ function scene.start()
             material = {}
         },
         Light = {
-			intensity = 10
-		}
+            intensity = 10
+        }
     }
 
     Game.makeActor {
@@ -182,6 +182,98 @@ function scene.start()
             intensity = 0.1
         }
     }
+
+    Game.makeActor {
+        Name = "Panel",
+        Transform = {
+            children = {
+                {
+                    Transform = {},
+                    UIRect = {
+                        anchorMin = {0.5, 0.5},
+                        anchorMax = {1, 1}
+                    },
+                    Sprite = {
+                        material = {
+                            shader = "sprite",
+                            texture = "textures/runicfloor.png"
+                        }
+                    },
+                    LuaBehavior = {
+                        onMouseEnter = function(self)
+                            self.actor:get("Sprite").isEnabled = false
+                        end,
+                        onMouseLeave = function(self)
+                            self.actor:get("Sprite").isEnabled = true
+                        end
+                    }
+                }
+            }
+        },
+        UIRect = {
+            anchorMin = {0, 0},
+            anchorMax = {1, 1},
+            offsetMin = { 100,  200},
+            offsetMax = {-100, -100}
+        },
+        Sprite = {
+            material = {
+                shader = "sprite",
+                texture = "textures/bricks.jpg"
+            }
+        }
+    }
+
+    Game.makeActor {
+        Name = "Child",
+        Transform = {
+            parent = "Panel"
+        },
+        UIRect = {
+            anchorMin = {0, 0.75},
+            anchorMax = {0.5, 1}
+        },
+        Sprite = {
+            material = {
+                shader = "sprite",
+                texture = "textures/land.jpg"
+            }
+        },
+        LuaBehavior = {
+            onMouseDown = function(self, button)
+                if button == 1 then
+                    self.actor:get("UIRect").isEnabled = false
+                end
+            end,
+            onMouseUp = function(self, button)
+                if button == 1 then
+                    self.actor:get("UIRect").isEnabled = true
+                end
+            end
+        }
+    }
+
+    Game.makeActor {
+        Name = "PanelBottom",
+        Transform = {},
+        UIRect = {
+            anchorMin = {0, 0},
+            anchorMax = {1, 0},
+            offsetMin = {50 , 0},
+            offsetMax = {-50, 100}
+        },
+        Sprite = {
+            material = {
+                shader = "sprite",
+                texture = "textures/black.png"
+            }
+        },
+        LuaBehavior = {
+            update = function(self)
+                self.actor:get("Sprite").isEnabled = not self.actor:get("UIRect").isMouseOver
+            end
+        }
+    }
 end
 
 function scene.update(dt)
@@ -189,11 +281,13 @@ function scene.update(dt)
     Game.find("Light"):get("Transform").position = {-4, 3 + 2 * math.sin(Game.getTime()), 0}
     --Game.find("LightDirectional"):get("Transform"):rotate(45 * dt, 1, 0, 0);
 
-    if (Game.keyboard.isHeld("Up")) then
+    if Game.keyboard.isHeld("Up") then
         Game.find("Light2"):get("Transform"):move(0, 2 * dt, 0)
-    elseif (Game.keyboard.isHeld("Down")) then
+    elseif Game.keyboard.isHeld("Down") then
         Game.find("Light2"):get("Transform"):move(0, -2 * dt, 0)
     end
+
+    --Game.find("Panel"):get("UIRect").isEnabled = math.fmod(Game.getTime(), 2) < 1
 end
 
 return scene

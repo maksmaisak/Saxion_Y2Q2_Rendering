@@ -2,7 +2,6 @@
 #include <string>
 
 #include <SFML/Graphics.hpp>
-#include "engine/core/Texture.hpp"
 #include "Texture.hpp"
 
 Texture::Texture(const std::string& filename, GLint internalFormat) {

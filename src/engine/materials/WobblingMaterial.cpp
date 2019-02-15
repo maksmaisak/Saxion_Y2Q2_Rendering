@@ -7,8 +7,8 @@
 
 #include "WobblingMaterial.h"
 #include "mge/config.hpp"
-#include "engine/core/Mesh.hpp"
-#include "engine/core/ShaderProgram.hpp"
+#include "Mesh.hpp"
+#include "ShaderProgram.hpp"
 
 #include "Resources.h"
 

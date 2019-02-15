@@ -21,6 +21,8 @@ void UIEventSystem::update(float dt) {
         auto& rect = m_registry->get<UIRect>(e);
         rect.wasMouseOver = rect.isMouseOver;
         rect.isMouseOver = glm::all(glm::lessThan(rect.computedMin, mousePosition)) && glm::all(glm::lessThan(mousePosition, rect.computedMax));
+        if (!rect.isEnabled)
+            continue;
 
         if (rect.isMouseOver && !rect.wasMouseOver)
             Receiver<MouseEnter>::broadcast(e);

@@ -238,6 +238,18 @@ function scene.start()
                 shader = "sprite",
                 texture = "textures/land.jpg"
             }
+        },
+        LuaBehavior = {
+            onMouseDown = function(self, button)
+                if button == 1 then
+                    self.actor:get("UIRect").isEnabled = false
+                end
+            end,
+            onMouseUp = function(self, button)
+                if button == 1 then
+                    self.actor:get("UIRect").isEnabled = true
+                end
+            end
         }
     }
 

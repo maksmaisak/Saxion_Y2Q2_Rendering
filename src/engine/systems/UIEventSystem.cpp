@@ -8,24 +8,13 @@
 #include "Transform.h"
 #include "UIRect.h"
 #include "UIEvents.h"
-#include <SFML/Graphics.hpp>
+#include "MouseHelper.h"
 
 using namespace en;
 
 void UIEventSystem::update(float dt) {
 
-    constexpr std::size_t numButtons = 5;
-    const bool isMouseButtonDown[numButtons] = {
-        sf::Mouse::isButtonPressed(sf::Mouse::Button::Left),
-        sf::Mouse::isButtonPressed(sf::Mouse::Button::Right),
-        sf::Mouse::isButtonPressed(sf::Mouse::Button::Middle),
-        sf::Mouse::isButtonPressed(sf::Mouse::Button::XButton1),
-        sf::Mouse::isButtonPressed(sf::Mouse::Button::XButton2),
-    };
-
-    sf::RenderWindow& window = m_engine->getWindow();
-    sf::Vector2i temp = sf::Mouse::getPosition(window);
-    glm::vec2 mousePosition = {temp.x, window.getSize().y - temp.y};
+    glm::vec2 mousePosition = utils::MouseHelper::getPosition(m_engine->getWindow());
 
     for (Entity e : m_registry->with<UIRect>()) {
 
@@ -42,10 +31,19 @@ void UIEventSystem::update(float dt) {
         if (!rect.isMouseOver && rect.wasMouseOver)
             Receiver<MouseLeave>::broadcast(e);
 
-        for (int i = 0; i < numButtons; ++i) {
+        if (rect.isMouseOver) {
+            for (int i = 0; i < sf::Mouse::ButtonCount; ++i) {
+                auto buttonCode = (sf::Mouse::Button)i;
 
-            if (isMouseButtonDown[i])
-                Receiver<MouseDown>::broadcast(e, i + 1);
+                if (utils::MouseHelper::isDown(buttonCode))
+                    Receiver<MouseDown>::broadcast(e, i + 1);
+
+                if (utils::MouseHelper::isHeld(buttonCode))
+                    Receiver<MouseHold>::broadcast(e, i + 1);
+
+                if (utils::MouseHelper::isUp(buttonCode))
+                    Receiver<MouseUp>::broadcast(e, i + 1);
+            }
         }
     }
 }

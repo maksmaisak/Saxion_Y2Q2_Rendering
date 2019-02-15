@@ -22,6 +22,7 @@
 #include "Resources.h"
 #include "Material.h"
 #include "KeyboardHelper.h"
+#include "MouseHelper.h"
 
 using namespace en;
 
@@ -84,6 +85,7 @@ void Engine::update(float dt) {
     m_scheduler.update(dt);
 
     utils::KeyboardHelper::update();
+    utils::MouseHelper::update();
 }
 
 void Engine::draw() {

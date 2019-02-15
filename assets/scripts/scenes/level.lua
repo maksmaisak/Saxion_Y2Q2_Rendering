@@ -155,7 +155,6 @@ function scene.start()
 	playerActor:get("LuaBehavior").map = map
 
 	player = {actor = playerActor}
-
 end
 
 return scene

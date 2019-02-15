@@ -20,7 +20,7 @@ namespace en {
     public:
         LuaScene(const std::string& filename);
         LuaScene(LuaReference&& table);
-        virtual ~LuaScene();
+        virtual ~LuaScene() = default;
 
         void open() override;
         void update(float dt) override;
@@ -34,8 +34,8 @@ namespace en {
         std::string m_filename;
         LuaReference m_table;
 
-        int m_luaUpdateFunctionRef = LUA_NOREF;
-        int m_luaOnCollisionFunctionRef = LUA_NOREF;
+        LuaReference m_update;
+        LuaReference m_onCollision;
     };
 }
 

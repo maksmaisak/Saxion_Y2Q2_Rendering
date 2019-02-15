@@ -28,13 +28,6 @@ using namespace en;
 LuaScene::LuaScene(const std::string& filename) : m_filename(filename) {}
 LuaScene::LuaScene(LuaReference&& table) : m_table(std::move(table)) {}
 
-LuaScene::~LuaScene() {
-
-    LuaState& lua = getEngine().getLuaState();
-    luaL_unref(lua, LUA_REGISTRYINDEX, m_luaUpdateFunctionRef);
-    luaL_unref(lua, LUA_REGISTRYINDEX, m_luaOnCollisionFunctionRef);
-}
-
 void LuaScene::open() {
 
     LuaState& lua = getEngine().getLuaState();
@@ -47,13 +40,13 @@ void LuaScene::open() {
 
     lua_getfield(lua, -1, "update");
     if (lua_isfunction(lua, -1))
-        m_luaUpdateFunctionRef = luaL_ref(lua, LUA_REGISTRYINDEX);
+        m_update = LuaReference(lua);
     else
         lua_pop(lua, 1);
 
     lua_getfield(lua, -1, "onCollision");
     if (lua_isfunction(lua, -1))
-        m_luaOnCollisionFunctionRef = luaL_ref(lua, LUA_REGISTRYINDEX);
+        m_onCollision = LuaReference(lua);
     else
         lua_pop(lua, 1);
 
@@ -68,11 +61,12 @@ void LuaScene::open() {
 
 void LuaScene::update(float dt) {
 
-    if (m_luaUpdateFunctionRef == LUA_NOREF) return;
+    if (!m_update)
+        return;
 
     LuaState& lua = getEngine().getLuaState();
 
-    lua_rawgeti(lua, LUA_REGISTRYINDEX, m_luaUpdateFunctionRef);
+    m_update.push();
     if (!lua_isfunction(lua, -1)) {
         lua_pop(lua, 1);
         return;
@@ -87,7 +81,7 @@ void LuaScene::receive(const Collision& collision) {
     Engine& engine = getEngine();
     LuaState& lua = engine.getLuaState();
 
-    lua_rawgeti(lua, LUA_REGISTRYINDEX, m_luaOnCollisionFunctionRef);
+    m_onCollision.push();
     if (!lua_isfunction(lua, -1)) {
         lua_pop(lua, 1);
         return;

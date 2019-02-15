@@ -129,12 +129,6 @@ public:
 
 std::vector<bool> wasHeld = std::vector<bool>(sf::Keyboard::KeyCount, false);
 
-class ButtonPressState : public std::vector<bool> {
-
-public:
-    ButtonPressState() : std::vector<bool>(sf::Keyboard::KeyCount, false) {}
-};
-
 sf::Keyboard::Key getKeyCode(const std::string& keyName) {
 
     std::string uppercaseKeyName = keyName;

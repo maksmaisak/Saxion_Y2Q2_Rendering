@@ -217,6 +217,32 @@ int makeMaterial(lua_State* L) {
     return 1;
 }
 
+int loadScene(lua_State* L) {
+
+    Engine* engine = lua::check<Engine*>(L, lua_upvalueindex(1));
+
+    if (lua::is<std::string>(L, 1)) {
+
+        std::string path = lua::to<std::string>(L, 1);
+        engine->getScheduler().delay(sf::microseconds(0), [=](){
+            engine->getSceneManager().setCurrentScene<LuaScene>(path);
+        });
+
+    } else if (lua_istable(L, 1)) {
+
+        lua_pushvalue(L, 1);
+        // Have to make a shared_ptr because LuaReference is non-copyable.
+        // Capturing a non-copyable type would make the lambda non-copyable,
+        // which would make it impossible to make a std::function out of it.
+        auto ref = std::make_shared<LuaReference>(L);
+        engine->getScheduler().delay(sf::microseconds(0), [engine, ref](){
+            engine->getSceneManager().setCurrentScene<LuaScene>(std::move(*ref));
+        });
+    }
+
+    return 0;
+}
+
 void Engine::initializeLua() {
 
     LUA_REGISTER_TYPE(Actor);
@@ -244,11 +270,10 @@ void Engine::initializeLua() {
         lua_setfield(lua, -2, "makeActor");
 
         lua.setField("getTime", [](){return GameTime::now().asSeconds();});
-        lua.setField("loadScene", [this](const std::string& path){
-            m_scheduler.delay(sf::microseconds(0), [=](){
-                m_sceneManager.setCurrentScene<LuaScene>(path);
-            });
-        });
+
+        lua.push(this);
+        lua_pushcclosure(lua, &loadScene, 1);
+        lua_setfield(lua, -2, "loadScene");
 
         // TODO make addProperty work on both tables and their metatables
         //lua::addProperty(lua, "time", lua::Property<float>([](){return GameTime::now().asSeconds();}));

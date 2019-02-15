@@ -43,7 +43,7 @@ int main() {
     lua_getglobal(lua, "Config");
     std::optional<std::string> startScene = lua.tryGetField<std::string>("startScene");
     if (startScene)
-        engine->getSceneManager().setCurrentScene<LuaScene>(*startScene);
+        engine->getSceneManager().setCurrentScene<en::LuaScene>(*startScene);
     lua.pop();
 
     //engine->getSceneManager().setCurrentScene<TestScene>();     // Assignment 2

@@ -26,6 +26,7 @@
 using namespace en;
 
 LuaScene::LuaScene(const std::string& filename) : m_filename(filename) {}
+LuaScene::LuaScene(LuaReference&& table) : m_table(std::move(table)) {}
 
 LuaScene::~LuaScene() {
 
@@ -40,8 +41,7 @@ void LuaScene::open() {
 
     std::cout << "Loading lua-defined scene " + m_filename + "..." << std::endl;
 
-    bool didLoad = lua.doFileInNewEnvironment(m_filename, 1);
-    if (!didLoad)
+    if (!popTableOnStack())
         return;
     auto popTable = PopperOnDestruct(lua);
 
@@ -96,4 +96,21 @@ void LuaScene::receive(const Collision& collision) {
     lua.push(engine.actor(collision.a));
     lua.push(engine.actor(collision.b));
     lua.pcall(2, 0);
+}
+
+bool LuaScene::popTableOnStack() {
+
+    LuaState& lua = getEngine().getLuaState();
+
+    if (!m_filename.empty())
+        if (lua.doFileInNewEnvironment(m_filename, 1))
+            return true;
+
+    if (m_table) {
+        m_table.push();
+        m_table = {};
+        return true;
+    }
+
+    return false;
 }

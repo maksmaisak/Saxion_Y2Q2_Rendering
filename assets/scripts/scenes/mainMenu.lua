@@ -4,7 +4,7 @@ local scenery = {
 	{
 		Name = "camera",
 		Transform = {
-		position = { x = 0, y = 0, z = 10 }
+			position = { x = 0, y = 0, z = 10 }
 		},
 		Camera = {},
 	}
@@ -77,8 +77,8 @@ function scene:start()
 			onMouseDown = function(self, button)
 				if button == 1 then
 					self.actor:get("Sprite").isEnabled					= false
-					Game.find("StartButton"):get("Sprite").isEnabled	= false
-					Game.find("CreditsButton"):get("Sprite").isEnabled	= false
+					Game.find("StartButton"):get("UIRect").isEnabled	= false
+					Game.find("CreditsButton"):get("UIRect").isEnabled	= false
 				end
 			end
 		}

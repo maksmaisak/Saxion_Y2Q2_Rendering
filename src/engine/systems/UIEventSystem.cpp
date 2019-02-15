@@ -16,36 +16,45 @@ void UIEventSystem::update(float dt) {
 
     glm::vec2 mousePosition = utils::MouseHelper::getPosition(m_engine->getWindow());
 
-    for (Entity e : m_registry->with<UIRect>()) {
+    for (Entity e : m_registry->with<UIRect, Transform>())
+        if (!m_registry->get<Transform>(e).getParent())
+            updateRect(e, m_registry->get<UIRect>(e), mousePosition);
+}
 
-        auto& rect = m_registry->get<UIRect>(e);
-        rect.wasMouseOver = rect.isMouseOver;
-        rect.isMouseOver = glm::all(glm::lessThan(rect.computedMin, mousePosition)) && glm::all(glm::lessThan(mousePosition, rect.computedMax));
-        if (!rect.isEnabled)
-            continue;
+void UIEventSystem::updateRect(Entity e, UIRect& rect, const glm::vec2& mousePosition) {
 
-        if (rect.isMouseOver && !rect.wasMouseOver)
-            Receiver<MouseEnter>::broadcast(e);
+    rect.wasMouseOver = rect.isMouseOver;
+    rect.isMouseOver = glm::all(glm::lessThan(rect.computedMin, mousePosition)) && glm::all(glm::lessThan(mousePosition, rect.computedMax));
+    if (!rect.isEnabled)
+        return;
 
-        if (rect.isMouseOver)
-            Receiver<MouseOver>::broadcast(e);
+    if (rect.isMouseOver && !rect.wasMouseOver)
+        Receiver<MouseEnter>::broadcast(e);
 
-        if (!rect.isMouseOver && rect.wasMouseOver)
-            Receiver<MouseLeave>::broadcast(e);
+    if (rect.isMouseOver)
+        Receiver<MouseOver>::broadcast(e);
 
-        if (rect.isMouseOver) {
-            for (int i = 0; i < sf::Mouse::ButtonCount; ++i) {
-                auto buttonCode = (sf::Mouse::Button)i;
+    if (!rect.isMouseOver && rect.wasMouseOver)
+        Receiver<MouseLeave>::broadcast(e);
 
-                if (utils::MouseHelper::isDown(buttonCode))
-                    Receiver<MouseDown>::broadcast(e, i + 1);
+    if (rect.isMouseOver) {
+        for (int i = 0; i < sf::Mouse::ButtonCount; ++i) {
+            auto buttonCode = (sf::Mouse::Button)i;
 
-                if (utils::MouseHelper::isHeld(buttonCode))
-                    Receiver<MouseHold>::broadcast(e, i + 1);
+            if (utils::MouseHelper::isDown(buttonCode))
+                Receiver<MouseDown>::broadcast(e, i + 1);
 
-                if (utils::MouseHelper::isUp(buttonCode))
-                    Receiver<MouseUp>::broadcast(e, i + 1);
-            }
+            if (utils::MouseHelper::isHeld(buttonCode))
+                Receiver<MouseHold>::broadcast(e, i + 1);
+
+            if (utils::MouseHelper::isUp(buttonCode))
+                Receiver<MouseUp>::broadcast(e, i + 1);
         }
     }
+
+    if (auto* tf = m_registry->tryGet<Transform>(e))
+        for (Entity child : tf->getChildren())
+            if (auto* childRect = m_registry->tryGet<UIRect>(child))
+                updateRect(child, *childRect, mousePosition);
 }
+

@@ -7,13 +7,19 @@
 
 #include "System.h"
 #include "Entity.h"
+#include "glm.hpp"
 
 namespace en {
+
+    class UIRect;
 
     class UIEventSystem : public System {
 
     public:
         void update(float dt) override;
+
+    private:
+        void updateRect(Entity e, UIRect& rect, const glm::vec2& mousePosition);
     };
 }
 

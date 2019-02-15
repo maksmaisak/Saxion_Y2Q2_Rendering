@@ -15,6 +15,7 @@
 #include "TupleUtils.h"
 #include "Light.h"
 #include "Transform.h"
+#include "Exception.h"
 
 namespace en {
 
@@ -182,7 +183,7 @@ namespace en {
 
         auto it = m_uniforms.find(name);
         if (it == m_uniforms.end()) {
-            throw "No such uniform: " + name;
+            throw utils::Exception("No such uniform: " + name);
         }
 
         static_assert(

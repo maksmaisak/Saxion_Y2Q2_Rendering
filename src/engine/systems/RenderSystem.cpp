@@ -12,6 +12,7 @@
 #include "components/Camera.h"
 #include "components/Name.h"
 #include "components/Sprite.h"
+#include "components/Text.h"
 #include "GLHelpers.h"
 #include "Font.h"
 #include "GameTime.h"
@@ -206,6 +207,9 @@ void RenderSystem::renderUIRect(Entity e, UIRect& rect) {
     if (!rect.isEnabled)
         return;
 
+    const glm::vec2 windowSize = getWindowSize();
+    const glm::mat4 matrixProjection = glm::ortho(0.f, windowSize.x, 0.f, windowSize.y);
+
     auto* sprite = m_registry->tryGet<Sprite>(e);
     if (sprite && sprite->isEnabled && sprite->material) {
 
@@ -222,8 +226,16 @@ void RenderSystem::renderUIRect(Entity e, UIRect& rect) {
         };
 
         glm::vec2 size = getWindowSize();
-        sprite->material->use(m_engine, &m_depthMaps, glm::mat4(1), glm::mat4(1), glm::ortho(0.f, size.x, 0.f, size.y));
+        sprite->material->use(m_engine, &m_depthMaps, glm::mat4(1), glm::mat4(1), matrixProjection);
         m_vertexRenderer.renderVertices(vertices);
+    }
+
+    auto* text = m_registry->tryGet<Text>(e);
+    if (text && text->getMaterial()) {
+
+        glm::mat4 offset = glm::translate(glm::vec3(rect.computedMin.x, rect.computedMin.y, 0.f));
+        text->getMaterial()->use(m_engine, &m_depthMaps, glm::mat4(1), glm::mat4(1), matrixProjection * offset);
+        m_vertexRenderer.renderVertices(text->getVertices());
     }
 
     if (auto* tf = m_registry->tryGet<Transform>(e))

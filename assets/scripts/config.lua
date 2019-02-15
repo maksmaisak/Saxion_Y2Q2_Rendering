@@ -4,7 +4,7 @@ width  = 800
 height = 600
 fullscreen = false
 framerateCap = 240
-startScene = 'assets/scripts/scenes/mainMenu.lua'
+startScene = 'assets/scripts/scenes/test/testUI.lua'
 firstLevelDefinition = 'assets/scripts/scenes/definition1.lua'
 
 -- custom

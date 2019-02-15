@@ -76,7 +76,7 @@ std::optional<Font::Character> loadCharacter(FT_Face& face, FT_ULong charCode) {
     });
 }
 
-Font::Font(const std::string& filename) : m_shader(Resources<ShaderProgram>::get("text")) {
+Font::Font(const std::string& filename) : m_shader(Resources<ShaderProgram>::get("text_alt")) {
 
     // Load font as face
     if (FT_New_Face(getFreeTypeLibrary(), filename.c_str(), 0, &m_face)) {

@@ -274,6 +274,15 @@ function scene:start()
             end
         }
     }
+
+    Game.makeActor {
+        Transform = {parent = "PanelBottom"},
+        UIRect = {},
+        Text = {
+            material = { shader = "text" },
+            string = "The quick brown fox jumps over the lazy dog"
+        }
+    }
 end
 
 function scene:update(dt)

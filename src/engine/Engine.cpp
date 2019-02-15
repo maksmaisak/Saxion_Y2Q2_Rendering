@@ -225,7 +225,7 @@ int loadScene(lua_State* L) {
 
         std::string path = lua::to<std::string>(L, 1);
         engine->getScheduler().delay(sf::microseconds(0), [=](){
-            engine->getSceneManager().setCurrentScene<LuaScene>(path);
+            engine->getSceneManager().setCurrentScene<LuaScene>(engine->getLuaState(), path);
         });
 
     } else if (lua_istable(L, 1)) {

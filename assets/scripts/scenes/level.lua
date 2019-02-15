@@ -54,7 +54,7 @@ local goalData = {
 
 local scene = {}
 
-function scene.start()
+function scene:start()
 
 	map = Map:new {
 		gridSize = { x = 10, y = 10}

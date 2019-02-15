@@ -124,7 +124,7 @@ local scenery = {
 
 local scene = {}
 
-function scene.start()
+function scene:start()
 
     Game.makeActors(scenery)
 
@@ -276,7 +276,7 @@ function scene.start()
     }
 end
 
-function scene.update(dt)
+function scene:update(dt)
 
     Game.find("Light"):get("Transform").position = {-4, 3 + 2 * math.sin(Game.getTime()), 0}
     --Game.find("LightDirectional"):get("Transform"):rotate(45 * dt, 1, 0, 0);

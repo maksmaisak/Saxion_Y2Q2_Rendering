@@ -160,7 +160,7 @@ end
 
 local scene = {}
 
-function scene.start()
+function scene:start()
 
     Game.bullets = {}
 
@@ -228,7 +228,7 @@ local sceneUpdateCoroutine = coroutine.wrap(function()
     Game.loadScene("assets/scripts/arena.lua")
 end)
 
-function scene.update(dt)
+function scene:update(dt)
 
     Game.find("PointLight"):get("Light").intensity = math.sin(Game.getTime()) ^ 2
     --Game.find("DirectionalLight"):get("Transform"):rotate(60 * dt, 1, 0, 0)

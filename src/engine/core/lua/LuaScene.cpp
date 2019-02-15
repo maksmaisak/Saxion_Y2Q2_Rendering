@@ -25,16 +25,24 @@
 
 using namespace en;
 
-LuaScene::LuaScene(const std::string& filename) : m_filename(filename) {}
-LuaScene::LuaScene(LuaReference&& table) : m_table(std::move(table)) {}
+LuaReference getTableByFilename(LuaState& lua, const std::string& filename) {
+
+    std::cout << "Loading lua-defined scene " + filename + "..." << std::endl;
+
+    if (lua.doFileInNewEnvironment(filename, 1))
+        return LuaReference(lua);
+
+    return {};
+}
+
+LuaScene::LuaScene(LuaState& lua, const std::string& filename) : m_self(getTableByFilename(lua, filename)) {}
+LuaScene::LuaScene(LuaReference&& table) : m_self(std::move(table)) {}
 
 void LuaScene::open() {
 
     LuaState& lua = getEngine().getLuaState();
 
-    std::cout << "Loading lua-defined scene " + m_filename + "..." << std::endl;
-
-    if (!popTableOnStack())
+    if (!pushTableOnStack())
         return;
     auto popTable = PopperOnDestruct(lua);
 
@@ -51,10 +59,12 @@ void LuaScene::open() {
         lua_pop(lua, 1);
 
     lua_getfield(lua, -1, "start");
-    if (lua_isfunction(lua, -1))
-        lua.pcall(0, 0);
-    else
+    if (lua_isfunction(lua, -1)) {
+        m_self.push();
+        lua.pcall(1, 0);
+    } else {
         lua_pop(lua, 1);
+    }
 
     std::cout << "Finished loading lua-defined scene." << std::endl;
 }
@@ -72,8 +82,9 @@ void LuaScene::update(float dt) {
         return;
     }
 
+    m_self.push();
     lua.push(dt);
-    lua.pcall(1, 0);
+    lua.pcall(2, 0);
 }
 
 void LuaScene::receive(const Collision& collision) {
@@ -87,22 +98,18 @@ void LuaScene::receive(const Collision& collision) {
         return;
     }
 
+    m_self.push();
     lua.push(engine.actor(collision.a));
     lua.push(engine.actor(collision.b));
-    lua.pcall(2, 0);
+    lua.pcall(3, 0);
 }
 
-bool LuaScene::popTableOnStack() {
+bool LuaScene::pushTableOnStack() {
 
     LuaState& lua = getEngine().getLuaState();
 
-    if (!m_filename.empty())
-        if (lua.doFileInNewEnvironment(m_filename, 1))
-            return true;
-
-    if (m_table) {
-        m_table.push();
-        m_table = {};
+    if (m_self) {
+        m_self.push();
         return true;
     }
 

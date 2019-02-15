@@ -10,7 +10,7 @@ local scene = {}
 
 local tf
 
-function scene.start()
+function scene:start()
 
     local camera = Game.makeActor("Camera")
     camera:add("Camera")
@@ -49,7 +49,7 @@ function scene.start()
 --    print("x:", x)
 end
 
-function scene.update(dt)
+function scene:update(dt)
     --tf.position = Vector.from {0, dt, 0} + tf.position
 end
 

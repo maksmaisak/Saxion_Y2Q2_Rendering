@@ -87,7 +87,7 @@ end
 
 local boidMaterial = Game.makeMaterial { shininess = 100 }
 
-function scene.start()
+function scene:start()
 
     local function makeBoid(position)
 
@@ -176,7 +176,7 @@ function scene.start()
     }
 end
 
-function scene.update(dt)
+function scene:update(dt)
 
     for i, boid in ipairs(boids) do
 

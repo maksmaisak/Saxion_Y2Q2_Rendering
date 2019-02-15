@@ -18,7 +18,7 @@ namespace en {
     class LuaScene : public Scene, Receiver<Collision> {
 
     public:
-        LuaScene(const std::string& filename);
+        LuaScene(LuaState& lua, const std::string& filename);
         LuaScene(LuaReference&& table);
         virtual ~LuaScene() = default;
 
@@ -29,11 +29,9 @@ namespace en {
 
         void receive(const Collision& info) override;
 
-        bool popTableOnStack();
+        bool pushTableOnStack();
 
-        std::string m_filename;
-        LuaReference m_table;
-
+        LuaReference m_self;
         LuaReference m_update;
         LuaReference m_onCollision;
     };

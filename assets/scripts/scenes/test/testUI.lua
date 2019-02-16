@@ -281,18 +281,12 @@ function scene:start()
         Transform = {parent = "PanelBottom"},
         UIRect = {},
         Text = {
-            material = { shader = "text" },
             string = "The quick brown fox jumps over the lazy dog\nThe quick brown fox jumps over the lazy dog"
         },
         LuaBehavior = {
-            update = function(self, dt)
-
---                local text = ""
---                for i = 1,Game.getTime() do
---                    text = text.."A"
---                end
---                self.actor:get("Text").string = text
-            end
+--            update = function(self, dt)
+--                self.actor:get("Text").string = string.sub("The quick brown fox jumps over the lazy dog, 0123456789 АБВГД", 1, 1 + math.floor(Game.getTime() * 10))
+--            end
         }
     }
 end

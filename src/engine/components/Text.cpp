@@ -102,10 +102,10 @@ void Text::ensureGeometryUpdate() const {
     m_material->setUniformValue("fontAtlas", m_font);
     m_material->setUniformValue("textColor", glm::vec3(1));
 
-    auto temp = m_font->getTexture(m_characterSize).getSize();
-    glm::vec2 atlasSize = {temp.x, temp.y};
-    float whitespaceWidth = m_font->getGlyph(L' ', m_characterSize, false).advance;
-    float lineSpacing     = m_font->getLineSpacing(m_characterSize);
+    const auto temp = m_font->getTexture(m_characterSize).getSize();
+    const glm::vec2 atlasSize = {temp.x, temp.y};
+    const float whitespaceWidth = m_font->getGlyph(L' ', m_characterSize, false).advance;
+    const float lineSpacing     = m_font->getLineSpacing(m_characterSize);
 
     glm::vec2 min = {0, 0};
     glm::vec2 max = {0, 0};
@@ -159,6 +159,9 @@ namespace {
         lua_getfield(lua, -1, "material");
         auto p = lua::PopperOnDestruct(lua);
 
+        if (lua_isnil(lua, -1))
+            return nullptr;
+
         if (lua.is<std::shared_ptr<Material>>())
             return lua.to<std::shared_ptr<Material>>();
 
@@ -169,7 +172,10 @@ namespace {
 Text& Text::addFromLua(Actor& actor, LuaState& lua) {
 
     auto& text = actor.add<Text>();
-    text.m_material = readMaterial(lua);
+
+    if (auto material = readMaterial(lua))
+        text.m_material = material;
+
     return text;
 }
 

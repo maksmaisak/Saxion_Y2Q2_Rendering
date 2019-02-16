@@ -43,7 +43,7 @@ namespace en {
 
         std::string m_string;
         std::shared_ptr<sf::Font> m_font = Resources<sf::Font>::get(config::FONT_PATH + "arial.ttf");
-        std::shared_ptr<Material> m_material;
+        std::shared_ptr<Material> m_material = Resources<Material>::get("text");
         unsigned int m_characterSize = 30;
 
         mutable bool m_needsGeometryUpdate = false;

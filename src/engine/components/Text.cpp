@@ -6,26 +6,32 @@
 
 using namespace en;
 
-void addGlyphQuad(std::vector<Vertex>& vertices, const glm::vec2& position, const sf::Glyph& glyph) {
+void addGlyphQuad(std::vector<Vertex>& vertices, const glm::vec2& position, const sf::Glyph& glyph, const glm::vec2& atlasSize) {
 
-    const float padding = 1.f;
+    const float padding = 0.5f;
 
-    float left   = glyph.bounds.left - padding;
-    float top    = glyph.bounds.top  - padding;
-    float right  = glyph.bounds.left + glyph.bounds.width + padding;
-    float bottom = glyph.bounds.top  + glyph.bounds.height + padding;
+    const float left   =  glyph.bounds.left - padding;
+    const float bottom = -glyph.bounds.top - glyph.bounds.height - padding;
+    const float right  =  glyph.bounds.left + glyph.bounds.width + padding;
+    const float top    = -glyph.bounds.top + padding;
 
     float u1 = static_cast<float>(glyph.textureRect.left) - padding;
-    float v1 = static_cast<float>(glyph.textureRect.top)  - padding;
+    float v1 = static_cast<float>(glyph.textureRect.top  + glyph.textureRect.height) + padding;
     float u2 = static_cast<float>(glyph.textureRect.left + glyph.textureRect.width)  + padding;
-    float v2 = static_cast<float>(glyph.textureRect.top  + glyph.textureRect.height) + padding;
+    float v2 = static_cast<float>(glyph.textureRect.top ) - padding;
+    const glm::vec2 multiplier = 1.f / atlasSize;
+    u1 *= multiplier.x;
+    u2 *= multiplier.x;
+    v1 *= multiplier.y;
+    v2 *= multiplier.y;
 
-    vertices.push_back({{position.x + left , position.y + top   , 0.f}, {u1, v1}});
-    vertices.push_back({{position.x + right, position.y + top   , 0.f}, {u2, v1}});
-    vertices.push_back({{position.x + left , position.y + bottom, 0.f}, {u1, v2}});
-    vertices.push_back({{position.x + left , position.y + bottom, 0.f}, {u1, v2}});
-    vertices.push_back({{position.x + right, position.y + top   , 0.f}, {u2, v1}});
-    vertices.push_back({{position.x + right, position.y + bottom, 0.f}, {u2, v2}});
+    vertices.push_back({{position.x + left , position.y + bottom, 0.f}, {u1, v1}});
+    vertices.push_back({{position.x + right, position.y + top   , 0.f}, {u2, v2}});
+    vertices.push_back({{position.x + left , position.y + top   , 0.f}, {u1, v2}});
+
+    vertices.push_back({{position.x + left , position.y + bottom, 0.f}, {u1, v1}});
+    vertices.push_back({{position.x + right, position.y + bottom, 0.f}, {u2, v1}});
+    vertices.push_back({{position.x + right, position.y + top   , 0.f}, {u2, v2}});
 }
 
 const std::string& Text::getString() const {
@@ -52,12 +58,15 @@ void Text::ensureGeometryUpdate() const {
         return;
 
     m_needsGeometryUpdate = false;
-
+    m_vertices.clear();
     if (!m_font || !m_material)
         return;
 
-    m_material->setUniformValue("fontAtlas", Textures::white());
+    m_material->setUniformValue("fontAtlas", m_font);
     m_material->setUniformValue("textColor", glm::vec3(1));
+
+    auto temp = m_font->getTexture(m_characterSize).getSize();
+    glm::vec2 atlasSize = {temp.x, temp.y};
 
     glm::vec2 position = {0, m_characterSize};
 
@@ -68,7 +77,7 @@ void Text::ensureGeometryUpdate() const {
 
         position.x += m_font->getKerning(previousChar, currentChar, m_characterSize);
         const sf::Glyph& glyph = m_font->getGlyph(currentChar, m_characterSize, false);
-        addGlyphQuad(m_vertices, position, glyph);
+        addGlyphQuad(m_vertices, position, glyph, atlasSize);
         position.x += glyph.advance;
 
         previousChar = currentChar;

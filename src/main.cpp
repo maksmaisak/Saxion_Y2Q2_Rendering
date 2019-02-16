@@ -11,9 +11,10 @@
 
 #include "components/RenderInfo.h"
 #include "components/Camera.h"
-#include "components/Sprite.h"
 #include "components/Transform.h"
 #include "components/UIRect.h"
+#include "components/Sprite.h"
+#include "components/Text.h"
 
 #include "TestScene.h"
 #include "LightingScene.h"
@@ -49,6 +50,11 @@ int main() {
     //engine->getSceneManager().setCurrentScene<TestScene>();     // Assignment 2
     //engine->getSceneManager().setCurrentScene<LightingScene>(); // Assignment 3
     //engine->getSceneManager().setCurrentScene<TerrainScene>();  // Assignment 4
+
+    engine->getScheduler().delay(sf::seconds(0), [engine = engine.get()](){
+        const auto& font = engine->findByName("TextElement").get<en::Text>().getFont();
+        engine->findByName("Square").get<en::Sprite>().material->setUniformValue("spriteTexture", font);
+    });
 
     engine->run();
 

@@ -16,6 +16,7 @@
 #include "Light.h"
 #include "Transform.h"
 #include "Exception.h"
+#include "SFML/Graphics.hpp"
 
 namespace en {
 
@@ -156,7 +157,8 @@ namespace en {
             GLint, GLuint, GLfloat,
             glm::vec2, glm::vec3, glm::vec4,
             glm::mat4,
-            std::shared_ptr<Texture>
+            std::shared_ptr<Texture>,
+            std::shared_ptr<sf::Font>
         > m_uniformValues;
 
         GLenum m_numTexturesInUse = 0;

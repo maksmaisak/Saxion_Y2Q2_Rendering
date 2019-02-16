@@ -188,6 +188,7 @@ function scene:start()
         Transform = {
             children = {
                 {
+                    Name = "Square",
                     Transform = {},
                     UIRect = {
                         anchorMin = {0.5, 0.5},
@@ -276,11 +277,22 @@ function scene:start()
     }
 
     Game.makeActor {
+        Name = "TextElement",
         Transform = {parent = "PanelBottom"},
         UIRect = {},
         Text = {
             material = { shader = "text" },
             string = "The quick brown fox jumps over the lazy dog"
+        },
+        LuaBehavior = {
+            update = function(self, dt)
+
+--                local text = ""
+--                for i = 1,Game.getTime() do
+--                    text = text.."A"
+--                end
+--                self.actor:get("Text").string = text
+            end
         }
     }
 end

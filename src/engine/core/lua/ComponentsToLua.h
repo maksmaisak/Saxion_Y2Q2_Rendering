@@ -63,6 +63,7 @@ namespace en {
 
         static void pushComponentReferenceByTypeName(lua_State* L, Actor& actor, const std::string& componentTypeName);
         static void addComponentByTypeName(lua_State* L, Actor& actor, const std::string& componentTypeName);
+        static void addComponentByTypeName(lua_State* L, Actor& actor, const std::string& componentTypeName, int componentDefinitionIndex);
         static void removeComponentByTypeName(lua_State* L, Actor& actor, const std::string& componentTypeName);
 
         static void printDebugInfo();
@@ -73,6 +74,7 @@ namespace en {
             std::function<void(Actor&, LuaState&)> addFromLua;
             std::function<void(Actor&, LuaState&)> pushFromActor;
             std::function<void(Actor&, LuaState&)> addToActor;
+            std::function<void(Actor&, LuaState&, int)> addToActorFromDefinition;
             std::function<void(Actor&, LuaState&)> removeFromActor;
         };
 
@@ -133,6 +135,18 @@ namespace en {
                 luaL_error(lua, "Actor %s already has a component of type %s", actor.getName().c_str(), utils::demangle<T>().c_str());
 
             actor.add<T>();
+            lua::push(lua, ComponentReference<T>(actor.getEngine().getRegistry(), actor));
+        };
+
+        entry.addToActorFromDefinition = [](Actor& actor, LuaState& lua, int componentDefinitionIndex) {
+
+            if (actor.tryGet<T>())
+                luaL_error(lua, "Actor %s already has a component of type %s", actor.getName().c_str(), utils::demangle<T>().c_str());
+
+            lua_pushvalue(lua, componentDefinitionIndex);
+            auto popDefinition = PopperOnDestruct(lua);
+
+            detail::LuaComponentFactoryFunctionOf<T>::get()(actor, lua);
             lua::push(lua, ComponentReference<T>(actor.getEngine().getRegistry(), actor));
         };
 

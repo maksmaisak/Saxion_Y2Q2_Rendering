@@ -22,6 +22,12 @@ void ComponentsToLua::addComponentByTypeName(lua_State* L, Actor& actor, const s
     getTypeInfoByName(componentTypeName).addToActor(actor, lua);
 }
 
+void ComponentsToLua::addComponentByTypeName(lua_State* L, Actor& actor, const std::string& componentTypeName, int componentDefinitionIndex) {
+
+    auto lua = LuaState(L);
+    getTypeInfoByName(componentTypeName).addToActorFromDefinition(actor, lua, componentDefinitionIndex);
+}
+
 void ComponentsToLua::removeComponentByTypeName(lua_State* L, Actor& actor, const std::string& componentTypeName) {
 
     auto lua = LuaState(L);

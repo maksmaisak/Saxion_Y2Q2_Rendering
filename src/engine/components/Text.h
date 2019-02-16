@@ -32,6 +32,9 @@ namespace en {
         const std::shared_ptr<sf::Font>& getFont() const;
         void setFont(const std::shared_ptr<sf::Font>& font);
 
+        const glm::vec2& getBoundsMin() const;
+        const glm::vec2& getBoundsMax() const;
+
         const std::vector<Vertex>& getVertices() const;
 
     private:
@@ -45,6 +48,8 @@ namespace en {
 
         mutable bool m_needsGeometryUpdate = false;
         mutable std::vector<Vertex> m_vertices;
+        mutable glm::vec2 m_boundsMin;
+        mutable glm::vec2 m_boundsMax;
     };
 }
 

@@ -215,7 +215,7 @@ void RenderSystem::renderUIRect(Entity e, UIRect& rect) {
 
         const glm::vec2& min = rect.computedMin;
         const glm::vec2& max = rect.computedMax;
-        std::vector<Vertex> vertices = {
+        const std::vector<Vertex> vertices = {
             {{min.x, max.y, 0}, {0, 1}},
             {{min.x, min.y, 0}, {0, 0}},
             {{max.x, min.y, 0}, {1, 0}},
@@ -225,7 +225,7 @@ void RenderSystem::renderUIRect(Entity e, UIRect& rect) {
             {{max.x, max.y, 0}, {1, 1}},
         };
 
-        glm::vec2 size = getWindowSize();
+        const glm::vec2 size = getWindowSize();
         sprite->material->use(m_engine, &m_depthMaps, glm::mat4(1), glm::mat4(1), matrixProjection);
         m_vertexRenderer.renderVertices(vertices);
     }
@@ -233,8 +233,12 @@ void RenderSystem::renderUIRect(Entity e, UIRect& rect) {
     auto* text = m_registry->tryGet<Text>(e);
     if (text && text->getMaterial()) {
 
-        glm::mat4 offset = glm::translate(glm::vec3(rect.computedMin.x, rect.computedMin.y, 0.f));
-        text->getMaterial()->use(m_engine, &m_depthMaps, glm::mat4(1), glm::mat4(1), matrixProjection * offset);
+        const glm::vec2 boundsCenter = (text->getBoundsMin() + text->getBoundsMax()) * 0.5;
+        const glm::vec2 desiredCenter = (rect.computedMin + rect.computedMax) * 0.5;
+        const glm::vec2 offset = desiredCenter - boundsCenter;
+
+        const glm::mat4 matrix = glm::translate(glm::vec3(offset.x, offset.y, 0.f));
+        text->getMaterial()->use(m_engine, &m_depthMaps, glm::mat4(1), glm::mat4(1), matrixProjection * matrix);
         m_vertexRenderer.renderVertices(text->getVertices());
     }
 

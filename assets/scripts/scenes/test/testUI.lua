@@ -282,7 +282,7 @@ function scene:start()
         UIRect = {},
         Text = {
             material = { shader = "text" },
-            string = "The quick brown fox jumps over the lazy dog"
+            string = "The quick brown fox jumps over the lazy dog\nThe quick brown fox jumps over the lazy dog"
         },
         LuaBehavior = {
             update = function(self, dt)

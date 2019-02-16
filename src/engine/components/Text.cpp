@@ -3,10 +3,11 @@
 //
 
 #include "Text.h"
+#include <tuple>
 
 using namespace en;
 
-void addGlyphQuad(std::vector<Vertex>& vertices, const glm::vec2& position, const sf::Glyph& glyph, const glm::vec2& atlasSize) {
+std::tuple<glm::vec2, glm::vec2> addGlyphQuad(std::vector<Vertex>& vertices, const glm::vec2& position, const sf::Glyph& glyph, const glm::vec2& atlasSize) {
 
     const float padding = 0.5f;
 
@@ -25,6 +26,9 @@ void addGlyphQuad(std::vector<Vertex>& vertices, const glm::vec2& position, cons
     v1 *= multiplier.y;
     v2 *= multiplier.y;
 
+    glm::vec2 min = {position.x + left , position.y + bottom};
+    glm::vec2 max = {position.x + right, position.y + top};
+
     vertices.push_back({{position.x + left , position.y + bottom, 0.f}, {u1, v1}});
     vertices.push_back({{position.x + right, position.y + top   , 0.f}, {u2, v2}});
     vertices.push_back({{position.x + left , position.y + top   , 0.f}, {u1, v2}});
@@ -32,6 +36,8 @@ void addGlyphQuad(std::vector<Vertex>& vertices, const glm::vec2& position, cons
     vertices.push_back({{position.x + left , position.y + bottom, 0.f}, {u1, v1}});
     vertices.push_back({{position.x + right, position.y + bottom, 0.f}, {u2, v1}});
     vertices.push_back({{position.x + right, position.y + top   , 0.f}, {u2, v2}});
+
+    return {min, max};
 }
 
 const std::string& Text::getString() const {
@@ -47,10 +53,39 @@ const std::shared_ptr<Material>& Text::getMaterial() const {
     return m_material;
 }
 
+void Text::setMaterial(const std::shared_ptr<Material>& material) {
+
+    m_material = material;
+    m_needsGeometryUpdate = true;
+}
+
 const std::vector<Vertex>& Text::getVertices() const {
     ensureGeometryUpdate();
     return m_vertices;
 }
+
+const std::shared_ptr<sf::Font>& Text::getFont() const {
+    return m_font;
+}
+
+void Text::setFont(const std::shared_ptr<sf::Font>& font) {
+
+    m_font = font;
+    m_needsGeometryUpdate = true;
+}
+
+const glm::vec2& Text::getBoundsMin() const {
+
+    ensureGeometryUpdate();
+    return m_boundsMin;
+}
+
+const glm::vec2& Text::getBoundsMax() const {
+
+    ensureGeometryUpdate();
+    return m_boundsMax;
+}
+
 
 void Text::ensureGeometryUpdate() const {
 
@@ -59,6 +94,8 @@ void Text::ensureGeometryUpdate() const {
 
     m_needsGeometryUpdate = false;
     m_vertices.clear();
+    m_boundsMin = {0, 0};
+    m_boundsMax = {0, 0};
     if (!m_font || !m_material)
         return;
 
@@ -67,21 +104,52 @@ void Text::ensureGeometryUpdate() const {
 
     auto temp = m_font->getTexture(m_characterSize).getSize();
     glm::vec2 atlasSize = {temp.x, temp.y};
+    float whitespaceWidth = m_font->getGlyph(L' ', m_characterSize, false).advance;
+    float lineSpacing     = m_font->getLineSpacing(m_characterSize);
 
-    glm::vec2 position = {0, m_characterSize};
-
+    glm::vec2 min = {0, 0};
+    glm::vec2 max = {0, 0};
+    glm::vec2 position = {0, 0};
     sf::Uint32 previousChar = 0;
     for (char c : m_string) {
 
         auto currentChar = (sf::Uint32)c;
-
         position.x += m_font->getKerning(previousChar, currentChar, m_characterSize);
-        const sf::Glyph& glyph = m_font->getGlyph(currentChar, m_characterSize, false);
-        addGlyphQuad(m_vertices, position, glyph, atlasSize);
-        position.x += glyph.advance;
-
         previousChar = currentChar;
+
+        if (c == ' ' || c == '\n' || c == '\t') {
+
+            // Update the current bounds (min coordinates)
+            min.x = std::min(min.x, position.x);
+            min.y = std::min(min.y, position.y);
+
+            switch (c) {
+                case ' ':  position.x += whitespaceWidth;             break;
+                case '\t': position.x += whitespaceWidth * 4;         break;
+                case '\n': position.y -= lineSpacing; position.x = 0; break;
+                default: break;
+            }
+
+            // Update the current bounds (max coordinates)
+            max.x = std::max(max.x, position.x);
+            max.y = std::max(max.y, position.y);
+
+            // Skip making a glyph for this
+            continue;
+        }
+
+        const sf::Glyph& glyph = m_font->getGlyph(currentChar, m_characterSize, false);
+        auto[glyphMin, glyphMax] = addGlyphQuad(m_vertices, position, glyph, atlasSize);
+        min.x = std::min(min.x, glyphMin.x);
+        min.y = std::min(min.y, glyphMin.y);
+        max.x = std::max(max.x, glyphMax.x);
+        max.y = std::max(max.y, glyphMax.y);
+
+        position.x += glyph.advance;
     }
+
+    m_boundsMin = min;
+    m_boundsMax = max;
 }
 
 namespace {
@@ -115,21 +183,4 @@ void Text::initializeMetatable(LuaState& lua) {
     lua::addProperty(lua, "font", lua::writeonlyProperty(
         [](ComponentReference<Text>& ref, const std::string& filepath) {ref->setFont(Resources<sf::Font>::get(filepath));}
     ));
-}
-
-void Text::setMaterial(const std::shared_ptr<Material>& material) {
-
-    m_material = material;
-    m_needsGeometryUpdate = true;
-}
-
-const std::shared_ptr<sf::Font>& Text::getFont() const {
-
-    return m_font;
-}
-
-void Text::setFont(const std::shared_ptr<sf::Font>& font) {
-
-    m_font = font;
-    m_needsGeometryUpdate = true;
 }

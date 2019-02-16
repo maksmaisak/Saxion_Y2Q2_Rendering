@@ -32,18 +32,21 @@ namespace en {
         const std::shared_ptr<sf::Font>& getFont() const;
         void setFont(const std::shared_ptr<sf::Font>& font);
 
-        const glm::vec2& getBoundsMin() const;
-        const glm::vec2& getBoundsMax() const;
+        const glm::vec4& getColor() const;
+        void setColor(const glm::vec4& color);
 
         const std::vector<Vertex>& getVertices() const;
+        const glm::vec2& getBoundsMin() const;
+        const glm::vec2& getBoundsMax() const;
 
     private:
 
         void ensureGeometryUpdate() const;
 
         std::string m_string;
-        std::shared_ptr<sf::Font> m_font = Resources<sf::Font>::get(config::FONT_PATH + "arial.ttf");
         std::shared_ptr<Material> m_material = Resources<Material>::get("text");
+        std::shared_ptr<sf::Font> m_font = Resources<sf::Font>::get(config::FONT_PATH + "arial.ttf");
+        glm::vec4 m_color = glm::vec4(1);
         unsigned int m_characterSize = 30;
 
         mutable bool m_needsGeometryUpdate = false;

@@ -333,7 +333,7 @@ namespace lua {
 
         static void push(lua_State* L, const TVec& value) {
 
-            lua_createtable(L, 0, 3);
+            lua_createtable(L, 0, Length);
 
             for (std::size_t i = 0; i < Length; ++i) {
                 lua::push(L, value[i]);

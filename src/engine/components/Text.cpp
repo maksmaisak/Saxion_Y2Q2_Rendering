@@ -59,11 +59,6 @@ void Text::setMaterial(const std::shared_ptr<Material>& material) {
     m_needsGeometryUpdate = true;
 }
 
-const std::vector<Vertex>& Text::getVertices() const {
-    ensureGeometryUpdate();
-    return m_vertices;
-}
-
 const std::shared_ptr<sf::Font>& Text::getFont() const {
     return m_font;
 }
@@ -72,6 +67,22 @@ void Text::setFont(const std::shared_ptr<sf::Font>& font) {
 
     m_font = font;
     m_needsGeometryUpdate = true;
+}
+
+const glm::vec4& Text::getColor() const {
+    return m_color;
+}
+
+void Text::setColor(const glm::vec4& color) {
+
+    m_color = color;
+    if (m_material)
+        m_material->setUniformValue("textColor", color);
+}
+
+const std::vector<Vertex>& Text::getVertices() const {
+    ensureGeometryUpdate();
+    return m_vertices;
 }
 
 const glm::vec2& Text::getBoundsMin() const {
@@ -86,7 +97,6 @@ const glm::vec2& Text::getBoundsMax() const {
     return m_boundsMax;
 }
 
-
 void Text::ensureGeometryUpdate() const {
 
     if (!m_needsGeometryUpdate)
@@ -100,7 +110,7 @@ void Text::ensureGeometryUpdate() const {
         return;
 
     m_material->setUniformValue("fontAtlas", m_font);
-    m_material->setUniformValue("textColor", glm::vec3(1));
+    m_material->setUniformValue("textColor", m_color);
 
     const auto temp = m_font->getTexture(m_characterSize).getSize();
     const glm::vec2 atlasSize = {temp.x, temp.y};
@@ -170,7 +180,6 @@ namespace {
 };
 
 Text& Text::addFromLua(Actor& actor, LuaState& lua) {
-
     auto& text = actor.add<Text>();
 
     if (auto material = readMaterial(lua))
@@ -188,5 +197,10 @@ void Text::initializeMetatable(LuaState& lua) {
 
     lua::addProperty(lua, "font", lua::writeonlyProperty(
         [](ComponentReference<Text>& ref, const std::string& filepath) {ref->setFont(Resources<sf::Font>::get(filepath));}
+    ));
+
+    lua::addProperty(lua, "color", lua::property(
+        [](ComponentReference<Text>& ref) {return ref->getColor();},
+        [](ComponentReference<Text>& ref, const glm::vec4& color) {ref->setColor(color);}
     ));
 }

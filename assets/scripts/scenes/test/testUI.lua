@@ -271,7 +271,7 @@ function scene:start()
         },
         LuaBehavior = {
             update = function(self)
-                self.actor:get("Sprite").isEnabled = not self.actor:get("UIRect").isMouseOver
+                self.actor:get("UIRect").isEnabled = not self.actor:get("UIRect").isMouseOver
             end
         }
     }
@@ -281,12 +281,23 @@ function scene:start()
         Transform = {parent = "PanelBottom"},
         UIRect = {},
         Text = {
+            font = "assets/fonts/Menlo.ttc",
+            color = {0, 1 / 3, 2 / 3, 1},
             string = "The quick brown fox jumps over the lazy dog\nThe quick brown fox jumps over the lazy dog"
         },
         LuaBehavior = {
---            update = function(self, dt)
---                self.actor:get("Text").string = string.sub("The quick brown fox jumps over the lazy dog, 0123456789 АБВГД", 1, 1 + math.floor(Game.getTime() * 10))
---            end
+            update = function(self, dt)
+
+                local text = self.actor:get("Text")
+                --text.string = string.sub("The quick brown fox jumps over the lazy dog, 0123456789 АБВГД", 1, 1 + math.floor(Game.getTime() * 10))
+                text.font = math.fmod(Game.getTime(), 2) < 1 and "assets/fonts/Menlo.ttc" or "assets/fonts/arial.ttf"
+
+                local color = text.color
+                color.x = math.fmod(color.x + dt, 1)
+                color.y = math.fmod(color.y + dt, 1)
+                color.z = math.fmod(color.z + dt, 1)
+                text.color = color
+            end
         }
     }
 end

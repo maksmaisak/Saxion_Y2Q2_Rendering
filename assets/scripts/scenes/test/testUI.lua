@@ -289,14 +289,16 @@ function scene:start()
             update = function(self, dt)
 
                 local text = self.actor:get("Text")
-                --text.string = string.sub("The quick brown fox jumps over the lazy dog, 0123456789 АБВГД", 1, 1 + math.floor(Game.getTime() * 10))
+                text.string = string.sub("The quick brown fox jumps over the lazy dog\nThe quick brown fox jumps over the lazy dog", 1, 1 + math.floor(Game.getTime() * 10))
                 text.font = math.fmod(Game.getTime(), 2) < 1 and "assets/fonts/Menlo.ttc" or "assets/fonts/arial.ttf"
 
                 local color = text.color
-                color.x = math.fmod(color.x + dt, 1)
-                color.y = math.fmod(color.y + dt, 1)
-                color.z = math.fmod(color.z + dt, 1)
+                color.x = math.fmod(color.x + dt * 0.1, 1)
+                color.y = math.fmod(color.y + dt * 0.1, 1)
+                color.z = math.fmod(color.z + dt * 0.1, 1)
                 text.color = color
+
+                text.fontSize = math.floor(30 + math.sin(Game.getTime()) * 20)
             end
         }
     }

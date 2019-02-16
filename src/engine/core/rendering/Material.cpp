@@ -198,10 +198,10 @@ void Material::setCustomUniformsOfType<std::shared_ptr<Texture>>(const Material:
 }
 
 template<>
-void Material::setCustomUniformsOfType<std::shared_ptr<sf::Font>>(const Material::LocationToUniformValue<std::shared_ptr<sf::Font>>& values) {
+void Material::setCustomUniformsOfType<Material::FontAtlas>(const Material::LocationToUniformValue<FontAtlas>& values) {
 
-    for (auto& [location, font] : values) {
-        if (!setUniformTexture(location, font->getTexture(30).getNativeHandle()))
+    for (auto& [location, setting] : values) {
+        if (!setUniformTexture(location, setting.font->getTexture(setting.characterSize).getNativeHandle()))
             break;
     }
 }

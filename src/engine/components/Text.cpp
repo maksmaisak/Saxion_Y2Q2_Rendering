@@ -45,8 +45,8 @@ const std::string& Text::getString() const {
 }
 
 void Text::setString(const std::string& newString) {
-    m_needsGeometryUpdate = true;
     m_string = newString;
+    m_needsGeometryUpdate = true;
 }
 
 const std::shared_ptr<Material>& Text::getMaterial() const {
@@ -54,6 +54,9 @@ const std::shared_ptr<Material>& Text::getMaterial() const {
 }
 
 void Text::setMaterial(const std::shared_ptr<Material>& material) {
+
+    if (m_material == material)
+        return;
 
     m_material = material;
     m_needsGeometryUpdate = true;
@@ -65,7 +68,24 @@ const std::shared_ptr<sf::Font>& Text::getFont() const {
 
 void Text::setFont(const std::shared_ptr<sf::Font>& font) {
 
+    if (m_font == font)
+        return;
+
     m_font = font;
+    m_needsGeometryUpdate = true;
+}
+
+const unsigned int Text::getCharacterSize() const {
+
+    return m_characterSize;
+}
+
+void Text::setCharacterSize(unsigned int size) {
+
+    if (m_characterSize == size)
+        return;
+
+    m_characterSize = size;
     m_needsGeometryUpdate = true;
 }
 
@@ -81,6 +101,7 @@ void Text::setColor(const glm::vec4& color) {
 }
 
 const std::vector<Vertex>& Text::getVertices() const {
+
     ensureGeometryUpdate();
     return m_vertices;
 }
@@ -109,7 +130,7 @@ void Text::ensureGeometryUpdate() const {
     if (!m_font || !m_material)
         return;
 
-    m_material->setUniformValue("fontAtlas", m_font);
+    m_material->setUniformValue("fontAtlas", Material::FontAtlas{m_font, m_characterSize});
     m_material->setUniformValue("textColor", m_color);
 
     const auto temp = m_font->getTexture(m_characterSize).getSize();
@@ -197,6 +218,11 @@ void Text::initializeMetatable(LuaState& lua) {
 
     lua::addProperty(lua, "font", lua::writeonlyProperty(
         [](ComponentReference<Text>& ref, const std::string& filepath) {ref->setFont(Resources<sf::Font>::get(filepath));}
+    ));
+
+    lua::addProperty(lua, "fontSize", lua::property(
+        [](ComponentReference<Text>& ref) {return ref->getCharacterSize();},
+        [](ComponentReference<Text>& ref, unsigned int size) {ref->setCharacterSize(size);}
     ));
 
     lua::addProperty(lua, "color", lua::property(

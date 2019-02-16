@@ -54,9 +54,15 @@ namespace en {
         template<typename T>
         void setUniformValue(const std::string& name, const T& value);
 
+        // Information necessary to use a font atlas as a texture uniform.
+        // Pass instances of this into setUniformValue<FontAtlas>
+        struct FontAtlas {
+            std::shared_ptr<sf::Font> font;
+            unsigned int characterSize = 30;
+        };
+
     private:
 
-        // TODO Make this a mapping from location instead of from name.
         template<typename T>
         using LocationToUniformValue = std::unordered_map<GLint, T>;
 
@@ -158,7 +164,7 @@ namespace en {
             glm::vec2, glm::vec3, glm::vec4,
             glm::mat4,
             std::shared_ptr<Texture>,
-            std::shared_ptr<sf::Font>
+            FontAtlas
         > m_uniformValues;
 
         GLenum m_numTexturesInUse = 0;

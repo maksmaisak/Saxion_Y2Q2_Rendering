@@ -53,7 +53,7 @@ int main() {
 
     engine->getScheduler().delay(sf::seconds(0), [engine = engine.get()](){
         const auto& font = engine->findByName("TextElement").get<en::Text>().getFont();
-        engine->findByName("Square").get<en::Sprite>().material->setUniformValue("spriteTexture", font);
+        engine->findByName("Square").get<en::Sprite>().material->setUniformValue("spriteTexture", en::Material::FontAtlas{font});
     });
 
     engine->run();

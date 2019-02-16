@@ -16,34 +16,28 @@ function scene:start()
 	
 	Game.makeActors(scenery)
 
-	Game.makeActor {
-		Name = "MainPanel",
+   	Game.makeActor {
+		Name = "ButtonsPanel",
 		Transform = {},
 		UIRect = {
-			anchorMin = {0,0},
-			anchorMax = {1,1}
-		},
-		Sprite = {
-			material = {
-				shader		= "sprite",
-				texture		= "textures/background.png"
-			}
+			anchorMin	= {0.4, 0.15},
+			anchorMax	= {0.6, 0.85}
 		}
 	}
 
 	Game.makeActor {
 		Name = "StartButton",
 		Transform = {
-			parent = "MainPanel"
+			parent = "ButtonsPanel"
 		},
 		UIRect = {
-			anchorMin	= {0.4, 0.75},
-			anchorMax	= {0.6, 0.85},
+			anchorMin	= {0, 0.85},
+			anchorMax	= {1, 1}
 		},
 		Sprite = {
 			material = {
-				shader = "sprite",
-				texture = "textures/runicfloor.png"
+				shader		= "sprite",
+				texture		= "textures/runicfloor.png"
 			}
 		},
 		LuaBehavior = {
@@ -61,11 +55,11 @@ function scene:start()
 	Game.makeActor {
 		Name = "ChoseLevelButton",
 		Transform = {
-			parent = "MainPanel"
+			parent = "ButtonsPanel"
 		},
 		UIRect = {
-			anchorMin = {0.4, 0.6},
-			anchorMax = {0.6, 0.7}
+			anchorMin = {0, 0.65},
+			anchorMax = {1, 0.8}
 		},
 		Sprite = {
 			material = {
@@ -76,9 +70,7 @@ function scene:start()
 		LuaBehavior = {
 			onMouseDown = function(self, button)
 				if button == 1 then
-					self.actor:get("Sprite").isEnabled					= false
-					Game.find("StartButton"):get("UIRect").isEnabled	= false
-					Game.find("CreditsButton"):get("UIRect").isEnabled	= false
+					Game.find("ButtonsPanel"):get("UIRect").isEnabled	= false
 				end
 			end
 		}
@@ -87,11 +79,11 @@ function scene:start()
 	Game.makeActor {
 		Name = "CreditsButton",
 		Transform = {
-			parent = "MainPanel"
+			parent = "ButtonsPanel"
 		},
 		UIRect = {
-			anchorMin = {0.4, 0.45},
-			anchorMax = {0.6, 0.55}
+			anchorMin = {0, 0.45},
+			anchorMax = {1, 0.6}
 		},
 		Sprite = {
 			material = {
@@ -102,11 +94,48 @@ function scene:start()
 		LuaBehavior = {
 			onMouseDown = function(self, button)
 				if button == 1 then
-					self.actor:get("Sprite").isEnabled						= false
-					Game.find("StartButton"):get("Sprite").isEnabled		= false
-					Game.find("ChoseLevelButton"):get("Sprite").isEnabled	= false
+					Game.find("ButtonsPanel"):get("UIRect").isEnabled		= false
 				end
 			end
+		}
+	}
+
+	Game.makeActor {
+		Name = "Exitutton",
+		Transform = {
+			parent = "ButtonsPanel"
+		},
+		UIRect = {
+			anchorMin = {0, 0.25},
+			anchorMax = {1, 0.4}
+		},
+		Sprite = {
+			material = {
+				shader	= "sprite",
+				texture = "textures/runicfloor.png"
+			}
+		},
+		LuaBehavior = {
+			onMouseDown = function(self, button)
+				if button == 1 then
+					Game.find("ButtonsPanel"):get("UIRect").isEnabled		= false
+				end
+			end
+		}
+	}
+
+	Game.makeActor {
+		Name = "MainPanel",
+		Transform = {},
+		UIRect = {
+			anchorMin = {0,0},
+			anchorMax = {1,1}
+		},
+		Sprite = {
+			material = {
+				shader		= "sprite",
+				texture		= "textures/background.png"
+			}
 		}
 	}
 end

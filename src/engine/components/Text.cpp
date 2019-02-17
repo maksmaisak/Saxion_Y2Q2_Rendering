@@ -4,6 +4,7 @@
 
 #include "Text.h"
 #include <tuple>
+#include "config.hpp"
 
 using namespace en;
 
@@ -120,8 +121,16 @@ const glm::vec2& Text::getBoundsMax() const {
 
 void Text::ensureGeometryUpdate() const {
 
-    if (!m_needsGeometryUpdate)
+    if (!m_needsGeometryUpdate) {
+
         return;
+
+//        int cacheId = m_font->getTexture(m_characterSize).m_cacheId; // can't access m_cacheId the way sf::Text does
+//        if (cacheId == m_fontTextureCacheId)
+//            return;
+//
+//        m_fontTextureCacheId = cacheId;
+    }
 
     m_needsGeometryUpdate = false;
     m_vertices.clear();
@@ -217,7 +226,7 @@ void Text::initializeMetatable(LuaState& lua) {
     ));
 
     lua::addProperty(lua, "font", lua::writeonlyProperty(
-        [](ComponentReference<Text>& ref, const std::string& filepath) {ref->setFont(Resources<sf::Font>::get(filepath));}
+        [](ComponentReference<Text>& ref, const std::string& filepath) {ref->setFont(Resources<sf::Font>::get(config::ASSETS_PATH + filepath));}
     ));
 
     lua::addProperty(lua, "fontSize", lua::property(

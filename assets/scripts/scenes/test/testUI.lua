@@ -188,16 +188,18 @@ function scene:start()
         Transform = {
             children = {
                 {
-                    Name = "Square",
+                    Name = "FontAtlasView",
                     Transform = {},
                     UIRect = {
-                        anchorMin = {0.5, 0.5},
-                        anchorMax = {1, 1}
+                        anchorMin = {0, 0},
+                        anchorMax = {1, 1},
+                        offsetMin = {0, 0},
+                        offsetMax = {0, -60}
                     },
                     Sprite = {
                         material = {
                             shader = "sprite",
-                            texture = "textures/runicfloor.png"
+                            texture = "textures/transparent.png"
                         }
                     },
                     LuaBehavior = {
@@ -207,6 +209,28 @@ function scene:start()
                         onMouseLeave = function(self)
                             self.actor:get("Sprite").isEnabled = true
                         end
+                    }
+                },
+                {
+                    Name = "FontAtlasViewTitle",
+                    Transform = {},
+                    UIRect = {
+                        anchorMin = {0, 1},
+                        anchorMax = {1, 1},
+                        offsetMin = {0, -60},
+                        offsetMax = {0, 0}
+                    },
+                    Sprite = {
+                        material = {
+                            shader = "sprite",
+                            texture = "textures/white.png"
+                        }
+                    },
+                    Text = {
+                        string = "Font atlas:",
+                        --font = "fonts/Menlo.ttc",
+                        fontSize = 50,
+                        color = {0,0,0,1}
                     }
                 }
             }
@@ -220,37 +244,8 @@ function scene:start()
         Sprite = {
             material = {
                 shader = "sprite",
-                texture = "textures/bricks.jpg"
+                texture = "textures/black.jpg"
             }
-        }
-    }
-
-    Game.makeActor {
-        Name = "Child",
-        Transform = {
-            parent = "Panel"
-        },
-        UIRect = {
-            anchorMin = {0, 0.75},
-            anchorMax = {0.5, 1}
-        },
-        Sprite = {
-            material = {
-                shader = "sprite",
-                texture = "textures/land.jpg"
-            }
-        },
-        LuaBehavior = {
-            onMouseDown = function(self, button)
-                if button == 1 then
-                    self.actor:get("UIRect").isEnabled = false
-                end
-            end,
-            onMouseUp = function(self, button)
-                if button == 1 then
-                    self.actor:get("UIRect").isEnabled = true
-                end
-            end
         }
     }
 
@@ -281,7 +276,7 @@ function scene:start()
         Transform = {parent = "PanelBottom"},
         UIRect = {},
         Text = {
-            font = "assets/fonts/Menlo.ttc",
+            font = "fonts/Menlo.ttc",
             color = {0, 1 / 3, 2 / 3, 1},
             string = "The quick brown fox jumps over the lazy dog\nThe quick brown fox jumps over the lazy dog"
         },
@@ -290,7 +285,7 @@ function scene:start()
 
                 local text = self.actor:get("Text")
                 text.string = string.sub("The quick brown fox jumps over the lazy dog\nThe quick brown fox jumps over the lazy dog", 1, 1 + math.floor(Game.getTime() * 10))
-                text.font = math.fmod(Game.getTime(), 2) < 1 and "assets/fonts/Menlo.ttc" or "assets/fonts/arial.ttf"
+                --text.font = math.fmod(Game.getTime(), 2) < 1 and "fonts/Menlo.ttc" or "fonts/arial.ttf"
 
                 local color = text.color
                 color.x = math.fmod(color.x + dt * 0.1, 1)

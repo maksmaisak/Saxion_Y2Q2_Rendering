@@ -51,10 +51,16 @@ int main() {
     //engine->getSceneManager().setCurrentScene<LightingScene>(); // Assignment 3
     //engine->getSceneManager().setCurrentScene<TerrainScene>();  // Assignment 4
 
-    engine->getScheduler().delay(sf::seconds(0), [engine = engine.get()](){
-        const auto& font = engine->findByName("TextElement").get<en::Text>().getFont();
-        engine->findByName("Square").get<en::Sprite>().material->setUniformValue("spriteTexture", en::Material::FontAtlas{font});
-    });
+    std::function<void()> update;
+    update = [&, engine = engine.get()](){
+        const auto& text = engine->findByName("TextElement").get<en::Text>();
+        auto& sprite = engine->findByName("FontAtlasView").get<en::Sprite>();
+        sprite.material->setUniformValue("spriteTexture", en::Material::FontAtlas{text.getFont(), text.getCharacterSize()});
+
+        engine->getScheduler().delay(sf::seconds(0.01f), update);
+    };
+
+    engine->getScheduler().delay(sf::seconds(0.01f), update);
 
     engine->run();
 

@@ -47,7 +47,7 @@ namespace en {
         void ensureGeometryUpdate() const;
 
         std::string m_string;
-        std::shared_ptr<Material> m_material = Resources<Material>::get("text");
+        std::shared_ptr<Material> m_material = std::make_shared<Material>("text");
         std::shared_ptr<sf::Font> m_font = Resources<sf::Font>::get(config::FONT_PATH + "arial.ttf");
         glm::vec4 m_color = glm::vec4(1);
         unsigned int m_characterSize = 30;

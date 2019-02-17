@@ -233,13 +233,15 @@ void RenderSystem::renderUIRect(Entity e, UIRect& rect) {
     auto* text = m_registry->tryGet<Text>(e);
     if (text && text->getMaterial()) {
 
+        const std::vector<Vertex>& vertices = text->getVertices();
+
         const glm::vec2 boundsCenter = (text->getBoundsMin() + text->getBoundsMax()) * 0.5;
         const glm::vec2 desiredCenter = (rect.computedMin + rect.computedMax) * 0.5;
         const glm::vec2 offset = desiredCenter - boundsCenter;
 
         const glm::mat4 matrix = glm::translate(glm::vec3(offset.x, offset.y, 0.f));
         text->getMaterial()->use(m_engine, &m_depthMaps, glm::mat4(1), glm::mat4(1), matrixProjection * matrix);
-        m_vertexRenderer.renderVertices(text->getVertices());
+        m_vertexRenderer.renderVertices(vertices);
     }
 
     if (auto* tf = m_registry->tryGet<Transform>(e))

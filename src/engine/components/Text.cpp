@@ -103,6 +103,11 @@ void Text::setColor(const glm::vec4& color) {
 
 const std::vector<Vertex>& Text::getVertices() const {
 
+    // Make it update no matter what since we can't be sure that
+    // the atlas texture hasn't changed and invalidated our UVs,
+    // because unlike sf::Text we have no access to m_font->getTexture(m_characterSize).m_cacheId
+    m_needsGeometryUpdate = true;
+
     ensureGeometryUpdate();
     return m_vertices;
 }
@@ -124,7 +129,6 @@ void Text::ensureGeometryUpdate() const {
     if (!m_needsGeometryUpdate) {
 
         return;
-
 //        int cacheId = m_font->getTexture(m_characterSize).m_cacheId; // can't access m_cacheId the way sf::Text does
 //        if (cacheId == m_fontTextureCacheId)
 //            return;

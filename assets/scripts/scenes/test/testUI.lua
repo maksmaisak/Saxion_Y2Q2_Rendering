@@ -228,7 +228,7 @@ function scene:start()
                     },
                     Text = {
                         string = "Font atlas:",
-                        --font = "fonts/Menlo.ttc",
+                        font = "fonts/Menlo.ttc",
                         fontSize = 50,
                         color = {0,0,0,1}
                     }

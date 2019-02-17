@@ -8,19 +8,15 @@
 #include <GL/glew.h>
 #include "glm.hpp"
 #include <vector>
+#include "Vertex.h"
 
 namespace en {
-
-    struct Vertex {
-        glm::vec3 position;
-        glm::vec2 uv;
-    };
 
     /// Owns the resources for rendering vertex arrays. Use for text, sprites, etc.
     class VertexRenderer {
 
     public:
-        VertexRenderer(std::size_t maxNumVerticesPerDrawCall = 4096);
+        explicit VertexRenderer(std::size_t maxNumVerticesPerDrawCall = 4096);
 
         void renderVertices(const std::vector<Vertex>& vertices);
 

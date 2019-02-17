@@ -48,7 +48,10 @@ namespace en {
             return 0;
 
         auto name = lua::check<std::string>(L, 2);
-        ComponentsToLua::addComponentByTypeName(L, actor, name);
+        if (lua_isnoneornil(L, 3))
+            ComponentsToLua::addComponentByTypeName(L, actor, name);
+        else
+            ComponentsToLua::addComponentByTypeName(L, actor, name, 3);
 
         return 1;
     }

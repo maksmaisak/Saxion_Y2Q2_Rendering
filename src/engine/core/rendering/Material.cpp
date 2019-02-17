@@ -197,6 +197,15 @@ void Material::setCustomUniformsOfType<std::shared_ptr<Texture>>(const Material:
     }
 }
 
+template<>
+void Material::setCustomUniformsOfType<Material::FontAtlas>(const Material::LocationToUniformValue<FontAtlas>& values) {
+
+    for (auto& [location, setting] : values) {
+        if (!setUniformTexture(location, setting.font->getTexture(setting.characterSize).getNativeHandle()))
+            break;
+    }
+}
+
 void Material::setCustomUniforms() {
 
     std::apply([this](auto&&... args){(setCustomUniformsOfType(args), ...);}, m_uniformValues);

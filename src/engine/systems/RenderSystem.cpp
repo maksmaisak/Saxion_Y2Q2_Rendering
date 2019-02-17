@@ -12,6 +12,7 @@
 #include "components/Camera.h"
 #include "components/Name.h"
 #include "components/Sprite.h"
+#include "components/Text.h"
 #include "GLHelpers.h"
 #include "Font.h"
 #include "GameTime.h"
@@ -206,12 +207,15 @@ void RenderSystem::renderUIRect(Entity e, UIRect& rect) {
     if (!rect.isEnabled)
         return;
 
+    const glm::vec2 windowSize = getWindowSize();
+    const glm::mat4 matrixProjection = glm::ortho(0.f, windowSize.x, 0.f, windowSize.y);
+
     auto* sprite = m_registry->tryGet<Sprite>(e);
     if (sprite && sprite->isEnabled && sprite->material) {
 
         const glm::vec2& min = rect.computedMin;
         const glm::vec2& max = rect.computedMax;
-        std::vector<Vertex> vertices = {
+        const std::vector<Vertex> vertices = {
             {{min.x, max.y, 0}, {0, 1}},
             {{min.x, min.y, 0}, {0, 0}},
             {{max.x, min.y, 0}, {1, 0}},
@@ -221,8 +225,22 @@ void RenderSystem::renderUIRect(Entity e, UIRect& rect) {
             {{max.x, max.y, 0}, {1, 1}},
         };
 
-        glm::vec2 size = getWindowSize();
-        sprite->material->use(m_engine, &m_depthMaps, glm::mat4(1), glm::mat4(1), glm::ortho(0.f, size.x, 0.f, size.y));
+        const glm::vec2 size = getWindowSize();
+        sprite->material->use(m_engine, &m_depthMaps, glm::mat4(1), glm::mat4(1), matrixProjection);
+        m_vertexRenderer.renderVertices(vertices);
+    }
+
+    auto* text = m_registry->tryGet<Text>(e);
+    if (text && text->getMaterial()) {
+
+        const std::vector<Vertex>& vertices = text->getVertices();
+
+        const glm::vec2 boundsCenter = (text->getBoundsMin() + text->getBoundsMax()) * 0.5;
+        const glm::vec2 desiredCenter = (rect.computedMin + rect.computedMax) * 0.5;
+        const glm::vec2 offset = desiredCenter - boundsCenter;
+
+        const glm::mat4 matrix = glm::translate(glm::vec3(offset.x, offset.y, 0.f));
+        text->getMaterial()->use(m_engine, &m_depthMaps, glm::mat4(1), glm::mat4(1), matrixProjection * matrix);
         m_vertexRenderer.renderVertices(vertices);
     }
 

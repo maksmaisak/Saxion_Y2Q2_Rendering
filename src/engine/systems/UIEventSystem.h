@@ -13,6 +13,7 @@ namespace en {
 
     class UIRect;
 
+    /// Dispatches mouse events to UIRects
     class UIEventSystem : public System {
 
     public:

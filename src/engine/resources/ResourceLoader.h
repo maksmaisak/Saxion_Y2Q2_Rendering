@@ -43,8 +43,7 @@ namespace en {
 
             auto fontPtr = std::make_shared<sf::Font>();
             bool didLoadFont = fontPtr->loadFromFile(filename);
-            assert(didLoadFont);
-            return fontPtr;
+            return didLoadFont ? fontPtr : nullptr;
         }
     };
 }

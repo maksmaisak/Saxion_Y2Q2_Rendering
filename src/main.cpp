@@ -11,9 +11,10 @@
 
 #include "components/RenderInfo.h"
 #include "components/Camera.h"
-#include "components/Sprite.h"
 #include "components/Transform.h"
 #include "components/UIRect.h"
+#include "components/Sprite.h"
+#include "components/Text.h"
 
 #include "TestScene.h"
 #include "LightingScene.h"
@@ -49,6 +50,17 @@ int main() {
     //engine->getSceneManager().setCurrentScene<TestScene>();     // Assignment 2
     //engine->getSceneManager().setCurrentScene<LightingScene>(); // Assignment 3
     //engine->getSceneManager().setCurrentScene<TerrainScene>();  // Assignment 4
+
+    std::function<void()> update;
+    update = [&, engine = engine.get()](){
+        const auto& text = engine->findByName("TextElement").get<en::Text>();
+        auto& sprite = engine->findByName("FontAtlasView").get<en::Sprite>();
+        sprite.material->setUniformValue("spriteTexture", en::Material::FontAtlas{text.getFont(), text.getCharacterSize()});
+
+        engine->getScheduler().delay(sf::seconds(0.01f), update);
+    };
+
+    engine->getScheduler().delay(sf::seconds(0.01f), update);
 
     engine->run();
 

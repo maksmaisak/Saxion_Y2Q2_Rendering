@@ -15,6 +15,8 @@
 #include "TupleUtils.h"
 #include "Light.h"
 #include "Transform.h"
+#include "Exception.h"
+#include "SFML/Graphics.hpp"
 
 namespace en {
 
@@ -52,9 +54,15 @@ namespace en {
         template<typename T>
         void setUniformValue(const std::string& name, const T& value);
 
+        // Information necessary to use a font atlas as a texture uniform.
+        // Pass instances of this into setUniformValue<FontAtlas>
+        struct FontAtlas {
+            std::shared_ptr<sf::Font> font;
+            unsigned int characterSize = 30;
+        };
+
     private:
 
-        // TODO Make this a mapping from location instead of from name.
         template<typename T>
         using LocationToUniformValue = std::unordered_map<GLint, T>;
 
@@ -155,7 +163,8 @@ namespace en {
             GLint, GLuint, GLfloat,
             glm::vec2, glm::vec3, glm::vec4,
             glm::mat4,
-            std::shared_ptr<Texture>
+            std::shared_ptr<Texture>,
+            FontAtlas
         > m_uniformValues;
 
         GLenum m_numTexturesInUse = 0;
@@ -182,7 +191,7 @@ namespace en {
 
         auto it = m_uniforms.find(name);
         if (it == m_uniforms.end()) {
-            throw "No such uniform: " + name;
+            throw utils::Exception("No such uniform: " + name);
         }
 
         static_assert(

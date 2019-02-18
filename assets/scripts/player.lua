@@ -172,6 +172,68 @@ function Player:unblockKey(key)
 	self.transform.position = self:getPositionFromGridPosition(self.gridPosition)
 end
 
+function Player:moveToPosition(nextPosition, canRegisterMove)
+	if not self.map:getGridAt(nextPosition).isObstacle then
+		if nextPosition.x ~= self.gridPosition.x or nextPosition.y ~= self.gridPosition.y then
+			self.lastPosition.x = self.gridPosition.x
+			self.lastPosition.y = self.gridPosition.y
+
+			self.gridPosition.x = nextPosition.x
+			self.gridPosition.y = nextPosition.y
+
+			if canRegisterMove then
+				self.moves[#self.moves + 1] = { x = self.gridPosition.x, y = self.gridPosition.y }
+				self.currentMoveIndex = self.currentMoveIndex + 1
+			end
+
+			if self.map:getGridAt(self.gridPosition).isButton then
+				self:activateButton(self.gridPosition)
+			end
+
+			-- if the tile changed then we gotta check if there was a button and disable it
+			if self.lastPosition.x ~= self.gridPosition.x or self.lastPosition.y ~= self.gridPosition.y then
+				if(self.map:getGridAt(self.lastPosition).isButton) then
+					self:disableButton(self.lastPosition)
+				end
+			end
+
+			if self.map:getGridAt(self.gridPosition).isGoal then
+				self:activateGoal(self.gridPosition)
+			end
+
+			self.transform.position = self:getPositionFromGridPosition(self.gridPosition)
+		end
+	end
+end
+
+function  Player:redoMove()
+	-- there are no redo moves left for us so do nothing here
+	if self.currentMoveIndex >= #self.moves then
+		print("No redos left")
+		return
+	end
+
+	self.currentMoveIndex	= self.currentMoveIndex + 1
+	local nextPosition		= self.moves[self.currentMoveIndex]
+
+	self:moveToPosition(nextPosition, false)
+end
+
+function Player:undoMove()
+	-- there are no undo moves left for us so do nothing here
+	if self.currentMoveIndex <= 1 then
+		print("No undos left")
+		return
+	end
+
+	self.currentMoveIndex	= self.currentMoveIndex - 1
+	local nextPosition		= self.moves[self.currentMoveIndex]
+
+	print("undoing move")
+
+	self:moveToPosition(nextPosition, false)
+end
+
 function Player:start()
 	self.gridPosition.x = self.startPosition.x
 	self.gridPosition.y = self.startPosition.y
@@ -180,6 +242,9 @@ function Player:start()
 
 	self.transform			= self.actor:get("Transform")
 	self.transform.position = self:getPositionFromGridPosition(self.gridPosition)
+
+	self.moves = { { x = self.gridPosition.x, y = self.gridPosition.y} }
+	self.currentMoveIndex = 1
 end
 
 function Player:update()
@@ -199,6 +264,14 @@ function Player:update()
 	if Game.keyboard.isDown("r") then
 		Game.loadScene("assets/scripts/scenes/level1.lua")
 		return
+	end
+
+	if Game.keyboard.isDown("e") then
+		self:redoMove()
+	end
+
+	if Game.keyboard.isDown("q") then
+		self:undoMove()
 	end
 
 	if Game.keyboard.isHeld("LShift") or Game.keyboard.isHeld("RShift") then
@@ -231,32 +304,7 @@ function Player:update()
         nextPosition.y = 1
     end
 
-	if not self.map:getGridAt(nextPosition).isObstacle then
-		if nextPosition.x ~= self.gridPosition.x or nextPosition.y ~= self.gridPosition.y then
-			self.lastPosition.x = self.gridPosition.x
-			self.lastPosition.y = self.gridPosition.y
-
-			self.gridPosition.x = nextPosition.x
-			self.gridPosition.y = nextPosition.y
-
-			if self.map:getGridAt(self.gridPosition).isButton then
-				self:activateButton(self.gridPosition)
-			end
-
-			-- if the tile changed then we gotta check if there was a button and disable it
-			if self.lastPosition.x ~= self.gridPosition.x or self.lastPosition.y ~= self.gridPosition.y then
-				if(self.map:getGridAt(self.lastPosition).isButton) then
-					self:disableButton(self.lastPosition)
-				end
-			end
-
-			if self.map:getGridAt(self.gridPosition).isGoal then
-				self:activateGoal(self.gridPosition)
-			end
-
-			self.transform.position = self:getPositionFromGridPosition(self.gridPosition)
-		end
-	end
+	self:moveToPosition(nextPosition, true)
 end
 
 return function(o)

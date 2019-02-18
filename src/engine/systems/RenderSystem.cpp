@@ -176,13 +176,18 @@ std::tuple<glm::vec2, glm::vec2> getBounds(UIRect& rect, const glm::vec2& parent
 void updateUIRect(Engine& engine, EntityRegistry& registry, Entity e, const glm::vec2& parentMin, const glm::vec2& parentMax, float scaleFactor) {
 
     auto& rect = registry.get<UIRect>(e);
+    auto* tf = registry.tryGet<Transform>(e);
+    if (!tf)
+        return;
+
     auto[min, max] = getBounds(rect, parentMin, parentMax, scaleFactor);
     rect.computedMin = min;
     rect.computedMax = max;
+    rect.computedSize = max - min;
 
-    if (auto* tf = registry.tryGet<Transform>(e))
-        for (Entity child : tf->getChildren())
-            updateUIRect(engine, registry, child, min, max, scaleFactor);
+    tf->setLocalPosition(glm::vec3(min.x, min.y, 0.f) - glm::vec3(parentMin.x, parentMin.y, 0.f));
+    for (Entity child : tf->getChildren())
+        updateUIRect(engine, registry, child, min, max, scaleFactor);
 }
 
 void RenderSystem::renderUI() {
@@ -205,22 +210,29 @@ void RenderSystem::renderUIRect(Entity e, UIRect& rect) {
     if (!rect.isEnabled)
         return;
 
+    auto* tf = m_registry->tryGet<Transform>(e);
+    if (!tf)
+        return;
+
     const glm::vec2 windowSize = getWindowSize();
     const glm::mat4 matrixProjection = glm::ortho(0.f, windowSize.x, 0.f, windowSize.y);
 
     auto* sprite = m_registry->tryGet<Sprite>(e);
     if (sprite && sprite->isEnabled && sprite->material) {
 
-        const glm::vec2& min = rect.computedMin;
-        const glm::vec2& max = rect.computedMax;
+        const glm::mat4& transform = tf->getWorldTransform();
+        const glm::vec3& min  = transform[3];
+        const glm::vec3& maxX = transform * glm::vec4(rect.computedSize.x,0,0,1);
+        const glm::vec3& maxY = transform * glm::vec4(0,rect.computedSize.y,0,1);
+        const glm::vec3& max  = transform * glm::vec4(rect.computedSize    ,0,1);
         const std::vector<Vertex> vertices = {
-            {{min.x, max.y, 0}, {0, 1}},
-            {{min.x, min.y, 0}, {0, 0}},
-            {{max.x, min.y, 0}, {1, 0}},
+            {maxY, {0, 1}},
+            {min , {0, 0}},
+            {maxX, {1, 0}},
 
-            {{min.x, max.y, 0}, {0, 1}},
-            {{max.x, min.y, 0}, {1, 0}},
-            {{max.x, max.y, 0}, {1, 1}},
+            {maxY, {0, 1}},
+            {maxX, {1, 0}},
+            {max , {1, 1}},
         };
 
         sprite->material->use(m_engine, &m_depthMaps, glm::mat4(1), glm::mat4(1), matrixProjection);
@@ -232,24 +244,24 @@ void RenderSystem::renderUIRect(Entity e, UIRect& rect) {
 
         const std::vector<Vertex>& vertices = text->getVertices();
 
-        const glm::vec2 boundsCenter = (text->getBoundsMin() + text->getBoundsMax()) * 0.5;
-        const glm::vec2 desiredCenter = (rect.computedMin + rect.computedMax) * 0.5;
-        const glm::vec2 offset = desiredCenter - boundsCenter;
+        const glm::vec2 boundsCenter  = (text->getBoundsMin() + text->getBoundsMax()) * 0.5f;
+        const glm::vec2 desiredCenter = (rect.computedMin + rect.computedMax) * 0.5f;
+        const glm::vec2 offset = rect.computedSize * 0.5f - boundsCenter;
 
         // Scale the bounds by the scale factor and bring them to the rect's position.
         glm::mat4 matrix = glm::translate(glm::vec3(-boundsCenter.x, -boundsCenter.y, 0.f));
         matrix = glm::scale(glm::vec3(getUIScaleFactor())) * matrix;
         matrix = glm::translate(glm::vec3(boundsCenter.x, boundsCenter.y, 0.f)) * matrix;
         matrix = glm::translate(glm::vec3(offset.x, offset.y, 0.f)) * matrix;
+        matrix = tf->getWorldTransform() * matrix;
 
         text->getMaterial()->use(m_engine, &m_depthMaps, glm::mat4(1), glm::mat4(1), matrixProjection * matrix);
         m_vertexRenderer.renderVertices(vertices);
     }
 
-    if (auto* tf = m_registry->tryGet<Transform>(e))
-        for (Entity child : tf->getChildren())
-            if (auto* childRect = m_registry->tryGet<UIRect>(child))
-                renderUIRect(child, *childRect);
+    for (Entity child : tf->getChildren())
+        if (auto* childRect = m_registry->tryGet<UIRect>(child))
+            renderUIRect(child, *childRect);
 }
 
 void RenderSystem::renderDebug() {

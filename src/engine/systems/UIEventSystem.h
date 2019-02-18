@@ -12,6 +12,7 @@
 namespace en {
 
     class UIRect;
+    class Transform;
 
     /// Dispatches mouse events to UIRects
     class UIEventSystem : public System {
@@ -20,7 +21,7 @@ namespace en {
         void update(float dt) override;
 
     private:
-        void updateRect(Entity e, UIRect& rect, const glm::vec2& mousePosition);
+        void updateRect(Entity e, UIRect& rect, Transform& transform, const glm::vec2& mousePosition);
     };
 }
 

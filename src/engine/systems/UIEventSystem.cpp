@@ -18,13 +18,18 @@ void UIEventSystem::update(float dt) {
 
     for (Entity e : m_registry->with<UIRect, Transform>())
         if (!m_registry->get<Transform>(e).getParent())
-            updateRect(e, m_registry->get<UIRect>(e), mousePosition);
+            updateRect(e, m_registry->get<UIRect>(e), m_registry->get<Transform>(e), mousePosition);
 }
 
-void UIEventSystem::updateRect(Entity e, UIRect& rect, const glm::vec2& mousePosition) {
+void UIEventSystem::updateRect(Entity e, UIRect& rect, Transform& transform, const glm::vec2& mousePosition) {
 
     rect.wasMouseOver = rect.isMouseOver;
-    rect.isMouseOver = glm::all(glm::lessThan(rect.computedMin, mousePosition)) && glm::all(glm::lessThan(mousePosition, rect.computedMax));
+
+    const glm::vec2 localMin = -rect.computedSize * rect.pivot;
+    const glm::vec2 localMax =  rect.computedSize * (1.f - rect.pivot);
+    const glm::vec2 localMousePosition = glm::inverse(transform.getWorldTransform()) * glm::vec4(mousePosition, 0.f, 1.f);
+    rect.isMouseOver = glm::all(glm::lessThan(localMin, localMousePosition)) && glm::all(glm::lessThan(localMousePosition, localMax));
+
     if (!rect.isEnabled)
         return;
 
@@ -55,6 +60,7 @@ void UIEventSystem::updateRect(Entity e, UIRect& rect, const glm::vec2& mousePos
     if (auto* tf = m_registry->tryGet<Transform>(e))
         for (Entity child : tf->getChildren())
             if (auto* childRect = m_registry->tryGet<UIRect>(child))
-                updateRect(child, *childRect, mousePosition);
+                if (auto* childTf = m_registry->tryGet<Transform>(child))
+                    updateRect(child, *childRect, *childTf, mousePosition);
 }
 

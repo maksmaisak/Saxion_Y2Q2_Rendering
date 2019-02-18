@@ -53,13 +53,15 @@ int main() {
 
     std::function<void()> update;
     update = [&, engine = engine.get()](){
-        const auto& text = engine->findByName("TextElement").get<en::Text>();
-        auto& sprite = engine->findByName("FontAtlasView").get<en::Sprite>();
-        sprite.material->setUniformValue("spriteTexture", en::Material::FontAtlas{text.getFont(), text.getCharacterSize()});
 
+        const auto* text = engine->findByName("TextElement").tryGet<en::Text>();
+        auto* sprite = engine->findByName("FontAtlasView").tryGet<en::Sprite>();
+        if (!text || !sprite)
+            return;
+
+        sprite->material->setUniformValue("spriteTexture", en::Material::FontAtlas{text->getFont(), text->getCharacterSize()});
         engine->getScheduler().delay(sf::seconds(0.01f), update);
     };
-
     engine->getScheduler().delay(sf::seconds(0.01f), update);
 
     engine->run();

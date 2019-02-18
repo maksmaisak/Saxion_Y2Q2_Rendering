@@ -90,6 +90,26 @@ function Player:activateButton(gridPosition)
 	print("Button activated")
 end
 
+function Player:registerMove(undoFunction, redoFunction)
+	print("move registered")
+
+	for k, v in pairs(self.moves) do
+		print(k)
+		if k >= self.currentMoveIndex then
+			self.moves[k] = nil
+			v = nil
+			k = nil
+		end
+	end
+
+	self.currentMoveIndex			= self.currentMoveIndex + 1
+
+	self.moves[#self.moves + 1]	= { 
+		undo = undoFunction,
+		redo = redoFunction
+	}
+end
+
 function Player:disableButton(gridPosition)
 	local button = self.map:getGridAt(gridPosition).button
 
@@ -119,7 +139,13 @@ function Player:disableButton(gridPosition)
 	print("Button Deactivated")
 end
 
-function Player:blockKey(key)
+function Player:bind(f, p1, p2, p3, p4, p5)
+	return function()
+		return f(p1, p2, p3, p4, p5)
+	end
+end
+
+function Player:blockKey(key, canRegisterMove)
 	print(key.." key blocked")
 	disabledKeys[key] = true
 	self.map:getDroppedKeysGridAt(self.gridPosition).hasKeyDropped[key] = true
@@ -131,9 +157,16 @@ function Player:blockKey(key)
 	self.map:getDroppedKeysGridAt(self.gridPosition).keys [#tempArray+1] = pair
 
 	self.transform.position = self:getPositionFromGridPosition(self.gridPosition)
+
+	if canRegisterMove then
+		self:registerMove(
+			self:bind(function(keyName, canRegisterMove) self:unblockKey(keyName, canRegisterMove) end, key, false), 
+			self:bind(function(keyName, canRegisterMove) self:blockKey(keyName, canRegisterMove) end, key, false)
+		)
+	end
 end
 
-function Player:unblockKey(key)
+function Player:unblockKey(key, canRegisterMove)
 	print(key.." key unblocked")
 
 	disabledKeys[key] = false
@@ -170,6 +203,13 @@ function Player:unblockKey(key)
 	end
 
 	self.transform.position = self:getPositionFromGridPosition(self.gridPosition)
+
+	if canRegisterMove then
+		self:registerMove(
+			self:bind(function(keyName, canRegisterMove) self:blockKey(keyName, canRegisterMove) end, key, false), 
+			self:bind(function(keyName, canRegisterMove) self:unblockKey(keyName, canRegisterMove) end, key, false)
+		)
+	end
 end
 
 function Player:moveToPosition(nextPosition, canRegisterMove)
@@ -181,9 +221,23 @@ function Player:moveToPosition(nextPosition, canRegisterMove)
 			self.gridPosition.x = nextPosition.x
 			self.gridPosition.y = nextPosition.y
 
+			local lastPosition = { x = self.lastPosition.x, y = self.lastPosition.y }
+			local gridPosition = { x = self.gridPosition.x, y = self.gridPosition.y }
+
 			if canRegisterMove then
-				self.moves[#self.moves + 1] = { x = self.gridPosition.x, y = self.gridPosition.y }
-				self.currentMoveIndex = self.currentMoveIndex + 1
+				self:registerMove(
+					self:bind(
+						function(position, canRegisterMove) 
+							self:moveToPosition(position, canRegisterMove) 
+						end, 
+						lastPosition, false, 1), 
+
+					self:bind(
+						function(position, canRegisterMove) 
+							self:moveToPosition(position, canRegisterMove) 
+						end,
+						gridPosition, false)
+				)
 			end
 
 			if self.map:getGridAt(self.gridPosition).isButton then
@@ -200,23 +254,25 @@ function Player:moveToPosition(nextPosition, canRegisterMove)
 			if self.map:getGridAt(self.gridPosition).isGoal then
 				self:activateGoal(self.gridPosition)
 			end
-
-			self.transform.position = self:getPositionFromGridPosition(self.gridPosition)
+			
+			self.transform.position = self:getPositionFromGridPosition(nextPosition)
 		end
 	end
 end
 
 function  Player:redoMove()
 	-- there are no redo moves left for us so do nothing here
-	if self.currentMoveIndex >= #self.moves then
+	if self.currentMoveIndex > #self.moves then
 		print("No redos left")
 		return
 	end
 
+	local move				= self.moves[self.currentMoveIndex]
 	self.currentMoveIndex	= self.currentMoveIndex + 1
-	local nextPosition		= self.moves[self.currentMoveIndex]
 
-	self:moveToPosition(nextPosition, false)
+	move.redo()
+
+	print("redoing move")
 end
 
 function Player:undoMove()
@@ -227,11 +283,16 @@ function Player:undoMove()
 	end
 
 	self.currentMoveIndex	= self.currentMoveIndex - 1
-	local nextPosition		= self.moves[self.currentMoveIndex]
+
+	if(self.currentMoveIndex < 1) then
+		self.currentMoveIndex = 1
+	end
+
+	local move	= self.moves[self.currentMoveIndex]	
+
+	move.undo()
 
 	print("undoing move")
-
-	self:moveToPosition(nextPosition, false)
 end
 
 function Player:start()
@@ -243,7 +304,7 @@ function Player:start()
 	self.transform			= self.actor:get("Transform")
 	self.transform.position = self:getPositionFromGridPosition(self.gridPosition)
 
-	self.moves = { { x = self.gridPosition.x, y = self.gridPosition.y} }
+	self.moves = {}
 	self.currentMoveIndex = 1
 end
 
@@ -268,23 +329,29 @@ function Player:update()
 
 	if Game.keyboard.isDown("e") then
 		self:redoMove()
+		return
 	end
 
 	if Game.keyboard.isDown("q") then
 		self:undoMove()
+		return
 	end
 
 	if Game.keyboard.isHeld("LShift") or Game.keyboard.isHeld("RShift") then
 		for key, value in pairs(inputKeys) do
 			if(Game.keyboard.isDown(key)) then
 				if (not self.map:getDroppedKeysGridAt(self.gridPosition).hasKeyDropped[key]) and not disabledKeys[key] then
-					self:blockKey(key)
+					self:blockKey(key, true)
 				elseif self.map:getDroppedKeysGridAt(self.gridPosition).hasKeyDropped[key] and disabledKeys[key] then
-					self:unblockKey(key)
+					self:unblockKey(key, true)
 				end
 				input = {x = 0, y = 0}
 			end
 		end
+	end
+
+	if input.x == 0 and input.y == 0 then
+		return
 	end
 
     local nextPosition = {

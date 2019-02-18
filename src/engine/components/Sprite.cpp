@@ -3,6 +3,8 @@
 //
 
 #include "Sprite.h"
+#include <memory>
+#include "Texture.hpp"
 
 using namespace en;
 
@@ -32,6 +34,7 @@ void Sprite::initializeMetatable(LuaState& lua) {
         if (!material)
             return glm::vec2(0);
 
-        return glm::vec2(0);
+        const auto& size = material->getUniformValue<std::shared_ptr<Texture>>("spriteTexture")->getSize();
+        return glm::vec2(size.x, size.y);
     }));
 }

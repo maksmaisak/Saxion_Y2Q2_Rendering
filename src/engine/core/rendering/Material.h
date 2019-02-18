@@ -54,6 +54,9 @@ namespace en {
         template<typename T>
         void setUniformValue(const std::string& name, const T& value);
 
+        template<typename T>
+        const T& getUniformValue(const std::string& name);
+
         // Information necessary to use a font atlas as a texture uniform.
         // Pass instances of this into setUniformValue<FontAtlas>
         struct FontAtlas {
@@ -201,6 +204,23 @@ namespace en {
 
         auto& values = std::get<LocationToUniformValue<T>>(m_uniformValues);
         values[it->second.location] = value;
+    }
+
+    template<typename T>
+    const T& Material::getUniformValue(const std::string& name) {
+
+        auto it = m_uniforms.find(name);
+        if (it == m_uniforms.end()) {
+            throw utils::Exception("No such uniform: " + name);
+        }
+
+        static_assert(
+            has_type_v<LocationToUniformValue<T>, decltype(m_uniformValues)>,
+            "This type is unsupported for custom uniforms."
+        );
+
+        auto& values = std::get<LocationToUniformValue<T>>(m_uniformValues);
+        return values[it->second.location];
     }
 }
 

@@ -27,4 +27,11 @@ Sprite& Sprite::addFromLua(Actor& actor, LuaState& lua) {
 void Sprite::initializeMetatable(LuaState& lua) {
 
     lua::addProperty(lua, "isEnabled", lua::property(&Sprite::isEnabled));
+    lua::addProperty(lua, "textureSize", lua::readonlyProperty([](ComponentReference<Sprite>& ref){
+        auto& material = ref->material;
+        if (!material)
+            return glm::vec2(0);
+
+        return glm::vec2(0);
+    }));
 }

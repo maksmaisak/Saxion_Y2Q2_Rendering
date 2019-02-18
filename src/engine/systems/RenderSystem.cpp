@@ -219,18 +219,20 @@ void RenderSystem::renderUIRect(Entity e, UIRect& rect) {
         const glm::mat4& transform = tf->getWorldTransform();
         const glm::vec2 localMin = -rect.computedSize * rect.pivot;
         const glm::vec2 localMax =  rect.computedSize * (1.f - rect.pivot);
-        const glm::vec3 min  = transform * glm::vec4(localMin,0,1);
-        const glm::vec3 maxX = transform * glm::vec4(localMax.x,localMin.y,0,1);
-        const glm::vec3 maxY = transform * glm::vec4(localMin.x,localMax.y,0,1);
-        const glm::vec3 max  = transform * glm::vec4(localMax,0,1);
+        const glm::vec3 corners[] = {
+            transform * glm::vec4(localMin              , 0, 1),
+            transform * glm::vec4(localMin.x, localMax.y, 0, 1),
+            transform * glm::vec4(localMax.x, localMin.y, 0, 1),
+            transform * glm::vec4(localMax              , 0, 1)
+        };
         const std::vector<Vertex> vertices = {
-            {maxY, {0, 1}},
-            {min , {0, 0}},
-            {maxX, {1, 0}},
+            {corners[1], {0, 1}},
+            {corners[0], {0, 0}},
+            {corners[2], {1, 0}},
 
-            {maxY, {0, 1}},
-            {maxX, {1, 0}},
-            {max , {1, 1}},
+            {corners[1], {0, 1}},
+            {corners[2], {1, 0}},
+            {corners[3], {1, 1}},
         };
 
         sprite->material->use(m_engine, &m_depthMaps, glm::mat4(1), glm::mat4(1), matrixProjection);

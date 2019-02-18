@@ -244,7 +244,7 @@ function scene:start()
         Sprite = {
             material = {
                 shader = "sprite",
-                texture = "textures/black.jpg"
+                texture = "textures/black.png"
             }
         }
     }

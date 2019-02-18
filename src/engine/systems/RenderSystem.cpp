@@ -166,28 +166,25 @@ void RenderSystem::renderEntities() {
     }
 }
 
-std::tuple<glm::vec2, glm::vec2> getBounds(UIRect& rect, const glm::vec2& parentMin, const glm::vec2& parentMax, float scaleFactor) {
-
-    const glm::vec2 min = glm::lerp(parentMin, parentMax, rect.anchorMin) + rect.offsetMin * scaleFactor;
-    const glm::vec2 max = glm::lerp(parentMin, parentMax, rect.anchorMax) + rect.offsetMax * scaleFactor;
-    return {min, max};
-}
-
-void updateUIRect(Engine& engine, EntityRegistry& registry, Entity e, const glm::vec2& parentMin, const glm::vec2& parentMax, float scaleFactor) {
+void updateUIRect(Engine& engine, EntityRegistry& registry, Entity e, const glm::vec2& parentSize, const glm::vec2& parentPivot, float scaleFactor) {
 
     auto& rect = registry.get<UIRect>(e);
     auto* tf = registry.tryGet<Transform>(e);
     if (!tf)
         return;
 
-    auto[min, max] = getBounds(rect, parentMin, parentMax, scaleFactor);
-    rect.computedMin = min;
-    rect.computedMax = max;
-    rect.computedSize = max - min;
+    const glm::vec2 parentMinToLocalMin = parentSize * rect.anchorMin + rect.offsetMin * scaleFactor;
+    const glm::vec2 parentMinToLocalMax = parentSize * rect.anchorMax + rect.offsetMax * scaleFactor;
+    rect.computedSize = parentMinToLocalMax - parentMinToLocalMin;
 
-    tf->setLocalPosition(glm::vec3(min.x, min.y, 0.f) - glm::vec3(parentMin.x, parentMin.y, 0.f));
+    const glm::vec2 parentMinToLocalPivot  = glm::lerp(parentMinToLocalMin, parentMinToLocalMax, rect.pivot);
+    const glm::vec2 parentPivotToParentMin = -parentSize * parentPivot;
+    const glm::vec2 parentPivotToLocalPivot = parentPivotToParentMin + parentMinToLocalPivot;
+
+    tf->setLocalPosition(glm::vec3(parentPivotToLocalPivot, tf->getLocalPosition().z));
+
     for (Entity child : tf->getChildren())
-        updateUIRect(engine, registry, child, min, max, scaleFactor);
+        updateUIRect(engine, registry, child, rect.computedSize, rect.pivot, scaleFactor);
 }
 
 void RenderSystem::renderUI() {
@@ -196,7 +193,7 @@ void RenderSystem::renderUI() {
 
     for (Entity e : m_registry->with<Transform, UIRect>())
         if (!m_registry->get<Transform>(e).getParent())
-            updateUIRect(*m_engine, *m_registry, e, {0, 0}, getWindowSize(), getUIScaleFactor());
+            updateUIRect(*m_engine, *m_registry, e, getWindowSize(), {0, 0}, getUIScaleFactor());
 
     for (Entity e : m_registry->with<Transform, UIRect>())
         if (!m_registry->get<Transform>(e).getParent())
@@ -221,10 +218,12 @@ void RenderSystem::renderUIRect(Entity e, UIRect& rect) {
     if (sprite && sprite->isEnabled && sprite->material) {
 
         const glm::mat4& transform = tf->getWorldTransform();
-        const glm::vec3& min  = transform[3];
-        const glm::vec3& maxX = transform * glm::vec4(rect.computedSize.x,0,0,1);
-        const glm::vec3& maxY = transform * glm::vec4(0,rect.computedSize.y,0,1);
-        const glm::vec3& max  = transform * glm::vec4(rect.computedSize    ,0,1);
+        const glm::vec2 localMin = -rect.computedSize * rect.pivot;
+        const glm::vec2 localMax =  rect.computedSize * (1.f - rect.pivot);
+        const glm::vec3 min  = transform * glm::vec4(localMin,0,1);
+        const glm::vec3 maxX = transform * glm::vec4(localMax.x,localMin.y,0,1);
+        const glm::vec3 maxY = transform * glm::vec4(localMin.x,localMax.y,0,1);
+        const glm::vec3 max  = transform * glm::vec4(localMax,0,1);
         const std::vector<Vertex> vertices = {
             {maxY, {0, 1}},
             {min , {0, 0}},
@@ -244,9 +243,8 @@ void RenderSystem::renderUIRect(Entity e, UIRect& rect) {
 
         const std::vector<Vertex>& vertices = text->getVertices();
 
-        const glm::vec2 boundsCenter  = (text->getBoundsMin() + text->getBoundsMax()) * 0.5f;
-        const glm::vec2 desiredCenter = (rect.computedMin + rect.computedMax) * 0.5f;
-        const glm::vec2 offset = rect.computedSize * 0.5f - boundsCenter;
+        const glm::vec2 boundsCenter = (text->getBoundsMin() + text->getBoundsMax()) * 0.5f;
+        const glm::vec2 offset = rect.computedSize * (0.5f - rect.pivot) - boundsCenter;
 
         // Scale the bounds by the scale factor and bring them to the rect's position.
         glm::mat4 matrix = glm::translate(glm::vec3(-boundsCenter.x, -boundsCenter.y, 0.f));

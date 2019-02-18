@@ -14,5 +14,6 @@ void UIRect::initializeMetatable(LuaState& lua) {
     lua::addProperty(lua, "offsetMax", lua::property(&UIRect::offsetMax));
     lua::addProperty(lua, "isEnabled", lua::property(&UIRect::isEnabled));
 
+    lua::addProperty(lua, "pivot", lua::property(&UIRect::pivot));
     lua::addProperty(lua, "isMouseOver", lua::readonlyProperty([](ComponentReference<UIRect> ref){return ref->isMouseOver;}));
 }

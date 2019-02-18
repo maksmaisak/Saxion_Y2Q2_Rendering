@@ -299,6 +299,20 @@ function scene:start()
     }
 end
 
+local function animateUITransform(actor)
+
+    local tf = actor:get("Transform")
+    tf.rotation = {0, 0, 10 * math.sin(Game.getTime() * 8) }
+    local scale = 1 + 0.03 * math.sin(Game.getTime() * 8)
+    tf.scale = {scale, scale, scale }
+
+    local uiRect = actor:get("UIRect")
+    uiRect.pivot = {
+        math.sin(Game.getTime() * 0.1) * 0.5 + 0.5,
+        math.sin(Game.getTime() * 0.1) * 0.5 + 0.5
+    }
+end
+
 function scene:update(dt)
 
     Game.find("Light"):get("Transform").position = {-4, 3 + 2 * math.sin(Game.getTime()), 0}
@@ -311,11 +325,7 @@ function scene:update(dt)
     end
 
     --Game.find("Panel"):get("UIRect").isEnabled = math.fmod(Game.getTime(), 2) < 1
-    local tf = Game.find("Panel"):get("Transform")
-
-    tf.rotation = {0, 0, math.sin(Game.getTime() * 8) * 5}
-    local scale = 1 + 0.03 * math.sin(Game.getTime() * 8)
-    tf.scale = {scale, scale, scale}
+    animateUITransform(Game.find("Panel"))
 end
 
 return scene

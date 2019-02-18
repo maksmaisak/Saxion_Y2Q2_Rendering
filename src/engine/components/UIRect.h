@@ -25,9 +25,8 @@ namespace en {
 
         bool isEnabled = true;
 
-        glm::vec2 computedMin;
-        glm::vec2 computedMax;
         glm::vec2 computedSize;
+        glm::vec2 pivot = {0.5f, 0.5f};
         bool isMouseOver = false;
         bool wasMouseOver = false;
     };

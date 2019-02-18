@@ -180,7 +180,6 @@ void updateUIRect(Engine& engine, EntityRegistry& registry, Entity e, const glm:
     const glm::vec2 parentMinToLocalPivot  = glm::lerp(parentMinToLocalMin, parentMinToLocalMax, rect.pivot);
     const glm::vec2 parentPivotToParentMin = -parentSize * parentPivot;
     const glm::vec2 parentPivotToLocalPivot = parentPivotToParentMin + parentMinToLocalPivot;
-
     tf->setLocalPosition(glm::vec3(parentPivotToLocalPivot, tf->getLocalPosition().z));
 
     for (Entity child : tf->getChildren())

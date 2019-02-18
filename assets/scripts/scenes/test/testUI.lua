@@ -309,7 +309,7 @@ local function animateUITransform(actor)
     local uiRect = actor:get("UIRect")
     uiRect.pivot = {
         math.sin(Game.getTime() * 0.1) * 0.5 + 0.5,
-        math.sin(Game.getTime() * 0.1) * 0.5 + 0.5
+        math.cos(Game.getTime() * 0.1) * 0.5 + 0.5
     }
 end
 

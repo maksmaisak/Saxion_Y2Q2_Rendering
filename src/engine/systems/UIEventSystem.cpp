@@ -25,8 +25,8 @@ void UIEventSystem::updateRect(Entity e, UIRect& rect, Transform& transform, con
 
     rect.wasMouseOver = rect.isMouseOver;
 
-    const glm::vec2 localMin = glm::lerp(glm::vec2(0.f), -rect.computedSize, rect.pivot);
-    const glm::vec2 localMax = glm::lerp(rect.computedSize, glm::vec2(0.f),  rect.pivot);
+    const glm::vec2 localMin = -rect.computedSize * rect.pivot;
+    const glm::vec2 localMax =  rect.computedSize * (1.f - rect.pivot);
     const glm::vec2 localMousePosition = glm::inverse(transform.getWorldTransform()) * glm::vec4(mousePosition, 0.f, 1.f);
     rect.isMouseOver = glm::all(glm::lessThan(localMin, localMousePosition)) && glm::all(glm::lessThan(localMousePosition, localMax));
 

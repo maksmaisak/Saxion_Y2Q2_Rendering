@@ -23,11 +23,14 @@ namespace en {
         glm::vec2 offsetMin = {0, 0};
         glm::vec2 offsetMax = {0, 0};
 
+        // Rotation and scale are applied from this pivot.
+        // In normalized coordinates [0..1]
+        glm::vec2 pivot = {0.5f, 0.5f};
+
         bool isEnabled = true;
 
         glm::vec2 computedSize;
-        glm::vec2 pivot = {0.5f, 0.5f};
-        bool isMouseOver = false;
+        bool isMouseOver  = false;
         bool wasMouseOver = false;
     };
 }

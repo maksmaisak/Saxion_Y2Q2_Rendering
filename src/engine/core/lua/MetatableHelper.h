@@ -104,6 +104,24 @@ namespace lua {
                 assert(oldTop == newTop);
             }
         };
+
+        template<typename T, typename Owner>
+        inline auto makeGetter(T Owner::* memberPtr) {
+
+            using OwnerRef = en::ComponentReference<Owner>;
+            return (std::function<T(OwnerRef)>)[memberPtr](OwnerRef owner) {
+                return (*owner).*memberPtr;
+            };
+        }
+
+        template<typename T, typename Owner>
+        inline auto makeSetter(T Owner::* memberPtr) {
+
+            using OwnerRef = en::ComponentReference<Owner>;
+            return (std::function<T(OwnerRef, const T&)>)[memberPtr](OwnerRef owner, const T& value) {
+                return (*owner).*memberPtr = value;
+            };
+        }
     }
 
     // Gets or adds a metatable for a given type.
@@ -145,6 +163,11 @@ namespace lua {
         Getter m_getter = {};
         Setter m_setter = {};
     };
+
+    // A type deduction guide.
+    template<typename GetterT, typename SetterT>
+    PropertyWrapper(GetterT&& getter, SetterT&& setter) ->
+        PropertyWrapper<utils::remove_cvref_t<GetterT>, utils::remove_cvref_t<SetterT>>;
 
     /// Adds a getter and setter, if present, to the __getter and __setter tables in the table on top of stack.
     /// That table is assumed to be a metatable.
@@ -194,8 +217,8 @@ namespace lua {
         using OwnerRef = en::ComponentReference<Owner>;
 
         return property<std::function<T(OwnerRef)>, std::function<T(OwnerRef, const T&)>>(
-            [memberPtr](OwnerRef owner){ return (*owner).*memberPtr; },
-            [memberPtr](OwnerRef owner, const T& value){ return (*owner).*memberPtr = value; }
+            detail::makeGetter<T, Owner>(memberPtr),
+            detail::makeSetter<T, Owner>(memberPtr)
         );
     }
 
@@ -207,12 +230,22 @@ namespace lua {
         return PropertyWrapper<typename traits::FunctionType, NoAccessor>(getter, NoAccessor());
     }
 
+    template<typename T, typename Owner>
+    inline auto readonlyProperty(T Owner::* memberPtr) {
+        return PropertyWrapper(detail::makeGetter<T, Owner>(memberPtr), NoAccessor());
+    }
+
     template<typename Setter>
     inline auto writeonlyProperty(Setter&& setter) {
 
         using traits = utils::functionTraits<Setter>;
         static_assert(traits::isFunction);
         return PropertyWrapper<NoAccessor, typename traits::FunctionType>(NoAccessor(), setter);
+    }
+
+    template<typename T, typename Owner>
+    inline auto writeonlyProperty(T Owner::* memberPtr) {
+        return PropertyWrapper(NoAccessor(), detail::makeSetter<T, Owner>(memberPtr));
     }
 }
 

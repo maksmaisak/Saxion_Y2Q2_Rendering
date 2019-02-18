@@ -3,18 +3,18 @@ require('assets/scripts/object')
 require('assets/scripts/level/map')
 
 Player = Object:new {
-	startPosition	= { x = 1, y = 1 },
-	gridPosition	= { x = 1, y = 1 },
-	lastPosition	= { x = 1, y = 1 },
-	map				= {}
+	startPosition = { x = 1, y = 1 },
+	gridPosition  = { x = 1, y = 1 },
+	lastPosition  = { x = 1, y = 1 },
+	map			  = {}
 }
 
 local disabledKeys = {left = false, right = false, up = false, down = false}
-local inputKeys = { left = { x = 1.0, y= 0}, right = {x = -1, y = 0}, up = {x = 0, y = 1}, down = {x = 0, y = -1} }
+local inputKeys = { left = { x = 1.0, y = 0}, right = {x = -1, y = 0}, up = {x = 0, y = 1}, down = {x = 0, y = -1} }
 
 function Player:getPositionFromGridPosition(gridPosition)
-	local yOffSet = self.map:calculateYOffset(gridPosition)
-    return Vector.from {0, 1 + yOffSet, 0} + self.map:getGridAt(gridPosition).tile:get("Transform").position
+	local yOffset = self.map:calculateYOffset(gridPosition)
+    return Vector.from {0, 1 + yOffset, 0} + self.map:getGridAt(gridPosition).tile:get("Transform").position
 end
 
 function Player:makeKey(gridPosition, keyName)
@@ -53,6 +53,7 @@ function Player:makeKey(gridPosition, keyName)
 end
 
 function Player:activateGoal(gridPosition)
+
 	local goal = self.map:getGridAt(gridPosition).goal
 	if not goal.isEnabled then
 		return
@@ -72,19 +73,19 @@ end
 function Player:activateButton(gridPosition)
 	local button = self.map:getGridAt(gridPosition).button
 
-	if(button.isActivated) then
+	if button.isActivated then
 		return
 	end
 
-	button.isActivated				= true
-	button.actionTarget.isEnabled	= true
+	button.isActivated		 	  = true
+	button.actionTarget.isEnabled = true
 
-	local buttonPosition		= button.transform.position
-	buttonPosition.y			= buttonPosition.y - 0.5
-	button.transform.position	= buttonPosition
+	local buttonPosition	  = button.transform.position
+	buttonPosition.y		  = buttonPosition.y - 0.5
+	button.transform.position = buttonPosition
 
-	local actionTargetPosition 	= button.actionTarget.transform.position
-	actionTargetPosition.y 		= actionTargetPosition.y + 0.5
+	local actionTargetPosition = button.actionTarget.transform.position
+	actionTargetPosition.y 	   = actionTargetPosition.y + 0.5
 
 	button.actionTarget.transform.position = actionTargetPosition
 	print("Button activated")
@@ -102,7 +103,7 @@ function Player:registerMove(undoFunction, redoFunction)
 		end
 	end
 
-	self.currentMoveIndex			= self.currentMoveIndex + 1
+	self.currentMoveIndex = self.currentMoveIndex + 1
 
 	self.moves[#self.moves + 1]	= { 
 		undo = undoFunction,
@@ -113,7 +114,7 @@ end
 function Player:disableButton(gridPosition)
 	local button = self.map:getGridAt(gridPosition).button
 
-	if(not button.isActivated) then
+	if not button.isActivated then
 		return
 	end
 
@@ -160,8 +161,8 @@ function Player:blockKey(key, canRegisterMove)
 
 	if canRegisterMove then
 		self:registerMove(
-			self:bind(function(keyName, canRegisterMove) self:unblockKey(keyName, canRegisterMove) end, key, false), 
-			self:bind(function(keyName, canRegisterMove) self:blockKey(keyName, canRegisterMove) end, key, false)
+			function() self:unblockKey(key, false) end,
+			function() self:blockKey  (key, false) end
 		)
 	end
 end
@@ -186,9 +187,9 @@ function Player:unblockKey(key, canRegisterMove)
 
 	for k, v in pairs(self.map:getDroppedKeysGridAt(self.gridPosition).keys) do
 		for m, p in pairs(v) do
-			if (p) then
-				local xNorm = (self.gridPosition.x - 1) /  self.map:getGridSize().x
-				local yNorm = (self.gridPosition.y - 1) /  self.map:getGridSize().y
+			if p then
+				local xNorm = (self.gridPosition.x - 1) / self.map:getGridSize().x
+				local yNorm = (self.gridPosition.y - 1) / self.map:getGridSize().y
 
 				local position = {
 					x = (xNorm - 0.5) *  self.map:getGridSize().x,
@@ -206,8 +207,8 @@ function Player:unblockKey(key, canRegisterMove)
 
 	if canRegisterMove then
 		self:registerMove(
-			self:bind(function(keyName, canRegisterMove) self:blockKey(keyName, canRegisterMove) end, key, false), 
-			self:bind(function(keyName, canRegisterMove) self:unblockKey(keyName, canRegisterMove) end, key, false)
+			function() self:blockKey(key, false) end,
+			function() self:unblockKey(key, false) end
 		)
 	end
 end
@@ -223,20 +224,14 @@ function Player:moveToPosition(nextPosition, canRegisterMove)
 
 			local lastPosition = { x = self.lastPosition.x, y = self.lastPosition.y }
 			local gridPosition = { x = self.gridPosition.x, y = self.gridPosition.y }
-
 			if canRegisterMove then
 				self:registerMove(
-					self:bind(
-						function(position, canRegisterMove) 
-							self:moveToPosition(position, canRegisterMove) 
-						end, 
-						lastPosition, false, 1), 
-
-					self:bind(
-						function(position, canRegisterMove) 
-							self:moveToPosition(position, canRegisterMove) 
-						end,
-						gridPosition, false)
+					function()
+						self:moveToPosition(lastPosition, false)
+					end,
+					function()
+						self:moveToPosition(gridPosition, false)
+					end
 				)
 			end
 
@@ -260,36 +255,35 @@ function Player:moveToPosition(nextPosition, canRegisterMove)
 	end
 end
 
-function  Player:redoMove()
+function Player:redoMove()
+
 	-- there are no redo moves left for us so do nothing here
 	if self.currentMoveIndex > #self.moves then
 		print("No redos left")
 		return
 	end
 
-	local move				= self.moves[self.currentMoveIndex]
-	self.currentMoveIndex	= self.currentMoveIndex + 1
-
+	local move			  = self.moves[self.currentMoveIndex]
+	self.currentMoveIndex = self.currentMoveIndex + 1
 	move.redo()
 
 	print("redoing move")
 end
 
 function Player:undoMove()
+
 	-- there are no undo moves left for us so do nothing here
 	if self.currentMoveIndex <= 1 then
 		print("No undos left")
 		return
 	end
 
-	self.currentMoveIndex	= self.currentMoveIndex - 1
-
-	if(self.currentMoveIndex < 1) then
+	self.currentMoveIndex = self.currentMoveIndex - 1
+	if self.currentMoveIndex < 1 then
 		self.currentMoveIndex = 1
 	end
 
-	local move	= self.moves[self.currentMoveIndex]	
-
+	local move = self.moves[self.currentMoveIndex]
 	move.undo()
 
 	print("undoing move")
@@ -359,14 +353,14 @@ function Player:update()
         y = self.gridPosition.y - input.y
     }
 
-    if nextPosition.x >  self.map:getGridSize().x then
-        nextPosition.x =  self.map:getGridSize().x
+    if nextPosition.x > self.map:getGridSize().x then
+        nextPosition.x = self.map:getGridSize().x
     elseif nextPosition.x < 1 then
         nextPosition.x = 1
     end
 
-    if nextPosition.y >  self.map:getGridSize().y then
-        nextPosition.y =  self.map:getGridSize().y
+    if nextPosition.y > self.map:getGridSize().y then
+        nextPosition.y = self.map:getGridSize().y
     elseif nextPosition.y < 1 then
         nextPosition.y = 1
     end

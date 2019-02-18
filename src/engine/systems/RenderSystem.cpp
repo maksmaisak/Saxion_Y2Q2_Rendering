@@ -70,6 +70,11 @@ void RenderSystem::start() {
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
     m_debugHud = std::make_unique<DebugHud>(&m_engine->getWindow());
+
+    auto& lua = m_engine->getLuaState();
+    lua_getglobal(lua, "Config");
+    auto popConfig = lua::PopperOnDestruct(lua);
+    m_referenceResolution = lua.tryGetField<glm::vec2>("referenceResolution").value_or(glm::vec2(1920, 1080));
 }
 
 glm::mat4 getProjectionMatrix(Engine& engine, Camera& camera) {
@@ -160,40 +165,32 @@ void RenderSystem::renderEntities() {
     }
 }
 
-std::tuple<glm::vec2, glm::vec2> getBounds(UIRect& rect, const glm::vec2& parentMin, const glm::vec2& parentMax) {
+std::tuple<glm::vec2, glm::vec2> getBounds(UIRect& rect, const glm::vec2& parentMin, const glm::vec2& parentMax, float scaleFactor) {
 
-    const glm::vec2 min = glm::lerp(parentMin, parentMax, rect.anchorMin) + rect.offsetMin;
-    const glm::vec2 max = glm::lerp(parentMin, parentMax, rect.anchorMax) + rect.offsetMax;
+    const glm::vec2 min = glm::lerp(parentMin, parentMax, rect.anchorMin) + rect.offsetMin * scaleFactor;
+    const glm::vec2 max = glm::lerp(parentMin, parentMax, rect.anchorMax) + rect.offsetMax * scaleFactor;
     return {min, max};
 }
 
-void updateUIRect(Engine& engine, EntityRegistry& registry, Entity e, const glm::vec2& parentMin, const glm::vec2& parentMax) {
+void updateUIRect(Engine& engine, EntityRegistry& registry, Entity e, const glm::vec2& parentMin, const glm::vec2& parentMax, float scaleFactor) {
 
     auto& rect = registry.get<UIRect>(e);
-    auto[min, max] = getBounds(rect, parentMin, parentMax);
+    auto[min, max] = getBounds(rect, parentMin, parentMax, scaleFactor);
     rect.computedMin = min;
     rect.computedMax = max;
 
     if (auto* tf = registry.tryGet<Transform>(e))
         for (Entity child : tf->getChildren())
-            updateUIRect(engine, registry, child, min, max);
+            updateUIRect(engine, registry, child, min, max, scaleFactor);
 }
 
 void RenderSystem::renderUI() {
 
     glDisable(GL_DEPTH_TEST);
 
-    sf::Vector2u windowSizeSf = m_engine->getWindow().getSize();
-    auto windowSize = glm::vec2(windowSizeSf.x, windowSizeSf.y);
-    glm::mat4 matrixProjection = glm::ortho(0.f, windowSize.x, 0.f, windowSize.y);
-    //glm::mat4 matrixProjection = glm::ortho(0.f, 1.f, 0.f, 1.f);
-
-    glm::vec2 parentMin = {0, 0};
-    glm::vec2 parentMax = windowSize;
-
     for (Entity e : m_registry->with<Transform, UIRect>())
         if (!m_registry->get<Transform>(e).getParent())
-            updateUIRect(*m_engine, *m_registry, e, {0, 0}, windowSize);
+            updateUIRect(*m_engine, *m_registry, e, {0, 0}, getWindowSize(), getUIScaleFactor());
 
     for (Entity e : m_registry->with<Transform, UIRect>())
         if (!m_registry->get<Transform>(e).getParent())
@@ -225,7 +222,6 @@ void RenderSystem::renderUIRect(Entity e, UIRect& rect) {
             {{max.x, max.y, 0}, {1, 1}},
         };
 
-        const glm::vec2 size = getWindowSize();
         sprite->material->use(m_engine, &m_depthMaps, glm::mat4(1), glm::mat4(1), matrixProjection);
         m_vertexRenderer.renderVertices(vertices);
     }
@@ -239,7 +235,11 @@ void RenderSystem::renderUIRect(Entity e, UIRect& rect) {
         const glm::vec2 desiredCenter = (rect.computedMin + rect.computedMax) * 0.5;
         const glm::vec2 offset = desiredCenter - boundsCenter;
 
-        const glm::mat4 matrix = glm::translate(glm::vec3(offset.x, offset.y, 0.f));
+        glm::mat4 matrix = glm::translate(glm::vec3(-boundsCenter.x, -boundsCenter.y, 0.f));
+        matrix = glm::scale(glm::vec3(getUIScaleFactor())) * matrix;
+        matrix = glm::translate(glm::vec3(boundsCenter.x, boundsCenter.y, 0.f)) * matrix;
+        matrix = glm::translate(glm::vec3(offset.x, offset.y, 0.f)) * matrix;
+
         text->getMaterial()->use(m_engine, &m_depthMaps, glm::mat4(1), glm::mat4(1), matrixProjection * matrix);
         m_vertexRenderer.renderVertices(vertices);
     }
@@ -393,6 +393,12 @@ glm::vec2 RenderSystem::getWindowSize() {
 
     sf::Vector2u windowSizeSf = m_engine->getWindow().getSize();
     return glm::vec2(windowSizeSf.x, windowSizeSf.y);
+}
+
+float RenderSystem::getUIScaleFactor() {
+
+    const glm::vec2 windowSize = getWindowSize();
+    return windowSize.x / m_referenceResolution.x;
 }
 
 void GLAPIENTRY

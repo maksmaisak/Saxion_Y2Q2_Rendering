@@ -37,14 +37,17 @@ namespace en {
         Actor getMainCamera();
         void updateDepthMapsDirectionalLights(const std::vector<Entity>& directionalLights);
         void updateDepthMapsPositionalLights(const std::vector<Entity>& pointLights);
+
         void renderUIRect(Entity entity, UIRect& rect);
         glm::vec2 getWindowSize();
+        float getUIScaleFactor();
 
         DepthMaps m_depthMaps;
         std::shared_ptr<ShaderProgram> m_directionalDepthShader;
         std::shared_ptr<ShaderProgram> m_positionalDepthShader;
 
         VertexRenderer m_vertexRenderer;
+        glm::vec2 m_referenceResolution;
 
         std::unique_ptr<DebugHud> m_debugHud;
         bool m_displayMeshDebugInfo = false;

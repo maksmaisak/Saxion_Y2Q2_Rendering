@@ -1,11 +1,12 @@
 
 -- engine
-width  = 1920
-height = 1080
+width  = 800
+height = 450
 fullscreen = false
 framerateCap = 240
 startScene = 'assets/scripts/scenes/test/testUI.lua'
 firstLevelDefinition = 'assets/scripts/scenes/definition1.lua'
+referenceResolution = {1920, 1080}
 
 -- custom
 bulletSpeed = 30

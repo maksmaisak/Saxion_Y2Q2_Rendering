@@ -7,6 +7,7 @@
 #include <tuple>
 #include <string>
 #include <sstream>
+#include <cmath>
 #include "components/RenderInfo.h"
 #include "components/Transform.h"
 #include "components/Camera.h"
@@ -235,6 +236,7 @@ void RenderSystem::renderUIRect(Entity e, UIRect& rect) {
         const glm::vec2 desiredCenter = (rect.computedMin + rect.computedMax) * 0.5;
         const glm::vec2 offset = desiredCenter - boundsCenter;
 
+        // Scale the bounds by the scale factor and bring them to the rect's position.
         glm::mat4 matrix = glm::translate(glm::vec3(-boundsCenter.x, -boundsCenter.y, 0.f));
         matrix = glm::scale(glm::vec3(getUIScaleFactor())) * matrix;
         matrix = glm::translate(glm::vec3(boundsCenter.x, boundsCenter.y, 0.f)) * matrix;
@@ -398,7 +400,7 @@ glm::vec2 RenderSystem::getWindowSize() {
 float RenderSystem::getUIScaleFactor() {
 
     const glm::vec2 windowSize = getWindowSize();
-    return windowSize.x / m_referenceResolution.x;
+    return std::sqrt((windowSize.x / m_referenceResolution.x) * (windowSize.y / m_referenceResolution.y));
 }
 
 void GLAPIENTRY

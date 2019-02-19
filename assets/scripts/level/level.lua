@@ -73,7 +73,7 @@ function Level:start()
     end
 
 	-- spawn obstacles
-	for k, v in pairs(self.definition.obstaclePositions) do
+	for k, v in pairs(self.definition.obstaclePositions or {}) do
 		local gridPosition = { x = v.x, y = v.y }
 
 		self.map:getGridAt(gridPosition).isObstacle = true
@@ -81,7 +81,7 @@ function Level:start()
 	end
 	
 	-- spawn buttons
-	for k, v in pairs(self.definition.buttonPositions) do
+	for k, v in pairs(self.definition.buttonPositions or {}) do
 		local gridPosition = { x = v.x, y = v.y }
 
 		self.map:getGridAt(gridPosition).isButton = true
@@ -109,7 +109,7 @@ function Level:start()
 	end
 
 	-- spawn portals
-	for k,v in pairs(self.definition.portalPositions) do
+	for k,v in pairs(self.definition.portalPositions or {}) do
 		local gridPosition = { x = v.x, y = v.y }
 
 		self.map:makeGameObject(gridPosition, portalData)

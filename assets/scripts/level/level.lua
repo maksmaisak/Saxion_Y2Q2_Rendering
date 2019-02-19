@@ -44,6 +44,16 @@ local goalData = {
 	}
 }
 
+local portalData = {
+	name			= "Portal",
+	startYPosition	= 1,
+	scale			= { 0.9 * 0.5, 0.5, 0.9 * 0.5},
+	mesh			= "models/cube_flat.obj",
+	material		=  Game.makeMaterial {
+		diffuseColor = {0, 0.81, 0.82}
+	}
+}
+
 function Level:start()
 	self.definition				= dofile(self.definitionPath)
 
@@ -52,7 +62,7 @@ function Level:start()
 	self.map = self.definition.map
 	self.map:initializeGrid()
 
-	-- make views
+	-- spawn base tiles
     for x = 1, self.map:getGridSize().x do
         for y = 1, self.map:getGridSize().y do
 
@@ -62,6 +72,7 @@ function Level:start()
         end
     end
 
+	-- spawn obstacles
 	for k, v in pairs(self.definition.obstaclePositions) do
 		local gridPosition = { x = v.x, y = v.y }
 
@@ -69,6 +80,7 @@ function Level:start()
 		self.map:makeGameObject(gridPosition, obstacleData)
 	end
 	
+	-- spawn buttons
 	for k, v in pairs(self.definition.buttonPositions) do
 		local gridPosition = { x = v.x, y = v.y }
 
@@ -94,6 +106,18 @@ function Level:start()
 
 		self.map:getGridAt(actionTargetPosition).isGoal	= true
 		self.map:getGridAt(actionTargetPosition).goal	= self.map:getGridAt(gridPosition).button.actionTarget
+	end
+
+	-- spawn portals
+	for k,v in pairs(self.definition.portalPositions) do
+		local gridPosition = { x = v.x, y = v.y }
+
+		self.map:makeGameObject(gridPosition, portalData)
+
+		self.map:getGridAt(gridPosition).isPortal	= true
+		self.map:getGridAt(gridPosition).portal		= {
+			teleportPosition = { x = v.teleportPosition.x, y = v.teleportPosition.y }
+		}
 	end
 
 	if self.definition.decorations then

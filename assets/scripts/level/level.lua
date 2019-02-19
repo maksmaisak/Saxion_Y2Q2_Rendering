@@ -93,7 +93,9 @@ function Level:start()
         }
     }
 
-	--Game.makeActors(self.definition.decorations)
+	if self.definition.decorations then
+		Game.makeActors(self.definition.decorations)
+	end
 
 	-- make views
     for x = 1, self.map:getGridSize().x do

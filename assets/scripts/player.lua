@@ -224,6 +224,7 @@ function Player:moveToPosition(nextPosition, canRegisterMove)
 
 			local lastPosition = { x = self.lastPosition.x, y = self.lastPosition.y }
 			local gridPosition = { x = self.gridPosition.x, y = self.gridPosition.y }
+
 			if canRegisterMove then
 				self:registerMove(
 					function()
@@ -249,7 +250,12 @@ function Player:moveToPosition(nextPosition, canRegisterMove)
 			if self.map:getGridAt(self.gridPosition).isGoal then
 				self:activateGoal(self.gridPosition)
 			end
-			
+
+			if self.map:getGridAt(self.gridPosition).isPortal then
+				self:moveToPosition(self.map:getGridAt(self.gridPosition).portal.teleportPosition, false)
+				return
+			end
+
 			self.transform.position = self:getPositionFromGridPosition(nextPosition)
 		end
 	end

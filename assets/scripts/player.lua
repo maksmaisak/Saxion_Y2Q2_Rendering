@@ -317,7 +317,7 @@ function Player:update()
     end
 
 	if Game.keyboard.isDown("r") then
-		Game.loadScene("assets/scripts/scenes/level1.lua")
+		Game.loadScene(Config.startScene)
 		return
 	end
 

@@ -6,6 +6,25 @@ Map = Object:new {
 	droppedKeysGrid = {}
 }
 
+function Map:init()
+
+	for x = 1, self.gridSize.x do
+		self.grid[x] = {}
+		for y = 1, self.gridSize.y do
+			self.grid[x][y] = {}
+		end
+	end
+
+	for x = 1, self.gridSize.x do
+		self.droppedKeysGrid[x] = {}
+		for y = 1, self.gridSize.y do
+			self.droppedKeysGrid[x][y]				 = {}
+			self.droppedKeysGrid[x][y].keys			 = {up = nil, down = nil, left = nil, right = nil }
+			self.droppedKeysGrid[x][y].hasKeyDropped = {up = false, down = false, left = false, right = false}
+		end
+	end
+end
+
 function Map:getGridSize()
 	return self.gridSize
 end
@@ -19,11 +38,12 @@ function Map:getDroppedKeysGridAt(gridPosition)
 end
 
 function Map:calculateYOffset(gridPosition)
+
 	local yOffset = 0.0
 
 	for k, v in pairs(self:getDroppedKeysGridAt(gridPosition).keys) do
 		for m, p in pairs(v) do
-			if(p) then
+			if p then
 				yOffset = yOffset + 2 * p:get("Transform").scale.y
 			end
 		end
@@ -52,23 +72,5 @@ function Map:makeGameObject(gridPosition, objectData)
             material	= objectData.material
         }
     }
-end
-
-function Map:initializeGrid()
-	for x = 1, self.gridSize.x do
-		self.grid[x] = {}
-		for y = 1, self.gridSize.y do
-			self.grid[x][y] = {}
-		end
-	end
-
-	for x = 1, self.gridSize.x do
-		self.droppedKeysGrid[x] = {}
-		for y = 1, self.gridSize.y do
-			self.droppedKeysGrid[x][y]					= {}
-			self.droppedKeysGrid[x][y].keys				= {up = nil, down = nil, left = nil, right = nil }
-			self.droppedKeysGrid[x][y].hasKeyDropped	= {up = false, down = false, left = false, right = false}
-		end
-	end
 end
 

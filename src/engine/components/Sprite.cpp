@@ -3,6 +3,8 @@
 //
 
 #include "Sprite.h"
+#include <memory>
+#include "Texture.hpp"
 
 using namespace en;
 
@@ -27,4 +29,12 @@ Sprite& Sprite::addFromLua(Actor& actor, LuaState& lua) {
 void Sprite::initializeMetatable(LuaState& lua) {
 
     lua::addProperty(lua, "isEnabled", lua::property(&Sprite::isEnabled));
+    lua::addProperty(lua, "textureSize", lua::readonlyProperty([](ComponentReference<Sprite>& ref){
+        auto& material = ref->material;
+        if (!material)
+            return glm::vec2(0);
+
+        const auto& size = material->getUniformValue<std::shared_ptr<Texture>>("spriteTexture")->getSize();
+        return glm::vec2(size.x, size.y);
+    }));
 }

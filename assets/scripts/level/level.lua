@@ -44,6 +44,16 @@ local goalData = {
 	}
 }
 
+local portalData = {
+	name			= "Portal",
+	startYPosition	= 1,
+	scale			= { 0.9 * 0.5, 0.5, 0.9 * 0.5},
+	mesh			= "models/cube_flat.obj",
+	material		=  Game.makeMaterial {
+		diffuseColor = {0, 0.81, 0.82}
+	}
+}
+
 function Level:start()
 	self.definition				= dofile(self.definitionPath)
 
@@ -52,12 +62,66 @@ function Level:start()
 	self.map = self.definition.map
 	self.map:initializeGrid()
 
+	-- spawn base tiles
+    for x = 1, self.map:getGridSize().x do
+        for y = 1, self.map:getGridSize().y do
+
+			local gridPosition = { x = x, y = y}
+
+			self.map:getGridAt(gridPosition).tile = self.map:makeGameObject(gridPosition, tileData)
+        end
+    end
+
+	-- spawn obstacles
 	for k, v in pairs(self.definition.obstaclePositions) do
-		self.map.grid[v.x][v.y].isObstacle = true
+		local gridPosition = { x = v.x, y = v.y }
+
+		self.map:getGridAt(gridPosition).isObstacle = true
+		self.map:makeGameObject(gridPosition, obstacleData)
 	end
 	
+	-- spawn buttons
 	for k, v in pairs(self.definition.buttonPositions) do
-		self.map.grid[v.x][v.y].isButton = true
+		local gridPosition = { x = v.x, y = v.y }
+
+		self.map:getGridAt(gridPosition).isButton = true
+
+		local buttonActor			= self.map:makeGameObject(gridPosition, buttonData)
+		local actionTargetPosition	= { x = v.actionTargetPosition.x, y = v.actionTargetPosition.y }
+		local actionTargetActor		= self.map:makeGameObject(actionTargetPosition, goalData)
+
+		self.map:getGridAt(gridPosition).button = {
+			actor		= buttonActor,
+			transform	= buttonActor:get("Transform"),
+
+			actionTarget = {
+				actor		= actionTargetActor,
+				transform	= actionTargetActor:get("Transform"),
+				isEnabled	= false,
+				isActivated = false
+			},
+
+			isActivated = false
+		}
+
+		self.map:getGridAt(actionTargetPosition).isGoal	= true
+		self.map:getGridAt(actionTargetPosition).goal	= self.map:getGridAt(gridPosition).button.actionTarget
+	end
+
+	-- spawn portals
+	for k,v in pairs(self.definition.portalPositions) do
+		local gridPosition = { x = v.x, y = v.y }
+
+		self.map:makeGameObject(gridPosition, portalData)
+
+		self.map:getGridAt(gridPosition).isPortal	= true
+		self.map:getGridAt(gridPosition).portal		= {
+			teleportPosition = { x = v.teleportPosition.x, y = v.teleportPosition.y }
+		}
+	end
+
+	if self.definition.decorations then
+		Game.makeActors(self.definition.decorations)
 	end
 
 	Game.makeActors {
@@ -92,46 +156,6 @@ function Level:start()
             }
         }
     }
-
-	--Game.makeActors(self.definition.decorations)
-
-	-- make views
-    for x = 1, self.map:getGridSize().x do
-        for y = 1, self.map:getGridSize().y do
-
-			local gridPosition = { x = x, y = y}
-
-			self.map:getGridAt(gridPosition).tile = self.map:makeGameObject(gridPosition, tileData)
-
-			if self.map:getGridAt(gridPosition).isObstacle then
-				self.map:makeGameObject(gridPosition, obstacleData)
-			end
-
-			if self.map:getGridAt(gridPosition).isButton then
-
-				local buttonActor			= self.map:makeGameObject(gridPosition, buttonData)
-				local actionTargetPosition	= { x = 8, y= 8}
-				local actionTargetActor		= self.map:makeGameObject(actionTargetPosition, goalData)
-
-				self.map:getGridAt(gridPosition).button = {
-					actor		= buttonActor,
-					transform	= buttonActor:get("Transform"),
-
-					actionTarget = {
-						actor		= actionTargetActor,
-						transform	= actionTargetActor:get("Transform"),
-						isEnabled	= false,
-						isActivated = false
-					},
-
-					isActivated = false
-				}
-
-				self.map:getGridAt(actionTargetPosition).isGoal	= true
-				self.map:getGridAt(actionTargetPosition).goal	= self.map:getGridAt(gridPosition).button.actionTarget
-			end
-        end
-    end
 
 	local playerActor = Game.makeActor {
         Name = "Player",

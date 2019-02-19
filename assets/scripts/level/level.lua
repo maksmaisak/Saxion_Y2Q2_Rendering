@@ -52,12 +52,52 @@ function Level:start()
 	self.map = self.definition.map
 	self.map:initializeGrid()
 
+	-- make views
+    for x = 1, self.map:getGridSize().x do
+        for y = 1, self.map:getGridSize().y do
+
+			local gridPosition = { x = x, y = y}
+
+			self.map:getGridAt(gridPosition).tile = self.map:makeGameObject(gridPosition, tileData)
+        end
+    end
+
 	for k, v in pairs(self.definition.obstaclePositions) do
-		self.map.grid[v.x][v.y].isObstacle = true
+		local gridPosition = { x = v.x, y = v.y }
+
+		self.map:getGridAt(gridPosition).isObstacle = true
+		self.map:makeGameObject(gridPosition, obstacleData)
 	end
 	
 	for k, v in pairs(self.definition.buttonPositions) do
-		self.map.grid[v.x][v.y].isButton = true
+		local gridPosition = { x = v.x, y = v.y }
+
+		self.map:getGridAt(gridPosition).isButton = true
+
+		local buttonActor			= self.map:makeGameObject(gridPosition, buttonData)
+		local actionTargetPosition	= { x = v.actionTargetPosition.x, y = v.actionTargetPosition.y }
+		local actionTargetActor		= self.map:makeGameObject(actionTargetPosition, goalData)
+
+		self.map:getGridAt(gridPosition).button = {
+			actor		= buttonActor,
+			transform	= buttonActor:get("Transform"),
+
+			actionTarget = {
+				actor		= actionTargetActor,
+				transform	= actionTargetActor:get("Transform"),
+				isEnabled	= false,
+				isActivated = false
+			},
+
+			isActivated = false
+		}
+
+		self.map:getGridAt(actionTargetPosition).isGoal	= true
+		self.map:getGridAt(actionTargetPosition).goal	= self.map:getGridAt(gridPosition).button.actionTarget
+	end
+
+	if self.definition.decorations then
+		Game.makeActors(self.definition.decorations)
 	end
 
 	Game.makeActors {
@@ -92,48 +132,6 @@ function Level:start()
             }
         }
     }
-
-	if self.definition.decorations then
-		Game.makeActors(self.definition.decorations)
-	end
-
-	-- make views
-    for x = 1, self.map:getGridSize().x do
-        for y = 1, self.map:getGridSize().y do
-
-			local gridPosition = { x = x, y = y}
-
-			self.map:getGridAt(gridPosition).tile = self.map:makeGameObject(gridPosition, tileData)
-
-			if self.map:getGridAt(gridPosition).isObstacle then
-				self.map:makeGameObject(gridPosition, obstacleData)
-			end
-
-			if self.map:getGridAt(gridPosition).isButton then
-
-				local buttonActor			= self.map:makeGameObject(gridPosition, buttonData)
-				local actionTargetPosition	= { x = 8, y= 8}
-				local actionTargetActor		= self.map:makeGameObject(actionTargetPosition, goalData)
-
-				self.map:getGridAt(gridPosition).button = {
-					actor		= buttonActor,
-					transform	= buttonActor:get("Transform"),
-
-					actionTarget = {
-						actor		= actionTargetActor,
-						transform	= actionTargetActor:get("Transform"),
-						isEnabled	= false,
-						isActivated = false
-					},
-
-					isActivated = false
-				}
-
-				self.map:getGridAt(actionTargetPosition).isGoal	= true
-				self.map:getGridAt(actionTargetPosition).goal	= self.map:getGridAt(gridPosition).button.actionTarget
-			end
-        end
-    end
 
 	local playerActor = Game.makeActor {
         Name = "Player",

@@ -5,15 +5,13 @@ return {
 		gridSize = {x = 6, y = 9}
 	},
 
-	obstaclePositions = 
-	{
+	obstaclePositions = {
 		{ x = 1, y = 2},
 		{ x = 5, y = 5},
 	},
 
-	buttonPositions = 
-	{
-		--{ x = 3, y = 3, actionTargetPosition = {6, 6}}
+	buttonPositions = {
+		--{ x = 3, y = 3, actionTargetPosition = {x = 6, y = 6}}
 	},
 
 	playerStartPosition = {x = 2, y = 3},

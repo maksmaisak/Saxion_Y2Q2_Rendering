@@ -4,7 +4,7 @@ width  = 1920
 height = 1080
 fullscreen = false
 framerateCap = 240
-startScene = 'assets/scripts/scenes/test/testUI.lua'
+startScene = 'assets/scripts/scenes/mainMenu.lua'
 firstLevelDefinition = 'assets/scripts/scenes/definition1.lua'
 referenceResolution = {1920, 1080}
 

@@ -11,8 +11,12 @@ end
 
 function Level:start()
 
-	self.definition			 = dofile(self.definitionPath)
-	self.playerStartPosition = self.definition.playerStartPosition
+	if not self.definitionPath then
+		print('Level: no path to level definition.')
+		return
+	end
+
+	self.definition	 = dofile(self.definitionPath)
 	self.map = self.definition.map
 
     for x = 1, self.map:getGridSize().x do
@@ -28,56 +32,33 @@ function Level:start()
 				gridItem.obstacle = Game.makeActor(gridItem.obstacle)
 			end
 
-			if gridItem.goal then
-				gridItem.goal = Game.makeActor(gridItem.goal)
-			end
-
 			if gridItem.player then
 				gridItem.player = Game.makeActor(gridItem.player)
+				gridItem.player:add("LuaBehavior", dofile(Config.player) {
+					level = self,
+					map   = self.map,
+				})
 			end
 
-			if gridItem.button then
-
-				local actor = Game.makeActor(gridItem.button)
-				gridItem.button = {
+			if gridItem.goal then
+				local actor = Game.makeActor(gridItem.goal)
+				gridItem.goal = {
 					actor = actor,
-					transform = actor.get("Transform")
+					transform = actor:get("Transform")
 				}
 			end
 
+			if gridItem.button then
+				local button = gridItem.button
+				button.actor = Game.makeActor(gridItem.button.actor)
+				button.transform = button.actor:get("Transform")
+			end
+
 			if gridItem.portal then
-				gridItem.portal = Game.makeActor(gridItem.portal)
+				gridItem.portal.actor = Game.makeActor(gridItem.portal.actor)
 			end
         end
 	end
-
---	-- spawn buttons
---	for k, v in pairs(self.definition.buttonPositions or {}) do
---		local gridPosition = { x = v.x, y = v.y }
---
---		self.map:getGridAt(gridPosition).isButton = true
---
---		local buttonActor			= self.map:makeGameObject(gridPosition, buttonData)
---		local actionTargetPosition	= { x = v.actionTargetPosition.x, y = v.actionTargetPosition.y }
---		local actionTargetActor		= self.map:makeGameObject(actionTargetPosition, goalData)
---
---		self.map:getGridAt(gridPosition).button = {
---			actor		= buttonActor,
---			transform	= buttonActor:get("Transform"),
---
---			actionTarget = {
---				actor		= actionTargetActor,
---				transform	= actionTargetActor:get("Transform"),
---				isEnabled	= false,
---				isActivated = false
---			},
---
---			isActivated = false
---		}
---
---		self.map:getGridAt(actionTargetPosition).isGoal	= true
---		self.map:getGridAt(actionTargetPosition).goal	= self.map:getGridAt(gridPosition).button.actionTarget
---	end
 
 --	-- spawn portals
 --	for k,v in pairs(self.definition.portalPositions or {}) do
@@ -127,13 +108,4 @@ function Level:start()
             }
         }
 	}
-
-	local player = Game.find("Player")
-	if player then
-		player:add("LuaBehavior", dofile(Config.player) {
-			startPosition = self.playerStartPosition,
-			map = self.map,
-			level = self
-		})
-	end
 end

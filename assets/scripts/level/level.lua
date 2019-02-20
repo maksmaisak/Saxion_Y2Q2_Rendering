@@ -2,7 +2,8 @@ require('assets/scripts/object')
 require('assets/scripts/vector')
 
 Level = Object:new {
-	definitionPath = nil
+	definitionPath = nil,
+	nextLevel = nil
 }
 
 local function getCameraPosition(gridSize)
@@ -16,7 +17,7 @@ function Level:start()
 		return
 	end
 
-	self.definition	 = dofile(self.definitionPath)
+	self.definition = dofile(self.definitionPath)
 	self.map = self.definition.map
 
     for x = 1, self.map:getGridSize().x do
@@ -59,18 +60,6 @@ function Level:start()
 			end
         end
 	end
-
---	-- spawn portals
---	for k,v in pairs(self.definition.portalPositions or {}) do
---		local gridPosition = { x = v.x, y = v.y }
---
---		self.map:makeGameObject(gridPosition, portalData)
---
---		self.map:getGridAt(gridPosition).isPortal	= true
---		self.map:getGridAt(gridPosition).portal		= {
---			teleportPosition = { x = v.teleportPosition.x, y = v.teleportPosition.y }
---		}
---	end
 
 --	if self.definition.decorations then
 --		Game.makeActors(self.definition.decorations)

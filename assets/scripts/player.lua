@@ -66,7 +66,7 @@ function Player:activateGoal(gridPosition)
 
 	goal.isActivated = true
 	Game.loadScene(Level:new {
-		definitionPath = self.level.definition.nextLevelDefinitionPath
+		definitionPath = self.level.definition.nextLevel
 	})
 	print("activating goal")
 end
@@ -214,9 +214,10 @@ function Player:unblockKey(key, canRegisterMove)
 	end
 end
 
-function Player:moveToPosition(nextPosition, canRegisterMove)
+function Player:moveToPosition(nextPosition, canRegisterMove, didUsePortal)
 
-	if self.map:getGridAt(nextPosition).obstacle then
+	local gridItem = self.map:getGridAt(nextPosition);
+	if gridItem.obstacle then
 		return
 	end
 	if nextPosition.x == self.gridPosition.x and nextPosition.y == self.gridPosition.y then
@@ -243,23 +244,23 @@ function Player:moveToPosition(nextPosition, canRegisterMove)
 		)
 	end
 
-	if self.map:getGridAt(self.gridPosition).button then
+	if gridItem.button then
 		self:activateButton(self.gridPosition)
 	end
 
 	-- if the tile changed then we gotta check if there was a button and disable it
 	if self.lastPosition.x ~= self.gridPosition.x or self.lastPosition.y ~= self.gridPosition.y then
-		if self.map:getGridAt(self.lastPosition).button then
+		if gridItem.button then
 			self:disableButton(self.lastPosition)
 		end
 	end
 
-	if self.map:getGridAt(self.gridPosition).goal then
+	if gridItem.goal then
 		self:activateGoal(self.gridPosition)
 	end
 
-	if self.map:getGridAt(self.gridPosition).portal then
-		self:moveToPosition(self.map:getGridAt(self.gridPosition).portal.teleportPosition, false)
+	if not didUsePortal and gridItem.portal then
+		self:moveToPosition(gridItem.portal.teleportPosition, false, true)
 		return
 	end
 

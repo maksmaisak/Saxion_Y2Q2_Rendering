@@ -217,7 +217,7 @@ end
 function Player:moveToPosition(nextPosition, canRegisterMove, didUsePortal)
 
 	local gridItem = self.map:getGridAt(nextPosition);
-	if gridItem.obstacle then
+	if gridItem.obstacle or not gridItem.tile then
 		return
 	end
 	if nextPosition.x == self.gridPosition.x and nextPosition.y == self.gridPosition.y then

@@ -305,8 +305,8 @@ function Player:start()
 	self.transform = self.actor:get("Transform")
 	local position = self.transform.position
 
-	self.gridPosition.x = position.x
-	self.gridPosition.y = position.z
+	self.gridPosition.x = position.x + 1
+	self.gridPosition.y = position.z + 1
 	self.lastPosition.x = self.gridPosition.x
 	self.lastPosition.y = self.gridPosition.y
 

@@ -1995,9 +1995,10 @@ grid[2][4].button = {
         },
     }
 }
-grid[1][1].player = {
+grid[4][5].player = {
     Name = "Player",
     Transform = {
+        position = {3, 0, 4},
         children = {
             {
                 Name = "Cube",

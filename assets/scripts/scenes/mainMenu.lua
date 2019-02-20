@@ -39,7 +39,7 @@ function scene:start()
 	
 	Game.makeActors(scenery)
 
---Start Main Buttons Panel
+	-- Start Main Buttons Panel
    	Game.makeActor {
 		Name = "MainButtonsPanel",
 		Transform = {},
@@ -52,28 +52,28 @@ function scene:start()
 	local startButton = Game.makeActor {
 		Name = "StartButton",
 		Transform = {
-			scale	= {1,1,1},
-			parent	= "MainButtonsPanel"
+			scale  = {1,1,1},
+			parent = "MainButtonsPanel"
 		},
 		Text = {
-			font = "fonts/Menlo.ttc",
-			color = {0, 0, 0, 1},
+			font   = "fonts/Menlo.ttc",
+			color  = {0, 0, 0, 1},
 			string = "START"
         },
 		UIRect = {
-			anchorMin	= {0.5, 0.8},
-			anchorMax	= {0.5, 0.8}
+			anchorMin = {0.5, 0.8},
+			anchorMax = {0.5, 0.8}
 		},
 		Sprite = {
 			material = {
-				shader		= "sprite",
-				texture		= "textures/button.png",
+				shader	= "sprite",
+				texture	= "textures/button.png",
 			}
 		},
 		LuaBehavior = {
 			onMouseDown = function(self, button)
 				if button == 1 then
-					Game.loadScene(Config.firstLevelDefinition)
+					Game.loadScene(Config.firstLevelPath)
 				end
 			end,
 
@@ -288,9 +288,7 @@ function scene:start()
 
 			onMouseDown = function(self, button)
 				if button == 1 then
-					Game.loadScene(Level:new {
-						definitionPath = "assets/scripts/scenes/definition"..levelIndex..".lua"
-					})
+					Game.loadScene("assets/scripts/scenes/level"..levelIndex..".lua")
 					print("Loaded scene : " ..levelIndex)
 				end
 			end

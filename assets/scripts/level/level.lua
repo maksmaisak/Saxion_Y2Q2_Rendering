@@ -15,6 +15,7 @@ function Level:start()
 
 	if not self.map then
 		print('Level: no map')
+		return
 	end
 
     for x = 1, self.map:getGridSize().x do

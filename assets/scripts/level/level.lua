@@ -59,9 +59,9 @@ function Level:start()
         end
 	end
 
---	if self.decorations then
---		Game.makeActors(self.definition.decorations)
---	end
+	if self.extras then
+		Game.makeActors(self.extras)
+	end
 
 	Game.makeActors {
         {

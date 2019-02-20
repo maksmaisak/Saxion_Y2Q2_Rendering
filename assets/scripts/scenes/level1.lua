@@ -2078,7 +2078,50 @@ grid[4][5].player = {
     },
 }
 
+local extras = {
+    {
+        Name = "Main Camera",
+        Transform = {
+            position = {8, 12, -8},
+            rotation = {45, 315, 1.207418E-06},
+        },
+    },
+    {
+        Name = "Directional Light",
+        Transform = {
+            position = {0, 3, 0},
+            rotation = {50, 330, 0},
+        },
+    },
+    {
+        Name = "Level",
+        Transform = {
+        },
+    },
+    {
+        Name = "Tiles",
+        Transform = {
+        },
+    },
+    {
+        Name = "Obstacles",
+        Transform = {
+        },
+    },
+    {
+        Name = "Buttons",
+        Transform = {
+        },
+    },
+    {
+        Name = "Portals",
+        Transform = {
+        },
+    },
+}
+
 return Level:new {
     map = map,
+    extras = extras,
     nextLevelPath = ''
 }

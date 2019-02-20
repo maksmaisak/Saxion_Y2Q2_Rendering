@@ -5,15 +5,17 @@ height = 1080
 fullscreen = false
 framerateCap = 240
 startScene = 'assets/scripts/scenes/mainMenu.lua'
-firstLevelDefinition = 'assets/scripts/scenes/definition1.lua'
 referenceResolution = {1920, 1080}
 
 -- custom
+player = 'assets/scripts/player.lua'
+firstLevelPath = 'assets/scripts/scenes/test/testLevelFormat.lua'
+
+-- old stuff
 bulletSpeed = 30
 levelRestartDelay = 2
 arenaSize = 60
 maxNumActiveBullets = 10
-player = 'assets/scripts/player.lua'
 players = {
     {
         color = {1, 0, 0},

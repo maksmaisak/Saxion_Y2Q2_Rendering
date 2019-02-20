@@ -50,9 +50,7 @@ function scene:start()
 			onMouseDown = function(self, button)
 				if button == 1 then
 					print("start")
-					Game.loadScene(Level:new {
-						definitionPath = Config.firstLevelDefinition
-					})
+					Game.loadScene(Config.firstLevelPath)
 				end
 			end
 		}

@@ -3,38 +3,39 @@ require('assets/scripts/object')
 require('assets/scripts/level/map')
 
 Player = Object:new {
-	startPosition = { x = 1, y = 1 },
-	gridPosition  = { x = 1, y = 1 },
-	lastPosition  = { x = 1, y = 1 },
-	map			  = {}
+	gridPosition = { x = 1, y = 1 },
+	lastPosition = { x = 1, y = 1 },
+	map			 = nil
 }
 
 local disabledKeys = {left = false, right = false, up = false, down = false}
 local inputKeys = { left = { x = 1.0, y = 0}, right = {x = -1, y = 0}, up = {x = 0, y = 1}, down = {x = 0, y = -1} }
 
 function Player:getPositionFromGridPosition(gridPosition)
-	local yOffset = self.map:calculateYOffset(gridPosition)
-    return Vector.from {0, 1 + yOffset, 0} + self.map:getGridAt(gridPosition).tile:get("Transform").position
+
+	return Vector:new {
+		x = gridPosition.x - 1,
+		y = self.map:calculateYOffset(gridPosition),
+		z = gridPosition.y - 1
+	}
 end
 
 function Player:makeKey(gridPosition, keyName)
 
-	local xNorm = (gridPosition.x - 1) / self.map:getGridSize().x
-    local yNorm = (gridPosition.y - 1) / self.map:getGridSize().y
     local position = {
-        x = (xNorm - 0.5) * self.map:getGridSize().x,
-        y = 1 + self.map:calculateYOffset(gridPosition),
-        z = (yNorm - 0.5) *  self.map:getGridSize().y
+        x = gridPosition.x - 1,
+        y = 0.2 + self.map:calculateYOffset(gridPosition),
+        z = gridPosition.y - 1
     }
 
-	local keyColor = { 0.0, 1.0, 0}
+	local keyColor = {0.0, 1.0, 0.0}
 
 	if keyName == "up" then
 		keyColor[1] = 1
 	elseif keyName == "down" then
 		keyColor[3] = 10
 	elseif keyName == "left" then
-		keyColor = { 0, 0, 0}
+		keyColor = {0, 0, 0}
 	end
 
     return Game.makeActor {
@@ -64,38 +65,67 @@ function Player:activateGoal(gridPosition)
 	end
 
 	goal.isActivated = true
-	Game.loadScene(Level:new {
-		definitionPath = self.level.definition.nextLevelDefinitionPath
-	})
+	Game.loadScene(self.level.nextLevelPath)
 	print("activating goal")
 end
 
 function Player:activateButton(gridPosition)
-	local button = self.map:getGridAt(gridPosition).button
 
+	local button = self.map:getGridAt(gridPosition).button
 	if button.isActivated then
 		return
 	end
 
-	button.isActivated		 	  = true
-	button.actionTarget.isEnabled = true
+	local target = self.map:getGridAt(button.targetPosition).goal
+	button.isActivated = true
+	target.isEnabled   = true
 
 	local buttonPosition	  = button.transform.position
 	buttonPosition.y		  = buttonPosition.y - 0.5
 	button.transform.position = buttonPosition
 
-	local actionTargetPosition = button.actionTarget.transform.position
+	local actionTargetPosition = target.transform.position
 	actionTargetPosition.y 	   = actionTargetPosition.y + 0.5
+	target.transform.position = actionTargetPosition
 
-	button.actionTarget.transform.position = actionTargetPosition
 	print("Button activated")
 end
 
+function Player:disableButton(gridPosition)
+
+	local button = self.map:getGridAt(gridPosition).button
+	if not button.isActivated then
+		return
+	end
+
+	-- if there is one key left on the droppable button don't do the animation
+	for k, v in pairs(self.map:getDroppedKeysGridAt(gridPosition).hasKeyDropped) do
+		if v then
+			return
+		end
+	end
+
+	local target = self.map:getGridAt(button.targetPosition).goal;
+	button.isActivated = false
+	target.isEnabled   = false
+
+	local buttonPosition	  = button.transform.position
+	buttonPosition.y		  = buttonPosition.y + 0.5
+	button.transform.position = buttonPosition
+
+	local actionTargetPosition = target.transform.position
+	actionTargetPosition.y 	   = actionTargetPosition.y - 0.5
+	target.transform.position = actionTargetPosition
+
+	print("Button Deactivated")
+end
+
 function Player:registerMove(undoFunction, redoFunction)
+
 	print("move registered")
 
 	for k, v in pairs(self.moves) do
-		print(k)
+		--print(k)
 		if k >= self.currentMoveIndex then
 			self.moves[k] = nil
 			v = nil
@@ -111,35 +141,6 @@ function Player:registerMove(undoFunction, redoFunction)
 	}
 end
 
-function Player:disableButton(gridPosition)
-	local button = self.map:getGridAt(gridPosition).button
-
-	if not button.isActivated then
-		return
-	end
-
-	-- if there is one key left on the droppable button don't do the animation
-	for k, v in pairs(self.map:getDroppedKeysGridAt(gridPosition).hasKeyDropped) do
-		if(v == true) then
-			return
-		end
-	end
-
-	button.isActivated				= false
-	button.actionTarget.isEnabled	= false
-
-	local buttonPosition		= button.transform.position
-	buttonPosition.y			= buttonPosition.y + 0.5
-	button.transform.position	= buttonPosition
-
-	local actionTargetPosition 	= button.actionTarget.transform.position
-	actionTargetPosition.y 		= actionTargetPosition.y - 0.5
-
-	button.actionTarget.transform.position = actionTargetPosition
-
-	print("Button Deactivated")
-end
-
 function Player:bind(f, p1, p2, p3, p4, p5)
 	return function()
 		return f(p1, p2, p3, p4, p5)
@@ -147,6 +148,7 @@ function Player:bind(f, p1, p2, p3, p4, p5)
 end
 
 function Player:blockKey(key, canRegisterMove)
+
 	print(key.." key blocked")
 	disabledKeys[key] = true
 	self.map:getDroppedKeysGridAt(self.gridPosition).hasKeyDropped[key] = true
@@ -154,8 +156,8 @@ function Player:blockKey(key, canRegisterMove)
 	local pair = {}
 	pair[key] = self:makeKey(self.gridPosition, key)
 
-	local tempArray = self.map:getDroppedKeysGridAt(self.gridPosition).keys
-	self.map:getDroppedKeysGridAt(self.gridPosition).keys [#tempArray+1] = pair
+	local keys = self.map:getDroppedKeysGridAt(self.gridPosition).keys
+	keys[#keys + 1] = pair
 
 	self.transform.position = self:getPositionFromGridPosition(self.gridPosition)
 
@@ -168,8 +170,8 @@ function Player:blockKey(key, canRegisterMove)
 end
 
 function Player:unblockKey(key, canRegisterMove)
-	print(key.." key unblocked")
 
+	print(key.." key unblocked")
 	disabledKeys[key] = false
 	self.map:getDroppedKeysGridAt(self.gridPosition).hasKeyDropped[key] = false
 
@@ -188,17 +190,14 @@ function Player:unblockKey(key, canRegisterMove)
 	for k, v in pairs(self.map:getDroppedKeysGridAt(self.gridPosition).keys) do
 		for m, p in pairs(v) do
 			if p then
-				local xNorm = (self.gridPosition.x - 1) / self.map:getGridSize().x
-				local yNorm = (self.gridPosition.y - 1) / self.map:getGridSize().y
 
-				local position = {
-					x = (xNorm - 0.5) *  self.map:getGridSize().x,
-					y = 1 + (index * 2 * p:get("Transform").scale.y),
-					z = (yNorm - 0.5) *  self.map:getGridSize().y
+				p:get("Transform").position = {
+					x = self.gridPosition.x - 1,
+					y = index * 2 * p:get("Transform").scale.y,
+					z = self.gridPosition.y - 1
 				}
 
 				index = index + 1
-				p:get("Transform").position = position 
 			end
 		end
 	end
@@ -213,52 +212,56 @@ function Player:unblockKey(key, canRegisterMove)
 	end
 end
 
-function Player:moveToPosition(nextPosition, canRegisterMove)
-	if not self.map:getGridAt(nextPosition).isObstacle then
-		if nextPosition.x ~= self.gridPosition.x or nextPosition.y ~= self.gridPosition.y then
-			self.lastPosition.x = self.gridPosition.x
-			self.lastPosition.y = self.gridPosition.y
+function Player:moveToPosition(nextPosition, canRegisterMove, didUsePortal)
 
-			self.gridPosition.x = nextPosition.x
-			self.gridPosition.y = nextPosition.y
+	local gridItem = self.map:getGridAt(nextPosition);
+	if gridItem.obstacle or not gridItem.tile then
+		return
+	end
+	if nextPosition.x == self.gridPosition.x and nextPosition.y == self.gridPosition.y then
+		return
+	end
 
-			local lastPosition = { x = self.lastPosition.x, y = self.lastPosition.y }
-			local gridPosition = { x = self.gridPosition.x, y = self.gridPosition.y }
+	self.lastPosition.x = self.gridPosition.x
+	self.lastPosition.y = self.gridPosition.y
 
-			if canRegisterMove then
-				self:registerMove(
-					function()
-						self:moveToPosition(lastPosition, false)
-					end,
-					function()
-						self:moveToPosition(gridPosition, false)
-					end
-				)
+	self.gridPosition.x = nextPosition.x
+	self.gridPosition.y = nextPosition.y
+
+	local lastPosition = { x = self.lastPosition.x, y = self.lastPosition.y }
+	local gridPosition = { x = self.gridPosition.x, y = self.gridPosition.y }
+	if canRegisterMove then
+		self:registerMove(
+			function()
+				self:moveToPosition(lastPosition, false)
+			end,
+			function()
+				self:moveToPosition(gridPosition, false)
 			end
+		)
+	end
 
-			if self.map:getGridAt(self.gridPosition).isButton then
-				self:activateButton(self.gridPosition)
-			end
+	if gridItem.button then
+		self:activateButton(self.gridPosition)
+	end
 
-			-- if the tile changed then we gotta check if there was a button and disable it
-			if self.lastPosition.x ~= self.gridPosition.x or self.lastPosition.y ~= self.gridPosition.y then
-				if(self.map:getGridAt(self.lastPosition).isButton) then
-					self:disableButton(self.lastPosition)
-				end
-			end
-
-			if self.map:getGridAt(self.gridPosition).isGoal then
-				self:activateGoal(self.gridPosition)
-			end
-
-			if self.map:getGridAt(self.gridPosition).isPortal then
-				self:moveToPosition(self.map:getGridAt(self.gridPosition).portal.teleportPosition, false)
-				return
-			end
-
-			self.transform.position = self:getPositionFromGridPosition(nextPosition)
+	-- if the tile changed then we gotta check if there was a button and disable it
+	if self.lastPosition.x ~= self.gridPosition.x or self.lastPosition.y ~= self.gridPosition.y then
+		if self.map:getGridAt(self.lastPosition).button then
+			self:disableButton(self.lastPosition)
 		end
 	end
+
+	if gridItem.goal then
+		self:activateGoal(self.gridPosition)
+	end
+
+	if not didUsePortal and gridItem.portal then
+		self:moveToPosition(gridItem.portal.teleportPosition, false, true)
+		return
+	end
+
+	self.transform.position = self:getPositionFromGridPosition(nextPosition)
 end
 
 function Player:redoMove()
@@ -296,13 +299,14 @@ function Player:undoMove()
 end
 
 function Player:start()
-	self.gridPosition.x = self.startPosition.x
-	self.gridPosition.y = self.startPosition.y
-	self.lastPosition.x = self.startPosition.x
-	self.lastPosition.y = self.startPosition.y
 
-	self.transform			= self.actor:get("Transform")
-	self.transform.position = self:getPositionFromGridPosition(self.gridPosition)
+	self.transform = self.actor:get("Transform")
+	local position = self.transform.position
+
+	self.gridPosition.x = position.x + 1
+	self.gridPosition.y = position.z + 1
+	self.lastPosition.x = self.gridPosition.x
+	self.lastPosition.y = self.gridPosition.y
 
 	self.moves = {}
 	self.currentMoveIndex = 1

@@ -3,9 +3,9 @@ require('assets/scripts/object')
 require('assets/scripts/level/map')
 
 Player = Object:new {
-	gridPosition  = { x = 1, y = 1 },
-	lastPosition  = { x = 1, y = 1 },
-	map			  = {}
+	gridPosition = { x = 1, y = 1 },
+	lastPosition = { x = 1, y = 1 },
+	map			 = nil
 }
 
 local disabledKeys = {left = false, right = false, up = false, down = false}
@@ -65,9 +65,7 @@ function Player:activateGoal(gridPosition)
 	end
 
 	goal.isActivated = true
-	Game.loadScene(Level:new {
-		definitionPath = self.level.definition.nextLevel
-	})
+	Game.loadScene(self.level.nextLevelPath)
 	print("activating goal")
 end
 
@@ -232,7 +230,6 @@ function Player:moveToPosition(nextPosition, canRegisterMove, didUsePortal)
 
 	local lastPosition = { x = self.lastPosition.x, y = self.lastPosition.y }
 	local gridPosition = { x = self.gridPosition.x, y = self.gridPosition.y }
-
 	if canRegisterMove then
 		self:registerMove(
 			function()
@@ -250,7 +247,7 @@ function Player:moveToPosition(nextPosition, canRegisterMove, didUsePortal)
 
 	-- if the tile changed then we gotta check if there was a button and disable it
 	if self.lastPosition.x ~= self.gridPosition.x or self.lastPosition.y ~= self.gridPosition.y then
-		if gridItem.button then
+		if self.map:getGridAt(self.lastPosition).button then
 			self:disableButton(self.lastPosition)
 		end
 	end

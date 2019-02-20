@@ -1,9 +1,10 @@
 require('assets/scripts/object')
 require('assets/scripts/vector')
+require('assets/scripts/level/map')
 
 Level = Object:new {
-	definitionPath = nil,
-	nextLevel = nil
+	map = nil,
+	nextLevelPath = nil
 }
 
 local function getCameraPosition(gridSize)
@@ -12,13 +13,9 @@ end
 
 function Level:start()
 
-	if not self.definitionPath then
-		print('Level: no path to level definition.')
-		return
+	if not self.map then
+		print('Level: no map')
 	end
-
-	self.definition = dofile(self.definitionPath)
-	self.map = self.definition.map
 
     for x = 1, self.map:getGridSize().x do
         for y = 1, self.map:getGridSize().y do
@@ -61,7 +58,7 @@ function Level:start()
         end
 	end
 
---	if self.definition.decorations then
+--	if self.decorations then
 --		Game.makeActors(self.definition.decorations)
 --	end
 

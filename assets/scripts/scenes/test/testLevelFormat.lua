@@ -1,4 +1,4 @@
-require('assets/scripts/level/map')
+require('assets/scripts/level/level')
 
 local materials = {
     {
@@ -1999,6 +1999,7 @@ grid[2][4].button = {
         },
     }
 }
+
 grid[2][7].portal = {
     teleportPosition = {x = 8, y = 6},
     actor = {
@@ -2027,6 +2028,7 @@ grid[2][7].portal = {
         },
     }
 }
+
 grid[8][6].portal = {
     teleportPosition = {x = 2, y = 7},
     actor = {
@@ -2055,6 +2057,7 @@ grid[8][6].portal = {
         },
     }
 }
+
 grid[4][5].player = {
     Name = "Player",
     Transform = {
@@ -2075,7 +2078,7 @@ grid[4][5].player = {
     },
 }
 
-return {
+return Level:new {
     map = map,
-    nextLevel = ''
+    nextLevelPath = ''
 }

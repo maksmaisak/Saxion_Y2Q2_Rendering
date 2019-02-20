@@ -9,7 +9,7 @@ referenceResolution = {1920, 1080}
 
 -- custom
 player = 'assets/scripts/player.lua'
-firstLevelDefinition = 'assets/scripts/scenes/test/testLevelFormat.lua'
+firstLevelPath = 'assets/scripts/scenes/test/testLevelFormat.lua'
 
 -- old stuff
 bulletSpeed = 30

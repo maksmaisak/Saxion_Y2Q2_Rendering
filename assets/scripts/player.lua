@@ -9,7 +9,7 @@ Player = Object:new {
 }
 
 local disabledKeys = {left = false, right = false, up = false, down = false}
-local inputKeys = { left = { x = 1.0, y = 0}, right = {x = -1, y = 0}, up = {x = 0, y = 1}, down = {x = 0, y = -1} }
+local inputKeys = { left = { x = 1, y = 0}, right = {x = -1, y = 0}, up = {x = 0, y = 1}, down = {x = 0, y = -1} }
 
 function Player:getPositionFromGridPosition(gridPosition)
 
@@ -359,8 +359,8 @@ function Player:update()
 	end
 
     local nextPosition = {
-        x = self.gridPosition.x - input.x,
-        y = self.gridPosition.y - input.y
+        x = self.gridPosition.x + input.x,
+        y = self.gridPosition.y + input.y
     }
 
     if nextPosition.x > self.map:getGridSize().x then

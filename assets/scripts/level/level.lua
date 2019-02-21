@@ -7,10 +7,6 @@ Level = Object:new {
 	nextLevelPath = nil
 }
 
-local function getCameraPosition(gridSize)
-	return Vector.from{gridSize.x, 0, gridSize.y} * 0.5 + {x = 8, y = 12, z = 8}
-end
-
 function Level:start()
 
 	if not self.map then
@@ -64,17 +60,6 @@ function Level:start()
 	end
 
 	Game.makeActors {
-        {
-            Name = "Camera",
-            Transform = {
-                position = getCameraPosition(self.map:getGridSize()),
-                rotation = {-45, 45, 0}
-            },
-            Camera = {
-                isOrthographic = true,
-                orthographicHalfSize = 8
-            }
-        },
         {
             Name = "DirectionalLight",
             Transform = {

@@ -58,26 +58,4 @@ function Level:start()
 	if self.extras then
 		Game.makeActors(self.extras)
 	end
-
-	Game.makeActors {
-        {
-            Name = "DirectionalLight",
-            Transform = {
-                rotation = {-70, 0, 0}
-            },
-            Light = {
-                kind = "directional",
-                intensity = 0.1
-            }
-        },
-        {
-            Name = "PointLight",
-            Transform = {
-                position = {0, 2, 0}
-            },
-            Light = {
-                intensity = 2
-            }
-        }
-	}
 end

@@ -1,8 +1,9 @@
 require ('assets/scripts/level/level')
 
+
 local isBlocked = false
 local isChooseLevelOpened = false
-local mainButtonPanel
+local mainButtonsPanel
 local chooseLevelPanel
 local creditsPanel
 local levelIndex = 1
@@ -36,7 +37,9 @@ end
 
 
 function scene:start()
-	
+
+	IsMenuOpened = true
+
 	Game.makeActors(scenery)
 
 	-- Start Main Buttons Panel
@@ -86,7 +89,6 @@ function scene:start()
 				self.actor:get("Transform").scale = {1,1,1}
 			end
 			--Mouse Over End
-			
 		}
 	}
 
@@ -412,7 +414,7 @@ function scene:start()
 		}
 	}
 
-	mainButtonPanel		= Game.find("MainButtonsPanel")
+	mainButtonsPanel	= Game.find("MainButtonsPanel")
 	chooseLevelPanel	= Game.find("ChooseLevelPanel")
 	creditsPanel		= Game.find("CreditsPanel")
 

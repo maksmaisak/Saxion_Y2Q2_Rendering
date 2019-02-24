@@ -58,6 +58,13 @@ function Level:start()
 				door.actor		= Game.makeActor(door.actor)
 				door.transform	= door.actor:get("Transform")
 			end
+
+			if gridItem.laser then
+				local laser		= gridItem.laser
+				laser.actor		= Game.makeActor(laser.actor)
+				laser.transform = laser.actor:get("transform")
+				self.map.lasers[#self.map.lasers + 1] = laser
+			end
         end
 	end
 

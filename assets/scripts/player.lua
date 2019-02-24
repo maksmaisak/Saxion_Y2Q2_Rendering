@@ -165,6 +165,33 @@ function Player:deactivateButtonTarget(button)
 	end
 end
 
+function Player:activateLasers()
+	for key, laser in pairs(self.map.lasers) do
+		if laser.isEnabled then
+			-- call all the keys that the player has left on the laser's buttonTarget
+			-- TODO: do some sort of animation
+			if laser.buttonTargetPosition then
+				for k, v in pairs(self.map:getDroppedKeysGridAt(laser.buttonTargetPosition).hasKeyDropped) do
+					if v == true then -- if has this currentKey dropped at this position
+						local input = {x = 0, y = 0}
+
+						local value = inputKeys[k]
+						input.x		= input.x + value.x
+						input.y		= input.y + value.y
+
+						local nextPosition = {
+							x = self.gridPosition.x + input.x,
+						    y = self.gridPosition.y + input.y
+						}
+
+						self:moveToPosition(nextPosition)
+					end
+				end
+			end
+		end
+	end
+end
+
 function Player:registerMove(undoFunction, redoFunction)
 
 	print("move registered")
@@ -362,6 +389,8 @@ function Player:update()
 		if (not disabledKeys[key] and Game.keyboard.isDown(key)) then
 			input.x = input.x + value.x
 			input.y = input.y + value.y
+			self:activateLasers()
+			break;
 		end
 	end
 

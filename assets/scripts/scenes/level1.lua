@@ -1949,6 +1949,36 @@ grid[10][10].tile = {
     },
 }
 
+grid[6][7].door = {
+	isEnabled = false,
+	targetYRotation = 90,
+	actor = {
+		Name = "Door",
+		Transform = {
+		    position = {5, 0, 6},
+		    children = {
+		        {
+		            Name = "cube_flat",
+		            Transform = {
+		                scale = {0.1, 0.5, 0.9 * 0.5},
+		                children = {
+		                    {
+		                        Name = "default",
+		                        Transform = {
+		                        },
+		                        RenderInfo = {
+		                            mesh = 'objects/tile/cube_flat.obj',
+		                            material = materials[3]
+		                        }
+		                    },
+		                }
+		            },
+		        },
+		    }
+		},
+	}
+}
+
 grid[7][1].obstacle = {
     Name = "Obstacle",
     Transform = {
@@ -1993,6 +2023,35 @@ grid[5][7].goal = {
             },
         }
     },
+}
+
+grid[9][5].button = {
+    targetPosition = {x = 6, y = 7},
+    actor = {
+        Name = "Button",
+        Transform = {
+            position = {8, 0.2, 4},
+            scale = {0.3, 0.2, 0.3},
+            children = {
+                {
+                    Name = "cube_flat",
+                    Transform = {
+                        children = {
+                            {
+                                Name = "default",
+                                Transform = {
+                                },
+                                RenderInfo = {
+                                    mesh = 'objects/tile/cube_flat.obj',
+                                    material = materials[5]
+                                }
+                            },
+                        }
+                    },
+                },
+            }
+        },
+    }
 }
 
 grid[9][4].button = {

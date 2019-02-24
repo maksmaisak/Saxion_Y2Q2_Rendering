@@ -44,13 +44,19 @@ function Level:start()
 			end
 
 			if gridItem.button then
-				local button = gridItem.button
-				button.actor = Game.makeActor(gridItem.button.actor)
-				button.transform = button.actor:get("Transform")
+				local button		= gridItem.button
+				button.actor		= Game.makeActor(button.actor)
+				button.transform	= button.actor:get("Transform")
 			end
 
 			if gridItem.portal then
 				gridItem.portal.actor = Game.makeActor(gridItem.portal.actor)
+			end
+
+			if gridItem.door then
+				local door		= gridItem.door
+				door.actor		= Game.makeActor(door.actor)
+				door.transform	= door.actor:get("Transform")
 			end
         end
 	end

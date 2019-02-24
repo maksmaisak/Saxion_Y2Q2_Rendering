@@ -76,17 +76,13 @@ function Player:activateButton(gridPosition)
 		return
 	end
 
-	local target = self.map:getGridAt(button.targetPosition).goal
 	button.isActivated = true
-	target.isEnabled   = true
 
 	local buttonPosition	  = button.transform.position
 	buttonPosition.y		  = buttonPosition.y - 0.5
 	button.transform.position = buttonPosition
 
-	local actionTargetPosition	= target.transform.position
-	actionTargetPosition.y 		= actionTargetPosition.y + 0.5
-	target.transform.position	= actionTargetPosition
+	self:activateButtonTarget(button)
 
 	print("Button activated")
 end
@@ -105,19 +101,68 @@ function Player:disableButton(gridPosition)
 		end
 	end
 
-	local target = self.map:getGridAt(button.targetPosition).goal;
 	button.isActivated = false
-	target.isEnabled   = false
 
 	local buttonPosition	  = button.transform.position
 	buttonPosition.y		  = buttonPosition.y + 0.5
 	button.transform.position = buttonPosition
 
-	local actionTargetPosition	= target.transform.position
-	actionTargetPosition.y 		= actionTargetPosition.y - 0.5
-	target.transform.position	= actionTargetPosition
-
+	self:deactivateButtonTarget(button)
 	print("Button Deactivated")
+end
+
+function Player:activateButtonTarget(button)
+	local target = self.map:getGridAt(button.targetPosition)
+
+	if target.goal ~= nil then
+		print("Activating goal")
+		local goal		= target.goal
+		goal.isEnabled	= true
+
+		-- play goal activation "animation" this is a placeholder (it moves the position)
+		-- replace it when with the real one when is done
+		local goalPosition		= goal.transform.position
+		goalPosition.y 			= goalPosition.y + 0.5
+		goal.transform.position	= goalPosition
+	elseif target.door ~= nil then
+		print("Activating door")
+		local door		= target.door
+		door.isEnabled	= true;
+
+		-- play door activation "anim" this is a placeholder (it rotates the door on the Y axis)
+		-- to its target rotation
+		local doorRotation		= door.transform.rotation
+		doorRotation.y			= doorRotation.y + door.targetYRotation
+		door.transform.rotation = doorRotation
+	end
+end
+
+function Player:deactivateButtonTarget(button)
+	local target = self.map:getGridAt(button.targetPosition)
+
+	if target.goal ~= nil then
+		print("Deactivating goal")
+
+		local goal		= target.goal
+		goal.isEnabled	= false
+
+		-- play goal activation "animation" this is a placeholder (it moves the position)
+		-- replace it when with the real one when is done
+		local goalPosition		= goal.transform.position
+		goalPosition.y 			= goalPosition.y - 0.5
+		goal.transform.position	= goalPosition
+	elseif target.door ~= nil then
+		print("Deactivating door")
+
+		local door		= target.door
+		door.isEnabled	= false;
+
+		-- play door activation "anim" this is a placeholder (it rotates the door on the Y axis)
+		-- back to its original rotation
+		local doorRotation		= door.transform.rotation
+		doorRotation.y			= doorRotation.y - door.targetYRotation
+		door.transform.rotation = doorRotation
+	end
 end
 
 function Player:registerMove(undoFunction, redoFunction)
@@ -206,11 +251,16 @@ function Player:unblockKey(key, canRegisterMove)
 end
 
 function Player:moveToPosition(nextPosition, canRegisterMove, didUsePortal)
-
 	local gridItem = self.map:getGridAt(nextPosition);
+
 	if gridItem.obstacle or not gridItem.tile then
 		return
 	end
+
+	if gridItem.door and not gridItem.door.isEnabled then
+		return
+	end
+
 	if nextPosition.x == self.gridPosition.x and nextPosition.y == self.gridPosition.y then
 		return
 	end

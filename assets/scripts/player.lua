@@ -84,9 +84,9 @@ function Player:activateButton(gridPosition)
 	buttonPosition.y		  = buttonPosition.y - 0.5
 	button.transform.position = buttonPosition
 
-	local actionTargetPosition = target.transform.position
-	actionTargetPosition.y 	   = actionTargetPosition.y + 0.5
-	target.transform.position = actionTargetPosition
+	local actionTargetPosition	= target.transform.position
+	actionTargetPosition.y 		= actionTargetPosition.y + 0.5
+	target.transform.position	= actionTargetPosition
 
 	print("Button activated")
 end
@@ -113,9 +113,9 @@ function Player:disableButton(gridPosition)
 	buttonPosition.y		  = buttonPosition.y + 0.5
 	button.transform.position = buttonPosition
 
-	local actionTargetPosition = target.transform.position
-	actionTargetPosition.y 	   = actionTargetPosition.y - 0.5
-	target.transform.position = actionTargetPosition
+	local actionTargetPosition	= target.transform.position
+	actionTargetPosition.y 		= actionTargetPosition.y - 0.5
+	target.transform.position	= actionTargetPosition
 
 	print("Button Deactivated")
 end
@@ -125,7 +125,6 @@ function Player:registerMove(undoFunction, redoFunction)
 	print("move registered")
 
 	for k, v in pairs(self.moves) do
-		--print(k)
 		if k >= self.currentMoveIndex then
 			self.moves[k] = nil
 			v = nil
@@ -139,12 +138,6 @@ function Player:registerMove(undoFunction, redoFunction)
 		undo = undoFunction,
 		redo = redoFunction
 	}
-end
-
-function Player:bind(f, p1, p2, p3, p4, p5)
-	return function()
-		return f(p1, p2, p3, p4, p5)
-	end
 end
 
 function Player:blockKey(key, canRegisterMove)

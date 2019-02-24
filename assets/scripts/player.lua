@@ -1,6 +1,7 @@
 require('assets/scripts/vector')
 require('assets/scripts/object')
 require('assets/scripts/level/map')
+require('assets/scripts/scenes/pauseMenu')
 
 Player = Object:new {
 	gridPosition = { x = 1, y = 1 },
@@ -397,6 +398,10 @@ function Player:update()
     if (input.x ~= 0 and input.y ~= 0) then
         input.y = 0
     end
+
+	if Game.keyboard.isDown("p") then
+		self.level.pauseMenu:activate()
+	end
 
 	if Game.keyboard.isDown("r") then
 		Game.loadScene(Config.startScene)

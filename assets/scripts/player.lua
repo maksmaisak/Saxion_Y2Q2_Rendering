@@ -33,7 +33,7 @@ function Player:makeKey(gridPosition, keyName)
 	if keyName == "up" then
 		keyColor[1] = 1
 	elseif keyName == "down" then
-		keyColor[3] = 10
+		keyColor[3] = 1
 	elseif keyName == "left" then
 		keyColor = {0, 0, 0}
 	end

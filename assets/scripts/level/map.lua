@@ -3,7 +3,8 @@ require('assets/scripts/object')
 Map = Object:new {
 	grid			= {},
 	gridSize		= { x = 10, y = 10 },
-	droppedKeysGrid = {}
+	droppedKeysGrid = {},
+	lasers = {}
 }
 
 function Map:init()

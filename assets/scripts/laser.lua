@@ -1,3 +1,4 @@
+require ('math')
 require ('assets/scripts/object')
 require ('assets/scripts/vector')
 require ('assets/scripts/level/map')
@@ -9,13 +10,13 @@ Laser = Object:new {
 }
 
 function Laser:start()
-
 	self.timer		   = 0
 	self.checkInterval = 0.5
 	self.gridItem	   = self.map:getGridAt(self.gridPosition)
 	self.transform	   = self.actor:get("Transform")
 
 	self.beamRenderInfo = self.gridItem.laser.beam:getInChildren("RenderInfo")
+	self.beamTransform  = self.gridItem.laser.beam:get("Transform")
 end
 
 function Laser:update(dt)
@@ -41,9 +42,15 @@ function Laser:hitDroppedKeys()
 	for i = 1, 20 do
 
 		local gridItem = self.map:getGridAt(position)
-		if gridItem ~= nil then
+		if gridItem then
 
 			if gridItem.obstacle then
+
+				local distance = math.abs(position.x - self.gridPosition.x) + math.abs(position.y - self.gridPosition.y)
+				local scale = self.beamTransform.scale
+				scale.z = distance - 0.5
+				self.beamTransform.scale = scale
+
 				return
 			end
 
@@ -64,6 +71,7 @@ function Laser:hitDroppedKeys()
 		if position.y > self.map.gridSize.y or position.y < 1 then
 			break
 		end
+
 	end
 end
 

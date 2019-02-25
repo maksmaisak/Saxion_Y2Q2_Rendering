@@ -4,6 +4,7 @@ width  = 800
 height = 600
 fullscreen = false
 framerateCap = 240
+vsync = true
 --startScene = 'assets/scripts/UI/mainMenu.lua'
 startScene = 'assets/scripts/scenes/level1.lua'
 referenceResolution = {1920, 1080}

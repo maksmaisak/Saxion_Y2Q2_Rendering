@@ -44,7 +44,7 @@ function Laser:hitDroppedKeys()
 		local gridItem = self.map:getGridAt(position)
 		if gridItem then
 
-			if gridItem.obstacle then
+			if gridItem.obstacle or (gridItem.door and not gridItem.isButtonTargetEnabled) then
 
 				local distance = math.abs(position.x - self.gridPosition.x) + math.abs(position.y - self.gridPosition.y)
 				local scale = self.beamTransform.scale

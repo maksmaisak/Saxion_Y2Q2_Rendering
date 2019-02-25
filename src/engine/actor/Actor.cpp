@@ -41,6 +41,18 @@ namespace en {
         return 1;
     }
 
+    int pushByTypeNameWithChildren(lua_State* L) {
+
+        auto actor = lua::check<Actor>(L, 1);
+        if (!actor)
+            return 0;
+
+        auto name = lua::check<std::string>(L, 2);
+        ComponentsToLua::pushComponentReferenceByTypeNameWithChildren(L, actor, name);
+
+        return 1;
+    }
+
     int addByTypeName(lua_State* L) {
 
         auto& actor = lua::check<Actor>(L, 1);
@@ -68,9 +80,23 @@ namespace en {
         return 0;
     }
 
+    template<typename TComponent>
+    TComponent* tryGetInChildren(const EntityRegistry& registry, Entity e) {
+
+        auto* component = registry.tryGet<TComponent>(e);
+        if (component)
+            return component;
+
+        if (auto* tf = registry.tryGet<Transform>(e))
+            for (Entity child : tf->getChildren())
+                if (auto* childComponent = tryGetInChildren<TComponent>(registry, child))
+                    return childComponent;
+    }
+
     void Actor::initializeMetatable(LuaState& lua) {
 
         lua.setField("get", &pushByTypeName);
+        lua.setField("getInChildren", &pushByTypeNameWithChildren);
         lua.setField("add", &addByTypeName);
         lua.setField("remove", &removeByTypeName);
         lua.setField("destroyImmediate", &Actor::destroy);

@@ -7,13 +7,43 @@
 #include <iostream>
 
 #include "Name.h"
+#include "Transform.h"
 
 using namespace en;
+
+namespace {
+
+    bool pushComponentReferenceWithChildren(Actor& actor, LuaState& lua, const std::function<void(Actor& actor, LuaState& lua)>& push) {
+
+        push(actor, lua);
+        if (!lua_isnil(lua, -1))
+            return true;
+
+        if (Transform* tf = actor.tryGet<Transform>()) {
+
+            Engine& engine = actor.getEngine();
+            for (Entity child : tf->getChildren()) {
+                Actor childActor = engine.actor(child);
+                if (pushComponentReferenceWithChildren(childActor, lua, push))
+                    return true;
+            }
+        }
+
+        return false;
+    }
+}
 
 void ComponentsToLua::pushComponentReferenceByTypeName(lua_State* L, Actor& actor, const std::string& componentTypeName) {
 
     auto lua = LuaState(L);
     getTypeInfoByName(componentTypeName).pushFromActor(actor, lua);
+}
+
+void ComponentsToLua::pushComponentReferenceByTypeNameWithChildren(lua_State* L, Actor& actor, const std::string& componentTypeName) {
+
+    auto lua = LuaState(L);
+    const auto& push = getTypeInfoByName(componentTypeName).pushFromActor;
+    pushComponentReferenceWithChildren(actor, lua, push);
 }
 
 void ComponentsToLua::addComponentByTypeName(lua_State* L, Actor& actor, const std::string& componentTypeName) {

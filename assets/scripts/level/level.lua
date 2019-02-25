@@ -60,7 +60,6 @@ function Level:start()
 			end
 
 			if gridItem.door then
-
 				local door	   = gridItem.door
 				door.actor	   = Game.makeActor(door.actor)
 				door.transform = door.actor:get("Transform")
@@ -75,14 +74,20 @@ function Level:start()
 			end
 
 			if gridItem.laser then
-				local laser		= Game.makeActor(gridItem.laser.actor)
-				laser:add("LuaBehavior", dofile(Config.laser) {
+
+				local laser = gridItem.laser
+
+				laser.actor = Game.makeActor(laser.actor)
+				laser.beam  = Game.makeActor(laser.beam)
+				laser.beam:get("Transform").parent = laser.actor
+
+				laser.actor:add("LuaBehavior", dofile(Config.laser) {
 					level		 = self,
 					map			 = self.map,
-					actor		 = laser,
-					direction	 = {x = gridItem.laser.direction.x, y = gridItem.laser.direction.y},
+					direction	 = {x = laser.direction.x, y = laser.direction.y},
 					gridPosition = {x = x, y = y}
 				})
+
 				self.map.lasers[#self.map.lasers + 1] = laser
 			end
         end

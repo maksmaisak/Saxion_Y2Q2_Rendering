@@ -5,17 +5,25 @@ require ('assets/scripts/player')
 
 Laser = Object:new {
 	level = nil,
-	map = nil
+	map   = nil
 }
 
 function Laser:start()
-	self.timer			= 0
-	self.checkInterval	= 0.5
-	self.gridItem		= self.map:getGridAt(self.gridPosition)
-	self.transform		= self.actor:get("Transform")
+
+	self.timer		   = 0
+	self.checkInterval = 0.5
+	self.gridItem	   = self.map:getGridAt(self.gridPosition)
+	self.transform	   = self.actor:get("Transform")
+
+	self.beamRenderInfo = self.gridItem.laser.beam:getInChildren("RenderInfo")
 end
 
 function Laser:update(dt)
+
+	if self.beamRenderInfo then
+		self.beamRenderInfo.isEnabled = self.gridItem.isButtonTargetEnabled or false
+	end
+
 	self.timer = self.timer + dt
 	if self.gridItem.isButtonTargetEnabled then
 		if self.timer >= self.checkInterval then
@@ -26,12 +34,13 @@ function Laser:update(dt)
 end
 
 function Laser:hitDroppedKeys()
-	print("hiting dropped keys")
+
+	print("hitting dropped keys")
 
 	local position = {x = self.gridPosition.x, y = self.gridPosition.y}
 	for i = 1, 20 do
-		local gridItem = self.map:getGridAt(position)
 
+		local gridItem = self.map:getGridAt(position)
 		if gridItem ~= nil then
 			-- end if we hit an obstacle or empty tile
 			if gridItem.obstacle or not gridItem.tile then

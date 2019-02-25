@@ -134,7 +134,7 @@ function Player:activateButtonTarget(button)
 		-- play door activation "anim" this is a placeholder (it rotates the door on the Y axis)
 		-- to its target rotation
 		local doorRotation		= door.transform.rotation
-		doorRotation.y			= doorRotation.y + door.targetYRotation
+		doorRotation.y			= doorRotation.y + 90
 		door.transform.rotation = doorRotation
 	end
 end
@@ -162,7 +162,7 @@ function Player:deactivateButtonTarget(button)
 		-- play door activation "anim" this is a placeholder (it rotates the door on the Y axis)
 		-- back to its original rotation
 		local doorRotation		= door.transform.rotation
-		doorRotation.y			= doorRotation.y - door.targetYRotation
+		doorRotation.y			= doorRotation.y - 90
 		door.transform.rotation = doorRotation
 	end
 end

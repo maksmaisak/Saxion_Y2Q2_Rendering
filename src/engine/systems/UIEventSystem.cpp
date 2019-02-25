@@ -14,8 +14,12 @@ using namespace en;
 
 void UIEventSystem::update(float dt) {
 
-    glm::vec2 mousePosition = utils::MouseHelper::getPosition(m_engine->getWindow());
+    for (Entity e : m_registry->with<UIRect>()) {
+        auto& rect = m_registry->get<UIRect>(e);
+        rect.wasEnabled = rect.isEnabled;
+    }
 
+    glm::vec2 mousePosition = utils::MouseHelper::getPosition(m_engine->getWindow());
     for (Entity e : m_registry->with<UIRect, Transform>())
         if (!m_registry->get<Transform>(e).getParent())
             updateRect(e, m_registry->get<UIRect>(e), m_registry->get<Transform>(e), mousePosition);
@@ -30,7 +34,7 @@ void UIEventSystem::updateRect(Entity e, UIRect& rect, Transform& transform, con
     const glm::vec2 localMousePosition = glm::inverse(transform.getWorldTransform()) * glm::vec4(mousePosition, 0.f, 1.f);
     rect.isMouseOver = glm::all(glm::lessThan(localMin, localMousePosition)) && glm::all(glm::lessThan(localMousePosition, localMax));
 
-    if (!rect.isEnabled)
+    if (!rect.isEnabled || !rect.wasEnabled)
         return;
 
     if (rect.isMouseOver && !rect.wasMouseOver)

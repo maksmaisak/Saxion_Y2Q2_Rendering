@@ -3,20 +3,24 @@ require('assets/scripts/level/level')
 local materials = {
     {
         shader = 'lit',
+        diffuseColor = {1, 0.9895964, 0.5707546, 1}
+    },
+    {
+        shader = 'lit',
         diffuseColor = {1, 0, 0.7361612, 1}
-    },
-    {
-        shader = 'lit',
-        diffuseColor = {0.8, 0.8, 0.8, 1}
-    },
-    {
-        shader = 'lit',
-        diffuseColor = {0.8, 0.8, 0.8, 1}
     },
     {
         shader = 'lit',
         diffuse = 'objects/tile/diffuse.png',
         diffuseColor = {1, 1, 1, 1}
+    },
+    {
+        shader = 'lit',
+        diffuseColor = {0.8, 0.8, 0.8, 1}
+    },
+    {
+        shader = 'lit',
+        diffuseColor = {0.8, 0.8, 0.8, 1}
     },
     {
         shader = 'lit',
@@ -58,11 +62,11 @@ grid[1][1].tile = {
                 Name = "Cube",
                 Transform = {
                     position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
+                    scale = {0.5, 0.5, 0.5},
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
+                    material = materials[3]
                 }
             },
         }
@@ -78,11 +82,11 @@ grid[1][2].tile = {
                 Name = "Cube",
                 Transform = {
                     position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
+                    scale = {0.5, 0.5, 0.5},
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
+                    material = materials[3]
                 }
             },
         }
@@ -98,11 +102,11 @@ grid[1][3].tile = {
                 Name = "Cube",
                 Transform = {
                     position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
+                    scale = {0.5, 0.5, 0.5},
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
+                    material = materials[3]
                 }
             },
         }
@@ -118,111 +122,11 @@ grid[1][4].tile = {
                 Name = "Cube",
                 Transform = {
                     position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
+                    scale = {0.5, 0.5, 0.5},
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
-                }
-            },
-        }
-    },
-}
-
-grid[1][6].tile = {
-    Name = "Tile",
-    Transform = {
-        position = {0, 0, 5},
-        children = {
-            {
-                Name = "Cube",
-                Transform = {
-                    position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
-                },
-                RenderInfo = {
-                    mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
-                }
-            },
-        }
-    },
-}
-
-grid[1][7].tile = {
-    Name = "Tile",
-    Transform = {
-        position = {0, 0, 6},
-        children = {
-            {
-                Name = "Cube",
-                Transform = {
-                    position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
-                },
-                RenderInfo = {
-                    mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
-                }
-            },
-        }
-    },
-}
-
-grid[1][8].tile = {
-    Name = "Tile",
-    Transform = {
-        position = {0, 0, 7},
-        children = {
-            {
-                Name = "Cube",
-                Transform = {
-                    position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
-                },
-                RenderInfo = {
-                    mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
-                }
-            },
-        }
-    },
-}
-
-grid[1][9].tile = {
-    Name = "Tile",
-    Transform = {
-        position = {0, 0, 8},
-        children = {
-            {
-                Name = "Cube",
-                Transform = {
-                    position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
-                },
-                RenderInfo = {
-                    mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
-                }
-            },
-        }
-    },
-}
-
-grid[1][10].tile = {
-    Name = "Tile",
-    Transform = {
-        position = {0, 0, 9},
-        children = {
-            {
-                Name = "Cube",
-                Transform = {
-                    position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
-                },
-                RenderInfo = {
-                    mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
+                    material = materials[3]
                 }
             },
         }
@@ -238,11 +142,11 @@ grid[2][1].tile = {
                 Name = "Cube",
                 Transform = {
                     position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
+                    scale = {0.5, 0.5, 0.5},
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
+                    material = materials[3]
                 }
             },
         }
@@ -258,11 +162,11 @@ grid[2][2].tile = {
                 Name = "Cube",
                 Transform = {
                     position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
+                    scale = {0.5, 0.5, 0.5},
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
+                    material = materials[3]
                 }
             },
         }
@@ -278,11 +182,11 @@ grid[2][3].tile = {
                 Name = "Cube",
                 Transform = {
                     position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
+                    scale = {0.5, 0.5, 0.5},
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
+                    material = materials[3]
                 }
             },
         }
@@ -298,11 +202,11 @@ grid[2][4].tile = {
                 Name = "Cube",
                 Transform = {
                     position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
+                    scale = {0.5, 0.5, 0.5},
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
+                    material = materials[3]
                 }
             },
         }
@@ -318,11 +222,11 @@ grid[2][6].tile = {
                 Name = "Cube",
                 Transform = {
                     position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
+                    scale = {0.5, 0.5, 0.5},
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
+                    material = materials[3]
                 }
             },
         }
@@ -330,7 +234,7 @@ grid[2][6].tile = {
 }
 
 grid[2][7].tile = {
-    Name = "Tile",
+    Name = "Tile (2)",
     Transform = {
         position = {1, 0, 6},
         children = {
@@ -338,11 +242,11 @@ grid[2][7].tile = {
                 Name = "Cube",
                 Transform = {
                     position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
+                    scale = {0.5, 0.5, 0.5},
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
+                    material = materials[3]
                 }
             },
         }
@@ -358,11 +262,11 @@ grid[2][8].tile = {
                 Name = "Cube",
                 Transform = {
                     position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
+                    scale = {0.5, 0.5, 0.5},
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
+                    material = materials[3]
                 }
             },
         }
@@ -378,11 +282,11 @@ grid[2][9].tile = {
                 Name = "Cube",
                 Transform = {
                     position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
+                    scale = {0.5, 0.5, 0.5},
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
+                    material = materials[3]
                 }
             },
         }
@@ -398,11 +302,11 @@ grid[2][10].tile = {
                 Name = "Cube",
                 Transform = {
                     position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
+                    scale = {0.5, 0.5, 0.5},
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
+                    material = materials[3]
                 }
             },
         }
@@ -418,11 +322,11 @@ grid[3][1].tile = {
                 Name = "Cube",
                 Transform = {
                     position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
+                    scale = {0.5, 0.5, 0.5},
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
+                    material = materials[3]
                 }
             },
         }
@@ -438,11 +342,11 @@ grid[3][2].tile = {
                 Name = "Cube",
                 Transform = {
                     position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
+                    scale = {0.5, 0.5, 0.5},
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
+                    material = materials[3]
                 }
             },
         }
@@ -458,11 +362,11 @@ grid[3][3].tile = {
                 Name = "Cube",
                 Transform = {
                     position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
+                    scale = {0.5, 0.5, 0.5},
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
+                    material = materials[3]
                 }
             },
         }
@@ -478,11 +382,11 @@ grid[3][4].tile = {
                 Name = "Cube",
                 Transform = {
                     position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
+                    scale = {0.5, 0.5, 0.5},
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
+                    material = materials[3]
                 }
             },
         }
@@ -498,91 +402,11 @@ grid[3][6].tile = {
                 Name = "Cube",
                 Transform = {
                     position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
+                    scale = {0.5, 0.5, 0.5},
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
-                }
-            },
-        }
-    },
-}
-
-grid[3][7].tile = {
-    Name = "Tile",
-    Transform = {
-        position = {2, 0, 6},
-        children = {
-            {
-                Name = "Cube",
-                Transform = {
-                    position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
-                },
-                RenderInfo = {
-                    mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
-                }
-            },
-        }
-    },
-}
-
-grid[3][8].tile = {
-    Name = "Tile",
-    Transform = {
-        position = {2, 0, 7},
-        children = {
-            {
-                Name = "Cube",
-                Transform = {
-                    position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
-                },
-                RenderInfo = {
-                    mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
-                }
-            },
-        }
-    },
-}
-
-grid[3][9].tile = {
-    Name = "Tile",
-    Transform = {
-        position = {2, 0, 8},
-        children = {
-            {
-                Name = "Cube",
-                Transform = {
-                    position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
-                },
-                RenderInfo = {
-                    mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
-                }
-            },
-        }
-    },
-}
-
-grid[3][10].tile = {
-    Name = "Tile",
-    Transform = {
-        position = {2, 0, 9},
-        children = {
-            {
-                Name = "Cube",
-                Transform = {
-                    position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
-                },
-                RenderInfo = {
-                    mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
+                    material = materials[3]
                 }
             },
         }
@@ -598,11 +422,11 @@ grid[4][1].tile = {
                 Name = "Cube",
                 Transform = {
                     position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
+                    scale = {0.5, 0.5, 0.5},
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
+                    material = materials[3]
                 }
             },
         }
@@ -618,11 +442,11 @@ grid[4][2].tile = {
                 Name = "Cube",
                 Transform = {
                     position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
+                    scale = {0.5, 0.5, 0.5},
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
+                    material = materials[3]
                 }
             },
         }
@@ -638,11 +462,11 @@ grid[4][3].tile = {
                 Name = "Cube",
                 Transform = {
                     position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
+                    scale = {0.5, 0.5, 0.5},
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
+                    material = materials[3]
                 }
             },
         }
@@ -658,11 +482,11 @@ grid[4][4].tile = {
                 Name = "Cube",
                 Transform = {
                     position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
+                    scale = {0.5, 0.5, 0.5},
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
+                    material = materials[3]
                 }
             },
         }
@@ -670,7 +494,7 @@ grid[4][4].tile = {
 }
 
 grid[4][6].tile = {
-    Name = "Tile",
+    Name = "Tile (1)",
     Transform = {
         position = {3, 0, 5},
         children = {
@@ -678,11 +502,11 @@ grid[4][6].tile = {
                 Name = "Cube",
                 Transform = {
                     position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
+                    scale = {0.5, 0.5, 0.5},
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
+                    material = materials[3]
                 }
             },
         }
@@ -698,11 +522,11 @@ grid[4][7].tile = {
                 Name = "Cube",
                 Transform = {
                     position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
+                    scale = {0.5, 0.5, 0.5},
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
+                    material = materials[3]
                 }
             },
         }
@@ -718,11 +542,11 @@ grid[4][8].tile = {
                 Name = "Cube",
                 Transform = {
                     position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
+                    scale = {0.5, 0.5, 0.5},
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
+                    material = materials[3]
                 }
             },
         }
@@ -738,11 +562,11 @@ grid[4][9].tile = {
                 Name = "Cube",
                 Transform = {
                     position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
+                    scale = {0.5, 0.5, 0.5},
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
+                    material = materials[3]
                 }
             },
         }
@@ -758,11 +582,11 @@ grid[4][10].tile = {
                 Name = "Cube",
                 Transform = {
                     position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
+                    scale = {0.5, 0.5, 0.5},
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
+                    material = materials[3]
                 }
             },
         }
@@ -778,11 +602,11 @@ grid[5][1].tile = {
                 Name = "Cube",
                 Transform = {
                     position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
+                    scale = {0.5, 0.5, 0.5},
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
+                    material = materials[3]
                 }
             },
         }
@@ -798,11 +622,11 @@ grid[5][2].tile = {
                 Name = "Cube",
                 Transform = {
                     position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
+                    scale = {0.5, 0.5, 0.5},
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
+                    material = materials[3]
                 }
             },
         }
@@ -818,11 +642,11 @@ grid[5][3].tile = {
                 Name = "Cube",
                 Transform = {
                     position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
+                    scale = {0.5, 0.5, 0.5},
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
+                    material = materials[3]
                 }
             },
         }
@@ -838,11 +662,11 @@ grid[5][4].tile = {
                 Name = "Cube",
                 Transform = {
                     position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
+                    scale = {0.5, 0.5, 0.5},
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
+                    material = materials[3]
                 }
             },
         }
@@ -858,11 +682,11 @@ grid[6][1].tile = {
                 Name = "Cube",
                 Transform = {
                     position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
+                    scale = {0.5, 0.5, 0.5},
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
+                    material = materials[3]
                 }
             },
         }
@@ -878,11 +702,11 @@ grid[6][2].tile = {
                 Name = "Cube",
                 Transform = {
                     position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
+                    scale = {0.5, 0.5, 0.5},
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
+                    material = materials[3]
                 }
             },
         }
@@ -898,11 +722,11 @@ grid[6][3].tile = {
                 Name = "Cube",
                 Transform = {
                     position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
+                    scale = {0.5, 0.5, 0.5},
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
+                    material = materials[3]
                 }
             },
         }
@@ -918,11 +742,11 @@ grid[6][4].tile = {
                 Name = "Cube",
                 Transform = {
                     position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
+                    scale = {0.5, 0.5, 0.5},
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
+                    material = materials[3]
                 }
             },
         }
@@ -938,11 +762,11 @@ grid[6][5].tile = {
                 Name = "Cube",
                 Transform = {
                     position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
+                    scale = {0.5, 0.5, 0.5},
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
+                    material = materials[3]
                 }
             },
         }
@@ -958,11 +782,11 @@ grid[6][6].tile = {
                 Name = "Cube",
                 Transform = {
                     position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
+                    scale = {0.5, 0.5, 0.5},
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
+                    material = materials[3]
                 }
             },
         }
@@ -978,11 +802,11 @@ grid[6][7].tile = {
                 Name = "Cube",
                 Transform = {
                     position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
+                    scale = {0.5, 0.5, 0.5},
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
+                    material = materials[3]
                 }
             },
         }
@@ -998,11 +822,11 @@ grid[6][8].tile = {
                 Name = "Cube",
                 Transform = {
                     position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
+                    scale = {0.5, 0.5, 0.5},
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
+                    material = materials[3]
                 }
             },
         }
@@ -1018,11 +842,11 @@ grid[6][9].tile = {
                 Name = "Cube",
                 Transform = {
                     position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
+                    scale = {0.5, 0.5, 0.5},
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
+                    material = materials[3]
                 }
             },
         }
@@ -1038,11 +862,11 @@ grid[7][1].tile = {
                 Name = "Cube",
                 Transform = {
                     position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
+                    scale = {0.5, 0.5, 0.5},
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
+                    material = materials[3]
                 }
             },
         }
@@ -1058,11 +882,11 @@ grid[7][2].tile = {
                 Name = "Cube",
                 Transform = {
                     position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
+                    scale = {0.5, 0.5, 0.5},
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
+                    material = materials[3]
                 }
             },
         }
@@ -1078,11 +902,11 @@ grid[7][3].tile = {
                 Name = "Cube",
                 Transform = {
                     position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
+                    scale = {0.5, 0.5, 0.5},
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
+                    material = materials[3]
                 }
             },
         }
@@ -1098,11 +922,11 @@ grid[7][4].tile = {
                 Name = "Cube",
                 Transform = {
                     position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
+                    scale = {0.5, 0.5, 0.5},
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
+                    material = materials[3]
                 }
             },
         }
@@ -1118,11 +942,11 @@ grid[7][5].tile = {
                 Name = "Cube",
                 Transform = {
                     position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
+                    scale = {0.5, 0.5, 0.5},
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
+                    material = materials[3]
                 }
             },
         }
@@ -1138,11 +962,11 @@ grid[7][6].tile = {
                 Name = "Cube",
                 Transform = {
                     position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
+                    scale = {0.5, 0.5, 0.5},
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
+                    material = materials[3]
                 }
             },
         }
@@ -1158,11 +982,11 @@ grid[7][7].tile = {
                 Name = "Cube",
                 Transform = {
                     position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
+                    scale = {0.5, 0.5, 0.5},
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
+                    material = materials[3]
                 }
             },
         }
@@ -1178,11 +1002,11 @@ grid[7][8].tile = {
                 Name = "Cube",
                 Transform = {
                     position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
+                    scale = {0.5, 0.5, 0.5},
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
+                    material = materials[3]
                 }
             },
         }
@@ -1198,11 +1022,11 @@ grid[7][9].tile = {
                 Name = "Cube",
                 Transform = {
                     position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
+                    scale = {0.5, 0.5, 0.5},
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
+                    material = materials[3]
                 }
             },
         }
@@ -1218,11 +1042,11 @@ grid[7][10].tile = {
                 Name = "Cube",
                 Transform = {
                     position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
+                    scale = {0.5, 0.5, 0.5},
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
+                    material = materials[3]
                 }
             },
         }
@@ -1238,11 +1062,11 @@ grid[8][1].tile = {
                 Name = "Cube",
                 Transform = {
                     position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
+                    scale = {0.5, 0.5, 0.5},
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
+                    material = materials[3]
                 }
             },
         }
@@ -1258,11 +1082,11 @@ grid[8][2].tile = {
                 Name = "Cube",
                 Transform = {
                     position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
+                    scale = {0.5, 0.5, 0.5},
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
+                    material = materials[3]
                 }
             },
         }
@@ -1278,11 +1102,11 @@ grid[8][3].tile = {
                 Name = "Cube",
                 Transform = {
                     position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
+                    scale = {0.5, 0.5, 0.5},
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
+                    material = materials[3]
                 }
             },
         }
@@ -1298,11 +1122,11 @@ grid[8][4].tile = {
                 Name = "Cube",
                 Transform = {
                     position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
+                    scale = {0.5, 0.5, 0.5},
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
+                    material = materials[3]
                 }
             },
         }
@@ -1318,11 +1142,11 @@ grid[8][5].tile = {
                 Name = "Cube",
                 Transform = {
                     position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
+                    scale = {0.5, 0.5, 0.5},
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
+                    material = materials[3]
                 }
             },
         }
@@ -1338,11 +1162,11 @@ grid[8][6].tile = {
                 Name = "Cube",
                 Transform = {
                     position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
+                    scale = {0.5, 0.5, 0.5},
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
+                    material = materials[3]
                 }
             },
         }
@@ -1358,11 +1182,11 @@ grid[8][7].tile = {
                 Name = "Cube",
                 Transform = {
                     position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
+                    scale = {0.5, 0.5, 0.5},
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
+                    material = materials[3]
                 }
             },
         }
@@ -1378,11 +1202,11 @@ grid[8][8].tile = {
                 Name = "Cube",
                 Transform = {
                     position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
+                    scale = {0.5, 0.5, 0.5},
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
+                    material = materials[3]
                 }
             },
         }
@@ -1398,11 +1222,11 @@ grid[8][9].tile = {
                 Name = "Cube",
                 Transform = {
                     position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
+                    scale = {0.5, 0.5, 0.5},
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
+                    material = materials[3]
                 }
             },
         }
@@ -1418,11 +1242,11 @@ grid[8][10].tile = {
                 Name = "Cube",
                 Transform = {
                     position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
+                    scale = {0.5, 0.5, 0.5},
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
+                    material = materials[3]
                 }
             },
         }
@@ -1438,11 +1262,11 @@ grid[9][1].tile = {
                 Name = "Cube",
                 Transform = {
                     position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
+                    scale = {0.5, 0.5, 0.5},
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
+                    material = materials[3]
                 }
             },
         }
@@ -1458,11 +1282,11 @@ grid[9][2].tile = {
                 Name = "Cube",
                 Transform = {
                     position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
+                    scale = {0.5, 0.5, 0.5},
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
+                    material = materials[3]
                 }
             },
         }
@@ -1478,11 +1302,11 @@ grid[9][3].tile = {
                 Name = "Cube",
                 Transform = {
                     position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
+                    scale = {0.5, 0.5, 0.5},
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
+                    material = materials[3]
                 }
             },
         }
@@ -1498,11 +1322,11 @@ grid[9][4].tile = {
                 Name = "Cube",
                 Transform = {
                     position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
+                    scale = {0.5, 0.5, 0.5},
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
+                    material = materials[3]
                 }
             },
         }
@@ -1518,11 +1342,11 @@ grid[9][5].tile = {
                 Name = "Cube",
                 Transform = {
                     position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
+                    scale = {0.5, 0.5, 0.5},
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
+                    material = materials[3]
                 }
             },
         }
@@ -1538,11 +1362,11 @@ grid[9][6].tile = {
                 Name = "Cube",
                 Transform = {
                     position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
+                    scale = {0.5, 0.5, 0.5},
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
+                    material = materials[3]
                 }
             },
         }
@@ -1558,11 +1382,11 @@ grid[9][7].tile = {
                 Name = "Cube",
                 Transform = {
                     position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
+                    scale = {0.5, 0.5, 0.5},
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
+                    material = materials[3]
                 }
             },
         }
@@ -1578,11 +1402,11 @@ grid[9][8].tile = {
                 Name = "Cube",
                 Transform = {
                     position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
+                    scale = {0.5, 0.5, 0.5},
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
+                    material = materials[3]
                 }
             },
         }
@@ -1598,11 +1422,11 @@ grid[9][9].tile = {
                 Name = "Cube",
                 Transform = {
                     position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
+                    scale = {0.5, 0.5, 0.5},
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
+                    material = materials[3]
                 }
             },
         }
@@ -1618,11 +1442,11 @@ grid[9][10].tile = {
                 Name = "Cube",
                 Transform = {
                     position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
+                    scale = {0.5, 0.5, 0.5},
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
+                    material = materials[3]
                 }
             },
         }
@@ -1638,11 +1462,11 @@ grid[10][1].tile = {
                 Name = "Cube",
                 Transform = {
                     position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
+                    scale = {0.5, 0.5, 0.5},
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
+                    material = materials[3]
                 }
             },
         }
@@ -1658,11 +1482,11 @@ grid[10][2].tile = {
                 Name = "Cube",
                 Transform = {
                     position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
+                    scale = {0.5, 0.5, 0.5},
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
+                    material = materials[3]
                 }
             },
         }
@@ -1678,11 +1502,11 @@ grid[10][3].tile = {
                 Name = "Cube",
                 Transform = {
                     position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
+                    scale = {0.5, 0.5, 0.5},
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
+                    material = materials[3]
                 }
             },
         }
@@ -1698,11 +1522,11 @@ grid[10][4].tile = {
                 Name = "Cube",
                 Transform = {
                     position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
+                    scale = {0.5, 0.5, 0.5},
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
+                    material = materials[3]
                 }
             },
         }
@@ -1718,11 +1542,11 @@ grid[10][5].tile = {
                 Name = "Cube",
                 Transform = {
                     position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
+                    scale = {0.5, 0.5, 0.5},
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
+                    material = materials[3]
                 }
             },
         }
@@ -1738,11 +1562,11 @@ grid[10][6].tile = {
                 Name = "Cube",
                 Transform = {
                     position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
+                    scale = {0.5, 0.5, 0.5},
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
+                    material = materials[3]
                 }
             },
         }
@@ -1758,11 +1582,11 @@ grid[10][7].tile = {
                 Name = "Cube",
                 Transform = {
                     position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
+                    scale = {0.5, 0.5, 0.5},
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
+                    material = materials[3]
                 }
             },
         }
@@ -1778,11 +1602,11 @@ grid[10][8].tile = {
                 Name = "Cube",
                 Transform = {
                     position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
+                    scale = {0.5, 0.5, 0.5},
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
+                    material = materials[3]
                 }
             },
         }
@@ -1798,11 +1622,11 @@ grid[10][9].tile = {
                 Name = "Cube",
                 Transform = {
                     position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
+                    scale = {0.5, 0.5, 0.5},
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
+                    material = materials[3]
                 }
             },
         }
@@ -1818,11 +1642,11 @@ grid[10][10].tile = {
                 Name = "Cube",
                 Transform = {
                     position = {0, -0.5, 0},
-                    scale = {0.45, 0.5, 0.45},
+                    scale = {0.5, 0.5, 0.5},
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[4]
+                    material = materials[3]
                 }
             },
         }
@@ -1845,7 +1669,7 @@ grid[6][6].obstacle = {
                             },
                             RenderInfo = {
                                 mesh = 'objects/tile/cube_flat.obj',
-                                material = materials[2]
+                                material = materials[4]
                             }
                         },
                     }
@@ -1871,7 +1695,7 @@ grid[7][6].obstacle = {
                             },
                             RenderInfo = {
                                 mesh = 'objects/tile/cube_flat.obj',
-                                material = materials[2]
+                                material = materials[4]
                             }
                         },
                     }
@@ -1897,7 +1721,7 @@ grid[9][6].obstacle = {
                             },
                             RenderInfo = {
                                 mesh = 'objects/tile/cube_flat.obj',
-                                material = materials[2]
+                                material = materials[4]
                             }
                         },
                     }
@@ -1923,7 +1747,7 @@ grid[10][6].obstacle = {
                             },
                             RenderInfo = {
                                 mesh = 'objects/tile/cube_flat.obj',
-                                material = materials[2]
+                                material = materials[4]
                             }
                         },
                     }
@@ -1933,10 +1757,10 @@ grid[10][6].obstacle = {
     },
 }
 
-grid[4][10].goal = {
+grid[2][10].goal = {
     Name = "LevelGoal",
     Transform = {
-        position = {3, 0, 9},
+        position = {1, 0, 9},
         children = {
             {
                 Name = "Cube",
@@ -1946,19 +1770,19 @@ grid[4][10].goal = {
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[6]
+                    material = materials[7]
                 }
             },
         }
     },
 }
 
-grid[1][10].button = {
-    targetPosition = {x = 4, y = 10},
+grid[3][6].button = {
+    targetPosition = {x = 2, y = 10},
     actor = {
         Name = "Button",
         Transform = {
-            position = {0, 0.2, 9},
+            position = {2, 0.2, 5},
             scale = {0.3, 0.2, 0.3},
             children = {
                 {
@@ -1971,7 +1795,7 @@ grid[1][10].button = {
                                 },
                                 RenderInfo = {
                                     mesh = 'objects/tile/cube_flat.obj',
-                                    material = materials[1]
+                                    material = materials[2]
                                 }
                             },
                         }
@@ -1982,12 +1806,41 @@ grid[1][10].button = {
     }
 }
 
-grid[8][3].button = {
+grid[5][2].button = {
+    targetPosition = {x = 3, y = 2},
+    actor = {
+        Name = "Button (2)",
+        Transform = {
+            position = {4, 0.2, 1},
+            scale = {0.3, 0.2, 0.3},
+            children = {
+                {
+                    Name = "cube_flat",
+                    Transform = {
+                        children = {
+                            {
+                                Name = "default",
+                                Transform = {
+                                },
+                                RenderInfo = {
+                                    mesh = 'objects/tile/cube_flat.obj',
+                                    material = materials[2]
+                                }
+                            },
+                        }
+                    },
+                },
+            }
+        },
+    }
+}
+
+grid[8][4].button = {
     targetPosition = {x = 8, y = 6},
     actor = {
         Name = "Button (1)",
         Transform = {
-            position = {7, 0.2, 2},
+            position = {7, 0.2, 3},
             scale = {0.3, 0.2, 0.3},
             children = {
                 {
@@ -2000,7 +1853,7 @@ grid[8][3].button = {
                                 },
                                 RenderInfo = {
                                     mesh = 'objects/tile/cube_flat.obj',
-                                    material = materials[1]
+                                    material = materials[2]
                                 }
                             },
                         }
@@ -2011,12 +1864,12 @@ grid[8][3].button = {
     }
 }
 
-grid[3][6].portal = {
-    teleportPosition = {x = 9, y = 8},
+grid[4][2].portal = {
+    teleportPosition = {x = 4, y = 10},
     actor = {
-        Name = "Portal A",
+        Name = "Portal B",
         Transform = {
-            position = {2, 0.5, 5},
+            position = {3, 0.5, 1},
             children = {
                 {
                     Name = "sphere2",
@@ -2029,7 +1882,7 @@ grid[3][6].portal = {
                                 },
                                 RenderInfo = {
                                     mesh = 'objects/portal/sphere2.obj',
-                                    material = materials[3]
+                                    material = materials[5]
                                 }
                             },
                         }
@@ -2052,12 +1905,12 @@ grid[3][6].portal = {
     }
 }
 
-grid[9][8].portal = {
-    teleportPosition = {x = 3, y = 6},
+grid[4][10].portal = {
+    teleportPosition = {x = 4, y = 2},
     actor = {
-        Name = "Portal B",
+        Name = "Portal A",
         Transform = {
-            position = {8, 0.5, 7},
+            position = {3, 0.5, 9},
             children = {
                 {
                     Name = "sphere2",
@@ -2070,7 +1923,7 @@ grid[9][8].portal = {
                                 },
                                 RenderInfo = {
                                     mesh = 'objects/portal/sphere2.obj',
-                                    material = materials[3]
+                                    material = materials[5]
                                 }
                             },
                         }
@@ -2111,7 +1964,7 @@ grid[8][6].door = {
                                 },
                                 RenderInfo = {
                                     mesh = 'objects/tile/cube_flat.obj',
-                                    material = materials[2]
+                                    material = materials[4]
                                 }
                             },
                         }
@@ -2129,7 +1982,7 @@ grid[8][6].door = {
                                 },
                                 RenderInfo = {
                                     mesh = 'objects/tile/cube_flat.obj',
-                                    material = materials[2]
+                                    material = materials[4]
                                 }
                             },
                         }
@@ -2155,7 +2008,7 @@ grid[8][6].door = {
                                 },
                                 RenderInfo = {
                                     mesh = 'objects/tile/cube_flat.obj',
-                                    material = materials[2]
+                                    material = materials[4]
                                 }
                             },
                         }
@@ -2181,7 +2034,64 @@ grid[8][6].door = {
                                 },
                                 RenderInfo = {
                                     mesh = 'objects/tile/cube_flat.obj',
-                                    material = materials[2]
+                                    material = materials[4]
+                                }
+                            },
+                        }
+                    },
+                },
+            }
+        },
+    }
+}
+
+grid[3][2].laser = {
+    direction = {x = 0, y = 1},
+    actor = {
+        Name = "Laser",
+        Transform = {
+            position = {2, 0, 1},
+            children = {
+                {
+                    Name = "cube_flat",
+                    Transform = {
+                        rotation = {45, 0, 0},
+                        scale = {0.4, 0.35, 0.35},
+                        children = {
+                            {
+                                Name = "default",
+                                Transform = {
+                                },
+                                RenderInfo = {
+                                    mesh = 'objects/tile/cube_flat.obj',
+                                    material = materials[4]
+                                }
+                            },
+                        }
+                    },
+                },
+            }
+        },
+    },
+    beam = {
+        Name = "Beam",
+        Transform = {
+            position = {0, 0.245, 0},
+            scale = {1, 1, 8.5},
+            children = {
+                {
+                    Name = "cube_flat",
+                    Transform = {
+                        position = {0, 0, 0.5},
+                        scale = {0.2, 0.2, 0.5},
+                        children = {
+                            {
+                                Name = "default",
+                                Transform = {
+                                },
+                                RenderInfo = {
+                                    mesh = 'objects/tile/cube_flat.obj',
+                                    material = materials[1]
                                 }
                             },
                         }
@@ -2205,7 +2115,7 @@ grid[7][5].player = {
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[7]
+                    material = materials[8]
                 }
             },
         }
@@ -2278,7 +2188,7 @@ local extras = {
                                 },
                                 RenderInfo = {
                                     mesh = 'objects/decorations/model.obj',
-                                    material = materials[5]
+                                    material = materials[6]
                                 }
                             },
                         }
@@ -2296,7 +2206,7 @@ local extras = {
                                 },
                                 RenderInfo = {
                                     mesh = 'objects/decorations/model.obj',
-                                    material = materials[5]
+                                    material = materials[6]
                                 }
                             },
                         }
@@ -2314,7 +2224,7 @@ local extras = {
                                 },
                                 RenderInfo = {
                                     mesh = 'objects/decorations/model.obj',
-                                    material = materials[5]
+                                    material = materials[6]
                                 }
                             },
                         }
@@ -2332,7 +2242,7 @@ local extras = {
                                 },
                                 RenderInfo = {
                                     mesh = 'objects/decorations/model.obj',
-                                    material = materials[5]
+                                    material = materials[6]
                                 }
                             },
                         }
@@ -2343,6 +2253,11 @@ local extras = {
     },
     {
         Name = "Doors",
+        Transform = {
+        },
+    },
+    {
+        Name = "Lasers",
         Transform = {
         },
     },

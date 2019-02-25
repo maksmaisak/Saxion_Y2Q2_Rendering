@@ -10,7 +10,6 @@
 #include <glm/gtc/quaternion.hpp>
 
 #include "Entity.h"
-#include "Behavior.h"
 #include "ComponentsToLua.h"
 #include "LuaStack.h"
 
@@ -19,10 +18,11 @@ namespace en {
     class Engine;
     class EntityRegistry;
     class LuaState;
+    class Actor;
 
     class Transform final {
 
-        LUA_TYPE(Transform)
+        LUA_TYPE(Transform);
 
         friend class TransformHierarchySystem;
 

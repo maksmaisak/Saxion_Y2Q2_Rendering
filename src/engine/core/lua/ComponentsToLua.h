@@ -62,6 +62,7 @@ namespace en {
         static void makeComponent(lua_State* L, Actor& actor, const std::string& componentTypeName, int componentValueIndex = -1);
 
         static void pushComponentReferenceByTypeName(lua_State* L, Actor& actor, const std::string& componentTypeName);
+        static void pushComponentReferenceByTypeNameWithChildren(lua_State* L, Actor& actor, const std::string& componentTypeName);
         static void addComponentByTypeName(lua_State* L, Actor& actor, const std::string& componentTypeName);
         static void addComponentByTypeName(lua_State* L, Actor& actor, const std::string& componentTypeName, int componentDefinitionIndex);
         static void removeComponentByTypeName(lua_State* L, Actor& actor, const std::string& componentTypeName);
@@ -105,6 +106,7 @@ namespace en {
 
         inline static bool isRegistered = false;
     };
+
 
     template<typename T>
     inline void ComponentsToLua::registerType(const std::string& name) {

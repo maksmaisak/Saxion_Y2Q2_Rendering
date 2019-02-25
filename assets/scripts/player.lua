@@ -160,33 +160,6 @@ function Player:deactivateButtonTarget(button)
 	end
 end
 
-function Player:activateLasers()
-	for key, laser in pairs(self.map.lasers) do
-		if laser.isEnabled then
-			-- call all the keys that the player has left on the laser's buttonTarget
-			-- TODO: do some sort of animation
-			if laser.buttonTargetPosition then
-				for k, v in pairs(self.map:getDroppedKeysGridAt(laser.buttonTargetPosition).hasKeyDropped) do
-					if v == true then -- if has this currentKey dropped at this position
-						local input = {x = 0, y = 0}
-
-						local value = inputKeys[k]
-						input.x		= input.x + value.x
-						input.y		= input.y + value.y
-
-						local nextPosition = {
-							x = self.gridPosition.x + input.x,
-						    y = self.gridPosition.y + input.y
-						}
-
-						self:moveToPosition(nextPosition)
-					end
-				end
-			end
-		end
-	end
-end
-
 function Player:registerMove(undoFunction, redoFunction)
 
 	print("move registered")
@@ -270,6 +243,38 @@ function Player:unblockKey(key, canRegisterMove)
 			function() self:unblockKey(key, false) end
 		)
 	end
+end
+
+function Player:moveByKey(keyFound)
+
+	local value = inputKeys[keyFound]
+	self:moveByInput({x = value.x, y = value.y})
+end
+
+function Player:moveByInput(input)
+
+	if input.x == 0 and input.y == 0 then
+		return
+	end
+
+	local nextPosition = {
+		x = self.gridPosition.x + input.x,
+		y = self.gridPosition.y + input.y
+	}
+
+	if nextPosition.x > self.map:getGridSize().x then
+		nextPosition.x = self.map:getGridSize().x
+	elseif nextPosition.x < 1 then
+		nextPosition.x = 1
+	end
+
+	if nextPosition.y > self.map:getGridSize().y then
+		nextPosition.y = self.map:getGridSize().y
+	elseif nextPosition.y < 1 then
+		nextPosition.y = 1
+	end
+
+	self:moveToPosition(nextPosition, true)
 end
 
 function Player:moveToPosition(nextPosition, canRegisterMove, didUsePortal)
@@ -378,19 +383,6 @@ function Player:start()
 end
 
 function Player:update()
-   local input = {x = 0, y = 0 }
-
-	for key, value in pairs(inputKeys) do
-		if (not disabledKeys[key] and Game.keyboard.isDown(key)) then
-			input.x = input.x + value.x
-			input.y = input.y + value.y
-			break;
-		end
-	end
-
-    if (input.x ~= 0 and input.y ~= 0) then
-        input.y = 0
-    end
 
 	if Game.keyboard.isDown("p") then
 		self.level.pauseMenu:activate()
@@ -413,39 +405,33 @@ function Player:update()
 
 	if Game.keyboard.isHeld("LShift") or Game.keyboard.isHeld("RShift") then
 		for key, value in pairs(inputKeys) do
-			if(Game.keyboard.isDown(key)) then
-				if (not self.map:getDroppedKeysGridAt(self.gridPosition).hasKeyDropped[key]) and not disabledKeys[key] then
+			if Game.keyboard.isDown(key) then
+
+				if not self.map:getDroppedKeysGridAt(self.gridPosition).hasKeyDropped[key] and not disabledKeys[key] then
 					self:blockKey(key, true)
-				elseif self.map:getDroppedKeysGridAt(self.gridPosition).hasKeyDropped[key] and disabledKeys[key] then
-					self:unblockKey(key, true)
+					return
 				end
-				input = {x = 0, y = 0}
+
+				if self.map:getDroppedKeysGridAt(self.gridPosition).hasKeyDropped[key] and disabledKeys[key] then
+					self:unblockKey(key, true)
+					return
+				end
 			end
 		end
 	end
 
-	if input.x == 0 and input.y == 0 then
-		return
+	local input = {x = 0, y = 0 }
+	for key, value in pairs(inputKeys) do
+		if (not disabledKeys[key] and Game.keyboard.isDown(key)) then
+			input.x = input.x + value.x
+			input.y = input.y + value.y
+			break;
+		end
 	end
-
-    local nextPosition = {
-        x = self.gridPosition.x + input.x,
-        y = self.gridPosition.y + input.y
-    }
-
-    if nextPosition.x > self.map:getGridSize().x then
-        nextPosition.x = self.map:getGridSize().x
-    elseif nextPosition.x < 1 then
-        nextPosition.x = 1
-    end
-
-    if nextPosition.y > self.map:getGridSize().y then
-        nextPosition.y = self.map:getGridSize().y
-    elseif nextPosition.y < 1 then
-        nextPosition.y = 1
-    end
-
-	self:moveToPosition(nextPosition, true)
+	if input.x ~= 0 and input.y ~= 0 then
+		input.y = 0
+	end
+	self:moveByInput(input)
 end
 
 return function(o)

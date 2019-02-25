@@ -321,15 +321,16 @@ void RenderSystem::updateDepthMapsDirectionalLights(const std::vector<Entity>& d
 
     for (Entity e : m_registry->with<Transform, RenderInfo>()) {
 
-        Mesh* mesh = m_registry->get<RenderInfo>(e).mesh.get();
-        if (!mesh)
+        auto& renderInfo = m_registry->get<RenderInfo>(e);
+        if (!renderInfo.isEnabled || !renderInfo.mesh)
             continue;
         const glm::mat4& modelTransform = m_registry->get<Transform>(e).getWorldTransform();
         m_directionalDepthShader->setUniformValue("matrixModel", modelTransform);
-        mesh->streamToOpenGL(0, -1, -1);
+        renderInfo.mesh->streamToOpenGL(0, -1, -1);
 
         checkRenderingError(m_engine->actor(e));
     }
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
@@ -388,13 +389,13 @@ void RenderSystem::updateDepthMapsPositionalLights(const std::vector<Entity>& po
 
     for (Entity e : m_registry->with<Transform, RenderInfo>()) {
 
-        Mesh* mesh = m_registry->get<RenderInfo>(e).mesh.get();
-        if (!mesh)
+        auto& renderInfo = m_registry->get<RenderInfo>(e);
+        if (!renderInfo.isEnabled || !renderInfo.mesh)
             continue;
 
         const glm::mat4& modelTransform = m_registry->get<Transform>(e).getWorldTransform();
         m_positionalDepthShader->setUniformValue("matrixModel", modelTransform);
-        mesh->streamToOpenGL(0, -1, -1);
+        renderInfo.mesh->streamToOpenGL(0, -1, -1);
         glCheckError();
     }
 

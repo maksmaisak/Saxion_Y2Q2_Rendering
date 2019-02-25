@@ -4,13 +4,15 @@ width  = 1920
 height = 1080
 fullscreen = true
 framerateCap = 240
-startScene = 'assets/scripts/UI/mainMenu.lua'
---startScene = 'assets/scripts/scenes/level1.lua'
+vsync = true
+--startScene = 'assets/scripts/UI/mainMenu.lua'
+startScene = 'assets/scripts/scenes/level1.lua'
 referenceResolution = {1920, 1080}
 
 -- custom
 player = 'assets/scripts/player.lua'
 firstLevelPath = 'assets/scripts/scenes/level1.lua'
+laser = 'assets/scripts/laser.lua'
 
 -- old stuff
 bulletSpeed = 30

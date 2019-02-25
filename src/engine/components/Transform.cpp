@@ -8,6 +8,8 @@
 #include <glm/gtx/matrix_decompose.hpp>
 #include <optional>
 #include <variant>
+#include "ComponentsToLua.h"
+#include "LuaStack.h"
 
 namespace en {
 

@@ -42,14 +42,14 @@ function Laser:hitDroppedKeys()
 
 		local gridItem = self.map:getGridAt(position)
 		if gridItem ~= nil then
-			-- end if we hit an obstacle or empty tile
-			if gridItem.obstacle or not gridItem.tile then
+
+			if gridItem.obstacle then
 				return
 			end
 
 			for k, v in pairs(self.map:getDroppedKeysGridAt(position).hasKeyDropped) do
 				if v then -- if has this currentKey dropped at this position
-					self.level.player:moveByLaser(k)
+					self.level.player:moveByKey(k)
 				end
 			end
 		end

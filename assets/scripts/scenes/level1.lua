@@ -1777,12 +1777,12 @@ grid[2][10].goal = {
     },
 }
 
-grid[2][6].button = {
+grid[3][6].button = {
     targetPosition = {x = 2, y = 10},
     actor = {
         Name = "Button",
         Transform = {
-            position = {1, 0.2, 5},
+            position = {2, 0.2, 5},
             scale = {0.3, 0.2, 0.3},
             children = {
                 {
@@ -1806,12 +1806,12 @@ grid[2][6].button = {
     }
 }
 
-grid[6][2].button = {
-    targetPosition = {x = 2, y = 2},
+grid[5][2].button = {
+    targetPosition = {x = 3, y = 2},
     actor = {
         Name = "Button (2)",
         Transform = {
-            position = {5, 0.2, 1},
+            position = {4, 0.2, 1},
             scale = {0.3, 0.2, 0.3},
             children = {
                 {
@@ -2045,12 +2045,12 @@ grid[8][6].door = {
     }
 }
 
-grid[2][2].laser = {
+grid[3][2].laser = {
     direction = {x = 0, y = 1},
     actor = {
         Name = "Laser",
         Transform = {
-            position = {1, 0, 1},
+            position = {2, 0, 1},
             children = {
                 {
                     Name = "cube_flat",

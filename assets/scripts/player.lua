@@ -56,8 +56,9 @@ end
 
 function Player:activateGoal(gridPosition)
 
-	local goal = self.map:getGridAt(gridPosition).goal
-	if not goal.isEnabled then
+	local gridItem	= self.map:getGridAt(gridPosition)
+	local goal		= gridItem.goal
+	if not gridItem.isButtonTargetEnabled then
 		return
 	end
 
@@ -102,7 +103,7 @@ function Player:disableButton(gridPosition)
 		end
 	end
 
-	button.isActivated = false
+	button.isActivated	= false
 
 	local buttonPosition	  = button.transform.position
 	buttonPosition.y		  = buttonPosition.y + 0.5
@@ -115,10 +116,11 @@ end
 function Player:activateButtonTarget(button)
 	local target = self.map:getGridAt(button.targetPosition)
 
+	target.isButtonTargetEnabled = true
+
 	if target.goal ~= nil then
 		print("Activating goal")
-		local goal		= target.goal
-		goal.isEnabled	= true
+		local goal = target.goal
 
 		-- play goal activation "animation" this is a placeholder (it moves the position)
 		-- replace it when with the real one when is done
@@ -128,7 +130,6 @@ function Player:activateButtonTarget(button)
 	elseif target.door ~= nil then
 		print("Activating door")
 		local door		= target.door
-		door.isEnabled	= true;
 
 		-- play door activation "anim" this is a placeholder (it rotates the door on the Y axis)
 		-- to its target rotation
@@ -141,11 +142,12 @@ end
 function Player:deactivateButtonTarget(button)
 	local target = self.map:getGridAt(button.targetPosition)
 
+	target.isButtonTargetEnabled = false
+
 	if target.goal ~= nil then
 		print("Deactivating goal")
 
 		local goal		= target.goal
-		goal.isEnabled	= false
 
 		-- play goal activation "animation" this is a placeholder (it moves the position)
 		-- replace it when with the real one when is done
@@ -156,7 +158,6 @@ function Player:deactivateButtonTarget(button)
 		print("Deactivating door")
 
 		local door		= target.door
-		door.isEnabled	= false;
 
 		-- play door activation "anim" this is a placeholder (it rotates the door on the Y axis)
 		-- back to its original rotation
@@ -285,7 +286,7 @@ function Player:moveToPosition(nextPosition, canRegisterMove, didUsePortal)
 		return
 	end
 
-	if gridItem.door and not gridItem.door.isEnabled then
+	if gridItem.door and not gridItem.isButtonTargetEnabled then
 		return
 	end
 
@@ -390,7 +391,6 @@ function Player:update()
 		if (not disabledKeys[key] and Game.keyboard.isDown(key)) then
 			input.x = input.x + value.x
 			input.y = input.y + value.y
-			self:activateLasers()
 			break;
 		end
 	end

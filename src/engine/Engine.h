@@ -84,6 +84,8 @@ namespace en {
         double m_fps = 0.f;
         long m_frameTimeMicroseconds = 0;
 
+        bool m_shouldExit = false;
+
         void printGLContextVersionInfo();
         void initializeGlew();
         void initializeLua();

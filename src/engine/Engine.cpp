@@ -275,6 +275,8 @@ void Engine::initializeLua() {
         lua_pushcclosure(lua, &loadScene, 1);
         lua_setfield(lua, -2, "loadScene");
 
+        lua.setField("quit", [this](){m_shouldExit = true;});
+
         // TODO make addProperty work on both tables and their metatables
         //lua::addProperty(lua, "time", lua::Property<float>([](){return GameTime::now().asSeconds();}));
 
@@ -309,20 +311,13 @@ void Engine::testMemberFunction() {
 
 void Engine::processWindowEvents() {
 
-    bool shouldExit = false;
-
     sf::Event event{};
     while (m_window.pollEvent(event)) {
 
         switch (event.type) {
 
             case sf::Event::Closed:
-                shouldExit = true;
-                break;
-
-            case sf::Event::KeyPressed:
-                if (event.key.code == sf::Keyboard::Escape)
-                    shouldExit = true;
+                m_shouldExit = true;
                 break;
 
             case sf::Event::Resized:
@@ -338,7 +333,7 @@ void Engine::processWindowEvents() {
         Receiver<sf::Event>::broadcast(event);
     }
 
-    if (shouldExit) {
+    if (m_shouldExit) {
         m_window.close();
     }
 }

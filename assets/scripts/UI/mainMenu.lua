@@ -196,7 +196,7 @@ function scene:start()
 		LuaBehavior = {
 			onMouseDown = function(self, button)
 				if button == 1 then
-					--mainButtonsPanel:get("UIRect").isEnabled	= false
+					Game.quit()
 				end
 			end,
 

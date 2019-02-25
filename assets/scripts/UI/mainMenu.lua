@@ -9,6 +9,7 @@ local creditsPanel
 local levelIndex = 1
 local numberOfLevels = 2
 local ratio
+local buttonSize = 60
 
 local scenery = {
 	{
@@ -59,18 +60,19 @@ function scene:start()
 			parent = "MainButtonsPanel"
 		},
 		Text = {
-			font   = "fonts/Menlo.ttc",
-			color  = {0, 0, 0, 1},
-			string = "START"
+			font   = "fonts/kenyanCoffee.ttf",
+			fontSize = 50,
+			color  = {1, 1, 1, 1},
+			string = "Start"
         },
 		UIRect = {
-			anchorMin = {0.5, 0.8},
-			anchorMax = {0.5, 0.8}
+			anchorMin = {0.85, 0.32},
+			anchorMax = {0.85, 0.32}
 		},
 		Sprite = {
 			material = {
 				shader	= "sprite",
-				texture	= "textures/button.png",
+				texture	= "textures/transparent.png",
 			}
 		},
 		LuaBehavior = {
@@ -98,18 +100,19 @@ function scene:start()
 			parent = "MainButtonsPanel"
 		},
 		Text = {
-			font = "fonts/Menlo.ttc",
-			color = {0, 0, 0, 1},
-			string = "CHOOSE LEVEL"
+			font = "fonts/kenyanCoffee.ttf",
+			fontSize = 50,
+			color = {1, 1, 1, 1},
+			string = "Choose Level"
         },
 		UIRect = {
-			anchorMin = {0.5, 0.6},
-			anchorMax = {0.5, 0.6}
+			anchorMin = {0.85, 0.24},
+			anchorMax = {0.85, 0.24}
 		},
 		Sprite = {
 			material = {
 				shader	= "sprite",
-				texture = "textures/button.png"
+				texture = "textures/transparent.png"
 			}
 		},
 		LuaBehavior = {
@@ -139,18 +142,19 @@ function scene:start()
 			parent = "MainButtonsPanel"
 		},
 		UIRect = {
-			anchorMin = {0.5, 0.4},
-			anchorMax = {0.5, 0.4}
+			anchorMin = {0.85, 0.16},
+			anchorMax = {0.85, 0.16}
 		},
 		Text = {
-			font = "fonts/Menlo.ttc",
-			color = {0, 0, 0, 1},
-			string = "CREDITS"
+			font = "fonts/kenyanCoffee.ttf",
+			fontSize = 50,
+			color = {1, 1, 1, 1},
+			string = "Credits"
         },
 		Sprite = {
 			material = {
 				shader	= "sprite",
-				texture = "textures/button.png"
+				texture = "textures/transparent.png"
 			}
 		},
 		LuaBehavior = {
@@ -179,18 +183,19 @@ function scene:start()
 			parent = "MainButtonsPanel"
 		},
 		UIRect = {
-			anchorMin = {0.5, 0.2},
-			anchorMax = {0.5, 0.2}
+			anchorMin = {0.85, 0.08},
+			anchorMax = {0.85, 0.08}
 		},
 		Text = {
-			font = "fonts/Menlo.ttc",
-			color = {0, 0, 0, 1},
-			string = "EXIT"
+			font = "fonts/kenyanCoffee.ttf",
+			fontSize = 50,
+			color = {1, 1, 1, 1},
+			string = "Exit"
         },
 		Sprite = {
 			material = {
 				shader	= "sprite",
-				texture = "textures/button.png"
+				texture = "textures/transparent.png"
 			}
 		},
 		LuaBehavior = {
@@ -297,6 +302,58 @@ function scene:start()
 		}
 	}
 
+	local arrowLeft = Game.makeActor {
+		Name = "ArrowLeft",
+		Transform = {
+			parent = "ChooseLevelPanel"
+		},
+		UIRect = {
+			anchorMin = {0.05, 0.6},
+			anchorMax = {0.05, 0.6}
+		},
+		Sprite = {
+			material = {
+				shader	= "sprite",
+				texture = "textures/arrowLeft.png"
+			}
+		},
+		LuaBehavior = {
+			update = function(self, dt)
+				if Game.keyboard.isHeld("left") then
+					self.actor:get("Transform").scale = {1.2,1.2,1.2}
+				else
+					self.actor:get("Transform").scale = {1,1,1}
+				end
+			end
+		}
+	}
+
+	local arrowRight = Game.makeActor {
+		Name = "ArrowRight",
+		Transform = {
+			parent = "ChooseLevelPanel"
+		},
+		UIRect = {
+			anchorMin = {0.95, 0.6},
+			anchorMax = {0.95, 0.6}
+		},
+		Sprite = {
+			material = {
+				shader	= "sprite",
+				texture = "textures/arrowRight.png"
+			}
+		},
+		LuaBehavior = {
+			update = function(self, dt)
+				if Game.keyboard.isHeld("right") then
+					self.actor:get("Transform").scale = {1.2,1.2,1.2}
+				else
+					self.actor:get("Transform").scale = {1,1,1}
+				end
+			end
+		}
+	}
+
 	local backButtonChooseLevel = Game.makeActor {
 		Name = "BackButtonChooseLevel",
 		Transform = {
@@ -307,14 +364,15 @@ function scene:start()
 			anchorMax = {0.5, 0.1}
 		},
 		Text = {
-			font = "fonts/Menlo.ttc",
-			color = {0, 0, 0, 1},
-			string = "BACK"
+			font = "fonts/kenyanCoffee.ttf",
+			fontSize = 50,
+			color = {1, 1, 1, 1},
+			string = "Back"
         },
 		Sprite = {
 			material = {
 				shader	= "sprite",
-				texture = "textures/button.png"
+				texture = "textures/transparent.png"
 			}
 		},
 		LuaBehavior = {
@@ -350,8 +408,9 @@ function scene:start()
 			anchorMax = {1, 1}
 		},
 		Text = {
-			font	= "fonts/Menlo.ttc",
-			color	= {0, 0, 0, 1},
+			font	= "fonts/kenyanCoffee.ttf",
+			fontSize = 50,
+			color	= {1, 1, 1, 1},
 			string	= "CREDITS"
         },
 	}
@@ -366,14 +425,15 @@ function scene:start()
 			anchorMax = {0.5, 0.1}
 		},
 		Text = {
-			font	= "fonts/Menlo.ttc",
-			color	= {0, 0, 0, 1},
-			string	= "BACK"
+			font	= "fonts/kenyanCoffee.ttf",
+			fontSize = 50,
+			color	= {1, 1, 1, 1},
+			string	= "Back"
         },
 		Sprite = {
 			material = {
 				shader	= "sprite",
-				texture = "textures/button.png"
+				texture = "textures/transparent.png"
 			}
 		},
 		LuaBehavior = {
@@ -409,7 +469,7 @@ function scene:start()
 		Sprite = {
 			material = {
 				shader		= "sprite",
-				texture		= "textures/background.png"
+				texture		= "textures/menuBackgrond.jpg"
 			}
 		}
 	}
@@ -421,13 +481,16 @@ function scene:start()
 	creditsPanel:get("UIRect").isEnabled		= false
 	chooseLevelPanel:get("UIRect").isEnabled	= false
 
-	keepAspectRatio(chooseLevelImage,600)
-	keepAspectRatio(startButton,125)
-	keepAspectRatio(chooseLevelButton,125)
-	keepAspectRatio(creditsButton,125)
-	keepAspectRatio(exitButton,125)
-	keepAspectRatio(backButtonChooseLevel,125)
-	keepAspectRatio(backButtonCredits,125)
+	keepAspectRatio(chooseLevelImage,500)
+	keepAspectRatio(startButton,buttonSize)
+	keepAspectRatio(chooseLevelButton,buttonSize)
+	keepAspectRatio(creditsButton,buttonSize)
+	keepAspectRatio(exitButton,buttonSize)
+	keepAspectRatio(backButtonChooseLevel,buttonSize)
+	keepAspectRatio(backButtonCredits,buttonSize)
+	keepAspectRatio(arrowLeft,256)
+	keepAspectRatio(arrowRight,256)
+
 end
 
 return scene

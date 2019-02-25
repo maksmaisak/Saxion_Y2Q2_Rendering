@@ -117,7 +117,7 @@ function scene:start()
 				if button == 1 then
 					isChooseLevelOpened = true
 					chooseLevelPanel:get("UIRect").isEnabled	= true
-					mainButtonPanel:get("UIRect").isEnabled		= false
+					mainButtonsPanel:get("UIRect").isEnabled		= false
 				end
 			end,
 
@@ -156,8 +156,8 @@ function scene:start()
 		LuaBehavior = {
 			onMouseDown = function(self, button)
 				if button == 1 then
-					creditsPanel:get("UIRect").isEnabled	= true
-					mainButtonPanel:get("UIRect").isEnabled	= false
+					creditsPanel:get("UIRect").isEnabled		= true
+					mainButtonsPanel:get("UIRect").isEnabled	= false
 				end
 			end,
 
@@ -196,7 +196,7 @@ function scene:start()
 		LuaBehavior = {
 			onMouseDown = function(self, button)
 				if button == 1 then
-					mainButtonPanel:get("UIRect").isEnabled	= false
+					--mainButtonsPanel:get("UIRect").isEnabled	= false
 				end
 			end,
 
@@ -322,7 +322,7 @@ function scene:start()
 				if button == 1 then
 					isChooseLevelOpened = false
 					print("Go back to main")
-					mainButtonPanel:get("UIRect").isEnabled		= true
+					mainButtonsPanel:get("UIRect").isEnabled		= true
 					chooseLevelPanel:get("UIRect").isEnabled	= false
 				end
 			end,
@@ -346,8 +346,8 @@ function scene:start()
 		Name = "CreditsPanel",
 		Transform = {},
 		UIRect = {
-			anchorMin = {0.3, 0.2},
-			anchorMax = {0.7, 1}
+			anchorMin = {0, 0},
+			anchorMax = {1, 1}
 		},
 		Text = {
 			font	= "fonts/Menlo.ttc",
@@ -362,8 +362,8 @@ function scene:start()
 			parent = "CreditsPanel"
 		},
 		UIRect = {
-			anchorMin = {0.5, -0.1},
-			anchorMax = {0.5, -0.1}
+			anchorMin = {0.5, 0.1},
+			anchorMax = {0.5, 0.1}
 		},
 		Text = {
 			font	= "fonts/Menlo.ttc",
@@ -379,8 +379,8 @@ function scene:start()
 		LuaBehavior = {
 			onMouseDown = function(self, button)
 				if button == 1 then
-					creditsPanel:get("UIRect").isEnabled		= false
-					mainButtonPanel:get("UIRect").isEnabled		= true
+					creditsPanel:get("UIRect").isEnabled			= false
+					mainButtonsPanel:get("UIRect").isEnabled		= true
 				end
 			end,
 

@@ -1,16 +1,16 @@
 
 -- engine
-width  = 1920
-height = 1080
+width  = 800
+height = 600
 fullscreen = false
 framerateCap = 240
---startScene = 'assets/scripts/scenes/mainMenu.lua'
-startScene = 'assets/scripts/scenes/level1.lua'
+startScene = 'assets/scripts/UI/mainMenu.lua'
+--startScene = 'assets/scripts/scenes/level1.lua'
 referenceResolution = {1920, 1080}
 
 -- custom
 player = 'assets/scripts/player.lua'
-firstLevelPath = 'assets/scripts/scenes/test/level1.lua'
+firstLevelPath = 'assets/scripts/scenes/level1.lua'
 
 -- old stuff
 bulletSpeed = 30

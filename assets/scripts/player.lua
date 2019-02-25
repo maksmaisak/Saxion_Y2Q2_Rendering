@@ -1,7 +1,7 @@
 require('assets/scripts/vector')
 require('assets/scripts/object')
 require('assets/scripts/level/map')
-require('assets/scripts/scenes/pauseMenu')
+require('assets/scripts/UI/pauseMenu')
 
 Player = Object:new {
 	gridPosition = { x = 1, y = 1 },

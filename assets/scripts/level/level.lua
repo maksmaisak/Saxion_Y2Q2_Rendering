@@ -1,7 +1,7 @@
 require('assets/scripts/object')
 require('assets/scripts/vector')
 require('assets/scripts/level/map')
-require('assets/scripts/scenes/pauseMenu')
+require('assets/scripts/UI/pauseMenu')
 
 Level = Object:new {
 	map = nil,

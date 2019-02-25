@@ -114,49 +114,62 @@ function Player:disableButton(gridPosition)
 end
 
 function Player:activateButtonTarget(button)
-	local target = self.map:getGridAt(button.targetPosition)
 
-	target.isButtonTargetEnabled = true
+	for i, targetPosition in ipairs(button.targetPositions) do
 
-	if target.goal ~= nil then
-		print("Activating goal")
-		local goal = target.goal
+		local target = self.map:getGridAt(targetPosition)
 
-		-- play goal activation "animation" this is a placeholder (it moves the position)
-		-- replace it when with the real one when is done
-		local goalPosition		= goal.transform.position
-		goalPosition.y 			= goalPosition.y + 0.5
-		goal.transform.position	= goalPosition
-	elseif target.door ~= nil then
+		target.isButtonTargetEnabled = true
 
-		print("Activating door")
-		local door = target.door
-		door.swingLeftTransform:rotate ( 90, 0, 1, 0)
-		door.swingRightTransform:rotate(-90, 0, 1, 0)
+		if target.goal ~= nil then
+
+			print("Activating goal")
+			local goal = target.goal
+
+			-- play goal activation "animation" this is a placeholder (it moves the position)
+			-- replace it when with the real one when is done
+			local goalPosition		= goal.transform.position
+			goalPosition.y 			= goalPosition.y + 0.5
+			goal.transform.position	= goalPosition
+
+		elseif target.door ~= nil then
+
+			print("Activating door")
+			local door = target.door
+			door.swingLeftTransform:rotate ( 90, 0, 1, 0)
+			door.swingRightTransform:rotate(-90, 0, 1, 0)
+		end
 	end
 end
 
 function Player:deactivateButtonTarget(button)
-	local target = self.map:getGridAt(button.targetPosition)
 
-	target.isButtonTargetEnabled = false
+	for i, targetPosition in ipairs(button.targetPositions) do
 
-	if target.goal ~= nil then
-		print("Deactivating goal")
+		local target = self.map:getGridAt(targetPosition)
 
-		local goal		= target.goal
+		target.isButtonTargetEnabled = false
 
-		-- play goal activation "animation" this is a placeholder (it moves the position)
-		-- replace it when with the real one when is done
-		local goalPosition		= goal.transform.position
-		goalPosition.y 			= goalPosition.y - 0.5
-		goal.transform.position	= goalPosition
-	elseif target.door ~= nil then
-		print("Deactivating door")
+		if target.goal ~= nil then
 
-		local door = target.door
-		door.swingLeftTransform:rotate (-90, 0, 1, 0)
-		door.swingRightTransform:rotate( 90, 0, 1, 0)
+			print("Deactivating goal")
+
+			local goal = target.goal
+
+			-- play goal activation "animation" this is a placeholder (it moves the position)
+			-- replace it when with the real one when is done
+			local goalPosition		= goal.transform.position
+			goalPosition.y 			= goalPosition.y - 0.5
+			goal.transform.position	= goalPosition
+
+		elseif target.door ~= nil then
+
+			print("Deactivating door")
+
+			local door = target.door
+			door.swingLeftTransform:rotate (-90, 0, 1, 0)
+			door.swingRightTransform:rotate( 90, 0, 1, 0)
+		end
 	end
 end
 

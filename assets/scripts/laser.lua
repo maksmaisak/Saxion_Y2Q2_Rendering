@@ -17,6 +17,8 @@ function Laser:start()
 
 	self.beamRenderInfo = self.gridItem.laser.beam:getInChildren("RenderInfo")
 	self.beamTransform  = self.gridItem.laser.beam:get("Transform")
+
+	self:updateBeamLength()
 end
 
 function Laser:update(dt)
@@ -34,6 +36,10 @@ function Laser:update(dt)
 	end
 end
 
+local function doesBlock(gridItem)
+	return not gridItem or gridItem.obstacle or (gridItem.door and not gridItem.isButtonTargetEnabled)
+end
+
 function Laser:hitDroppedKeys()
 
 	print("hitting dropped keys")
@@ -42,22 +48,14 @@ function Laser:hitDroppedKeys()
 	for i = 1, 20 do
 
 		local gridItem = self.map:getGridAt(position)
-		if gridItem then
+		if doesBlock(gridItem) then
+			self:setBeamLength(i)
+			return
+		end
 
-			if gridItem.obstacle or (gridItem.door and not gridItem.isButtonTargetEnabled) then
-
-				local distance = math.abs(position.x - self.gridPosition.x) + math.abs(position.y - self.gridPosition.y)
-				local scale = self.beamTransform.scale
-				scale.z = distance - 0.5
-				self.beamTransform.scale = scale
-
-				return
-			end
-
-			for k, v in pairs(self.map:getDroppedKeysGridAt(position).hasKeyDropped) do
-				if v then -- if has this currentKey dropped at this position
-					self.level.player:moveByKey(k)
-				end
+		for k, v in pairs(self.map:getDroppedKeysGridAt(position).hasKeyDropped) do
+			if v then -- if has this currentKey dropped at this position
+				self.level.player:moveByKey(k)
 			end
 		end
 
@@ -71,8 +69,38 @@ function Laser:hitDroppedKeys()
 		if position.y > self.map.gridSize.y or position.y < 1 then
 			break
 		end
-
 	end
+end
+
+function Laser:updateBeamLength()
+
+	local position = {x = self.gridPosition.x, y = self.gridPosition.y}
+	for i = 0, math.max(self.map.gridSize.x, self.map.gridSize.y) do
+
+		local gridItem = self.map:getGridAt(position)
+		if doesBlock(gridItem) then
+			self:setBeamLength(i)
+			return
+		end
+
+		position.x = position.x + self.direction.x
+		position.y = position.y + self.direction.y
+
+		if position.x > self.map.gridSize.x or position.x < 1 then
+			break
+		end
+
+		if position.y > self.map.gridSize.y or position.y < 1 then
+			break
+		end
+	end
+end
+
+function Laser:setBeamLength(length)
+
+	local scale = self.beamTransform.scale
+	scale.z = length - 0.5
+	self.beamTransform.scale = scale
 end
 
 return function(o)

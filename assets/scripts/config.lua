@@ -1,8 +1,8 @@
 
 -- engine
-width  = 800
-height = 600
-fullscreen = false
+width  = 1920
+height = 1080
+fullscreen = true
 framerateCap = 240
 startScene = 'assets/scripts/UI/mainMenu.lua'
 --startScene = 'assets/scripts/scenes/level1.lua'

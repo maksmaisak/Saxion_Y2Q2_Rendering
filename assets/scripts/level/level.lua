@@ -49,9 +49,9 @@ function Level:start()
 			end
 
 			if gridItem.button then
-				local button		= gridItem.button
-				button.actor		= Game.makeActor(button.actor)
-				button.transform	= button.actor:get("Transform")
+				local button	 = gridItem.button
+				button.actor	 = Game.makeActor(button.actor)
+				button.transform = button.actor:get("Transform")
 			end
 
 			if gridItem.portal then
@@ -59,9 +59,18 @@ function Level:start()
 			end
 
 			if gridItem.door then
-				local door		= gridItem.door
-				door.actor		= Game.makeActor(door.actor)
-				door.transform	= door.actor:get("Transform")
+
+				local door	   = gridItem.door
+				door.actor	   = Game.makeActor(door.actor)
+				door.transform = door.actor:get("Transform")
+
+				door.swingLeft = Game.makeActor(door.swingLeft)
+				door.swingLeftTransform = door.swingLeft:get("Transform")
+				door.swingLeftTransform.parent = door.actor
+
+				door.swingRight = Game.makeActor(door.swingRight)
+				door.swingRightTransform = door.swingRight:get("Transform")
+				door.swingRightTransform.parent = door.actor
 			end
 
 			if gridItem.laser then

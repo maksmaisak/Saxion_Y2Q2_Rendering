@@ -128,14 +128,11 @@ function Player:activateButtonTarget(button)
 		goalPosition.y 			= goalPosition.y + 0.5
 		goal.transform.position	= goalPosition
 	elseif target.door ~= nil then
-		print("Activating door")
-		local door		= target.door
 
-		-- play door activation "anim" this is a placeholder (it rotates the door on the Y axis)
-		-- to its target rotation
-		local doorRotation		= door.transform.rotation
-		doorRotation.y			= doorRotation.y + door.targetYRotation
-		door.transform.rotation = doorRotation
+		print("Activating door")
+		local door = target.door
+		door.swingLeftTransform:rotate ( 90, 0, 1, 0)
+		door.swingRightTransform:rotate(-90, 0, 1, 0)
 	end
 end
 
@@ -157,13 +154,9 @@ function Player:deactivateButtonTarget(button)
 	elseif target.door ~= nil then
 		print("Deactivating door")
 
-		local door		= target.door
-
-		-- play door activation "anim" this is a placeholder (it rotates the door on the Y axis)
-		-- back to its original rotation
-		local doorRotation		= door.transform.rotation
-		doorRotation.y			= doorRotation.y - door.targetYRotation
-		door.transform.rotation = doorRotation
+		local door = target.door
+		door.swingLeftTransform:rotate (-90, 0, 1, 0)
+		door.swingRightTransform:rotate( 90, 0, 1, 0)
 	end
 end
 

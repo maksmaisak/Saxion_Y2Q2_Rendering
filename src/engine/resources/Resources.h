@@ -94,11 +94,13 @@ namespace en {
     std::map<std::string, std::shared_ptr<TResource>> Resources<TResource>::m_resources;
 
     using Meshes = Resources<Mesh>;
+
     struct Textures : Resources<Texture> {
 
         inline static std::shared_ptr<Texture> white() {return get(config::TEXTURE_PATH + "white.png");}
         inline static std::shared_ptr<Texture> black() {return get(config::TEXTURE_PATH + "black.png");}
         inline static std::shared_ptr<Texture> transparent() {return get(config::TEXTURE_PATH + "transparent.png");}
+        inline static std::shared_ptr<Texture> defaultNormalMap() {return get(config::TEXTURE_PATH + "defaultNormalMap.png", GL_RGBA);}
     };
 }
 

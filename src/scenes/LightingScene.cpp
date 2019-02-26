@@ -124,6 +124,7 @@ void LightingScene::open() {
         material->setUniformValue("albedoMap"   , en::Textures::get(config::TEXTURE_PATH + "testPBR/rust/albedo.png"   ));
         material->setUniformValue("metallicMap" , en::Textures::get(config::TEXTURE_PATH + "testPBR/rust/metallic.png" ));
         material->setUniformValue("roughnessMap", en::Textures::get(config::TEXTURE_PATH + "testPBR/rust/roughness.png"));
+        material->setUniformValue("normalMap", en::Textures::defaultNormalMap());
         material->setUniformValue("aoMap", en::Textures::white());
         material->setUniformValue("albedoColor"        , glm::vec3(1));
         material->setUniformValue("metallicMultiplier" , 1.f);
@@ -141,6 +142,7 @@ void LightingScene::open() {
         material->setUniformValue("albedoMap"   , en::Textures::get(config::TEXTURE_PATH + "testPBR/pillar/Pillars_C.png"));
         material->setUniformValue("metallicMap" , en::Textures::get(config::TEXTURE_PATH + "testPBR/pillar/Pillars_M.png"));
         material->setUniformValue("roughnessMap", en::Textures::get(config::TEXTURE_PATH + "testPBR/pillar/Pillars_R.png"));
+        material->setUniformValue("normalMap", en::Textures::defaultNormalMap());
         material->setUniformValue("aoMap", en::Textures::white());
         material->setUniformValue("albedoColor"        , glm::vec3(1));
         material->setUniformValue("metallicMultiplier" , 1.f);
@@ -157,6 +159,7 @@ void LightingScene::open() {
         material->setUniformValue("albedoMap"   , en::Textures::get(config::TEXTURE_PATH + "testPBR/oldTiledStone/tiledstone1_basecolor.png"));
         material->setUniformValue("metallicMap" , en::Textures::get(config::TEXTURE_PATH + "testPBR/oldTiledStone/tiledstone1_metallic.png" ));
         material->setUniformValue("roughnessMap", en::Textures::get(config::TEXTURE_PATH + "testPBR/oldTiledStone/tiledstone1_roughness.png"));
+        material->setUniformValue("normalMap"   , en::Textures::get(config::TEXTURE_PATH + "testPBR/oldTiledStone/tiledstone1_normal.png"));
         material->setUniformValue("aoMap"       , en::Textures::get(config::TEXTURE_PATH + "testPBR/oldTiledStone/tiledstone1_AO.png"    ));
         material->setUniformValue("albedoColor"        , glm::vec3(1));
         material->setUniformValue("metallicMultiplier" , 1.f);

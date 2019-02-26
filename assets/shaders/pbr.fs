@@ -68,10 +68,12 @@ uniform vec3 viewPosition;
 uniform sampler2D albedoMap;
 uniform sampler2D metallicMap;
 uniform sampler2D roughnessMap;
+uniform sampler2D normalMap;
 uniform sampler2D aoMap;
 uniform vec3 albedoColor = vec3(1,1,1);
 uniform float metallicMultiplier = 1;
 uniform float roughnessMultiplier = 1;
+uniform float normalMultiplier = 1;
 uniform float aoMultiplier = 1;
 
 const float PI = 3.14159265359;
@@ -82,13 +84,14 @@ vec3 CalculateDirectionalLightContribution(int i, vec3 N, vec3 V, vec3 albedo, f
 vec3 CalculatePointLightContribution(int i, vec3 N, vec3 V, vec3 albedo, float metallic, float roughness, float ao);
 vec3 CalculateSpotLightContribution (int i, vec3 N, vec3 V, vec3 albedo, float metallic, float roughness, float ao);
 
+vec3 GetNormal();
 vec3 CookTorranceBRDF(vec3 N, vec3 V, vec3 L, vec3 albedo, float metallic, float roughness);
 float CalculateDirectionalShadowMultiplier(int i, float biasMultiplier);
 float CalculatePointShadowMultiplier(int i, vec3 fromLight, float distance, float biasMultiplier);
 
 void main() {
 
-    vec3 normal = normalize(worldNormal);
+    vec3 normal = GetNormal();
     vec3 viewDirection = normalize(viewPosition - worldPosition);
 
     vec3  albedo    = albedoColor         * vec3(texture(albedoMap, texCoords));
@@ -111,6 +114,22 @@ void main() {
     }
 
 	fragmentColor = vec4(color, 1);
+}
+
+vec3 GetNormal() {
+
+    vec3 tangentspaceNormal = texture(normalMap, texCoords).xyz * 2.0 - 1.0;
+
+    vec3 q1  = dFdx(worldPosition);
+    vec3 q2  = dFdy(worldPosition);
+    vec2 st1 = dFdx(texCoords);
+    vec2 st2 = dFdy(texCoords);
+
+    vec3 N = normalize(worldNormal);
+    vec3 T = normalize(q1 * st2.t - q2 * st1.t);
+    vec3 B = -normalize(cross(N, T));
+
+    return normalize(mat3(T,B,N) * tangentspaceNormal);
 }
 
 vec3 CalculateDirectionalLightContribution(int i, vec3 N, vec3 V, vec3 albedo, float metallic, float roughness, float ao) {

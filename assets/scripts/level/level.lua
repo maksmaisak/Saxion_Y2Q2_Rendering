@@ -97,3 +97,9 @@ function Level:start()
 		Game.makeActors(self.extras)
 	end
 end
+
+function Level:update(dt)
+	if self.pauseMenu ~= nil then
+		self.pauseMenu:update(dt)
+	end
+end

@@ -42,14 +42,14 @@ function Level:start()
 			end
 
 			if gridItem.goal then
-				local actor = Game.makeActor(gridItem.goal)
-				gridItem.goal = {
-					actor = actor,
-					transform = actor:get("Transform")
-				}
+
+                local goal = gridItem.goal
+                goal.actor = Game.makeActor(goal.actor)
+				goal.transform = goal.actor:get("Transform")
 			end
 
 			if gridItem.button then
+
 				local button	 = gridItem.button
 				button.actor	 = Game.makeActor(button.actor)
 				button.transform = button.actor:get("Transform")
@@ -60,6 +60,7 @@ function Level:start()
 			end
 
 			if gridItem.door then
+
 				local door	   = gridItem.door
 				door.actor	   = Game.makeActor(door.actor)
 				door.transform = door.actor:get("Transform")

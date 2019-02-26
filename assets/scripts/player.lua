@@ -58,7 +58,7 @@ function Player:activateGoal(gridPosition)
 
 	local gridItem	= self.map:getGridAt(gridPosition)
 	local goal		= gridItem.goal
-	if not gridItem.isButtonTargetEnabled then
+	if not goal.startActive and not gridItem.isButtonTargetEnabled then
 		return
 	end
 

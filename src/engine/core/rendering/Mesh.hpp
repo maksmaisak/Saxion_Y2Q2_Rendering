@@ -27,7 +27,7 @@ public:
 	/**
 	 * Streams the mesh to opengl using the given indexes for the different attributes
 	 */
-	void streamToOpenGL(GLint pVerticesAttrib, GLint pNormalsAttrib, GLint pUVsAttrib);
+	void streamToOpenGL(GLint verticesAttrib = -1, GLint normalsAttrib = -1, GLint uvsAttrib = -1, GLint tangentAttrib = -1, GLint bitangentAttrib = -1);
 
 	/**
 	 * Draws debug info (normals) for the mesh using the given matrices)
@@ -35,26 +35,30 @@ public:
 	void drawDebugInfo(const glm::mat4& pModelMatrix, const glm::mat4& pViewMatrix, const glm::mat4& pProjectionMatrix);
 
 protected:
-	Mesh();
+	Mesh() = default;
 
-	//OpenGL id's for the different buffers created for this mesh
-	GLuint _indexBufferId;
-	GLuint _vertexBufferId;
-	GLuint _normalBufferId;
-	GLuint _uvBufferId;
+	// OpenGL id's for the different buffers created for this mesh
+	GLuint m_indexBufferId     = 0;
+	GLuint m_vertexBufferId    = 0;
+	GLuint m_normalBufferId    = 0;
+	GLuint m_uvBufferId        = 0;
+	GLuint m_tangentBufferId   = 0;
+	GLuint m_bitangentBufferId = 0;
 
-	GLuint _vao;
+	GLuint m_vao;
 
-	//the actual data
-	std::vector<glm::vec3> _vertices;       //vec3 with 3d coords for all vertices
-	std::vector<glm::vec3> _normals;        //vec3 with 3d normal data
-	std::vector<glm::vec2> _uvs;            //vec2 for uv
+	// vertex data
+	std::vector<glm::vec3> m_vertices;
+	std::vector<glm::vec3> m_normals;
+	std::vector<glm::vec2> m_uvs;
+	std::vector<glm::vec3> m_tangents;
+	std::vector<glm::vec3> m_bitangents;
 
 	//references to the vertices/normals & uvs in previous vectors
-	std::vector<unsigned> _indices;
+	std::vector<unsigned> m_indices;
 
 	//buffer vertices, normals, and uv's
-	void _buffer();
+	void buffer();
 
 	//Please read the "load" function documentation on the .obj file format first.
 	//FaceVertexTriplet  is a helper class for loading and converting to obj file to
@@ -68,15 +72,15 @@ protected:
 	//So for a vertex index a FaceVertexTriplet contains the index for uv and n as well.
 	struct FaceIndexTriplet {
 
-		unsigned v; //vertex
-		unsigned uv;//uv
-		unsigned n; //normal
+		unsigned v;  //vertex
+		unsigned uv; //uv
+		unsigned n;  //normal
 
 		FaceIndexTriplet(unsigned pV, unsigned pUV, unsigned pN)
 			: v(pV), uv(pUV), n(pN) {}
 
 		// needed for use as key in map
-		bool operator<(const FaceIndexTriplet other) const {
+		bool operator < (const FaceIndexTriplet other) const {
 			return memcmp((void*)this, (void*)&other, sizeof(FaceIndexTriplet)) > 0;
 		}
 	};

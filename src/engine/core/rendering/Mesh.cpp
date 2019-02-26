@@ -6,16 +6,18 @@
 #include "Mesh.hpp"
 #include "GLHelpers.h"
 
-
-Mesh::Mesh() : _indexBufferId(0), _vertexBufferId(0), _normalBufferId(0), _uvBufferId(0), _vertices(), _normals(), _uvs(), _indices() {
-	//ctor
-}
-
 Mesh::~Mesh() {
 
-	// TODO destroy the VAO, free buffers.
-}
+	glDeleteBuffers(1, &m_indexBufferId);
 
+	glDeleteBuffers(1, &m_vertexBufferId);
+	glDeleteBuffers(1, &m_normalBufferId);
+	glDeleteBuffers(1, &m_uvBufferId);
+	glDeleteBuffers(1, &m_tangentBufferId);
+	glDeleteBuffers(1, &m_bitangentBufferId);
+
+	glDeleteVertexArrays(1, &m_vao);
+}
 
 /**
  * Load reads the obj data into a new mesh using C++ combined with c style coding.
@@ -150,18 +152,18 @@ Mesh* Mesh::load(std::string pFilename) {
 							mappedTriplets[triplet] = index;
 
 							//now record this index
-							mesh->_indices.push_back(index);
+							mesh->m_indices.push_back(index);
 							//and store the corresponding vertex/normal/uv values into our own buffers
 							//note the -1 is required since all values in the f triplets in the .obj file
 							//are 1 based, but our vectors are 0 based
-							mesh->_vertices.push_back(vertices[vertexIndex[i] - 1]);
-							mesh->_normals.push_back(normals[normalIndex[i] - 1]);
-							mesh->_uvs.push_back(uvs[uvIndex[i] - 1]);
+							mesh->m_vertices.push_back(vertices[vertexIndex[i] - 1]);
+							mesh->m_normals.push_back(normals[normalIndex[i] - 1]);
+							mesh->m_uvs.push_back(uvs[uvIndex[i] - 1]);
 						} else {
 							//if the key was already present, get the index value for it
 							unsigned int index = found->second;
 							//and update our index buffer with it
-							mesh->_indices.push_back(index);
+							mesh->m_indices.push_back(index);
 						}
 					}
 				} else {
@@ -174,9 +176,9 @@ Mesh* Mesh::load(std::string pFilename) {
 		}
 
 		file.close();
-		mesh->_buffer();
+		mesh->buffer();
 
-		std::cout << "Mesh loaded and buffered:" << (mesh->_indices.size() / 3.0f) << " triangles." << std::endl;
+		std::cout << "Mesh loaded and buffered:" << (mesh->m_indices.size() / 3.0f) << " triangles." << std::endl;
 		return mesh;
 	} else {
 		std::cout << "Could not read " << pFilename << std::endl;
@@ -185,63 +187,49 @@ Mesh* Mesh::load(std::string pFilename) {
 	}
 }
 
-void Mesh::_buffer() {
+void Mesh::streamToOpenGL(GLint verticesAttrib, GLint normalsAttrib, GLint uvsAttrib, GLint tangentAttrib, GLint bitangentAttrib) {
 
-	// TODO free these buffers in the destructor.
+	glBindVertexArray(m_vao);
 
-	glGenBuffers(1, &_indexBufferId);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _indexBufferId);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, _indices.size() * sizeof(unsigned int), &_indices[0], GL_STATIC_DRAW);
-
-	glGenBuffers(1, &_vertexBufferId);
-	glBindBuffer(GL_ARRAY_BUFFER, _vertexBufferId);
-	glBufferData(GL_ARRAY_BUFFER, _vertices.size() * sizeof(glm::vec3), &_vertices[0], GL_STATIC_DRAW);
-
-	glGenBuffers(1, &_normalBufferId);
-	glBindBuffer(GL_ARRAY_BUFFER, _normalBufferId);
-	glBufferData(GL_ARRAY_BUFFER, _normals.size() * sizeof(glm::vec3), &_normals[0], GL_STATIC_DRAW);
-
-	glGenBuffers(1, &_uvBufferId);
-	glBindBuffer(GL_ARRAY_BUFFER, _uvBufferId);
-	glBufferData(GL_ARRAY_BUFFER, _uvs.size() * sizeof(glm::vec2), &_uvs[0], GL_STATIC_DRAW);
-
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-	glGenVertexArrays(1, &_vao);
-}
-
-void Mesh::streamToOpenGL(GLint pVerticesAttrib, GLint pNormalsAttrib, GLint pUVsAttrib) {
-
-	glBindVertexArray(_vao);
-
-	if (pVerticesAttrib != -1) {
-		glBindBuffer(GL_ARRAY_BUFFER, _vertexBufferId);
-		glEnableVertexAttribArray(pVerticesAttrib);
-		glVertexAttribPointer(pVerticesAttrib, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	if (verticesAttrib > -1) {
+		glBindBuffer(GL_ARRAY_BUFFER, m_vertexBufferId);
+		glEnableVertexAttribArray(static_cast<GLuint>(verticesAttrib));
+		glVertexAttribPointer(static_cast<GLuint>(verticesAttrib), 3, GL_FLOAT, GL_FALSE, 0, 0);
 	}
 
-	if (pNormalsAttrib != -1) {
-		glBindBuffer(GL_ARRAY_BUFFER, _normalBufferId);
-		glEnableVertexAttribArray(pNormalsAttrib);
-		glVertexAttribPointer(pNormalsAttrib, 3, GL_FLOAT, GL_TRUE, 0, 0);
+	if (normalsAttrib > -1) {
+		glBindBuffer(GL_ARRAY_BUFFER, m_normalBufferId);
+		glEnableVertexAttribArray(static_cast<GLuint>(normalsAttrib));
+		glVertexAttribPointer(static_cast<GLuint>(normalsAttrib), 3, GL_FLOAT, GL_TRUE, 0, 0);
 	}
 
-	if (pUVsAttrib != -1) {
-		glBindBuffer(GL_ARRAY_BUFFER, _uvBufferId);
-		glEnableVertexAttribArray(pUVsAttrib);
-		glVertexAttribPointer(pUVsAttrib, 2, GL_FLOAT, GL_FALSE, 0, 0);
+	if (uvsAttrib > -1) {
+		glBindBuffer(GL_ARRAY_BUFFER, m_uvBufferId);
+		glEnableVertexAttribArray(static_cast<GLuint>(uvsAttrib));
+		glVertexAttribPointer(static_cast<GLuint>(uvsAttrib), 2, GL_FLOAT, GL_FALSE, 0, 0);
 	}
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _indexBufferId);
-
-	glDrawElements(GL_TRIANGLES, _indices.size(), GL_UNSIGNED_INT, (GLvoid*)0);
-	if (glCheckError()) {
-		std::cout << "";
+	if (tangentAttrib > -1) {
+		glBindBuffer(GL_ARRAY_BUFFER, m_tangentBufferId);
+		glEnableVertexAttribArray(static_cast<GLuint>(tangentAttrib));
+		glVertexAttribPointer(static_cast<GLuint>(tangentAttrib), 3, GL_FLOAT, GL_FALSE, 0, 0);
 	}
 
-	if (pUVsAttrib      != -1) glDisableVertexAttribArray(pUVsAttrib);
-	if (pNormalsAttrib  != -1) glDisableVertexAttribArray(pNormalsAttrib);
-	if (pVerticesAttrib != -1) glDisableVertexAttribArray(pVerticesAttrib);
+	if (bitangentAttrib > -1) {
+		glBindBuffer(GL_ARRAY_BUFFER, m_bitangentBufferId);
+		glEnableVertexAttribArray(static_cast<GLuint>(bitangentAttrib));
+		glVertexAttribPointer(static_cast<GLuint>(bitangentAttrib), 3, GL_FLOAT, GL_FALSE, 0, 0);
+	}
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBufferId);
+
+	glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(m_indices.size()), GL_UNSIGNED_INT, (GLvoid*)0);
+
+	if (bitangentAttrib > -1) glDisableVertexAttribArray(static_cast<GLuint>(bitangentAttrib));
+	if (tangentAttrib   > -1) glDisableVertexAttribArray(static_cast<GLuint>(tangentAttrib));
+	if (uvsAttrib       > -1) glDisableVertexAttribArray(static_cast<GLuint>(uvsAttrib));
+	if (normalsAttrib   > -1) glDisableVertexAttribArray(static_cast<GLuint>(normalsAttrib));
+	if (verticesAttrib  > -1) glDisableVertexAttribArray(static_cast<GLuint>(verticesAttrib));
 
 	glBindVertexArray(0);
 }
@@ -256,14 +244,14 @@ void Mesh::drawDebugInfo(const glm::mat4& pModelMatrix, const glm::mat4& pViewMa
 
 	glBegin(GL_LINES);
 	//for each index draw the normal starting at the corresponding vertex
-	for (size_t i = 0; i < _indices.size(); i++) {
+	for (size_t i = 0; i < m_indices.size(); i++) {
 		//draw normal for vertex
 		if (true) {
 			//now get normal end
-			glm::vec3 normal = _normals[_indices[i]];
+			glm::vec3 normal = m_normals[m_indices[i]];
 			glColor3fv(glm::value_ptr(normal));
 
-			glm::vec3 normalStart = _vertices[_indices[i]];
+			glm::vec3 normalStart = m_vertices[m_indices[i]];
 			glVertex3fv(glm::value_ptr(normalStart));
 			glm::vec3 normalEnd = normalStart + normal * 0.2f;
 			glVertex3fv(glm::value_ptr(normalEnd));
@@ -271,4 +259,37 @@ void Mesh::drawDebugInfo(const glm::mat4& pModelMatrix, const glm::mat4& pViewMa
 
 	}
 	glEnd();
+}
+
+void Mesh::buffer() {
+
+	// TODO free these buffers in the destructor.
+
+	glGenBuffers(1, &m_indexBufferId);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBufferId);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_indices.size() * sizeof(unsigned int), m_indices.data(), GL_STATIC_DRAW);
+
+	glGenBuffers(1, &m_vertexBufferId);
+	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBufferId);
+	glBufferData(GL_ARRAY_BUFFER, m_vertices.size() * sizeof(glm::vec3), m_vertices.data(), GL_STATIC_DRAW);
+
+	glGenBuffers(1, &m_normalBufferId);
+	glBindBuffer(GL_ARRAY_BUFFER, m_normalBufferId);
+	glBufferData(GL_ARRAY_BUFFER, m_normals.size() * sizeof(glm::vec3), m_normals.data(), GL_STATIC_DRAW);
+
+	glGenBuffers(1, &m_uvBufferId);
+	glBindBuffer(GL_ARRAY_BUFFER, m_uvBufferId);
+	glBufferData(GL_ARRAY_BUFFER, m_uvs.size() * sizeof(glm::vec2), m_uvs.data(), GL_STATIC_DRAW);
+
+	glGenBuffers(1, &m_tangentBufferId);
+	glBindBuffer(GL_ARRAY_BUFFER, m_tangentBufferId);
+	glBufferData(GL_ARRAY_BUFFER, m_tangents.size() * sizeof(glm::vec3), m_tangents.data(), GL_STATIC_DRAW);
+
+	glGenBuffers(1, &m_bitangentBufferId);
+	glBindBuffer(GL_ARRAY_BUFFER, m_bitangentBufferId);
+	glBufferData(GL_ARRAY_BUFFER, m_bitangents.size() * sizeof(glm::vec3), m_bitangents.data(), GL_STATIC_DRAW);
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	glGenVertexArrays(1, &m_vao);
 }

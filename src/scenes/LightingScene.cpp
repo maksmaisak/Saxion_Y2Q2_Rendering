@@ -102,22 +102,22 @@ void LightingScene::open() {
         if (AnimateLightProperties) light.add<LightPropertyAnimator>();
     }
 
-    auto cube = engine.makeActor("Cube");
-    cube.add<en::Transform>();
-    {
-        auto mesh = en::Meshes::get(config::MODEL_PATH + "cube_flat.obj");
-        auto material = std::make_shared<en::Material>("lit");
-        material->setUniformValue("diffuseMap"   , en::Textures::get(config::TEXTURE_PATH + "container/diffuse.png"));
-        material->setUniformValue("diffuseColor" , glm::vec3(1));
-        material->setUniformValue("specularMap"  , en::Textures::get(config::TEXTURE_PATH + "container/specular.png"));
-        material->setUniformValue("specularColor", glm::vec3(1));
-        material->setUniformValue("shininess"    , 64.f);
-        cube.add<en::RenderInfo>(mesh, std::move(material));
-    }
-    camera.get<CameraOrbitBehavior>().setTarget(cube);
+//    auto cube = engine.makeActor("Cube");
+//    cube.add<en::Transform>();
+//    {
+//        auto mesh = en::Meshes::get(config::MODEL_PATH + "cube_flat.obj");
+//        auto material = std::make_shared<en::Material>("lit");
+//        material->setUniformValue("diffuseMap"   , en::Textures::get(config::TEXTURE_PATH + "container/diffuse.png"));
+//        material->setUniformValue("diffuseColor" , glm::vec3(1));
+//        material->setUniformValue("specularMap"  , en::Textures::get(config::TEXTURE_PATH + "container/specular.png"));
+//        material->setUniformValue("specularColor", glm::vec3(1));
+//        material->setUniformValue("shininess"    , 64.f);
+//        cube.add<en::RenderInfo>(mesh, std::move(material));
+//    }
+//    camera.get<CameraOrbitBehavior>().setTarget(cube);
 
     auto sphere = engine.makeActor("Sphere");
-    sphere.add<en::Transform>().move({0, 2, 0});
+    sphere.add<en::Transform>().move({0, 0, 0});
     {
         auto mesh = en::Resources<Mesh>::get(config::MODEL_PATH + "sphere2.obj");
         auto material = std::make_shared<en::Material>("pbr");
@@ -132,7 +132,7 @@ void LightingScene::open() {
         material->setUniformValue("aoMultiplier"       , 1.f);
         sphere.add<en::RenderInfo>(mesh, std::move(material));
     }
-    //camera.get<CameraOrbitBehavior>().setTarget(sphere);
+    camera.get<CameraOrbitBehavior>().setTarget(sphere);
 
     auto pillar = engine.makeActor("Pillar");
     pillar.add<en::Transform>().move({-4, -1, 0}).scale(glm::vec3(0.01f));
@@ -142,7 +142,7 @@ void LightingScene::open() {
         material->setUniformValue("albedoMap"   , en::Textures::get(config::TEXTURE_PATH + "testPBR/pillar/Pillars_C.png"));
         material->setUniformValue("metallicMap" , en::Textures::get(config::TEXTURE_PATH + "testPBR/pillar/Pillars_M.png"));
         material->setUniformValue("roughnessMap", en::Textures::get(config::TEXTURE_PATH + "testPBR/pillar/Pillars_R.png"));
-        material->setUniformValue("normalMap", en::Textures::defaultNormalMap());
+        material->setUniformValue("normalMap"   , en::Textures::get(config::TEXTURE_PATH + "testPBR/pillar/Pillars_N.png", GL_RGBA));
         material->setUniformValue("aoMap", en::Textures::white());
         material->setUniformValue("albedoColor"        , glm::vec3(1));
         material->setUniformValue("metallicMultiplier" , 1.f);
@@ -159,8 +159,8 @@ void LightingScene::open() {
         material->setUniformValue("albedoMap"   , en::Textures::get(config::TEXTURE_PATH + "testPBR/oldTiledStone/tiledstone1_basecolor.png"));
         material->setUniformValue("metallicMap" , en::Textures::get(config::TEXTURE_PATH + "testPBR/oldTiledStone/tiledstone1_metallic.png" ));
         material->setUniformValue("roughnessMap", en::Textures::get(config::TEXTURE_PATH + "testPBR/oldTiledStone/tiledstone1_roughness.png"));
-        material->setUniformValue("normalMap"   , en::Textures::get(config::TEXTURE_PATH + "testPBR/oldTiledStone/tiledstone1_normal.png"));
-        material->setUniformValue("aoMap"       , en::Textures::get(config::TEXTURE_PATH + "testPBR/oldTiledStone/tiledstone1_AO.png"    ));
+        material->setUniformValue("normalMap"   , en::Textures::get(config::TEXTURE_PATH + "testPBR/oldTiledStone/tiledstone1_normal.png", GL_RGBA));
+        material->setUniformValue("aoMap"       , en::Textures::get(config::TEXTURE_PATH + "testPBR/oldTiledStone/tiledstone1_AO.png"));
         material->setUniformValue("albedoColor"        , glm::vec3(1));
         material->setUniformValue("metallicMultiplier" , 1.f);
         material->setUniformValue("roughnessMultiplier", 1.f);

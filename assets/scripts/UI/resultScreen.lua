@@ -58,6 +58,18 @@ function ResultScreen:animateStar(actor, dt)
 	tf.scale = temp
 end
 
+function ResultScreen:CalculateTotalStars()
+	local undosUsed = self.level.undoCounts
+
+	local totalNumberOfStars = 3
+	for k, v in pairs(self.level.starsRating) do
+		if undosUsed > v then
+			totalNumberOfStars = totalNumberOfStars - 1
+		end
+	end
+	return totalNumberOfStars
+end
+
 function ResultScreen:createResultPanel()
 
 	self.resultPanel = Game.makeActor{
@@ -71,13 +83,15 @@ function ResultScreen:createResultPanel()
 		}
 	}
 
+	self.totalNumberOfStars = self:CalculateTotalStars()
+
 	local anchorValue = 0.4
 	local anchorStep = 0.1
-	for i = 1, 3 do
+
+	for i = 1, self.totalNumberOfStars do
 		self:createStar(anchorValue,0.5,anchorValue,0.5)
 		anchorValue = anchorValue + anchorStep
 	end
-	
 end
 
 function ResultScreen:activate()
@@ -85,8 +99,10 @@ function ResultScreen:activate()
 end
 
 function ResultScreen:update(dt)
-	for i=1, #stars do
-		self:animateStar(stars[i], dt)
+	if self.totalNumberOfStars > 0 then
+		for i=1, self.totalNumberOfStars do
+			self:animateStar(stars[i], dt)
+		end
 	end
 end
 

@@ -74,6 +74,7 @@ function Player:activateGoal(gridPosition)
 		LuaBehavior = Config.resultScreen
 	}
 
+	resultScreen:get("LuaBehavior").level = self.level
 	resultScreen:get("LuaBehavior"):activate()
 	
 	print("activating goal")
@@ -385,6 +386,7 @@ function Player:undoMove()
 
 	local move = self.moves[self.currentMoveIndex]
 	move.undo()
+	self.level.undoCounts = self.level.undoCounts + 1
 
 	print("undoing move")
 end
@@ -401,6 +403,7 @@ function Player:start()
 
 	self.moves = {}
 	self.currentMoveIndex = 1
+	self.level.undoCounts = 0
 end
 
 function Player:update()

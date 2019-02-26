@@ -2,6 +2,7 @@ require('assets/scripts/vector')
 require('assets/scripts/object')
 require('assets/scripts/level/map')
 require('assets/scripts/UI/pauseMenu')
+require('assets/scripts/UI/resultScreen')
 
 Player = Object:new {
 	gridPosition = { x = 1, y = 1 },
@@ -67,7 +68,15 @@ function Player:activateGoal(gridPosition)
 	end
 
 	goal.isActivated = true
-	Game.loadScene(self.level.nextLevelPath)
+	
+	local resultScreen = Game.makeActor {
+		Name = "ResultScreen",
+		LuaBehavior = Config.resultScreen
+	}
+
+	resultScreen:get("LuaBehavior").level = self.level
+	resultScreen:get("LuaBehavior"):activate()
+	
 	print("activating goal")
 end
 
@@ -377,6 +386,7 @@ function Player:undoMove()
 
 	local move = self.moves[self.currentMoveIndex]
 	move.undo()
+	self.level.undoCounts = self.level.undoCounts + 1
 
 	print("undoing move")
 end
@@ -393,11 +403,12 @@ function Player:start()
 
 	self.moves = {}
 	self.currentMoveIndex = 1
+	self.level.undoCounts = 0
 end
 
 function Player:update()
 
-	if Game.keyboard.isDown("p") then
+	if Game.keyboard.isDown("escape") then
 		self.level.pauseMenu:activate()
 	end
 

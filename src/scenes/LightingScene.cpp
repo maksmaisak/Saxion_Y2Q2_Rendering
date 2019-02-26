@@ -102,26 +102,26 @@ void LightingScene::open() {
         if (AnimateLightProperties) light.add<LightPropertyAnimator>();
     }
 
-//    auto cube = engine.makeActor("Cube");
-//    cube.add<en::Transform>();
-//    {
-//        auto mesh = en::Meshes::get(config::MODEL_PATH + "cube_flat.obj");
-//        auto material = std::make_shared<en::Material>("lit");
-//        material->setUniformValue("diffuseMap"   , en::Textures::get(config::TEXTURE_PATH + "container/diffuse.png"));
-//        material->setUniformValue("diffuseColor" , glm::vec3(1));
-//        material->setUniformValue("specularMap"  , en::Textures::get(config::TEXTURE_PATH + "container/specular.png"));
-//        material->setUniformValue("specularColor", glm::vec3(1));
-//        material->setUniformValue("shininess"    , 64.f);
-//        cube.add<en::RenderInfo>(mesh, std::move(material));
-//    }
-//    camera.get<CameraOrbitBehavior>().setTarget(cube);
+    auto cube = engine.makeActor("Cube");
+    cube.add<en::Transform>();
+    {
+        auto mesh = en::Meshes::get(config::MODEL_PATH + "cube_flat.obj");
+        auto material = std::make_shared<en::Material>("lit");
+        material->setUniformValue("diffuseMap"   , en::Textures::get(config::TEXTURE_PATH + "container/diffuse.png"));
+        material->setUniformValue("diffuseColor" , glm::vec3(1));
+        material->setUniformValue("specularMap"  , en::Textures::get(config::TEXTURE_PATH + "container/specular.png"));
+        material->setUniformValue("specularColor", glm::vec3(1));
+        material->setUniformValue("shininess"    , 64.f);
+        cube.add<en::RenderInfo>(mesh, std::move(material));
+    }
+    camera.get<CameraOrbitBehavior>().setTarget(cube);
 
     auto sphere = engine.makeActor("Sphere");
-    sphere.add<en::Transform>().move({0, 0, 0});
+    sphere.add<en::Transform>().move({0, 2, 0});
     {
         auto mesh = en::Resources<Mesh>::get(config::MODEL_PATH + "sphere2.obj");
         auto material = std::make_shared<en::Material>("pbr");
-        material->setUniformValue("albedoMap"   , en::Textures::get(config::TEXTURE_PATH + "testPBR/albedo.png"  ));
+        material->setUniformValue("albedoMap"   , en::Textures::get(config::TEXTURE_PATH + "testPBR/albedo.png"   ));
         material->setUniformValue("metallicMap" , en::Textures::get(config::TEXTURE_PATH + "testPBR/metallic.png" ));
         material->setUniformValue("roughnessMap", en::Textures::get(config::TEXTURE_PATH + "testPBR/roughness.png"));
         material->setUniformValue("albedoColor"        , glm::vec3(1));
@@ -129,7 +129,7 @@ void LightingScene::open() {
         material->setUniformValue("roughnessMultiplier", 1.f);
         sphere.add<en::RenderInfo>(mesh, std::move(material));
     }
-    camera.get<CameraOrbitBehavior>().setTarget(sphere);
+    //camera.get<CameraOrbitBehavior>().setTarget(sphere);
 
     auto plane = engine.makeActor("Plane");
     plane.add<en::Transform>().move({0, -1, 0}).setLocalScale(glm::vec3(5));

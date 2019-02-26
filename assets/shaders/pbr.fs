@@ -76,8 +76,9 @@ const float PI = 3.14159265359;
 
 out vec4 fragmentColor;
 
-vec3 CalculateDirectionalLightContribution(int i, vec3 normal, vec3 viewDirection, vec3 albedo, float metallic, float roughness);
-//vec3 CalculatePointLightContribution(int i, vec3 normal, vec3 viewDirection, vec3 materialDiffuse, vec3 materialSpecular);
+vec3 CookTorranceBRDF(vec3 N, vec3 V, vec3 L, vec3 albedo, float metallic, float roughness);
+vec3 CalculateDirectionalLightContribution(int i, vec3 N, vec3 V, vec3 albedo, float metallic, float roughness);
+vec3 CalculatePointLightContribution(int i, vec3 N, vec3 V, vec3 albedo, float metallic, float roughness);
 //vec3 CalculateSpotLightContribution(SpotLight light, vec3 normal, vec3 viewDirection, vec3 materialDiffuse, vec3 materialSpecular);
 float CalculateDirectionalShadowMultiplier(int i, float biasMultiplier);
 float CalculatePointShadowMultiplier(int i, vec3 fromLight, float distance, float biasMultiplier);
@@ -97,9 +98,9 @@ void main() {
         color += CalculateDirectionalLightContribution(i, normal, viewDirection, albedo, metallic, roughness);
     }
 
-//    for (int i = 0; i < numPointLights; ++i) {
-//        color += CalculatePointLightContribution(i, normal, viewDirection, materialDiffuse, materialSpecular);
-//    }
+    for (int i = 0; i < numPointLights; ++i) {
+        color += CalculatePointLightContribution(i, normal, viewDirection, albedo, metallic, roughness);
+    }
 
 //    for (int i = 0; i < numSpotLights; ++i) {
 //        color += CalculateSpotLightContribution(spotLights[i], normal, viewDirection, materialDiffuse, materialSpecular);
@@ -107,6 +108,53 @@ void main() {
 
 	fragmentColor = vec4(color, 1);
 }
+
+vec3 CalculateDirectionalLightContribution(int i, vec3 N, vec3 V, vec3 albedo, float metallic, float roughness) {
+
+    DirectionalLight light = directionalLights[i];
+
+    vec3 brdf = CookTorranceBRDF(N, V, light.direction, albedo, metallic, roughness);
+
+    float NdotL = max(dot(N, light.direction), 0.0);
+    float shadowMultiplier = CalculateDirectionalShadowMultiplier(i, 1 - NdotL);
+    return brdf * light.color * NdotL * shadowMultiplier;
+}
+
+vec3 CalculatePointLightContribution(int i, vec3 N, vec3 V, vec3 albedo, float metallic, float roughness) {
+
+    PointLight light = pointLights[i];
+
+    vec3  delta = light.position - worldPosition;
+    float distance = length(delta);
+    vec3  L = delta / distance;
+    float attenuation = 1.f / (light.falloffConstant + light.falloffLinear * distance + light.falloffQuadratic * distance * distance);
+
+    vec3 brdf = CookTorranceBRDF(N, V, L, albedo, metallic, roughness);
+
+    float NdotL = max(dot(N, L), 0.0);
+    float shadowMultiplier =  CalculatePointShadowMultiplier(i, -delta, distance, 1 - NdotL);
+    return brdf * light.color * NdotL * attenuation * shadowMultiplier;
+}
+//
+//vec3 CalculateSpotLightContribution(SpotLight light, vec3 normal, vec3 viewDirection, vec3 materialDiffuse, vec3 materialSpecular) {
+//
+//    vec3 ambient = light.colorAmbient * materialDiffuse;
+//
+//    vec3 delta = light.position - worldPosition;
+//    float distance = length(delta);
+//    vec3 lightDirection = delta / distance;
+//
+//    vec3 diffuse = max(0, dot(normal, lightDirection)) * light.color * materialDiffuse;
+//
+//    vec3 reflectedDirection = reflect(-lightDirection, normal);
+//    vec3 specular = pow(max(0, dot(reflectedDirection, viewDirection)), shininess) * light.color * materialSpecular;
+//
+//    float attenuation = 1.f / (light.falloffConstant + light.falloffLinear * distance + light.falloffQuadratic * distance * distance);
+//    attenuation *= smoothstep(light.outerCutoff, light.innerCutoff, dot(-lightDirection, light.direction));
+//
+//    return ambient + attenuation * (diffuse + specular);
+//}
+
 
 float DistributionGGX(vec3 N, vec3 H, float roughness) {
 
@@ -134,6 +182,7 @@ float GeometrySchlickGGX(float NdotV, float roughness) {
 }
 
 float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness) {
+
     float NdotV = max(dot(N, V), 0.0);
     float NdotL = max(dot(N, L), 0.0);
     float ggx2 = GeometrySchlickGGX(NdotV, roughness);
@@ -143,22 +192,21 @@ float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness) {
 }
 
 vec3 FresnelSchlick(float cosTheta, vec3 F0) {
+
     return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
 }
 
-vec3 CalculateDirectionalLightContribution(int i, vec3 N, vec3 V, vec3 albedo, float metallic, float roughness) {
+vec3 CookTorranceBRDF(vec3 N, vec3 V, vec3 L, vec3 albedo, float metallic, float roughness) {
 
-    DirectionalLight light = directionalLights[i];
-
-    vec3 L = light.direction;
-    vec3 H = normalize(V + L);
     float NdotL = dot(N, L);
     float NdotV = dot(N, V);
 
-    // Cook-Torrance BRDF
+    vec3 H = normalize(V + L);
+    float HdotV = dot(H, V);
+
     float NDF = DistributionGGX(N, H, roughness);
     float G   = GeometrySmith(N, V, L, roughness);
-    vec3  F   = FresnelSchlick(max(dot(H, V), 0.0), mix(vec3(0.04), albedo, metallic));
+    vec3  F   = FresnelSchlick(max(HdotV, 0.0), mix(vec3(0.04), albedo, metallic));
 
     vec3  nominator   = NDF * G * F;
     float denominator = 4 * max(NdotV, 0.0) * max(NdotL, 0.0) + 0.001; // 0.001 to prevent divide by zero.
@@ -168,53 +216,8 @@ vec3 CalculateDirectionalLightContribution(int i, vec3 N, vec3 V, vec3 albedo, f
     vec3 kD = vec3(1.0) - kS;
     kD *= 1.0 - metallic;
 
-    vec3 brdf = (kD * albedo / PI + specular);
-
-    float shadowMultiplier = CalculateDirectionalShadowMultiplier(i, 1 - NdotL);
-    return brdf * light.color * NdotL * shadowMultiplier;
+    return kD * albedo / PI + specular;
 }
-
-//vec3 CalculatePointLightContribution(int i, vec3 normal, vec3 viewDirection, vec3 materialDiffuse, vec3 materialSpecular) {
-//
-//    PointLight light = pointLights[i];
-//
-//    vec3 ambient = light.colorAmbient * materialDiffuse;
-//
-//    vec3 delta = light.position - worldPosition;
-//    float distance = length(delta);
-//    vec3 lightDirection = delta / distance;
-//
-//    float normalDotDirection = dot(normal, lightDirection);
-//    vec3 diffuse = max(0, normalDotDirection) * materialDiffuse;
-//
-//    vec3 reflectedDirection = reflect(-lightDirection, normal);
-//    vec3 specular = pow(max(0, dot(reflectedDirection, viewDirection)), shininess) * materialSpecular;
-//
-//    float attenuation = 1.f / (light.falloffConstant + light.falloffLinear * distance + light.falloffQuadratic * distance * distance);
-//    float shadowMultiplier = CalculatePointShadowMultiplier(i, -delta, distance, 1 - normalDotDirection);
-//    //return texture(depthMap, -delta).r * vec3(1);
-//    //return shadowMultiplier * vec3(1) / numPointLights;
-//    return ambient + shadowMultiplier * attenuation * (diffuse + specular) * light.color;
-//}
-//
-//vec3 CalculateSpotLightContribution(SpotLight light, vec3 normal, vec3 viewDirection, vec3 materialDiffuse, vec3 materialSpecular) {
-//
-//    vec3 ambient = light.colorAmbient * materialDiffuse;
-//
-//    vec3 delta = light.position - worldPosition;
-//    float distance = length(delta);
-//    vec3 lightDirection = delta / distance;
-//
-//    vec3 diffuse = max(0, dot(normal, lightDirection)) * light.color * materialDiffuse;
-//
-//    vec3 reflectedDirection = reflect(-lightDirection, normal);
-//    vec3 specular = pow(max(0, dot(reflectedDirection, viewDirection)), shininess) * light.color * materialSpecular;
-//
-//    float attenuation = 1.f / (light.falloffConstant + light.falloffLinear * distance + light.falloffQuadratic * distance * distance);
-//    attenuation *= smoothstep(light.outerCutoff, light.innerCutoff, dot(-lightDirection, light.direction));
-//
-//    return ambient + attenuation * (diffuse + specular);
-//}
 
 float CalculateDirectionalShadowMultiplier(int i, float biasMultiplier) {
 

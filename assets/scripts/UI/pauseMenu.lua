@@ -37,7 +37,7 @@ function PauseMenu:createPanel()
 	Game.makeActor {
 		Name = "PauseText",
 		Transform = {
-			scale = {3,3,3},
+			scale = {1,1,1},
 			parent = "PauseMenuPanel"
 		},
 		UIRect = {
@@ -45,7 +45,8 @@ function PauseMenu:createPanel()
 			anchorMax = {1, 1.5}
 		},
 		Text = {
-			font = "fonts/Menlo.ttc",
+			font = "fonts/kenyanCoffee.ttf",
+			fontSize = 120,
 			color = {0, 0, 1, 1},
 			string = "PAUSED"
         }
@@ -58,9 +59,9 @@ function PauseMenu:createPanel()
 			parent = "PauseMenuPanel"
 		},
 		Text = {
-			font   = "fonts/Menlo.ttc",
+			font   = "fonts/kenyanCoffee.ttf",
 			color  = {0, 0, 0, 1},
-			string = "RESUME"
+			string = "Resume"
         },
 		UIRect = {
 			anchorMin = {0.5, 0.6},
@@ -98,9 +99,9 @@ function PauseMenu:createPanel()
 			parent = "PauseMenuPanel"
 		},
 		Text = {
-			font   = "fonts/Menlo.ttc",
+			font   = "fonts/kenyanCoffee.ttf",
 			color  = {0, 0, 0, 1},
-			string = "MAIN MENU"
+			string = "Main Menu"
         },
 		UIRect = {
 			anchorMin = {0.5, 0.4},

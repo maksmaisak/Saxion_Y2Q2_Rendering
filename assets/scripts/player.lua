@@ -408,7 +408,7 @@ end
 
 function Player:update()
 
-	if Game.keyboard.isDown("p") then
+	if Game.keyboard.isDown("escape") then
 		self.level.pauseMenu:activate()
 	end
 

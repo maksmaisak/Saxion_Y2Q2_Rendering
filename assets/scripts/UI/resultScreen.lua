@@ -83,15 +83,100 @@ function ResultScreen:createResultPanel()
 		}
 	}
 
+	local nextLevelButton = Game.makeActor {
+		Name = "NextLevelButton",
+		Transform = {
+			scale  = {1,1,1},
+			parent = "ResultPanel"
+		},
+		Text = {
+			font   = "fonts/kenyanCoffee.ttf",
+			color  = {0, 0, 0, 1},
+			string = "Next Level"
+        },
+		UIRect = {
+			anchorMin = {0.6, 0.45},
+			anchorMax = {0.6, 0.45}
+		},
+		Sprite = {
+			material = {
+				shader	= "sprite",
+				texture	= "textures/button.png",
+			}
+		},
+		LuaBehavior = {
+			onMouseDown = function(self, button)
+				if button == 1 then
+					Game.loadScene(self.level.nextLevelPath)
+				end
+			end,
+
+			--Mouse Over Start
+			onMouseEnter = function(self, button)
+				self.actor:get("Transform").scale = {1.2,1.2,1.2}
+			end,
+
+			onMouseLeave = function(self, button)
+				self.actor:get("Transform").scale = {1,1,1}
+			end
+			--Mouse Over End
+		}
+	}
+
+	nextLevelButton:get("LuaBehavior").level = self.level
+
+	local mainMenuButton = Game.makeActor {
+		Name = "MainMenuButton",
+		Transform = {
+			scale  = {1,1,1},
+			parent = "ResultPanel"
+		},
+		Text = {
+			font   = "fonts/kenyanCoffee.ttf",
+			color  = {0, 0, 0, 1},
+			string = "Main Menu"
+        },
+		UIRect = {
+			anchorMin = {0.4, 0.45},
+			anchorMax = {0.4, 0.45}
+		},
+		Sprite = {
+			material = {
+				shader	= "sprite",
+				texture	= "textures/button.png",
+			}
+		},
+		LuaBehavior = {
+			onMouseDown = function(self, button)
+				if button == 1 then
+					Game.loadScene(Config.startScene)
+				end
+			end,
+
+			--Mouse Over Start
+			onMouseEnter = function(self, button)
+				self.actor:get("Transform").scale = {1.2,1.2,1.2}
+			end,
+
+			onMouseLeave = function(self, button)
+				self.actor:get("Transform").scale = {1,1,1}
+			end
+			--Mouse Over End
+		}
+	}
+
 	self.totalNumberOfStars = self:CalculateTotalStars()
 
 	local anchorValue = 0.4
 	local anchorStep = 0.1
 
 	for i = 1, self.totalNumberOfStars do
-		self:createStar(anchorValue,0.5,anchorValue,0.5)
+		self:createStar(anchorValue,0.6,anchorValue,0.6)
 		anchorValue = anchorValue + anchorStep
 	end
+
+	self:keepAspectRatio(mainMenuButton,125)
+	self:keepAspectRatio(nextLevelButton,125)
 end
 
 function ResultScreen:activate()

@@ -2,7 +2,6 @@ require('assets/scripts/object')
 
 PauseMenu = Object:new()
 local pauseCanvas
-local stars = {}
 
 function PauseMenu:init()	
 	self:createPanel()

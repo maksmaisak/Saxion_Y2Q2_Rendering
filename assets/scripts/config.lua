@@ -13,6 +13,7 @@ referenceResolution = {1920, 1080}
 player = 'assets/scripts/player.lua'
 firstLevelPath = 'assets/scripts/scenes/level1.lua'
 laser = 'assets/scripts/laser.lua'
+resultScreen = 'assets/scripts/UI/resultScreen.lua'
 
 -- old stuff
 bulletSpeed = 30

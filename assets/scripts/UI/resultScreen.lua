@@ -2,12 +2,22 @@ require('assets/scripts/object')
 
 ResultScreen = Object:new()
 
-function ResultScreen:init()
-	self:crateResultPanel()
-	self.resultPanel:get("UIRect").isEnabled = false
+local stars = {}
+
+function ResultScreen:keepAspectRatio(actor , theight)
+
+	local textureSize = actor:get("Sprite").textureSize
+
+	ratio = textureSize.x/textureSize.y
+	local height = theight
+	local width = height * ratio
+	local minWidth = (width / 2) * -1
+	local minHeight =  (height / 2) * -1
+	actor:get("UIRect").offsetMin = { minWidth, minHeight }
+	actor:get("UIRect").offsetMax = { width / 2, height / 2}
 end
 
-function createStar(aMinX,aMinY,aMaxX,aMaxY)
+function ResultScreen:createStar(aMinX,aMinY,aMaxX,aMaxY)
 	
 	local star = Game.makeActor{
 		Name = "Star",
@@ -26,32 +36,29 @@ function createStar(aMinX,aMinY,aMaxX,aMaxY)
 			}
 		}
 	}
-	keepAspectRatio(star, 100)
+
+	self:keepAspectRatio(star, 100)
 
 	stars[#stars + 1] = star
 end
 
-function animateStar(actor)
+function lerp(a, b, t)
+	return (1 - t) * a + t * b;
+end
+
+function ResultScreen:animateStar(actor, dt)
     tf = actor:get("Transform")
-	scale = 0.1 * Game.getTime()
 
-	tf.scale = {scale, scale, scale}
+	local temp = { x = tf.scale.x, y = tf.scale.y, z = tf.scale.z}
+
+	temp.x = lerp(temp.x, 1, 2 * dt)
+	temp.y = lerp(temp.y, 1, 2 * dt)
+	temp.z = lerp(temp.z, 1, 2 * dt)
+
+	tf.scale = temp
 end
 
-local function keepAspectRatio(actor , theight)
-
-	local textureSize = actor:get("Sprite").textureSize
-
-	ratio = textureSize.x/textureSize.y
-	local height = theight
-	local width = height * ratio
-	local minWidth = (width / 2) * -1
-	local minHeight =  (height / 2) * -1
-	actor:get("UIRect").offsetMin = { minWidth, minHeight }
-	actor:get("UIRect").offsetMax = { width / 2, height / 2}
-end
-
-function ResultScreen:crateResultPanel()
+function ResultScreen:createResultPanel()
 
 	self.resultPanel = Game.makeActor{
 		Name = "ResultPanel",
@@ -67,18 +74,22 @@ function ResultScreen:crateResultPanel()
 	local anchorValue = 0.4
 	local anchorStep = 0.1
 	for i = 1, 3 do
-		createStar(anchorValue,0.5,anchorValue,0.5)
+		self:createStar(anchorValue,0.5,anchorValue,0.5)
 		anchorValue = anchorValue + anchorStep
 	end
 	
 end
 
 function ResultScreen:activate()
-
+	self:createResultPanel()
 end
 
 function ResultScreen:update(dt)
 	for i=1, #stars do
-		animateStar(stars[i])
+		self:animateStar(stars[i], dt)
 	end
+end
+
+return function(o)
+    return ResultScreen:new(o)
 end

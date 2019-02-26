@@ -2,6 +2,7 @@ require('assets/scripts/vector')
 require('assets/scripts/object')
 require('assets/scripts/level/map')
 require('assets/scripts/UI/pauseMenu')
+require('assets/scripts/UI/resultScreen')
 
 Player = Object:new {
 	gridPosition = { x = 1, y = 1 },
@@ -58,7 +59,7 @@ function Player:activateGoal(gridPosition)
 
 	local gridItem	= self.map:getGridAt(gridPosition)
 	local goal		= gridItem.goal
-	if not gridItem.isButtonTargetEnabled then
+	if not goal.startActive and not gridItem.isButtonTargetEnabled then
 		return
 	end
 
@@ -67,7 +68,14 @@ function Player:activateGoal(gridPosition)
 	end
 
 	goal.isActivated = true
-	Game.loadScene(self.level.nextLevelPath)
+	
+	local resultScreen = Game.makeActor {
+		Name = "ResultScreen",
+		LuaBehavior = Config.resultScreen
+	}
+
+	resultScreen:get("LuaBehavior"):activate()
+	
 	print("activating goal")
 end
 

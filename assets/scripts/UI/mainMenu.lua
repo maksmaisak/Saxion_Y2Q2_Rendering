@@ -261,7 +261,6 @@ function scene:start()
 							if(levelIndex > numberOfLevels) then
 								levelIndex = numberOfLevels
 							end
-
 							self.actor:remove("Sprite")
 							self.actor:add("Sprite", {
 								material = {
@@ -280,7 +279,6 @@ function scene:start()
 							if(levelIndex < 1) then
 								levelIndex = 1
 							end
-
 							self.actor:remove("Sprite")
 							self.actor:add("Sprite", {
 								material = {

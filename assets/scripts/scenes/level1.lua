@@ -861,6 +861,11 @@ local extras = {
 }
 
 return Level:new {
+	starsRating = {
+		threeStars = 2,
+		twoStars = 5,
+		oneStar = 10,
+	},
     map = map,
     extras = extras,
     nextLevelPath = 'assets/scripts/scenes/level1.lua'

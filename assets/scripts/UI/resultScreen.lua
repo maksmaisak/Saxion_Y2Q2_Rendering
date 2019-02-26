@@ -2,12 +2,9 @@ require('assets/scripts/object')
 
 ResultScreen = Object:new()
 
-function ResultScreen:init()
-	self:crateResultPanel()
-	self.resultPanel:get("UIRect").isEnabled = false
-end
+local stars = {}
 
-local function keepAspectRatio(actor , theight)
+function ResultScreen:keepAspectRatio(actor , theight)
 
 	local textureSize = actor:get("Sprite").textureSize
 
@@ -20,12 +17,12 @@ local function keepAspectRatio(actor , theight)
 	actor:get("UIRect").offsetMax = { width / 2, height / 2}
 end
 
-local function createStar(aMinX,aMinY,aMaxX,aMaxY)
+function ResultScreen:createStar(aMinX,aMinY,aMaxX,aMaxY)
 	
 	local star = Game.makeActor{
 		Name = "Star",
 		Transform = {
-			scale = {0.1,0.1,0.1}
+			scale = {0.1,0.1,0.1},
 			parent = "ResultPanel"
 		},
 		UIRect = {
@@ -40,14 +37,44 @@ local function createStar(aMinX,aMinY,aMaxX,aMaxY)
 		}
 	}
 
-	keepAspectRatio(star, 100)
+	self:keepAspectRatio(star, 100)
+
+	stars[#stars + 1] = star
 end
 
-function ResultScreen:crateResultPanel()
-	
+function lerp(a, b, t)
+	return (1 - t) * a + t * b;
+end
+
+function ResultScreen:animateStar(actor, dt)
+    tf = actor:get("Transform")
+
+	local temp = { x = tf.scale.x, y = tf.scale.y, z = tf.scale.z}
+
+	temp.x = lerp(temp.x, 1, 2 * dt)
+	temp.y = lerp(temp.y, 1, 2 * dt)
+	temp.z = lerp(temp.z, 1, 2 * dt)
+
+	tf.scale = temp
+end
+
+function ResultScreen:CalculateTotalStars()
+	local undosUsed = self.level.undoCounts
+
+	local totalNumberOfStars = 3
+	for k, v in pairs(self.level.starsRating) do
+		if undosUsed > v then
+			totalNumberOfStars = totalNumberOfStars - 1
+		end
+	end
+	return totalNumberOfStars
+end
+
+function ResultScreen:createResultPanel()
+
 	self.resultPanel = Game.makeActor{
 		Name = "ResultPanel",
-		Trasform = {
+		Transform = {
 			scale = {1,1,1}
 		},
 		UIRect ={
@@ -56,11 +83,114 @@ function ResultScreen:crateResultPanel()
 		}
 	}
 
-	createStar(0.5,1,0.5,0)
-	createStar(0.5,1,0.5,0)
-	createStar(0.5,1,0.5,0)
+	local nextLevelButton = Game.makeActor {
+		Name = "NextLevelButton",
+		Transform = {
+			scale  = {1,1,1},
+			parent = "ResultPanel"
+		},
+		Text = {
+			font   = "fonts/kenyanCoffee.ttf",
+			color  = {0, 0, 0, 1},
+			string = "Next Level"
+        },
+		UIRect = {
+			anchorMin = {0.6, 0.45},
+			anchorMax = {0.6, 0.45}
+		},
+		Sprite = {
+			material = {
+				shader	= "sprite",
+				texture	= "textures/button.png",
+			}
+		},
+		LuaBehavior = {
+			onMouseDown = function(self, button)
+				if button == 1 then
+					Game.loadScene(self.level.nextLevelPath)
+				end
+			end,
+
+			--Mouse Over Start
+			onMouseEnter = function(self, button)
+				self.actor:get("Transform").scale = {1.2,1.2,1.2}
+			end,
+
+			onMouseLeave = function(self, button)
+				self.actor:get("Transform").scale = {1,1,1}
+			end
+			--Mouse Over End
+		}
+	}
+
+	nextLevelButton:get("LuaBehavior").level = self.level
+
+	local mainMenuButton = Game.makeActor {
+		Name = "MainMenuButton",
+		Transform = {
+			scale  = {1,1,1},
+			parent = "ResultPanel"
+		},
+		Text = {
+			font   = "fonts/kenyanCoffee.ttf",
+			color  = {0, 0, 0, 1},
+			string = "Main Menu"
+        },
+		UIRect = {
+			anchorMin = {0.4, 0.45},
+			anchorMax = {0.4, 0.45}
+		},
+		Sprite = {
+			material = {
+				shader	= "sprite",
+				texture	= "textures/button.png",
+			}
+		},
+		LuaBehavior = {
+			onMouseDown = function(self, button)
+				if button == 1 then
+					Game.loadScene(Config.startScene)
+				end
+			end,
+
+			--Mouse Over Start
+			onMouseEnter = function(self, button)
+				self.actor:get("Transform").scale = {1.2,1.2,1.2}
+			end,
+
+			onMouseLeave = function(self, button)
+				self.actor:get("Transform").scale = {1,1,1}
+			end
+			--Mouse Over End
+		}
+	}
+
+	self.totalNumberOfStars = self:CalculateTotalStars()
+
+	local anchorValue = 0.4
+	local anchorStep = 0.1
+
+	for i = 1, self.totalNumberOfStars do
+		self:createStar(anchorValue,0.6,anchorValue,0.6)
+		anchorValue = anchorValue + anchorStep
+	end
+
+	self:keepAspectRatio(mainMenuButton,125)
+	self:keepAspectRatio(nextLevelButton,125)
 end
 
 function ResultScreen:activate()
+	self:createResultPanel()
+end
 
+function ResultScreen:update(dt)
+	if self.totalNumberOfStars > 0 then
+		for i=1, self.totalNumberOfStars do
+			self:animateStar(stars[i], dt)
+		end
+	end
+end
+
+return function(o)
+    return ResultScreen:new(o)
 end

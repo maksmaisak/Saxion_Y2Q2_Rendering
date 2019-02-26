@@ -68,18 +68,21 @@ uniform vec3 viewPosition;
 uniform sampler2D albedoMap;
 uniform sampler2D metallicMap;
 uniform sampler2D roughnessMap;
+uniform sampler2D aoMap;
 uniform vec3 albedoColor = vec3(1,1,1);
 uniform float metallicMultiplier = 1;
 uniform float roughnessMultiplier = 1;
+uniform float aoMultiplier = 1;
 
 const float PI = 3.14159265359;
 
 out vec4 fragmentColor;
 
+vec3 CalculateDirectionalLightContribution(int i, vec3 N, vec3 V, vec3 albedo, float metallic, float roughness, float ao);
+vec3 CalculatePointLightContribution(int i, vec3 N, vec3 V, vec3 albedo, float metallic, float roughness, float ao);
+vec3 CalculateSpotLightContribution (int i, vec3 N, vec3 V, vec3 albedo, float metallic, float roughness, float ao);
+
 vec3 CookTorranceBRDF(vec3 N, vec3 V, vec3 L, vec3 albedo, float metallic, float roughness);
-vec3 CalculateDirectionalLightContribution(int i, vec3 N, vec3 V, vec3 albedo, float metallic, float roughness);
-vec3 CalculatePointLightContribution(int i, vec3 N, vec3 V, vec3 albedo, float metallic, float roughness);
-vec3 CalculateSpotLightContribution(int i, vec3 N, vec3 V, vec3 albedo, float metallic, float roughness);
 float CalculateDirectionalShadowMultiplier(int i, float biasMultiplier);
 float CalculatePointShadowMultiplier(int i, vec3 fromLight, float distance, float biasMultiplier);
 
@@ -91,25 +94,26 @@ void main() {
     vec3  albedo    = albedoColor         * vec3(texture(albedoMap, texCoords));
     float metallic  = metallicMultiplier  * texture(metallicMap , texCoords).r;
     float roughness = roughnessMultiplier * texture(roughnessMap, texCoords).r;
+    float ao        = aoMultiplier        * texture(aoMap, texCoords).r;
 
     vec3 color = vec3(0,0,0);
 
     for (int i = 0; i < numDirectionalLights; ++i) {
-        color += CalculateDirectionalLightContribution(i, normal, viewDirection, albedo, metallic, roughness);
+        color += CalculateDirectionalLightContribution(i, normal, viewDirection, albedo, metallic, roughness, ao);
     }
 
     for (int i = 0; i < numPointLights; ++i) {
-        color += CalculatePointLightContribution(i, normal, viewDirection, albedo, metallic, roughness);
+        color += CalculatePointLightContribution(i, normal, viewDirection, albedo, metallic, roughness, ao);
     }
 
     for (int i = 0; i < numSpotLights; ++i) {
-        color += CalculateSpotLightContribution(i, normal, viewDirection, albedo, metallic, roughness);
+        color += CalculateSpotLightContribution(i, normal, viewDirection, albedo, metallic, roughness, ao);
     }
 
 	fragmentColor = vec4(color, 1);
 }
 
-vec3 CalculateDirectionalLightContribution(int i, vec3 N, vec3 V, vec3 albedo, float metallic, float roughness) {
+vec3 CalculateDirectionalLightContribution(int i, vec3 N, vec3 V, vec3 albedo, float metallic, float roughness, float ao) {
 
     DirectionalLight light = directionalLights[i];
 
@@ -117,10 +121,13 @@ vec3 CalculateDirectionalLightContribution(int i, vec3 N, vec3 V, vec3 albedo, f
 
     float NdotL = max(dot(N, light.direction), 0.0);
     float shadowMultiplier = CalculateDirectionalShadowMultiplier(i, 1 - NdotL);
-    return brdf * light.color * NdotL * shadowMultiplier;
+
+    vec3 ambient = light.colorAmbient * albedo * ao;
+
+    return ambient + brdf * light.color * NdotL * shadowMultiplier;
 }
 
-vec3 CalculatePointLightContribution(int i, vec3 N, vec3 V, vec3 albedo, float metallic, float roughness) {
+vec3 CalculatePointLightContribution(int i, vec3 N, vec3 V, vec3 albedo, float metallic, float roughness, float ao) {
 
     PointLight light = pointLights[i];
 
@@ -133,10 +140,13 @@ vec3 CalculatePointLightContribution(int i, vec3 N, vec3 V, vec3 albedo, float m
 
     float NdotL = max(dot(N, L), 0.0);
     float shadowMultiplier =  CalculatePointShadowMultiplier(i, -delta, distance, 1 - NdotL);
-    return brdf * light.color * NdotL * attenuation * shadowMultiplier;
+
+    vec3 ambient = light.colorAmbient * albedo * ao;
+
+    return ambient + brdf * light.color * NdotL * attenuation * shadowMultiplier;
 }
 
-vec3 CalculateSpotLightContribution(int i, vec3 N, vec3 V, vec3 albedo, float metallic, float roughness) {
+vec3 CalculateSpotLightContribution(int i, vec3 N, vec3 V, vec3 albedo, float metallic, float roughness, float ao) {
 
     SpotLight light = spotLights[i];
 
@@ -150,7 +160,10 @@ vec3 CalculateSpotLightContribution(int i, vec3 N, vec3 V, vec3 albedo, float me
 
     float NdotL = max(dot(N, L), 0.0);
     float shadowMultiplier =  CalculatePointShadowMultiplier(i, -delta, distance, 1 - NdotL);
-    return brdf * light.color * NdotL * attenuation * shadowMultiplier;
+
+    vec3 ambient = light.colorAmbient * albedo * ao;
+
+    return ambient + brdf * light.color * NdotL * attenuation * shadowMultiplier;
 }
 
 float DistributionGGX(vec3 N, vec3 H, float roughness) {

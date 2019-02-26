@@ -30,14 +30,14 @@ void LightingScene::open() {
     auto camera = engine.makeActor("Camera");
     camera.add<en::Camera>();
     camera.add<en::Transform>();
-    camera.add<CameraOrbitBehavior>(5, -45.f, 89.f);
+    camera.add<CameraOrbitBehavior>(7, -45.f, 89.f);
 
     auto ambientLight = engine.makeActor("AmbientLight");
     ambientLight.add<en::Transform>();
     {
         auto& l = ambientLight.add<en::Light>();
         l.color = {0,0,0};
-        l.colorAmbient = {0, 0, 0.1};
+        l.colorAmbient = glm::vec3(0.01);
     }
     if (AnimateLightProperties) ambientLight.add<LightPropertyAnimator>();
 
@@ -121,26 +121,47 @@ void LightingScene::open() {
     {
         auto mesh = en::Resources<Mesh>::get(config::MODEL_PATH + "sphere2.obj");
         auto material = std::make_shared<en::Material>("pbr");
-        material->setUniformValue("albedoMap"   , en::Textures::get(config::TEXTURE_PATH + "testPBR/albedo.png"   ));
-        material->setUniformValue("metallicMap" , en::Textures::get(config::TEXTURE_PATH + "testPBR/metallic.png" ));
-        material->setUniformValue("roughnessMap", en::Textures::get(config::TEXTURE_PATH + "testPBR/roughness.png"));
+        material->setUniformValue("albedoMap"   , en::Textures::get(config::TEXTURE_PATH + "testPBR/rust/albedo.png"   ));
+        material->setUniformValue("metallicMap" , en::Textures::get(config::TEXTURE_PATH + "testPBR/rust/metallic.png" ));
+        material->setUniformValue("roughnessMap", en::Textures::get(config::TEXTURE_PATH + "testPBR/rust/roughness.png"));
+        material->setUniformValue("aoMap", en::Textures::white());
         material->setUniformValue("albedoColor"        , glm::vec3(1));
         material->setUniformValue("metallicMultiplier" , 1.f);
         material->setUniformValue("roughnessMultiplier", 1.f);
+        material->setUniformValue("aoMultiplier"       , 1.f);
         sphere.add<en::RenderInfo>(mesh, std::move(material));
     }
     //camera.get<CameraOrbitBehavior>().setTarget(sphere);
 
+    auto pillar = engine.makeActor("Pillar");
+    pillar.add<en::Transform>().move({-4, -1, 0}).scale(glm::vec3(0.01f));
+    {
+        auto mesh = en::Resources<Mesh>::get(config::MODEL_PATH + "Pillar_tall.obj");
+        auto material = std::make_shared<en::Material>("pbr");
+        material->setUniformValue("albedoMap"   , en::Textures::get(config::TEXTURE_PATH + "testPBR/pillar/Pillars_C.png"));
+        material->setUniformValue("metallicMap" , en::Textures::get(config::TEXTURE_PATH + "testPBR/pillar/Pillars_M.png"));
+        material->setUniformValue("roughnessMap", en::Textures::get(config::TEXTURE_PATH + "testPBR/pillar/Pillars_R.png"));
+        material->setUniformValue("aoMap", en::Textures::white());
+        material->setUniformValue("albedoColor"        , glm::vec3(1));
+        material->setUniformValue("metallicMultiplier" , 1.f);
+        material->setUniformValue("roughnessMultiplier", 1.f);
+        material->setUniformValue("aoMultiplier"       , 1.f);
+        pillar.add<en::RenderInfo>(mesh, std::move(material));
+    }
+
     auto plane = engine.makeActor("Plane");
-    plane.add<en::Transform>().move({0, -1, 0}).setLocalScale(glm::vec3(5));
+    plane.add<en::Transform>().move({0, -1, 0}).setLocalScale(glm::vec3(7));
     {
         auto mesh = en::Resources<Mesh>::get(config::MODEL_PATH + "plane.obj");
-        auto material = std::make_shared<en::Material>("lit");
-        material->setUniformValue("diffuseColor" , glm::vec3(1));
-        material->setUniformValue("diffuseMap"   , en::Textures::get(config::TEXTURE_PATH + "land.jpg"));
-        material->setUniformValue("specularColor", glm::vec3(0.04));
-        material->setUniformValue("specularMap"  , en::Textures::white());
-        material->setUniformValue("shininess"    , 10.f);
+        auto material = std::make_shared<en::Material>("pbr");
+        material->setUniformValue("albedoMap"   , en::Textures::get(config::TEXTURE_PATH + "testPBR/oldTiledStone/tiledstone1_basecolor.png"));
+        material->setUniformValue("metallicMap" , en::Textures::get(config::TEXTURE_PATH + "testPBR/oldTiledStone/tiledstone1_metallic.png" ));
+        material->setUniformValue("roughnessMap", en::Textures::get(config::TEXTURE_PATH + "testPBR/oldTiledStone/tiledstone1_roughness.png"));
+        material->setUniformValue("aoMap"       , en::Textures::get(config::TEXTURE_PATH + "testPBR/oldTiledStone/tiledstone1_AO.png"    ));
+        material->setUniformValue("albedoColor"        , glm::vec3(1));
+        material->setUniformValue("metallicMultiplier" , 1.f);
+        material->setUniformValue("roughnessMultiplier", 1.f);
+        material->setUniformValue("aoMultiplier"       , 1.f);
         plane.add<en::RenderInfo>(mesh, std::move(material));
     }
 }

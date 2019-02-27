@@ -149,9 +149,11 @@ namespace en {
 
         struct AttributeLocations {
 
-            GLint vertex = -1;
-            GLint normal = -1;
-            GLint uv     = -1;
+            GLint vertex    = -1;
+            GLint normal    = -1;
+            GLint uv        = -1;
+            GLint tangent   = -1;
+            GLint bitangent = -1;
 
         } m_attributeLocations;
 

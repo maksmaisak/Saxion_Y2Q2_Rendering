@@ -47,9 +47,9 @@ int main() {
         engine->getSceneManager().setCurrentScene<en::LuaScene>(engine->getLuaState(), *startScene);
     lua.pop();
 
-    //engine->getSceneManager().setCurrentScene<TestScene>();     // Assignment 2
-    engine->getSceneManager().setCurrentScene<LightingScene>(); // Assignment 3
-    //engine->getSceneManager().setCurrentScene<TerrainScene>();  // Assignment 4
+    //engine->getSceneManager().setCurrentScene<TestScene>();
+    //engine->getSceneManager().setCurrentScene<LightingScene>();
+    //engine->getSceneManager().setCurrentScene<TerrainScene>();
 
     std::function<void()> update;
     update = [&, engine = engine.get()](){

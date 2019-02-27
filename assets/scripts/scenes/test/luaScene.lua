@@ -7,11 +7,16 @@
 local planeRenderInfo = {
     mesh = "models/plane.obj",
     material = Game.makeMaterial {
-        diffuse = "textures/land.jpg",
-        specularColor = {0.05, 0.08, 0.05},
-        shininess = 10
+        shader = "pbr",
+        albedo    = "textures/testPBR/oldTiledStone/tiledstone1_basecolor.png",
+        metallic  = "textures/testPBR/oldTiledStone/tiledstone1_metallic.png",
+        roughness = "textures/testPBR/oldTiledStone/tiledstone1_roughness.png",
+        normal    = "textures/testPBR/oldTiledStone/tiledstone1_normal.png",
+        ao        = "textures/testPBR/oldTiledStone/tiledstone1_AO.png",
     }
 }
+
+local defaultMaterial = Game.makeMaterial {shader = "pbr"}
 
 local scenery = {
     {
@@ -89,9 +94,8 @@ local scenery = {
         RenderInfo = {
             mesh = "models/cube_flat.obj",
             material = {
-                diffuse = "textures/container/diffuse.png",
-                specular = "textures/container/specular.png",
-                shininess = 100
+                shader = "pbr",
+                albedo = "textures/container/diffuse.png",
             }
         },
     },
@@ -103,8 +107,8 @@ local scenery = {
         RenderInfo = {
             mesh = "models/suzanna_flat.obj",
             material = {
-                diffuse = "textures/bricks.jpg",
-                shininess = 100
+                shader = "pbr",
+                albedo = "textures/bricks.jpg",
             }
         }
     },
@@ -116,7 +120,10 @@ local scenery = {
         RenderInfo = {
             mesh = "models/teapot_smooth.obj",
             material = {
-                diffuse = "textures/bricks.jpg"
+                shader = "pbr",
+                albedo = "textures/bricks.jpg",
+                metallicMultiplier  = 0.1,
+                roughnessMultiplier = 0.95,
             }
         }
     }
@@ -135,10 +142,11 @@ function scene:start()
         },
         RenderInfo = {
             mesh = "models/sphere2.obj",
-            material = {}
+            material = defaultMaterial
         },
         Light = {
-            intensity = 10
+            color = {1, 0, 0},
+            intensity = 100
         }
     }
 
@@ -150,11 +158,25 @@ function scene:start()
         },
         RenderInfo = {
             mesh = "models/sphere2.obj",
-            material = {}
+            material = defaultMaterial
         },
         Light = {
-			intensity = 10
+            color = {0, 1, 0},
+			intensity = 20
 		}
+    }
+
+    Game.makeActor {
+        Name = "LightAmbient",
+        Transform = {
+            scale = {0.1, 0.1, 0.1},
+            rotation = {-45, 0, 0}
+        },
+        Light = {
+            kind = "directional",
+            intensity = 0,
+            ambientColor = {0.02, 0.02, 0.02}
+        }
     }
 
     Game.makeActor {
@@ -165,8 +187,7 @@ function scene:start()
         },
         Light = {
             kind = "directional",
-            ambientColor = {0, 0, 0},
-            intensity = 0.1
+            intensity = 1
         }
     }
 
@@ -178,7 +199,6 @@ function scene:start()
         },
         Light = {
             kind = "directional",
-            ambientColor = {0, 0, 0},
             intensity = 0.1
         }
     }

@@ -68,13 +68,12 @@ uniform vec3 viewPosition;
 
 // Custom uniforms
 uniform sampler2D albedoMap;
-uniform sampler2D metallicMap;
-uniform sampler2D roughnessMap;
+uniform sampler2D metallicSmoothnessMap;
 uniform sampler2D normalMap;
 uniform sampler2D aoMap;
 uniform vec3 albedoColor = vec3(1,1,1);
 uniform float metallicMultiplier = 1;
-uniform float roughnessMultiplier = 1;
+uniform float smoothnessMultiplier = 1;
 uniform float normalMultiplier = 1;
 uniform float aoMultiplier = 1;
 
@@ -96,10 +95,11 @@ void main() {
     vec3 normal = GetNormal();
     vec3 viewDirection = normalize(viewPosition - worldPosition);
 
-    vec3  albedo    = albedoColor         * vec3(texture(albedoMap, texCoords));
-    float metallic  = metallicMultiplier  * texture(metallicMap , texCoords).r;
-    float roughness = roughnessMultiplier * texture(roughnessMap, texCoords).r;
-    float ao        = aoMultiplier        * texture(aoMap, texCoords).r;
+    vec4 msSample   = texture(metallicSmoothnessMap, texCoords);
+    float metallic  = metallicMultiplier * msSample.r;
+    float roughness = 1.f - smoothnessMultiplier * msSample.a;
+    vec3  albedo    = albedoColor  * vec3(texture(albedoMap, texCoords));
+    float ao        = aoMultiplier * texture(aoMap, texCoords).r;
 
     vec3 color = vec3(0,0,0);
 
@@ -185,11 +185,11 @@ float DistributionGGX(vec3 N, vec3 H, float roughness) {
 
     float a = roughness * roughness;
     float a2 = a * a;
-    float NdotH = max(dot(N, H), 0.0);
+    float NdotH  = max(dot(N, H), 0.0);
     float NdotH2 = NdotH * NdotH;
 
     float nom   = a2;
-    float denom = (NdotH2 * (a2 - 1.0) + 1.0);
+    float denom = NdotH2 * (a2 - 1.0) + 1.0;
     denom = PI * denom * denom;
 
     return nom / denom;

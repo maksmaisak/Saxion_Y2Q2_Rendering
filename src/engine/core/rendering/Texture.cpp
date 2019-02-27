@@ -6,7 +6,8 @@
 
 Texture::Texture(const std::string& filename, GLint internalFormat) {
 
-    // Load from file and store in cache
+    // Load from file using sf::Image, then put the data in an opengGL buffer.
+
     sf::Image image;
     if (!image.loadFromFile(filename))
         return;
@@ -14,7 +15,7 @@ Texture::Texture(const std::string& filename, GLint internalFormat) {
     auto temp = image.getSize();
     m_size = {temp.x, temp.y};
 
-    // Normal image 0,0 is top left, but opengl considers 0,0 to be bottom left, so we flip the image internally
+    // 0,0 in sf::Image is top left, but opengl considers 0,0 to be bottom left, flip to compensate.
     image.flipVertically();
 
     glGenTextures(1, &m_id);

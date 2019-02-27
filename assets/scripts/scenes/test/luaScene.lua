@@ -8,11 +8,10 @@ local planeRenderInfo = {
     mesh = "models/plane.obj",
     material = Game.makeMaterial {
         shader = "pbr",
-        albedo    = "textures/testPBR/oldTiledStone/tiledstone1_basecolor.png",
-        metallic  = "textures/testPBR/oldTiledStone/tiledstone1_metallic.png",
-        roughness = "textures/testPBR/oldTiledStone/tiledstone1_roughness.png",
-        normal    = "textures/testPBR/oldTiledStone/tiledstone1_normal.png",
-        ao        = "textures/testPBR/oldTiledStone/tiledstone1_AO.png",
+        albedo             = "textures/testPBR/oldTiledStone/tiledstone1_basecolor.png",
+        metallicSmoothness = "textures/testPBR/oldTiledStone/tiledstone1_metallicSmoothness.psd",
+        normal             = "textures/testPBR/oldTiledStone/tiledstone1_normal.png",
+        ao                 = "textures/testPBR/oldTiledStone/tiledstone1_AO.png",
     }
 }
 
@@ -108,7 +107,7 @@ local scenery = {
             mesh = "models/suzanna_flat.obj",
             material = {
                 shader = "pbr",
-                albedo = "textures/bricks.jpg",
+                albedo = "textures/bricks.jpg"
             }
         }
     },
@@ -122,8 +121,8 @@ local scenery = {
             material = {
                 shader = "pbr",
                 albedo = "textures/bricks.jpg",
-                metallicMultiplier  = 0.1,
-                roughnessMultiplier = 0.95,
+                metallicMultiplier   = 0.1,
+                smoothnessMultiplier = 0.05,
             }
         }
     }

@@ -4,12 +4,12 @@ ResultScreen = Object:new()
 
 local stars = {}
 
-function ResultScreen:keepAspectRatio(actor , theight)
+function ResultScreen:keepAspectRatio(actor , tHeight)
 
 	local textureSize = actor:get("Sprite").textureSize
 
-	ratio = textureSize.x/textureSize.y
-	local height = theight
+	local ratio = textureSize.x / textureSize.y
+	local height = tHeight
 	local width = height * ratio
 	local minWidth = (width / 2) * -1
 	local minHeight =  (height / 2) * -1
@@ -42,14 +42,15 @@ function ResultScreen:createStar(aMinX,aMinY,aMaxX,aMaxY)
 	stars[#stars + 1] = star
 end
 
-function lerp(a, b, t)
+local function lerp(a, b, t)
 	return (1 - t) * a + t * b;
 end
 
 function ResultScreen:animateStar(actor, dt)
-    tf = actor:get("Transform")
 
-	local temp = { x = tf.scale.x, y = tf.scale.y, z = tf.scale.z}
+    local tf = actor:get("Transform")
+
+	local temp = {x = tf.scale.x, y = tf.scale.y, z = tf.scale.z}
 
 	temp.x = lerp(temp.x, 1, 2 * dt)
 	temp.y = lerp(temp.y, 1, 2 * dt)
@@ -59,10 +60,11 @@ function ResultScreen:animateStar(actor, dt)
 end
 
 function ResultScreen:CalculateTotalStars()
+
 	local undosUsed = self.level.undoCounts
 
 	local totalNumberOfStars = 3
-	for k, v in pairs(self.level.starsRating) do
+	for k, v in pairs(self.level.maxNumUndos or {}) do
 		if undosUsed > v then
 			totalNumberOfStars = totalNumberOfStars - 1
 		end

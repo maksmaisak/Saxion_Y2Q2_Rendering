@@ -104,7 +104,7 @@ void Material::render(
     const glm::mat4& projectionMatrix
 ) {
     use(engine, depthMaps, modelMatrix, viewMatrix, projectionMatrix);
-    mesh->streamToOpenGL(m_attributeLocations.vertex, m_attributeLocations.normal, m_attributeLocations.uv);
+    mesh->render(m_attributeLocations.vertex, m_attributeLocations.normal, m_attributeLocations.uv);
 }
 
 inline bool valid(GLint location) {return location != -1;}

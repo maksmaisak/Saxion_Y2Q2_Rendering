@@ -68,157 +68,166 @@ Mesh::~Mesh() {
  * Note that loading this mesh isn't cached like we do with texturing, this is an exercise left for the students.
  */
 Mesh* Mesh::load(std::string pFilename) {
+
 	std::cout << "Loading " << pFilename << "...";
 
 	Mesh* mesh = new Mesh();
 
 	std::ifstream file(pFilename, std::ios::in);
-
-	if (file.is_open()) {
-		//these three vectors will contains data as taken from the obj file
-		//in the order it is encountered in the object file
-		std::vector<glm::vec3> vertices;
-		std::vector<glm::vec3> normals;
-		std::vector<glm::vec2> uvs;
-
-		//in addition we create a map to store the triplets found under the f(aces) section in the
-		//object file and map them to an index for our index buffer (just number them sequentially
-		//as we encounter them and store references to the pack
-		std::map <FaceIndexTriplet, unsigned int> mappedTriplets;
-
-		std::string line; // to store each line in
-		while (getline(file, line)) {
-
-			// c-type string to store cmd read from obj file (cmd is v, vt, vn, f)
-			char cmd[10];
-			cmd[0] = 0;
-
-			//get the first string in the line of max 10 chars (c-style)
-			sscanf(line.c_str(), "%10s", cmd);
-
-			//note that although the if statements below seem to imply that we can
-			//read these different line types (eg vertex, normal, uv) in any order,
-			//this is just convenience coding for us (instead of multiple while loops)
-			//we assume the obj file to list ALL v lines first, then ALL vt lines,
-			//then ALL vn lines and last but not least ALL f lines last
-
-			//so... start processing lines
-			//are we reading a vertex line? straightforward copy into local vertices vector
-			if (strcmp(cmd, "v") == 0) {
-				glm::vec3 vertex;
-				sscanf(line.c_str(), "%10s %f %f %f ", cmd, &vertex.x, &vertex.y, &vertex.z);
-				vertices.push_back(vertex);
-
-				//or are we reading a normal line? straightforward copy into local normal vector
-			} else if (strcmp(cmd, "vn") == 0) {
-				glm::vec3 normal;
-				sscanf(line.c_str(), "%10s %f %f %f ", cmd, &normal.x, &normal.y, &normal.z);
-				normals.push_back(normal);
-
-				//or are we reading a uv line? straightforward copy into local uv vector
-			} else if (strcmp(cmd, "vt") == 0) {
-				glm::vec2 uv;
-				sscanf(line.c_str(), "%10s %f %f ", cmd, &uv.x, &uv.y);
-				uvs.push_back(uv);
-
-				//this is where it gets nasty. After having read all vertices, normals and uvs into
-				//their own buffer
-			} else if (strcmp(cmd, "f") == 0) {
-
-				//an f lines looks like
-				//f 2/1/1 1/2/1 3/3/1
-				//in other words
-				//f v1/u1/n1 v2/u2/n2 v3/u3/n3
-				//for each triplet like that we need to check whether we already encountered it
-				//and update our administration based on that
-				glm::ivec3 vertexIndex;
-				glm::ivec3 normalIndex;
-				glm::ivec3 uvIndex;
-				int count = sscanf(line.c_str(), "%10s %d/%d/%d %d/%d/%d %d/%d/%d", cmd, &vertexIndex[0], &uvIndex[0], &normalIndex[0], &vertexIndex[1], &uvIndex[1], &normalIndex[1], &vertexIndex[2], &uvIndex[2], &normalIndex[2]);
-
-				//Have we read exactly 10 elements?
-				if (count == 10) {
-
-					//process 3 triplets, one for each vertex (which is first element of the triplet)
-					for (int i = 0; i < 3; ++i) {
-						//create key out of the triplet and check if we already encountered this before
-						FaceIndexTriplet triplet(vertexIndex[i], uvIndex[i], normalIndex[i]);
-						std::map<FaceIndexTriplet, unsigned int>::iterator found = mappedTriplets.find(triplet);
-
-						//if iterator points at the end, we haven't found it
-						if (found == mappedTriplets.end()) {
-							//so create a new index value, and map our triplet to it
-							unsigned int index = mappedTriplets.size();
-							mappedTriplets[triplet] = index;
-
-							//now record this index
-							mesh->m_indices.push_back(index);
-							//and store the corresponding vertex/normal/uv values into our own buffers
-							//note the -1 is required since all values in the f triplets in the .obj file
-							//are 1 based, but our vectors are 0 based
-							mesh->m_vertices.push_back(vertices[vertexIndex[i] - 1]);
-							mesh->m_normals.push_back(normals[normalIndex[i] - 1]);
-							mesh->m_uvs.push_back(uvs[uvIndex[i] - 1]);
-						} else {
-							//if the key was already present, get the index value for it
-							unsigned int index = found->second;
-							//and update our index buffer with it
-							mesh->m_indices.push_back(index);
-						}
-					}
-				} else {
-					//If we read a different amount, something is wrong
-					std::cout << "Error reading obj, needing v,vn,vt" << std::endl;
-					delete mesh;
-					return NULL;
-				}
-			}
-		}
-
-		file.close();
-		mesh->buffer();
-
-		std::cout << "Mesh loaded and buffered:" << (mesh->m_indices.size() / 3.0f) << " triangles." << std::endl;
-		return mesh;
-	} else {
+	if (!file.is_open()) {
 		std::cout << "Could not read " << pFilename << std::endl;
 		delete mesh;
-		return NULL;
+		return nullptr;
 	}
+
+	//these three vectors will contains data as taken from the obj file
+	//in the order it is encountered in the object file
+	std::vector<glm::vec3> vertices;
+	std::vector<glm::vec3> normals;
+	std::vector<glm::vec2> uvs;
+
+	//in addition we create a map to store the triplets found under the f(aces) section in the
+	//object file and map them to an index for our index buffer (just number them sequentially
+	//as we encounter them and store references to the pack
+	std::map<FaceIndexTriplet, unsigned> mappedTriplets;
+
+	std::string line; // to store each line in
+	while (getline(file, line)) {
+
+		// c-type string to store cmd read from obj file (cmd is v, vt, vn, f)
+		char cmd[10];
+		cmd[0] = 0;
+
+		//get the first string in the line of max 10 chars (c-style)
+		sscanf(line.c_str(), "%10s", cmd);
+
+		//note that although the if statements below seem to imply that we can
+		//read these different line types (eg vertex, normal, uv) in any order,
+		//this is just convenience coding for us (instead of multiple while loops)
+		//we assume the obj file to list ALL v lines first, then ALL vt lines,
+		//then ALL vn lines and last but not least ALL f lines last
+
+		//so... start processing lines
+		//are we reading a vertex line? straightforward copy into local vertices vector
+		if (strcmp(cmd, "v") == 0) {
+
+			glm::vec3 vertex;
+			sscanf(line.c_str(), "%10s %f %f %f ", cmd, &vertex.x, &vertex.y, &vertex.z);
+			vertices.push_back(vertex);
+
+			//or are we reading a normal line? straightforward copy into local normal vector
+		} else if (strcmp(cmd, "vn") == 0) {
+
+			glm::vec3 normal;
+			sscanf(line.c_str(), "%10s %f %f %f ", cmd, &normal.x, &normal.y, &normal.z);
+			normals.push_back(normal);
+
+			//or are we reading a uv line? straightforward copy into local uv vector
+		} else if (strcmp(cmd, "vt") == 0) {
+
+			glm::vec2 uv;
+			sscanf(line.c_str(), "%10s %f %f ", cmd, &uv.x, &uv.y);
+			uvs.push_back(uv);
+
+			//this is where it gets nasty. After having read all vertices, normals and uvs into
+			//their own buffer
+		} else if (strcmp(cmd, "f") == 0) {
+
+			//an f lines looks like
+			//f 2/1/1 1/2/1 3/3/1
+			//in other words
+			//f v1/u1/n1 v2/u2/n2 v3/u3/n3
+			//for each triplet like that we need to check whether we already encountered it
+			//and update our administration based on that
+			glm::ivec3 vertexIndex;
+			glm::ivec3 normalIndex;
+			glm::ivec3 uvIndex;
+			int count = sscanf(line.c_str(), "%10s %d/%d/%d %d/%d/%d %d/%d/%d", cmd, &vertexIndex[0], &uvIndex[0], &normalIndex[0], &vertexIndex[1], &uvIndex[1], &normalIndex[1], &vertexIndex[2], &uvIndex[2], &normalIndex[2]);
+
+			//Have we read exactly 10 elements?
+			if (count == 10) {
+
+				//process 3 triplets, one for each vertex (which is first element of the triplet)
+				for (int i = 0; i < 3; ++i) {
+
+					//create key out of the triplet and check if we already encountered this before
+					FaceIndexTriplet triplet(vertexIndex[i], uvIndex[i], normalIndex[i]);
+					const auto found = mappedTriplets.find(triplet);
+
+					//if iterator points at the end, we haven't found it
+					if (found == mappedTriplets.end()) {
+
+						//so create a new index value, and map our triplet to it
+						const unsigned index = mappedTriplets.size();
+						mappedTriplets[triplet] = index;
+
+						//now record this index
+						mesh->m_indices.push_back(index);
+						//and store the corresponding vertex/normal/uv values into our own buffers
+						//note the -1 is required since all values in the f triplets in the .obj file
+						//are 1 based, but our vectors are 0 based
+						mesh->m_vertices.push_back(vertices[vertexIndex[i] - 1]);
+						mesh->m_normals.push_back(normals[normalIndex[i] - 1]);
+						mesh->m_uvs.push_back(uvs[uvIndex[i] - 1]);
+
+					} else {
+
+						//if the key was already present, get the index value for it
+						const unsigned index = found->second;
+						//and update our index buffer with it
+						mesh->m_indices.push_back(index);
+					}
+				}
+			} else {
+
+				//If we read a different amount, something is wrong
+				std::cout << "Error reading obj, needing v,vn,vt" << std::endl;
+				delete mesh;
+				return nullptr;
+			}
+		}
+	}
+	file.close();
+
+	mesh->generateTangentsAndBitangents();
+	mesh->buffer();
+
+	std::cout << "Mesh loaded and buffered:" << (mesh->m_indices.size() / 3.0f) << " triangles." << std::endl;
+	return mesh;
 }
 
-void Mesh::streamToOpenGL(GLint verticesAttrib, GLint normalsAttrib, GLint uvsAttrib, GLint tangentAttrib, GLint bitangentAttrib) {
+void Mesh::render(GLint verticesAttrib, GLint normalsAttrib, GLint uvsAttrib, GLint tangentAttrib, GLint bitangentAttrib) {
 
 	glBindVertexArray(m_vao);
 
 	if (verticesAttrib > -1) {
 		glBindBuffer(GL_ARRAY_BUFFER, m_vertexBufferId);
 		glEnableVertexAttribArray(static_cast<GLuint>(verticesAttrib));
-		glVertexAttribPointer(static_cast<GLuint>(verticesAttrib), 3, GL_FLOAT, GL_FALSE, 0, 0);
+		glVertexAttribPointer(static_cast<GLuint>(verticesAttrib), 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 	}
 
 	if (normalsAttrib > -1) {
 		glBindBuffer(GL_ARRAY_BUFFER, m_normalBufferId);
 		glEnableVertexAttribArray(static_cast<GLuint>(normalsAttrib));
-		glVertexAttribPointer(static_cast<GLuint>(normalsAttrib), 3, GL_FLOAT, GL_TRUE, 0, 0);
+		glVertexAttribPointer(static_cast<GLuint>(normalsAttrib), 3, GL_FLOAT, GL_TRUE, 0, nullptr);
 	}
 
 	if (uvsAttrib > -1) {
 		glBindBuffer(GL_ARRAY_BUFFER, m_uvBufferId);
 		glEnableVertexAttribArray(static_cast<GLuint>(uvsAttrib));
-		glVertexAttribPointer(static_cast<GLuint>(uvsAttrib), 2, GL_FLOAT, GL_FALSE, 0, 0);
+		glVertexAttribPointer(static_cast<GLuint>(uvsAttrib), 2, GL_FLOAT, GL_FALSE, 0, nullptr);
 	}
 
 	if (tangentAttrib > -1) {
 		glBindBuffer(GL_ARRAY_BUFFER, m_tangentBufferId);
 		glEnableVertexAttribArray(static_cast<GLuint>(tangentAttrib));
-		glVertexAttribPointer(static_cast<GLuint>(tangentAttrib), 3, GL_FLOAT, GL_FALSE, 0, 0);
+		glVertexAttribPointer(static_cast<GLuint>(tangentAttrib), 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 	}
 
 	if (bitangentAttrib > -1) {
 		glBindBuffer(GL_ARRAY_BUFFER, m_bitangentBufferId);
 		glEnableVertexAttribArray(static_cast<GLuint>(bitangentAttrib));
-		glVertexAttribPointer(static_cast<GLuint>(bitangentAttrib), 3, GL_FLOAT, GL_FALSE, 0, 0);
+		glVertexAttribPointer(static_cast<GLuint>(bitangentAttrib), 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 	}
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBufferId);
@@ -235,6 +244,7 @@ void Mesh::streamToOpenGL(GLint verticesAttrib, GLint normalsAttrib, GLint uvsAt
 }
 
 void Mesh::drawDebugInfo(const glm::mat4& pModelMatrix, const glm::mat4& pViewMatrix, const glm::mat4& pProjectionMatrix) {
+
 	//demo of how to render some debug info using the good ol' direct rendering mode...
 	glUseProgram(0);
 	glMatrixMode(GL_PROJECTION);
@@ -244,30 +254,85 @@ void Mesh::drawDebugInfo(const glm::mat4& pModelMatrix, const glm::mat4& pViewMa
 
 	glBegin(GL_LINES);
 	//for each index draw the normal starting at the corresponding vertex
-	for (size_t i = 0; i < m_indices.size(); i++) {
+	for (std::size_t index : m_indices) {
+
 		//draw normal for vertex
-		if (true) {
-			//now get normal end
-			glm::vec3 normal = m_normals[m_indices[i]];
-			glColor3fv(glm::value_ptr(normal));
-
-			glm::vec3 normalStart = m_vertices[m_indices[i]];
-			glVertex3fv(glm::value_ptr(normalStart));
-			glm::vec3 normalEnd = normalStart + normal * 0.2f;
-			glVertex3fv(glm::value_ptr(normalEnd));
-		}
-
+		glm::vec3 normal = m_normals[index];
+		glColor3fv(glm::value_ptr(normal));
+		glm::vec3 normalStart = m_vertices[index];
+		glVertex3fv(glm::value_ptr(normalStart));
+		glm::vec3 normalEnd = normalStart + normal * 0.2f;
+		glVertex3fv(glm::value_ptr(normalEnd));
 	}
 	glEnd();
 }
 
-void Mesh::buffer() {
+void Mesh::generateTangentsAndBitangents() {
 
-	// TODO free these buffers in the destructor.
+	const std::size_t numVertices  = m_vertices.size();
+	const std::size_t numTriangles = m_indices.size() / 3;
+
+	m_tangents.clear();
+	m_tangents.resize(numVertices, glm::vec3(0));
+	m_bitangents.clear();
+	m_bitangents.resize(numVertices, glm::vec3(0));
+	std::vector<unsigned int> numIndexUsages(m_vertices.size(), 0);
+
+	for (std::size_t i = 0; i < numTriangles; ++i) {
+
+		const std::size_t index0 = m_indices[i * 3 + 0];
+		const std::size_t index1 = m_indices[i * 3 + 1];
+		const std::size_t index2 = m_indices[i * 3 + 2];
+		const glm::vec3& v0 = m_vertices[index0];
+		const glm::vec3& v1 = m_vertices[index1];
+		const glm::vec3& v2 = m_vertices[index2];
+		const glm::vec2& uv0 = m_uvs[index0];
+		const glm::vec2& uv1 = m_uvs[index1];
+		const glm::vec2& uv2 = m_uvs[index2];
+
+		const glm::vec3 delta1 = v1 - v0;
+		const glm::vec3 delta2 = v2 - v0;
+		const glm::vec2 deltaUV1 = uv1 - uv0;
+		const glm::vec2 deltaUV2 = uv2 - uv0;
+
+		const float f = 1.f / (deltaUV1.x * deltaUV2.y - deltaUV1.y * deltaUV2.x);
+
+		glm::vec3 tangent;
+		tangent.x = f * (deltaUV2.y * delta1.x - deltaUV1.y * delta2.x);
+		tangent.y = f * (deltaUV2.y * delta1.y - deltaUV1.y * delta2.y);
+		tangent.z = f * (deltaUV2.y * delta1.z - deltaUV1.y * delta2.z);
+		tangent = glm::normalize(tangent);
+
+		glm::vec3 bitangent;
+		bitangent.x = f * (-deltaUV2.x * delta1.x + deltaUV1.x * delta2.x);
+		bitangent.y = f * (-deltaUV2.x * delta1.y + deltaUV1.x * delta2.y);
+		bitangent.z = f * (-deltaUV2.x * delta1.z + deltaUV1.x * delta2.z);
+		bitangent = glm::normalize(bitangent);
+
+		m_tangents[index0] += tangent;
+		m_tangents[index1] += tangent;
+		m_tangents[index2] += tangent;
+		m_bitangents[index0] += bitangent;
+		m_bitangents[index1] += bitangent;
+		m_bitangents[index2] += bitangent;
+		numIndexUsages[index0] += 1;
+		numIndexUsages[index1] += 1;
+		numIndexUsages[index2] += 1;
+	}
+
+	for (std::size_t index = 0; index < numVertices; ++index) {
+
+		const std::size_t numUsages = numIndexUsages[index];
+		m_tangents  [index] /= numUsages;
+		m_bitangents[index] /= numUsages;
+	}
+}
+
+void Mesh::buffer() {
 
 	glGenBuffers(1, &m_indexBufferId);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBufferId);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_indices.size() * sizeof(unsigned int), m_indices.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_indices.size() * sizeof(unsigned), m_indices.data(), GL_STATIC_DRAW);
 
 	glGenBuffers(1, &m_vertexBufferId);
 	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBufferId);

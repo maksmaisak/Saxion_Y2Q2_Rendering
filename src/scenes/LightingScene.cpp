@@ -124,7 +124,7 @@ void LightingScene::open() {
         material->setUniformValue("albedoMap"   , en::Textures::get(config::TEXTURE_PATH + "testPBR/rust/albedo.png"   ));
         material->setUniformValue("metallicMap" , en::Textures::get(config::TEXTURE_PATH + "testPBR/rust/metallic.png" ));
         material->setUniformValue("roughnessMap", en::Textures::get(config::TEXTURE_PATH + "testPBR/rust/roughness.png"));
-        material->setUniformValue("normalMap", en::Textures::defaultNormalMap());
+        material->setUniformValue("normalMap"   , en::Textures::get(config::TEXTURE_PATH + "testPBR/rust/normal.png", GL_RGBA));
         material->setUniformValue("aoMap", en::Textures::white());
         material->setUniformValue("albedoColor"        , glm::vec3(1));
         material->setUniformValue("metallicMultiplier" , 1.f);

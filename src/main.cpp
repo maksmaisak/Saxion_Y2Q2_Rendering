@@ -48,7 +48,7 @@ int main() {
     lua.pop();
 
     //engine->getSceneManager().setCurrentScene<TestScene>();
-    //engine->getSceneManager().setCurrentScene<LightingScene>();
+    engine->getSceneManager().setCurrentScene<LightingScene>();
     //engine->getSceneManager().setCurrentScene<TerrainScene>();
 
     std::function<void()> update;

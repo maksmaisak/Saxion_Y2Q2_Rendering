@@ -68,6 +68,8 @@ function Player:activateGoal(gridPosition)
 	end
 
 	goal.isActivated = true
+
+	self.canControl = false
 	
 	local resultScreen = Game.makeActor {
 		Name = "ResultScreen",
@@ -393,6 +395,7 @@ end
 
 function Player:start()
 
+
 	self.transform = self.actor:get("Transform")
 	local position = self.transform.position
 
@@ -404,9 +407,14 @@ function Player:start()
 	self.moves = {}
 	self.currentMoveIndex = 1
 	self.level.undoCounts = 0
+	self.canControl = true
 end
 
 function Player:update()
+
+	if not self.canControl then
+		return
+	end
 
 	if Game.keyboard.isDown("escape") then
 		self.level.pauseMenu:activate()

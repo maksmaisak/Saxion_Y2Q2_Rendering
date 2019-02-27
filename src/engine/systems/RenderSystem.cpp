@@ -326,7 +326,7 @@ void RenderSystem::updateDepthMapsDirectionalLights(const std::vector<Entity>& d
             continue;
         const glm::mat4& modelTransform = m_registry->get<Transform>(e).getWorldTransform();
         m_directionalDepthShader->setUniformValue("matrixModel", modelTransform);
-        renderInfo.mesh->streamToOpenGL(0, -1, -1);
+        renderInfo.mesh->render(0, -1, -1);
 
         checkRenderingError(m_engine->actor(e));
     }
@@ -395,7 +395,7 @@ void RenderSystem::updateDepthMapsPositionalLights(const std::vector<Entity>& po
 
         const glm::mat4& modelTransform = m_registry->get<Transform>(e).getWorldTransform();
         m_positionalDepthShader->setUniformValue("matrixModel", modelTransform);
-        renderInfo.mesh->streamToOpenGL(0, -1, -1);
+        renderInfo.mesh->render(0, -1, -1);
         glCheckError();
     }
 

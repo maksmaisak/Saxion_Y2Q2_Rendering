@@ -119,8 +119,8 @@ function scene:start()
 			onMouseDown = function(self, button)
 				if button == 1 then
 					isChooseLevelOpened = true
-					chooseLevelPanel:get("UIRect").isEnabled	= true
-					mainButtonsPanel:get("UIRect").isEnabled		= false
+					chooseLevelPanel:get("UIRect").isEnabled = true
+					mainButtonsPanel:get("UIRect").isEnabled = false
 				end
 			end,
 
@@ -378,8 +378,8 @@ function scene:start()
 				if button == 1 then
 					isChooseLevelOpened = false
 					print("Go back to main")
-					mainButtonsPanel:get("UIRect").isEnabled		= true
-					chooseLevelPanel:get("UIRect").isEnabled	= false
+					mainButtonsPanel:get("UIRect").isEnabled = true
+					chooseLevelPanel:get("UIRect").isEnabled = false
 				end
 			end,
 
@@ -437,8 +437,8 @@ function scene:start()
 		LuaBehavior = {
 			onMouseDown = function(self, button)
 				if button == 1 then
-					creditsPanel:get("UIRect").isEnabled			= false
-					mainButtonsPanel:get("UIRect").isEnabled		= true
+					creditsPanel:get("UIRect").isEnabled	 = false
+					mainButtonsPanel:get("UIRect").isEnabled = true
 				end
 			end,
 
@@ -466,18 +466,18 @@ function scene:start()
 		},
 		Sprite = {
 			material = {
-				shader		= "sprite",
-				texture		= "textures/menuBackgrond.jpg"
+				shader	= "sprite",
+				texture	= "textures/menuBackgrond.jpg"
 			}
 		}
 	}
 
-	mainButtonsPanel	= Game.find("MainButtonsPanel")
-	chooseLevelPanel	= Game.find("ChooseLevelPanel")
-	creditsPanel		= Game.find("CreditsPanel")
+	mainButtonsPanel = Game.find("MainButtonsPanel")
+	chooseLevelPanel = Game.find("ChooseLevelPanel")
+	creditsPanel	 = Game.find("CreditsPanel")
 
-	creditsPanel:get("UIRect").isEnabled		= false
-	chooseLevelPanel:get("UIRect").isEnabled	= false
+	creditsPanel:get("UIRect").isEnabled	 = false
+	chooseLevelPanel:get("UIRect").isEnabled = false
 
 	keepAspectRatio(chooseLevelImage,500)
 	keepAspectRatio(startButton,buttonSize)

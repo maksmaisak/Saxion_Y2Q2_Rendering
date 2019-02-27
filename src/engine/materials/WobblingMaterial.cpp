@@ -44,7 +44,7 @@ void WobblingMaterial::render(Mesh* mesh, en::Engine* engine, en::DepthMaps* dep
     glUniform1i(m_shader->getUniformLocation("diffuseTexture"), 0);
 
     //now inform mesh of where to stream its data
-    mesh->streamToOpenGL(
+    mesh->render(
         m_shader->getAttribLocation("vertex"),
         m_shader->getAttribLocation("normal"),
         m_shader->getAttribLocation("uv")

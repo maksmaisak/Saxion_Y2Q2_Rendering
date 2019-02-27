@@ -30,7 +30,10 @@ void main(void) {
     mat3 normalModelToWorld = mat3(transpose(inverse(matrixModel)));
     worldNormal    = normalModelToWorld * normal;
     worldTangent   = normalModelToWorld * tangent;
-    worldBitangent = normalModelToWorld * bitangent;
+
+    // Ensure orthonormality of the (normal,tangent,bitangent) basis.
+    worldTangent = normalize(worldTangent - dot(worldTangent, worldNormal) * worldNormal);
+    worldBitangent = cross(worldNormal, worldTangent);
 
     texCoords = uv;
 

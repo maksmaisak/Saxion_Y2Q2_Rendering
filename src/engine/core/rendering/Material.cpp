@@ -66,16 +66,20 @@ static std::map<std::string, std::function<void(LuaState&, Material&)>> readers 
         "pbr",
         [](LuaState& lua, Material& m) {
 
-            m.setUniformValue("albedoMap"   , getTextureFromLua(lua, "albedo"));
-            m.setUniformValue("metallicMap" , getTextureFromLua(lua, "metallic" , Textures::white(), GL_RGBA));
-            m.setUniformValue("roughnessMap", getTextureFromLua(lua, "roughness", Textures::white(), GL_RGBA));
-            m.setUniformValue("aoMap"       , getTextureFromLua(lua, "ao"       , Textures::white(), GL_RGBA));
+            m.setUniformValue("albedoMap", getTextureFromLua(lua, "albedo"));
+
+            const auto defaultMetallicSmoothnessMap = Textures::white();
+            const auto metallicSmoothnessMap = getTextureFromLua(lua, "metallicSmoothness", defaultMetallicSmoothnessMap, GL_RGBA);
+            const bool isDefaultMSMap = metallicSmoothnessMap == defaultMetallicSmoothnessMap;
+            m.setUniformValue("metallicSmoothnessMap", metallicSmoothnessMap);
+
+            m.setUniformValue("aoMap"       , getTextureFromLua(lua, "ao"    , Textures::white(), GL_RGBA));
             m.setUniformValue("normalMap"   , getTextureFromLua(lua, "normal", Textures::defaultNormalMap(), GL_RGBA));
 
             m.setUniformValue("albedoColor", lua.tryGetField<glm::vec3>("albedoColor").value_or(glm::vec3(1, 1, 1)));
-            m.setUniformValue("metallicMultiplier" , lua.tryGetField<float>("metallicMultiplier").value_or(1));
-            m.setUniformValue("roughnessMultiplier", lua.tryGetField<float>("roughnessMultiplier").value_or(1));
-            m.setUniformValue("aoMultiplier"       , lua.tryGetField<float>("aoMultiplier").value_or(1));
+            m.setUniformValue("metallicMultiplier"  , lua.tryGetField<float>("metallicMultiplier").value_or(isDefaultMSMap ? 0 : 1));
+            m.setUniformValue("smoothnessMultiplier", lua.tryGetField<float>("smoothnessMultiplier").value_or(isDefaultMSMap ? 0.5 : 1));
+            m.setUniformValue("aoMultiplier"        , lua.tryGetField<float>("aoMultiplier").value_or(1));
         }
     },
     {

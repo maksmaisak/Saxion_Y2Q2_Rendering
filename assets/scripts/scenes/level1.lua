@@ -2,37 +2,67 @@ require('assets/scripts/level/level')
 
 local materials = {
     {
-        shader = 'lit',
-        diffuseColor = {1, 0, 0, 1}
+        shader = 'pbr',
+        albedo = 'objects/decorations/testPBR/rustediron2_basecolor.png',
+        metallicSmoothness = 'objects/decorations/testPBR/rustediron2_metallic.psd',
+        smoothnessMultiplier = 1,
+        aoMultiplier = 1,
     },
     {
-        shader = 'lit',
-        diffuseColor = {0.8, 0.8, 0.8, 1}
+        shader = 'pbr',
+        metallicMultiplier = 0,
+        smoothnessMultiplier = 0.5,
+        aoMultiplier = 1,
+        albedoColor = {1, 0, 0, 1}
     },
     {
-        shader = 'lit',
-        diffuseColor = {0, 0, 1, 1}
+        shader = 'pbr',
+        metallicMultiplier = 0,
+        smoothnessMultiplier = 0,
+        aoMultiplier = 1,
+        albedoColor = {0.8, 0.8, 0.8, 1}
     },
     {
-        shader = 'lit',
-        diffuseColor = {1, 0, 0.7361612, 1}
+        shader = 'pbr',
+        metallicMultiplier = 0,
+        smoothnessMultiplier = 0.5,
+        aoMultiplier = 1,
+        albedoColor = {0, 0, 1, 1}
     },
     {
-        shader = 'lit',
-        diffuseColor = {0.8, 0.8, 0.8, 1}
+        shader = 'pbr',
+        metallicMultiplier = 0,
+        smoothnessMultiplier = 0.5,
+        aoMultiplier = 1,
+        albedoColor = {1, 0, 0.7361612, 1}
     },
     {
-        shader = 'lit',
-        diffuseColor = {1, 0.9895964, 0.5707546, 1}
+        shader = 'pbr',
+        metallicMultiplier = 0,
+        smoothnessMultiplier = 0,
+        aoMultiplier = 1,
+        albedoColor = {0.8, 0.8, 0.8, 1}
     },
     {
-        shader = 'lit',
-        diffuse = 'objects/tile/diffuse.png',
-        diffuseColor = {1, 1, 1, 1}
+        shader = 'pbr',
+        metallicMultiplier = 0,
+        smoothnessMultiplier = 0.5,
+        aoMultiplier = 1,
+        albedoColor = {1, 0.9895964, 0.5707546, 1}
     },
     {
-        shader = 'lit',
-        diffuseColor = {0.8, 0.8, 0.8, 1}
+        shader = 'pbr',
+        albedo = 'objects/tile/diffuse.png',
+        metallicMultiplier = 0,
+        smoothnessMultiplier = 0.5,
+        aoMultiplier = 1,
+    },
+    {
+        shader = 'pbr',
+        metallicMultiplier = 0,
+        smoothnessMultiplier = 0,
+        aoMultiplier = 1,
+        albedoColor = {0.8, 0.8, 0.8, 1}
     },
 }
 
@@ -66,7 +96,7 @@ grid[1][1].tile = {
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[7]
+                    material = materials[8]
                 }
             },
         }
@@ -86,7 +116,7 @@ grid[1][2].tile = {
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[7]
+                    material = materials[8]
                 }
             },
         }
@@ -106,7 +136,7 @@ grid[1][3].tile = {
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[7]
+                    material = materials[8]
                 }
             },
         }
@@ -126,7 +156,7 @@ grid[1][4].tile = {
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[7]
+                    material = materials[8]
                 }
             },
         }
@@ -146,7 +176,7 @@ grid[2][1].tile = {
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[7]
+                    material = materials[8]
                 }
             },
         }
@@ -166,7 +196,7 @@ grid[2][2].tile = {
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[7]
+                    material = materials[8]
                 }
             },
         }
@@ -186,7 +216,7 @@ grid[2][3].tile = {
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[7]
+                    material = materials[8]
                 }
             },
         }
@@ -206,7 +236,7 @@ grid[2][4].tile = {
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[7]
+                    material = materials[8]
                 }
             },
         }
@@ -226,7 +256,7 @@ grid[2][6].tile = {
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[7]
+                    material = materials[8]
                 }
             },
         }
@@ -246,7 +276,7 @@ grid[2][7].tile = {
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[7]
+                    material = materials[8]
                 }
             },
         }
@@ -266,7 +296,7 @@ grid[2][8].tile = {
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[7]
+                    material = materials[8]
                 }
             },
         }
@@ -286,7 +316,7 @@ grid[2][9].tile = {
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[7]
+                    material = materials[8]
                 }
             },
         }
@@ -306,7 +336,7 @@ grid[2][10].tile = {
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[7]
+                    material = materials[8]
                 }
             },
         }
@@ -326,7 +356,7 @@ grid[3][1].tile = {
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[7]
+                    material = materials[8]
                 }
             },
         }
@@ -346,7 +376,7 @@ grid[3][2].tile = {
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[7]
+                    material = materials[8]
                 }
             },
         }
@@ -366,7 +396,7 @@ grid[3][3].tile = {
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[7]
+                    material = materials[8]
                 }
             },
         }
@@ -386,7 +416,7 @@ grid[3][4].tile = {
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[7]
+                    material = materials[8]
                 }
             },
         }
@@ -406,7 +436,7 @@ grid[3][6].tile = {
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[7]
+                    material = materials[8]
                 }
             },
         }
@@ -426,7 +456,7 @@ grid[3][8].tile = {
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[7]
+                    material = materials[8]
                 }
             },
         }
@@ -446,7 +476,7 @@ grid[4][1].tile = {
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[7]
+                    material = materials[8]
                 }
             },
         }
@@ -466,7 +496,7 @@ grid[4][2].tile = {
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[7]
+                    material = materials[8]
                 }
             },
         }
@@ -486,7 +516,7 @@ grid[4][3].tile = {
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[7]
+                    material = materials[8]
                 }
             },
         }
@@ -506,7 +536,7 @@ grid[4][4].tile = {
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[7]
+                    material = materials[8]
                 }
             },
         }
@@ -526,7 +556,7 @@ grid[4][6].tile = {
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[7]
+                    material = materials[8]
                 }
             },
         }
@@ -546,7 +576,7 @@ grid[4][7].tile = {
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[7]
+                    material = materials[8]
                 }
             },
         }
@@ -566,7 +596,7 @@ grid[4][8].tile = {
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[7]
+                    material = materials[8]
                 }
             },
         }
@@ -586,7 +616,7 @@ grid[4][9].tile = {
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[7]
+                    material = materials[8]
                 }
             },
         }
@@ -606,7 +636,7 @@ grid[4][10].tile = {
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[7]
+                    material = materials[8]
                 }
             },
         }
@@ -626,7 +656,7 @@ grid[5][1].tile = {
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[7]
+                    material = materials[8]
                 }
             },
         }
@@ -646,7 +676,7 @@ grid[5][2].tile = {
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[7]
+                    material = materials[8]
                 }
             },
         }
@@ -666,7 +696,7 @@ grid[5][3].tile = {
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[7]
+                    material = materials[8]
                 }
             },
         }
@@ -686,7 +716,7 @@ grid[5][4].tile = {
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[7]
+                    material = materials[8]
                 }
             },
         }
@@ -706,7 +736,7 @@ grid[6][1].tile = {
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[7]
+                    material = materials[8]
                 }
             },
         }
@@ -726,7 +756,7 @@ grid[6][2].tile = {
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[7]
+                    material = materials[8]
                 }
             },
         }
@@ -746,7 +776,7 @@ grid[6][3].tile = {
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[7]
+                    material = materials[8]
                 }
             },
         }
@@ -766,7 +796,7 @@ grid[6][4].tile = {
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[7]
+                    material = materials[8]
                 }
             },
         }
@@ -786,7 +816,7 @@ grid[6][5].tile = {
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[7]
+                    material = materials[8]
                 }
             },
         }
@@ -806,7 +836,7 @@ grid[6][6].tile = {
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[7]
+                    material = materials[8]
                 }
             },
         }
@@ -826,7 +856,7 @@ grid[6][7].tile = {
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[7]
+                    material = materials[8]
                 }
             },
         }
@@ -846,7 +876,7 @@ grid[6][8].tile = {
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[7]
+                    material = materials[8]
                 }
             },
         }
@@ -866,7 +896,7 @@ grid[6][9].tile = {
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[7]
+                    material = materials[8]
                 }
             },
         }
@@ -886,7 +916,7 @@ grid[7][1].tile = {
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[7]
+                    material = materials[8]
                 }
             },
         }
@@ -906,7 +936,7 @@ grid[7][2].tile = {
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[7]
+                    material = materials[8]
                 }
             },
         }
@@ -926,7 +956,7 @@ grid[7][3].tile = {
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[7]
+                    material = materials[8]
                 }
             },
         }
@@ -946,7 +976,7 @@ grid[7][4].tile = {
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[7]
+                    material = materials[8]
                 }
             },
         }
@@ -966,7 +996,7 @@ grid[7][5].tile = {
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[7]
+                    material = materials[8]
                 }
             },
         }
@@ -986,7 +1016,7 @@ grid[7][6].tile = {
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[7]
+                    material = materials[8]
                 }
             },
         }
@@ -1006,7 +1036,7 @@ grid[7][7].tile = {
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[7]
+                    material = materials[8]
                 }
             },
         }
@@ -1026,7 +1056,7 @@ grid[7][8].tile = {
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[7]
+                    material = materials[8]
                 }
             },
         }
@@ -1046,7 +1076,7 @@ grid[7][9].tile = {
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[7]
+                    material = materials[8]
                 }
             },
         }
@@ -1066,7 +1096,7 @@ grid[7][10].tile = {
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[7]
+                    material = materials[8]
                 }
             },
         }
@@ -1086,7 +1116,7 @@ grid[8][1].tile = {
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[7]
+                    material = materials[8]
                 }
             },
         }
@@ -1106,7 +1136,7 @@ grid[8][2].tile = {
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[7]
+                    material = materials[8]
                 }
             },
         }
@@ -1126,7 +1156,7 @@ grid[8][3].tile = {
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[7]
+                    material = materials[8]
                 }
             },
         }
@@ -1146,7 +1176,7 @@ grid[8][4].tile = {
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[7]
+                    material = materials[8]
                 }
             },
         }
@@ -1166,7 +1196,7 @@ grid[8][5].tile = {
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[7]
+                    material = materials[8]
                 }
             },
         }
@@ -1186,7 +1216,7 @@ grid[8][6].tile = {
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[7]
+                    material = materials[8]
                 }
             },
         }
@@ -1206,7 +1236,7 @@ grid[8][7].tile = {
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[7]
+                    material = materials[8]
                 }
             },
         }
@@ -1226,7 +1256,7 @@ grid[8][8].tile = {
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[7]
+                    material = materials[8]
                 }
             },
         }
@@ -1246,7 +1276,7 @@ grid[8][9].tile = {
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[7]
+                    material = materials[8]
                 }
             },
         }
@@ -1266,7 +1296,7 @@ grid[8][10].tile = {
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[7]
+                    material = materials[8]
                 }
             },
         }
@@ -1286,7 +1316,7 @@ grid[9][1].tile = {
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[7]
+                    material = materials[8]
                 }
             },
         }
@@ -1306,7 +1336,7 @@ grid[9][2].tile = {
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[7]
+                    material = materials[8]
                 }
             },
         }
@@ -1326,7 +1356,7 @@ grid[9][3].tile = {
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[7]
+                    material = materials[8]
                 }
             },
         }
@@ -1346,7 +1376,7 @@ grid[9][4].tile = {
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[7]
+                    material = materials[8]
                 }
             },
         }
@@ -1366,7 +1396,7 @@ grid[9][5].tile = {
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[7]
+                    material = materials[8]
                 }
             },
         }
@@ -1386,7 +1416,7 @@ grid[9][6].tile = {
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[7]
+                    material = materials[8]
                 }
             },
         }
@@ -1406,7 +1436,7 @@ grid[9][7].tile = {
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[7]
+                    material = materials[8]
                 }
             },
         }
@@ -1426,7 +1456,7 @@ grid[9][8].tile = {
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[7]
+                    material = materials[8]
                 }
             },
         }
@@ -1446,7 +1476,7 @@ grid[9][9].tile = {
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[7]
+                    material = materials[8]
                 }
             },
         }
@@ -1466,7 +1496,7 @@ grid[9][10].tile = {
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[7]
+                    material = materials[8]
                 }
             },
         }
@@ -1486,7 +1516,7 @@ grid[10][1].tile = {
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[7]
+                    material = materials[8]
                 }
             },
         }
@@ -1506,7 +1536,7 @@ grid[10][2].tile = {
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[7]
+                    material = materials[8]
                 }
             },
         }
@@ -1526,7 +1556,7 @@ grid[10][3].tile = {
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[7]
+                    material = materials[8]
                 }
             },
         }
@@ -1546,7 +1576,7 @@ grid[10][4].tile = {
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[7]
+                    material = materials[8]
                 }
             },
         }
@@ -1566,7 +1596,7 @@ grid[10][5].tile = {
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[7]
+                    material = materials[8]
                 }
             },
         }
@@ -1586,7 +1616,7 @@ grid[10][6].tile = {
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[7]
+                    material = materials[8]
                 }
             },
         }
@@ -1606,7 +1636,7 @@ grid[10][7].tile = {
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[7]
+                    material = materials[8]
                 }
             },
         }
@@ -1626,7 +1656,7 @@ grid[10][8].tile = {
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[7]
+                    material = materials[8]
                 }
             },
         }
@@ -1646,7 +1676,7 @@ grid[10][9].tile = {
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[7]
+                    material = materials[8]
                 }
             },
         }
@@ -1666,7 +1696,7 @@ grid[10][10].tile = {
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[7]
+                    material = materials[8]
                 }
             },
         }
@@ -1689,7 +1719,7 @@ grid[3][8].obstacle = {
                             },
                             RenderInfo = {
                                 mesh = 'objects/tile/cube_flat.obj',
-                                material = materials[5]
+                                material = materials[6]
                             }
                         },
                     }
@@ -1715,7 +1745,7 @@ grid[6][6].obstacle = {
                             },
                             RenderInfo = {
                                 mesh = 'objects/tile/cube_flat.obj',
-                                material = materials[5]
+                                material = materials[6]
                             }
                         },
                     }
@@ -1741,7 +1771,7 @@ grid[7][6].obstacle = {
                             },
                             RenderInfo = {
                                 mesh = 'objects/tile/cube_flat.obj',
-                                material = materials[5]
+                                material = materials[6]
                             }
                         },
                     }
@@ -1767,7 +1797,7 @@ grid[9][6].obstacle = {
                             },
                             RenderInfo = {
                                 mesh = 'objects/tile/cube_flat.obj',
-                                material = materials[5]
+                                material = materials[6]
                             }
                         },
                     }
@@ -1793,7 +1823,7 @@ grid[10][6].obstacle = {
                             },
                             RenderInfo = {
                                 mesh = 'objects/tile/cube_flat.obj',
-                                material = materials[5]
+                                material = materials[6]
                             }
                         },
                     }
@@ -1818,7 +1848,7 @@ grid[2][10].goal = {
                     },
                     RenderInfo = {
                         mesh = 'objects/tile/cube_flat.obj',
-                        material = materials[3]
+                        material = materials[4]
                     }
                 },
             }
@@ -1846,7 +1876,7 @@ grid[3][6].button = {
                                 },
                                 RenderInfo = {
                                     mesh = 'objects/tile/cube_flat.obj',
-                                    material = materials[4]
+                                    material = materials[5]
                                 }
                             },
                         }
@@ -1878,7 +1908,7 @@ grid[8][2].button = {
                                 },
                                 RenderInfo = {
                                     mesh = 'objects/tile/cube_flat.obj',
-                                    material = materials[4]
+                                    material = materials[5]
                                 }
                             },
                         }
@@ -1907,7 +1937,7 @@ grid[4][10].portal = {
                                 },
                                 RenderInfo = {
                                     mesh = 'objects/portal/sphere2.obj',
-                                    material = materials[2]
+                                    material = materials[3]
                                 }
                             },
                         }
@@ -1948,7 +1978,7 @@ grid[5][2].portal = {
                                 },
                                 RenderInfo = {
                                     mesh = 'objects/portal/sphere2.obj',
-                                    material = materials[2]
+                                    material = materials[3]
                                 }
                             },
                         }
@@ -1989,7 +2019,7 @@ grid[8][6].door = {
                                 },
                                 RenderInfo = {
                                     mesh = 'objects/tile/cube_flat.obj',
-                                    material = materials[5]
+                                    material = materials[6]
                                 }
                             },
                         }
@@ -2007,7 +2037,7 @@ grid[8][6].door = {
                                 },
                                 RenderInfo = {
                                     mesh = 'objects/tile/cube_flat.obj',
-                                    material = materials[5]
+                                    material = materials[6]
                                 }
                             },
                         }
@@ -2033,7 +2063,7 @@ grid[8][6].door = {
                                 },
                                 RenderInfo = {
                                     mesh = 'objects/tile/cube_flat.obj',
-                                    material = materials[5]
+                                    material = materials[6]
                                 }
                             },
                         }
@@ -2059,7 +2089,7 @@ grid[8][6].door = {
                                 },
                                 RenderInfo = {
                                     mesh = 'objects/tile/cube_flat.obj',
-                                    material = materials[5]
+                                    material = materials[6]
                                 }
                             },
                         }
@@ -2089,7 +2119,7 @@ grid[3][2].laser = {
                                 },
                                 RenderInfo = {
                                     mesh = 'objects/tile/cube_flat.obj',
-                                    material = materials[5]
+                                    material = materials[6]
                                 }
                             },
                         }
@@ -2116,7 +2146,7 @@ grid[3][2].laser = {
                                 },
                                 RenderInfo = {
                                     mesh = 'objects/tile/cube_flat.obj',
-                                    material = materials[6]
+                                    material = materials[7]
                                 }
                             },
                         }
@@ -2140,7 +2170,7 @@ grid[8][4].player = {
                 },
                 RenderInfo = {
                     mesh = 'objects/tile/cube_flat.obj',
-                    material = materials[1]
+                    material = materials[2]
                 }
             },
         }
@@ -2213,7 +2243,7 @@ local extras = {
                                 },
                                 RenderInfo = {
                                     mesh = 'objects/decorations/model.obj',
-                                    material = materials[8]
+                                    material = materials[9]
                                 }
                             },
                         }
@@ -2231,7 +2261,7 @@ local extras = {
                                 },
                                 RenderInfo = {
                                     mesh = 'objects/decorations/model.obj',
-                                    material = materials[8]
+                                    material = materials[9]
                                 }
                             },
                         }
@@ -2249,7 +2279,7 @@ local extras = {
                                 },
                                 RenderInfo = {
                                     mesh = 'objects/decorations/model.obj',
-                                    material = materials[8]
+                                    material = materials[9]
                                 }
                             },
                         }
@@ -2267,7 +2297,24 @@ local extras = {
                                 },
                                 RenderInfo = {
                                     mesh = 'objects/decorations/model.obj',
-                                    material = materials[8]
+                                    material = materials[9]
+                                }
+                            },
+                        }
+                    },
+                },
+                {
+                    Name = "sphere2",
+                    Transform = {
+                        position = {9.5, 0, 9.5},
+                        children = {
+                            {
+                                Name = "default",
+                                Transform = {
+                                },
+                                RenderInfo = {
+                                    mesh = 'objects/portal/sphere2.obj',
+                                    material = materials[1]
                                 }
                             },
                         }
@@ -2289,11 +2336,6 @@ local extras = {
 }
 
 return Level:new {
-	starsRating = {
-		threeStars = 2,
-		twoStars = 5,
-		oneStar = 10,
-	},
     map = map,
     extras = extras,
     nextLevelPath = 'assets/scripts/scenes/level2.lua'

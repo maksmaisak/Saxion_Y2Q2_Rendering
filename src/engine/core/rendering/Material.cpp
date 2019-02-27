@@ -67,9 +67,9 @@ static std::map<std::string, std::function<void(LuaState&, Material&)>> readers 
         [](LuaState& lua, Material& m) {
 
             m.setUniformValue("albedoMap"   , getTextureFromLua(lua, "albedo"));
-            m.setUniformValue("metallicMap" , getTextureFromLua(lua, "metallic"));
-            m.setUniformValue("roughnessMap", getTextureFromLua(lua, "roughness"));
-            m.setUniformValue("aoMap"       , getTextureFromLua(lua, "ao"));
+            m.setUniformValue("metallicMap" , getTextureFromLua(lua, "metallic" , Textures::white(), GL_RGBA));
+            m.setUniformValue("roughnessMap", getTextureFromLua(lua, "roughness", Textures::white(), GL_RGBA));
+            m.setUniformValue("aoMap"       , getTextureFromLua(lua, "ao"       , Textures::white(), GL_RGBA));
             m.setUniformValue("normalMap"   , getTextureFromLua(lua, "normal", Textures::defaultNormalMap(), GL_RGBA));
 
             m.setUniformValue("albedoColor", lua.tryGetField<glm::vec3>("albedoColor").value_or(glm::vec3(1, 1, 1)));

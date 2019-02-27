@@ -104,7 +104,13 @@ void Material::render(
     const glm::mat4& projectionMatrix
 ) {
     use(engine, depthMaps, modelMatrix, viewMatrix, projectionMatrix);
-    mesh->render(m_attributeLocations.vertex, m_attributeLocations.normal, m_attributeLocations.uv);
+    mesh->render(
+        m_attributeLocations.vertex,
+        m_attributeLocations.normal,
+        m_attributeLocations.uv,
+        m_attributeLocations.tangent,
+        m_attributeLocations.bitangent
+    );
 }
 
 inline bool valid(GLint location) {return location != -1;}
@@ -313,9 +319,12 @@ Material::BuiltinUniformLocations Material::cacheBuiltinUniformLocations() {
 Material::AttributeLocations Material::cacheAttributeLocations() {
 
     AttributeLocations a;
-    a.vertex = m_shader->getAttribLocation("vertex");
-    a.normal = m_shader->getAttribLocation("normal");
-    a.uv     = m_shader->getAttribLocation("uv");
+
+    a.vertex    = m_shader->getAttribLocation("vertex");
+    a.normal    = m_shader->getAttribLocation("normal");
+    a.uv        = m_shader->getAttribLocation("uv");
+    a.tangent   = m_shader->getAttribLocation("tangent");
+    a.bitangent = m_shader->getAttribLocation("bitangent");
 
     return a;
 }

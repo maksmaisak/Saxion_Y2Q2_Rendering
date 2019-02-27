@@ -6,6 +6,8 @@ const int NUM_SPOT_LIGHTS = 4;
 
 in vec3 worldPosition;
 in vec3 worldNormal;
+in vec3 worldTangent;
+in vec3 worldBitangent;
 in vec2 texCoords;
 in vec4 directionalLightspacePosition[NUM_DIRECTIONAL_LIGHTS];
 
@@ -120,15 +122,9 @@ vec3 GetNormal() {
 
     vec3 tangentspaceNormal = texture(normalMap, texCoords).xyz * 2.0 - 1.0;
 
-    vec3 q1  = dFdx(worldPosition);
-    vec3 q2  = dFdy(worldPosition);
-    vec2 st1 = dFdx(texCoords);
-    vec2 st2 = dFdy(texCoords);
-
     vec3 N = normalize(worldNormal);
-    vec3 T = normalize(q1 * st2.t - q2 * st1.t);
-    vec3 B = -normalize(cross(N, T));
-
+    vec3 T = normalize(worldTangent);
+    vec3 B = normalize(worldBitangent);
     return normalize(mat3(T,B,N) * tangentspaceNormal);
 }
 

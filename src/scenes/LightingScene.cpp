@@ -21,7 +21,7 @@
 #include <glm/gtx/euler_angles.hpp>
 
 constexpr bool AnimateLightProperties = false;
-constexpr int NumRotatingLights = 4;
+constexpr int NumRotatingLights = 2;
 
 void LightingScene::open() {
 
@@ -37,7 +37,7 @@ void LightingScene::open() {
     {
         auto& l = ambientLight.add<en::Light>();
         l.color = {0,0,0};
-        l.colorAmbient = glm::vec3(0.01);
+        l.colorAmbient = glm::vec3(0.02);
     }
     if (AnimateLightProperties) ambientLight.add<LightPropertyAnimator>();
 

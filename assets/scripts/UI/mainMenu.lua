@@ -3,7 +3,7 @@ require ('assets/scripts/level/level')
 
 local isBlocked = false
 local isChooseLevelOpened = false
-local mainButtonsPanel
+local MainMenuPanel
 local chooseLevelPanel
 local creditsPanel
 local levelIndex = 1
@@ -47,7 +47,7 @@ function scene:start()
 
 	-- Start Main Buttons Panel
    	Game.makeActor {
-		Name = "MainButtonsPanel",
+		Name = "MainMenuPanel",
 		Transform = {},
 		UIRect = {
 			anchorMin	= {0, 0},
@@ -55,11 +55,24 @@ function scene:start()
 		}
 	}
 
+	Game.makeActor {
+		Name = "ButtonsPanel",
+		Transform = {
+			parent = "MainMenuPanel"
+		},
+		UIRect = {
+			anchorMin	= {0.85, 0.05},
+			anchorMax	= {0.85, 0.35},
+			offsetMin	= {-150, 0},
+			offsetMax	= { 150, 0}
+		},
+	}
+
 	local startButton = Game.makeActor {
 		Name = "StartButton",
 		Transform = {
 			scale  = {1,1,1},
-			parent = "MainButtonsPanel"
+			parent = "ButtonsPanel"
 		},
 		Text = {
 			font   = "fonts/kenyanCoffee.ttf",
@@ -68,8 +81,8 @@ function scene:start()
 			string = "Start"
         },
 		UIRect = {
-			anchorMin = {0.85, 0.32},
-			anchorMax = {0.85, 0.32}
+			anchorMin = {0, 0.75},
+			anchorMax = {1, 1},
 		},
 		Sprite = {
 			material = {
@@ -99,7 +112,7 @@ function scene:start()
 	local chooseLevelButton = Game.makeActor {
 		Name = "ChooseLevelButton",
 		Transform = {
-			parent = "MainButtonsPanel"
+			parent = "ButtonsPanel"
 		},
 		Text = {
 			font = "fonts/kenyanCoffee.ttf",
@@ -108,8 +121,10 @@ function scene:start()
 			string = "Choose Level"
         },
 		UIRect = {
-			anchorMin = {0.85, 0.24},
-			anchorMax = {0.85, 0.24}
+			anchorMin = {0, 0.5},
+			anchorMax = {1, 0.75},
+			--offsetMin = {0,20},
+			--offsetMax = {0,-20}
 		},
 		Sprite = {
 			material = {
@@ -122,7 +137,7 @@ function scene:start()
 				if button == 1 then
 					isChooseLevelOpened = true
 					chooseLevelPanel:get("UIRect").isEnabled = true
-					mainButtonsPanel:get("UIRect").isEnabled = false
+					MainMenuPanel:get("UIRect").isEnabled = false
 				end
 			end,
 
@@ -141,11 +156,11 @@ function scene:start()
 	local creditsButton = Game.makeActor {
 		Name = "CreditsButton",
 		Transform = {
-			parent = "MainButtonsPanel"
+			parent = "ButtonsPanel"
 		},
 		UIRect = {
-			anchorMin = {0.85, 0.16},
-			anchorMax = {0.85, 0.16}
+			anchorMin = {0, 0.25},
+			anchorMax = {1, 0.5}
 		},
 		Text = {
 			font = "fonts/kenyanCoffee.ttf",
@@ -163,7 +178,7 @@ function scene:start()
 			onMouseDown = function(self, button)
 				if button == 1 then
 					creditsPanel:get("UIRect").isEnabled		= true
-					mainButtonsPanel:get("UIRect").isEnabled	= false
+					MainMenuPanel:get("UIRect").isEnabled	= false
 				end
 			end,
 
@@ -182,11 +197,11 @@ function scene:start()
 	local exitButton = Game.makeActor {
 		Name = "ExitButton",
 		Transform = {
-			parent = "MainButtonsPanel"
+			parent = "ButtonsPanel"
 		},
 		UIRect = {
-			anchorMin = {0.85, 0.08},
-			anchorMax = {0.85, 0.08}
+			anchorMin = {0, 0},
+			anchorMax = {1, 0.25}
 		},
 		Text = {
 			font = "fonts/kenyanCoffee.ttf",
@@ -380,7 +395,7 @@ function scene:start()
 				if button == 1 then
 					isChooseLevelOpened = false
 					print("Go back to main")
-					mainButtonsPanel:get("UIRect").isEnabled = true
+					MainMenuPanel:get("UIRect").isEnabled = true
 					chooseLevelPanel:get("UIRect").isEnabled = false
 				end
 			end,
@@ -440,7 +455,7 @@ function scene:start()
 			onMouseDown = function(self, button)
 				if button == 1 then
 					creditsPanel:get("UIRect").isEnabled	 = false
-					mainButtonsPanel:get("UIRect").isEnabled = true
+					MainMenuPanel:get("UIRect").isEnabled = true
 				end
 			end,
 
@@ -474,7 +489,7 @@ function scene:start()
 		}
 	}
 
-	mainButtonsPanel = Game.find("MainButtonsPanel")
+	MainMenuPanel = Game.find("MainMenuPanel")
 	chooseLevelPanel = Game.find("ChooseLevelPanel")
 	creditsPanel	 = Game.find("CreditsPanel")
 
@@ -482,12 +497,6 @@ function scene:start()
 	chooseLevelPanel:get("UIRect").isEnabled = false
 
 	keepAspectRatio(chooseLevelImage,500)
-	keepAspectRatio(startButton,buttonSize)
-	keepAspectRatio(chooseLevelButton,buttonSize)
-	keepAspectRatio(creditsButton,buttonSize)
-	keepAspectRatio(exitButton,buttonSize)
-	keepAspectRatio(backButtonChooseLevel,buttonSize)
-	keepAspectRatio(backButtonCredits,buttonSize)
 	keepAspectRatio(arrowLeft,256)
 	keepAspectRatio(arrowRight,256)
 

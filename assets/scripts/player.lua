@@ -12,6 +12,14 @@ Player = Object:new {
 
 local disabledKeys = {left = false, right = false, up = false, down = false}
 local inputKeys = { left = { x = 1, y = 0}, right = {x = -1, y = 0}, up = {x = 0, y = 1}, down = {x = 0, y = -1} }
+local keyMaterial = Game.makeMaterial {
+	shader = 'pbr',
+	metallicMultiplier = 0,
+    smoothnessMultiplier = 0.5,
+    aoMultiplier = 1,
+	albedoColor = {1, 0.6, 0.5, 1},
+	normal = 'objects/key/KeyNormal.png',
+}
 
 function Player:getPositionFromGridPosition(gridPosition)
 
@@ -30,27 +38,25 @@ function Player:makeKey(gridPosition, keyName)
         z = gridPosition.y - 1
     }
 
-	local keyColor = {0.0, 1.0, 0.0}
+	local rotation = {0, 0, 0}
 
 	if keyName == "up" then
-		keyColor[1] = 1
-	elseif keyName == "down" then
-		keyColor[3] = 1
+		rotation.y = 90
 	elseif keyName == "left" then
-		keyColor = {0, 0, 0}
+		rotation.y = 180
+	elseif keyName == "down" then
+		rotation.y = 270
 	end
 
     return Game.makeActor {
         Name = "Key."..gridPosition.x.."."..gridPosition.y,
         Transform = {
             position = position,
-            scale = {0.9 * 0.5, 0.2, 0.9 * 0.5}
+			rotation = rotation,
         },
         RenderInfo = {
-            mesh = "models/cube_flat.obj",
-            material = {
-				diffuseColor = keyColor
-			}
+            mesh = "objects/key/Key.obj",
+            material = keyMaterial
         }
 	}
 end
@@ -140,7 +146,8 @@ function Player:activateButtonTarget(button)
 			-- play goal activation "animation" this is a placeholder (it moves the position)
 			-- replace it when with the real one when is done
 			local goalPosition		= goal.transform.position
-			goalPosition.y 			= goalPosition.y + 0.5
+			goalPosition.y 			=
+			goalPosition.y + 0.5
 			goal.transform.position	= goalPosition
 
 		elseif target.door ~= nil then
@@ -250,7 +257,7 @@ function Player:unblockKey(key, canRegisterMove)
 
 				p:get("Transform").position = {
 					x = self.gridPosition.x - 1,
-					y = index * 2 * p:get("Transform").scale.y,
+					y = index * p:get("Transform").scale.y * 0.2,
 					z = self.gridPosition.y - 1
 				}
 

@@ -290,6 +290,15 @@ void Engine::initializeLua() {
             lua.setField("isUp"  , &utils::KeyboardHelper::isUp);
         }
         lua_setfield(lua, -2, "keyboard");
+
+        lua_pushvalue(lua, -1);
+        lua_newtable(lua);
+        {
+            lua.setField("isHeld", [](int buttonNum){return utils::MouseHelper::isHeld((sf::Mouse::Button)(buttonNum - 1));});
+            lua.setField("isDown", [](int buttonNum){return utils::MouseHelper::isDown((sf::Mouse::Button)(buttonNum - 1));});
+            lua.setField("isUp"  , [](int buttonNum){return utils::MouseHelper::isUp  ((sf::Mouse::Button)(buttonNum - 1));});
+        }
+        lua_setfield(lua, -2, "mouse");
     }
     lua_setglobal(lua, "Game");
 

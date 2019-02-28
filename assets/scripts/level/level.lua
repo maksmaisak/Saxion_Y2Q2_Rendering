@@ -19,8 +19,6 @@ function Level:start()
 	self.redoUndoButtons = RedoUndoButtons:new()
 	self.pauseMenu = PauseMenu:new()
 
-	--self.pauseMenu:init()
-
     for x = 1, self.map:getGridSize().x do
         for y = 1, self.map:getGridSize().y do
 

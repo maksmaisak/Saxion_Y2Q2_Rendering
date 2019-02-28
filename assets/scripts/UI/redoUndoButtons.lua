@@ -50,7 +50,7 @@ function RedoUndoButtons:createButtons()
 		},
 		LuaBehavior = {
 			update = function(self, dt)
-				if Game.keyboard.isHeld("q")then
+				if Game.keyboard.isHeld("q") or (Game.mouse.isHeld(1) and self.actor:get("UIRect").isMouseOver) then
 					self.actor:get("Transform").scale = {1.2,1.2,1.2}
 				else
 					self.actor:get("Transform").scale = {1,1,1}
@@ -78,7 +78,7 @@ function RedoUndoButtons:createButtons()
 		},
 		LuaBehavior = {
 			update = function(self, dt)
-				if Game.keyboard.isHeld("e")then
+				if Game.keyboard.isHeld("e") or (Game.mouse.isHeld(1) and self.actor:get("UIRect").isMouseOver) then
 					self.actor:get("Transform").scale = {1.2,1.2,1.2}
 				else
 					self.actor:get("Transform").scale = {1,1,1}

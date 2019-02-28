@@ -45,7 +45,7 @@ function Map:calculateYOffset(gridPosition)
 	for k, v in pairs(self:getDroppedKeysGridAt(gridPosition).keys) do
 		for m, p in pairs(v) do
 			if p then
-				yOffset = yOffset + 2 * p:get("Transform").scale.y
+				yOffset = yOffset + p:get("Transform").scale.y * 0.2
 			end
 		end
 	end

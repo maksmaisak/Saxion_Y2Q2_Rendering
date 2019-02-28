@@ -91,6 +91,30 @@ Mesh* Mesh::load(std::string pFilename) {
 	//as we encounter them and store references to the pack
 	std::map<FaceIndexTriplet, unsigned> mappedTriplets;
 
+	const auto addTriplet = [&](const FaceIndexTriplet triplet) {
+
+		const auto found = mappedTriplets.find(triplet);
+		if (found != mappedTriplets.end()) {
+
+			const unsigned index = found->second;
+			mesh->m_indices.push_back(index);
+			return;
+		}
+
+		//so create a new index value, and map our triplet to it
+		const unsigned index = static_cast<unsigned>(mappedTriplets.size());
+		mappedTriplets[triplet] = index;
+
+		//now record this index
+		mesh->m_indices.push_back(index);
+		//and store the corresponding vertex/normal/uv values into our own buffers
+		//note the -1 is required since all values in the f triplets in the .obj file
+		//are 1 based, but our vectors are 0 based
+		mesh->m_vertices.push_back(vertices[triplet.v  - 1]);
+		mesh->m_normals .push_back(normals [triplet.n  - 1]);
+		mesh->m_uvs     .push_back(uvs     [triplet.uv - 1]);
+	};
+
 	std::string line; // to store each line in
 	while (getline(file, line)) {
 
@@ -139,51 +163,32 @@ Mesh* Mesh::load(std::string pFilename) {
 			//f v1/u1/n1 v2/u2/n2 v3/u3/n3
 			//for each triplet like that we need to check whether we already encountered it
 			//and update our administration based on that
-			glm::ivec3 vertexIndex;
-			glm::ivec3 normalIndex;
-			glm::ivec3 uvIndex;
-			int count = sscanf(line.c_str(), "%10s %d/%d/%d %d/%d/%d %d/%d/%d", cmd, &vertexIndex[0], &uvIndex[0], &normalIndex[0], &vertexIndex[1], &uvIndex[1], &normalIndex[1], &vertexIndex[2], &uvIndex[2], &normalIndex[2]);
+			glm::ivec4 vertexIndex;
+			glm::ivec4 normalIndex;
+			glm::ivec4 uvIndex;
+			const int numRead = sscanf(line.c_str(), "%10s %d/%d/%d %d/%d/%d %d/%d/%d %d/%d/%d", cmd, &vertexIndex[0], &uvIndex[0], &normalIndex[0], &vertexIndex[1], &uvIndex[1], &normalIndex[1], &vertexIndex[2], &uvIndex[2], &normalIndex[2], &vertexIndex[3], &uvIndex[3], &normalIndex[3]);
 
-			//Have we read exactly 10 elements?
-			if (count == 10) {
+			switch (numRead) {
 
-				//process 3 triplets, one for each vertex (which is first element of the triplet)
-				for (int i = 0; i < 3; ++i) {
+				// 3 vertices
+				case 10:
+					for (int i = 0; i < 3; ++i)
+						addTriplet(FaceIndexTriplet(vertexIndex[i], uvIndex[i], normalIndex[i]));
+					break;
+				// 4 vertices
+				case 13:
+					for (int i = 0; i < 3; ++i)
+						addTriplet(FaceIndexTriplet(vertexIndex[i], uvIndex[i], normalIndex[i]));
 
-					//create key out of the triplet and check if we already encountered this before
-					FaceIndexTriplet triplet(vertexIndex[i], uvIndex[i], normalIndex[i]);
-					const auto found = mappedTriplets.find(triplet);
-
-					//if iterator points at the end, we haven't found it
-					if (found == mappedTriplets.end()) {
-
-						//so create a new index value, and map our triplet to it
-						const unsigned index = mappedTriplets.size();
-						mappedTriplets[triplet] = index;
-
-						//now record this index
-						mesh->m_indices.push_back(index);
-						//and store the corresponding vertex/normal/uv values into our own buffers
-						//note the -1 is required since all values in the f triplets in the .obj file
-						//are 1 based, but our vectors are 0 based
-						mesh->m_vertices.push_back(vertices[vertexIndex[i] - 1]);
-						mesh->m_normals.push_back(normals[normalIndex[i] - 1]);
-						mesh->m_uvs.push_back(uvs[uvIndex[i] - 1]);
-
-					} else {
-
-						//if the key was already present, get the index value for it
-						const unsigned index = found->second;
-						//and update our index buffer with it
-						mesh->m_indices.push_back(index);
-					}
-				}
-			} else {
-
-				//If we read a different amount, something is wrong
-				std::cout << "Error reading obj, needing v,vn,vt" << std::endl;
-				delete mesh;
-				return nullptr;
+					addTriplet(FaceIndexTriplet(vertexIndex[0], uvIndex[0], normalIndex[0]));
+					addTriplet(FaceIndexTriplet(vertexIndex[2], uvIndex[2], normalIndex[3]));
+					addTriplet(FaceIndexTriplet(vertexIndex[3], uvIndex[3], normalIndex[3]));
+					break;
+				default:
+					//If we read a different amount, something is wrong
+					std::cout << "Error reading obj, needing v,vn,vt" << std::endl;
+					delete mesh;
+					return nullptr;
 			}
 		}
 	}

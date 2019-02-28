@@ -37,6 +37,7 @@ function Level:start()
 				gridItem.player:add("LuaBehavior", dofile(Config.player) {
 					level = self,
 					map   = self.map,
+					pauseMenu  = self.pauseMenu
 				})
 				self.player = gridItem.player:get("LuaBehavior")
 			end

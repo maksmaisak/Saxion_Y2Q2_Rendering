@@ -76,6 +76,7 @@ function Player:activateGoal(gridPosition)
 	goal.isActivated = true
 
 	self.canControl = false
+	self.level.isLevelComplete = true
 	
 	local resultScreen = Game.makeActor {
 		Name = "ResultScreen",
@@ -402,7 +403,6 @@ end
 
 function Player:start()
 
-
 	self.transform = self.actor:get("Transform")
 	local position = self.transform.position
 
@@ -415,16 +415,22 @@ function Player:start()
 	self.currentMoveIndex = 1
 	self.level.undoCounts = 0
 	self.canControl = true
+	self.pauseMenu.resumeButton:get("LuaBehavior").player = self
 end
 
 function Player:update()
 
-	if not self.canControl then
-		return
+	if Game.keyboard.isDown("escape") then
+		if self.level.isLevelComplete then
+			return
+		end
+
+		self.canControl = not self.canControl
+		self.pauseMenu:activate()
 	end
 
-	if Game.keyboard.isDown("escape") then
-		self.level.pauseMenu:activate()
+	if not self.canControl then
+		return
 	end
 
 	if Game.keyboard.isDown("r") then

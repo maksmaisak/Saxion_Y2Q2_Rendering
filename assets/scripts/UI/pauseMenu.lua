@@ -52,7 +52,7 @@ function PauseMenu:createPanel()
         }
 	}
 
-	local resumeButton = Game.makeActor {
+	self.resumeButton = Game.makeActor {
 		Name = "ResumeButton",
 		Transform = {
 			scale  = {1,1,1},
@@ -77,6 +77,7 @@ function PauseMenu:createPanel()
 			onMouseDown = function(self, button)
 				if button == 1 then
 					pauseCanvas:get("UIRect").isEnabled = false
+					self.player.canControl = true
 				end
 			end,
 
@@ -135,7 +136,7 @@ function PauseMenu:createPanel()
 	pauseCanvas	= Game.find("PauseMenuPanel")
 
 	keepAspectRatio(mainMenuButton,125)
-	keepAspectRatio(resumeButton,125)
+	keepAspectRatio(self.resumeButton,125)
 end
 
 function PauseMenu:activate()

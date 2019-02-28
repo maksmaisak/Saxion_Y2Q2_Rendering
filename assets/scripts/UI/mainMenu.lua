@@ -83,6 +83,8 @@ function scene:start()
 		UIRect = {
 			anchorMin = {0, 0.75},
 			anchorMax = {1, 1},
+			offsetMin = {0,5},
+			offsetMax = {0,-5}
 		},
 		Sprite = {
 			material = {
@@ -123,8 +125,8 @@ function scene:start()
 		UIRect = {
 			anchorMin = {0, 0.5},
 			anchorMax = {1, 0.75},
-			--offsetMin = {0,20},
-			--offsetMax = {0,-20}
+			offsetMin = {0,5},
+			offsetMax = {0,-5}
 		},
 		Sprite = {
 			material = {
@@ -160,7 +162,10 @@ function scene:start()
 		},
 		UIRect = {
 			anchorMin = {0, 0.25},
-			anchorMax = {1, 0.5}
+			anchorMax = {1, 0.5},
+			offsetMin = {0,5},
+			offsetMax = {0,-5}
+
 		},
 		Text = {
 			font = "fonts/kenyanCoffee.ttf",
@@ -201,7 +206,9 @@ function scene:start()
 		},
 		UIRect = {
 			anchorMin = {0, 0},
-			anchorMax = {1, 0.25}
+			anchorMax = {1, 0.25},
+			offsetMin = {0,5},
+			offsetMax = {0,-5}
 		},
 		Text = {
 			font = "fonts/kenyanCoffee.ttf",
@@ -360,7 +367,7 @@ function scene:start()
 		},
 		LuaBehavior = {
 			update = function(self, dt)
-				if Game.keyboard.isHeld("right") then
+				if Game.keyboard.isHeld("right")then
 					self.actor:get("Transform").scale = {1.2,1.2,1.2}
 				else
 					self.actor:get("Transform").scale = {1,1,1}
@@ -375,8 +382,8 @@ function scene:start()
 			parent = "ChooseLevelPanel"
 		},
 		UIRect = {
-			anchorMin = {0.5, 0.1},
-			anchorMax = {0.5, 0.1}
+			anchorMin = {0.5, 0.15},
+			anchorMax = {0.5, 0.1},
 		},
 		Text = {
 			font = "fonts/kenyanCoffee.ttf",
@@ -497,6 +504,8 @@ function scene:start()
 	chooseLevelPanel:get("UIRect").isEnabled = false
 
 	keepAspectRatio(chooseLevelImage,500)
+	keepAspectRatio(backButtonChooseLevel,95)
+	keepAspectRatio(backButtonCredits,95)
 	keepAspectRatio(arrowLeft,256)
 	keepAspectRatio(arrowRight,256)
 

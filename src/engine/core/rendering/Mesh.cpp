@@ -276,7 +276,6 @@ void Mesh::generateTangentsAndBitangents() {
 	m_tangents.resize(numVertices, glm::vec3(0));
 	m_bitangents.clear();
 	m_bitangents.resize(numVertices, glm::vec3(0));
-	std::vector<unsigned int> numIndexUsages(m_vertices.size(), 0);
 
 	for (std::size_t i = 0; i < numTriangles; ++i) {
 
@@ -315,16 +314,11 @@ void Mesh::generateTangentsAndBitangents() {
 		m_bitangents[index0] += bitangent;
 		m_bitangents[index1] += bitangent;
 		m_bitangents[index2] += bitangent;
-		numIndexUsages[index0] += 1;
-		numIndexUsages[index1] += 1;
-		numIndexUsages[index2] += 1;
 	}
 
 	for (std::size_t index = 0; index < numVertices; ++index) {
-
-		const std::size_t numUsages = numIndexUsages[index];
-		m_tangents  [index] /= numUsages;
-		m_bitangents[index] /= numUsages;
+		m_tangents  [index] = glm::normalize(m_tangents[index]);
+		m_bitangents[index] = glm::normalize(m_bitangents[index]);
 	}
 }
 

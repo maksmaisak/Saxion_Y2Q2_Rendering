@@ -124,10 +124,10 @@ void LightingScene::open() {
     {
         auto mesh = en::Resources<Mesh>::get(config::MODEL_PATH + "Pillar_tall.obj");
         auto material = std::make_shared<en::Material>("pbr");
-        material->setUniformValue("albedoMap", en::Textures::get(config::TEXTURE_PATH + "testPBR/pillar/Pillars_C.png"));
-        material->setUniformValue("metallicSmoothnessMap", en::Textures::get(config::TEXTURE_PATH + "testPBR/pillar/Pillars_M.png", GL_RGBA));
-        material->setUniformValue("normalMap", en::Textures::get(config::TEXTURE_PATH + "testPBR/pillar/Pillars_N.png", GL_RGBA));
-        material->setUniformValue("aoMap", en::Textures::white());
+        material->setUniformValue("albedoMap", en::Textures::get(config::TEXTURE_PATH + "testPBR/pillar/Pilars_AlbedoTransparency.png"));
+        material->setUniformValue("metallicSmoothnessMap", en::Textures::get(config::TEXTURE_PATH + "testPBR/pillar/Pilars_MetallicSmoothness.png", GL_RGBA));
+        material->setUniformValue("normalMap", en::Textures::get(config::TEXTURE_PATH + "testPBR/pillar/Pilars_Normal.png", GL_RGBA));
+        material->setUniformValue("aoMap", en::Textures::get(config::TEXTURE_PATH + "testPBR/pillar/Pilars_AO.png", GL_RGBA));
         material->setUniformValue("albedoColor"         , glm::vec3(1));
         material->setUniformValue("metallicMultiplier"  , 1.f);
         material->setUniformValue("smoothnessMultiplier", 1.f);

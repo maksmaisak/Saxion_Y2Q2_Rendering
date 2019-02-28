@@ -23,15 +23,17 @@ local scenery = {
 
 local scene = {}
 
-local function keepAspectRatio(actor , theight)
+local function keepAspectRatio(actor, theight)
 
-	local textureSize = actor:get("Sprite").textureSize
+	local sprite = actor:get("Sprite")
+	if not sprite then return end
 
-	ratio = textureSize.x/textureSize.y
+	local textureSize = sprite.textureSize
+	ratio = textureSize.x / textureSize.y
 	local height = theight
 	local width = height * ratio
-	local minWidth = (width / 2) * -1
-	local minHeight =  (height / 2) * -1
+	local minWidth  = (width  / 2) * -1
+	local minHeight = (height / 2) * -1
 	actor:get("UIRect").offsetMin = { minWidth, minHeight }
 	actor:get("UIRect").offsetMax = { width / 2, height / 2}
 end
@@ -72,7 +74,7 @@ function scene:start()
 		Sprite = {
 			material = {
 				shader	= "sprite",
-				texture	= "textures/transparent.png",
+				texture = "textures/transparent.png"
 			}
 		},
 		LuaBehavior = {

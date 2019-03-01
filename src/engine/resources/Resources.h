@@ -86,6 +86,10 @@ namespace en {
             return numRemoved;
         }
 
+        inline static void clear() {
+            m_resources.clear();
+        }
+
     private:
         static std::map<std::string, std::shared_ptr<TResource>> m_resources;
     };

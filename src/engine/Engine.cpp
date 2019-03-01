@@ -393,6 +393,6 @@ Engine::~Engine() {
 
     // If sf::SoundBuffer is being destroyed when statics are destroyed when the app quits,
     // that causes OpenAL to throw an error. This prevents that.
-    Resources<Sound>::removeUnused();
-    Resources<sf::SoundBuffer>::removeUnused();
+    Resources<Sound>::clear();
+    Resources<sf::SoundBuffer>::clear();
 }

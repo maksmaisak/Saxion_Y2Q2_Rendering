@@ -298,7 +298,13 @@ void Engine::initializeLua() {
 
         lua.setField("makeMaterial", &makeMaterial);
 
-        lua.setField("getSound", [](const std::string& filepath){return Resources<Sound>::get(config::ASSETS_PATH + filepath);});
+        lua.setField("makeSound", [](const std::string& filepath) {
+            return std::make_shared<Sound>(config::ASSETS_PATH + filepath);
+        });
+
+        lua.setField("getSound", [](const std::string& filepath) {
+            return Resources<Sound>::get(config::ASSETS_PATH + filepath);
+        });
 
         // Game.keyboard
         lua_pushvalue(lua, -1);

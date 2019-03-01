@@ -1,5 +1,6 @@
 require('assets/scripts/object')
 
+
 RedoUndoButtons = Object:new()
 
 function RedoUndoButtons:init()	
@@ -19,7 +20,9 @@ local function keepAspectRatio(actor , theight)
 end
 
 function RedoUndoButtons:createButtons()
-		
+
+	local level = self.level
+
 	self.reduUndoPanel = Game.makeActor {
 		Name = "ReduUndoPanel",
 		Transform = {
@@ -50,14 +53,22 @@ function RedoUndoButtons:createButtons()
 		},
 		LuaBehavior = {
 			update = function(self, dt)
-				if Game.keyboard.isHeld("q") or (Game.mouse.isHeld(1) and self.actor:get("UIRect").isMouseOver) then
-					self.actor:get("Transform").scale = {1.2,1.2,1.2}
-				else
-					self.actor:get("Transform").scale = {1,1,1}
+				if level.player.canControl then
+					if Game.keyboard.isHeld("q") or (Game.mouse.isHeld(1) and self.actor:get("UIRect").isMouseOver) then
+						self.actor:get("Transform").scale = {1.2,1.2,1.2}
+					else
+						self.actor:get("Transform").scale = {1,1,1}
+					end
+				
+					if Game.mouse.isDown(1) and self.actor:get("UIRect").isMouseOver then
+						level.player:undoMove()
+					end
 				end
 			end,
 		}
 	}
+
+
 
 	self.redoButton = Game.makeActor {
 		Name = "RedoButton",
@@ -78,10 +89,16 @@ function RedoUndoButtons:createButtons()
 		},
 		LuaBehavior = {
 			update = function(self, dt)
-				if Game.keyboard.isHeld("e") or (Game.mouse.isHeld(1) and self.actor:get("UIRect").isMouseOver) then
-					self.actor:get("Transform").scale = {1.2,1.2,1.2}
-				else
-					self.actor:get("Transform").scale = {1,1,1}
+				if level.player.canControl then
+					if Game.keyboard.isHeld("e") or (Game.mouse.isHeld(1) and self.actor:get("UIRect").isMouseOver) then
+						self.actor:get("Transform").scale = {1.2,1.2,1.2}
+					else
+						self.actor:get("Transform").scale = {1,1,1}
+					end
+
+					if Game.mouse.isDown(1) and self.actor:get("UIRect").isMouseOver then
+						level.player:redoMove()
+					end
 				end
 			end
 		}

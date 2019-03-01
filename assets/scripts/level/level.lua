@@ -2,6 +2,7 @@ require('assets/scripts/object')
 require('assets/scripts/vector')
 require('assets/scripts/level/map')
 require('assets/scripts/UI/pauseMenu')
+require('assets/scripts/UI/redoUndoButtons')
 
 Level = Object:new {
 	map = nil,
@@ -15,9 +16,10 @@ function Level:start()
 		return
 	end
 
+	self.redoUndoButtons = RedoUndoButtons:new{
+		level = self
+	}
 	self.pauseMenu = PauseMenu:new()
-
-	self.pauseMenu:init()
 
     for x = 1, self.map:getGridSize().x do
         for y = 1, self.map:getGridSize().y do

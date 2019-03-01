@@ -42,7 +42,8 @@ namespace en {
         inline static std::shared_ptr<TResource> get(const std::string& key, Args&&... args) {
 
             auto it = m_resources.find(key);
-            if (it != m_resources.end()) return it->second;
+            if (it != m_resources.end())
+                return it->second;
 
             bool didAdd = false;
 

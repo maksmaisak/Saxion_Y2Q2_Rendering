@@ -3,11 +3,11 @@
 
 #include <GL/glew.h>
 #include <SFML/Graphics/Text.hpp>
-#include "mge/util/DebugHud.hpp"
-#include "mge/config.hpp"
+#include "DebugHud.hpp"
+#include "config.hpp"
 
-DebugHud::DebugHud(sf::RenderWindow* aWindow): _window(aWindow), _debugInfo(), _font(), _debugText()
-{
+DebugHud::DebugHud(sf::RenderWindow* aWindow): _window(aWindow), _debugInfo(), _font(), _debugText() {
+
 	assert (_window);
 
     if (!_font.loadFromFile(config::FONT_PATH + "arial.ttf")) {

@@ -35,7 +35,7 @@ namespace en {
 
     public:
         Engine();
-        virtual ~Engine() = default;
+        virtual ~Engine();
         Engine(const Engine& other) = delete;
         Engine& operator=(const Engine& other) = delete;
         Engine(Engine&& other) = delete;

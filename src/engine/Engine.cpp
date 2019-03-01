@@ -23,6 +23,7 @@
 #include "Material.h"
 #include "KeyboardHelper.h"
 #include "MouseHelper.h"
+#include "Sound.h"
 
 using namespace en;
 
@@ -243,6 +244,21 @@ int loadScene(lua_State* L) {
     return 0;
 }
 
+template<>
+struct ResourceLoader<sf::SoundBuffer> {
+
+    inline static std::shared_ptr<sf::SoundBuffer> load(const std::string& filepath) {
+
+        auto buffer = std::make_shared<sf::SoundBuffer>();
+        if (!buffer->loadFromFile(filepath)) {
+            std::cerr << "Couldn't load sound from: " << filepath << std::endl;
+            return nullptr;
+        }
+
+        return buffer;
+    }
+};
+
 void Engine::initializeLua() {
 
     LUA_REGISTER_TYPE(Actor);
@@ -282,6 +298,9 @@ void Engine::initializeLua() {
 
         lua.setField("makeMaterial", &makeMaterial);
 
+        lua.setField("getSound", [](const std::string& filepath){return Resources<Sound>::get(config::ASSETS_PATH + filepath);});
+
+        // Game.keyboard
         lua_pushvalue(lua, -1);
         lua_newtable(lua);
         {
@@ -291,6 +310,7 @@ void Engine::initializeLua() {
         }
         lua_setfield(lua, -2, "keyboard");
 
+        // Game.mouse
         lua_pushvalue(lua, -1);
         lua_newtable(lua);
         {
@@ -330,8 +350,8 @@ void Engine::processWindowEvents() {
                 break;
 
             case sf::Event::Resized:
-                //would be better to move this to the render system
-                //this version implements unconstrained match viewport scaling
+                // TODO move this to the render system
+                // Unconstrained match viewport scaling
                 glViewport(0, 0, event.size.width, event.size.height);
                 break;
 
@@ -361,4 +381,12 @@ Actor Engine::makeActor(const std::string& name) {
 
 Actor Engine::findByName(const std::string& name) const {
     return actor(m_registry.findByName(name));
+}
+
+Engine::~Engine() {
+
+    // If sf::SoundBuffer is being destroyed when statics are destroyed when the app quits,
+    // that causes OpenAL to throw an error. This prevents that.
+    Resources<Sound>::removeUnused();
+    Resources<sf::SoundBuffer>::removeUnused();
 }

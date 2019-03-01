@@ -25,6 +25,10 @@ namespace lua {
         /// Try using a property setter from __setters, otherwise just rawset it
         int newindexFunction(lua_State* L);
 
+        /// Same but just forward the call to a table at the first upvalue.
+        int indexFunctionForward(lua_State* L);
+        int newindexFunctionForward(lua_State* L);
+
         template<typename T>
         int onBeforeGarbageCollection(lua_State* L) {
 
@@ -49,6 +53,28 @@ namespace lua {
             inline static void initializeMetatable(en::LuaState&) {}
         };
 
+        template<typename T>
+        struct InitializeMetatableFunctionOf<std::shared_ptr<T>> {
+
+            inline static void initializeMetatable(en::LuaState& lua) {
+
+                const int ownMetatableIndex = lua_gettop(lua);
+
+                getMetatable<T>(lua);
+
+                lua_pushvalue(lua, -1);
+                lua_pushcclosure(lua, indexFunctionForward, 1);
+                lua_setfield(lua, ownMetatableIndex, "__index");
+
+                lua_pushvalue(lua, -1);
+                lua_pushcclosure(lua, newindexFunctionForward, 1);
+                lua_setfield(lua, ownMetatableIndex, "__newindex");
+
+                lua_pop(lua, 1);
+            }
+        };
+
+        // If static T::initializeMetatable(LuaState&) exists
         template<typename T>
         struct InitializeMetatableFunctionOf<T, std::enable_if_t<std::is_convertible_v<decltype(&std::remove_pointer_t<utils::remove_cvref_t<T>>::initializeMetatable), InitializeMetatableFunction>>> {
 
@@ -91,6 +117,7 @@ namespace lua {
             }
         };
 
+        // If static T::initializeEmptyMetatable(LuaState&) exists
         template<typename T>
         struct InitializeEmptyMetatable<T, std::enable_if_t<std::is_convertible_v<decltype(&std::remove_pointer_t<utils::remove_cvref_t<T>>::initializeEmptyMetatable), InitializeEmptyMetatableFunction>>> {
 
@@ -232,6 +259,7 @@ namespace lua {
 
     template<typename T, typename Owner>
     inline auto readonlyProperty(T Owner::* memberPtr) {
+
         return PropertyWrapper(detail::makeGetter<T, Owner>(memberPtr), NoAccessor());
     }
 

@@ -201,6 +201,8 @@ function scene:start()
             intensity = 0.1
         }
     }
+
+    Game.getSound('audio/test/test.wav'):play()
 end
 
 function scene:update(dt)

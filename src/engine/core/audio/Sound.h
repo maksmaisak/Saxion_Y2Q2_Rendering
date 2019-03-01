@@ -12,12 +12,12 @@ namespace en {
 
     class LuaState;
 
-    class Sound final {
+    class Sound {
 
     public:
         Sound(const std::shared_ptr<sf::SoundBuffer>& buffer);
         Sound(const std::string& filepath);
-        ~Sound();
+        virtual ~Sound() = default;
 
         sf::Sound& getUnderlyingSound();
 

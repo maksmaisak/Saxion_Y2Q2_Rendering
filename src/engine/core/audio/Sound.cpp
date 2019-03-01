@@ -39,11 +39,6 @@ void Sound::initializeMetatable(LuaState& lua) {
     }));
 }
 
-Sound::~Sound() {
-
-    m_sound.stop();
-}
-
 namespace en {
 
     template<>

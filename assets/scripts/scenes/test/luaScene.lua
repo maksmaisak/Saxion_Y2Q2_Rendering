@@ -4,6 +4,8 @@
 -- Time: 20:15
 --
 
+require('assets/scripts/vector')
+
 local planeRenderInfo = {
     mesh = "models/plane.obj",
     material = Game.makeMaterial {
@@ -202,13 +204,8 @@ function scene:start()
         }
     }
 
-    local music = Game.audio.getSound('audio/test/test.wav')
-    print(music.duration)
-    music.playingOffset = music.duration * 0.5
-    music.loop = true
-    music.volume = 40
-    music:play()
-    print(music.playingOffset)
+    local tf = Game.find("teapot"):get("Transform")
+    tf:tweenPosition(Vector.from {5, 0, 0} + tf.position);
 end
 
 function scene:update(dt)

@@ -11,8 +11,11 @@
 
 using namespace en;
 
-Sound::Sound(const std::shared_ptr<sf::SoundBuffer>& buffer) : m_buffer(buffer) , m_sound(*buffer) {
-    assert(buffer);
+Sound::Sound(const std::shared_ptr<sf::SoundBuffer>& buffer) : m_buffer(buffer) {
+
+    if (m_buffer) {
+        m_sound = sf::Sound(*m_buffer);
+    }
 }
 
 Sound::Sound(const std::string& filepath) : Sound(Resources<sf::SoundBuffer>::get(filepath)) {}
@@ -21,28 +24,32 @@ sf::Sound& Sound::getUnderlyingSound() {
     return m_sound;
 }
 
+bool Sound::isValid() const {
+    return m_buffer.get();
+}
+
 void Sound::initializeMetatable(LuaState& lua) {
 
     lua.setField("play" , [](const std::shared_ptr<Sound>& sound) {sound->getUnderlyingSound().play(); });
     lua.setField("pause", [](const std::shared_ptr<Sound>& sound) {sound->getUnderlyingSound().pause();});
     lua.setField("stop" , [](const std::shared_ptr<Sound>& sound) {sound->getUnderlyingSound().stop(); });
 
-    lua.setField("volume", lua::property(
+    lua::addProperty(lua, "volume", lua::property(
         [](const std::shared_ptr<Sound>& sound) {return sound->getUnderlyingSound().getVolume();},
         [](const std::shared_ptr<Sound>& sound, float volume) {sound->getUnderlyingSound().setVolume(volume);}
     ));
 
-    lua.setField("pitch", lua::property(
+    lua::addProperty(lua, "pitch", lua::property(
         [](const std::shared_ptr<Sound>& sound) {return sound->getUnderlyingSound().getPitch();},
         [](const std::shared_ptr<Sound>& sound, float pitch) {sound->getUnderlyingSound().setPitch(pitch);}
     ));
 
-    lua.setField("playingOffset", lua::property(
+    lua::addProperty(lua, "playingOffset", lua::property(
         [](const std::shared_ptr<Sound>& sound) {return sound->getUnderlyingSound().getPlayingOffset().asSeconds();},
         [](const std::shared_ptr<Sound>& sound, float offset) {sound->getUnderlyingSound().setPlayingOffset(sf::seconds(offset));}
     ));
 
-    lua.setField("loop", lua::property(
+    lua::addProperty(lua, "loop", lua::property(
         [](const std::shared_ptr<Sound>& sound) {return sound->getUnderlyingSound().getLoop();},
         [](const std::shared_ptr<Sound>& sound, bool loop) {sound->getUnderlyingSound().setLoop(loop);}
     ));
@@ -51,7 +58,7 @@ void Sound::initializeMetatable(LuaState& lua) {
         return sound->getUnderlyingSound().getBuffer()->getDuration().asSeconds();
     }));
 
-    lua.setField("status", lua::readonlyProperty(
+    lua::addProperty(lua, "status", lua::readonlyProperty(
         [](const std::shared_ptr<Sound>& sound) {
             sf::Sound::Status status = sound->getUnderlyingSound().getStatus();
             switch (status) {

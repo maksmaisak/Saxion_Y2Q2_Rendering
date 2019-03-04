@@ -202,7 +202,13 @@ function scene:start()
         }
     }
 
-    Game.audio.getMusic('audio/test/test.wav'):play()
+    local music = Game.audio.getSound('audio/test/test.wav')
+    print(music.duration)
+    music.playingOffset = music.duration * 0.5
+    music.loop = true
+    music.volume = 40
+    music:play()
+    print(music.playingOffset)
 end
 
 function scene:update(dt)

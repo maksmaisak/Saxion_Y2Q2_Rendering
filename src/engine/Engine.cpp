@@ -304,19 +304,23 @@ void Engine::initializeLua() {
         lua_newtable(lua);
         {
             lua.setField("makeSound", [](const std::string& filepath) {
-                return std::make_shared<Sound>(config::ASSETS_PATH + filepath);
+                auto sound = std::make_shared<Sound>(config::ASSETS_PATH + filepath);
+                return sound->isValid() ? std::make_optional(sound) : std::nullopt;
             });
 
             lua.setField("getSound", [](const std::string& filepath) {
-                return Resources<Sound>::get(config::ASSETS_PATH + filepath);
+                auto sound = Resources<Sound>::get(config::ASSETS_PATH + filepath);
+                return sound->isValid() ? std::make_optional(sound) : std::nullopt;
             });
 
             lua.setField("makeMusic", [](const std::string& filepath) {
-                return ResourceLoader<sf::Music>::load(config::ASSETS_PATH + filepath);
+                auto ptr = ResourceLoader<sf::Music>::load(config::ASSETS_PATH + filepath);
+                return ptr ? std::make_optional(ptr) : std::nullopt;
             });
 
             lua.setField("getMusic", [](const std::string& filepath) {
-                return Resources<sf::Music>::get(config::ASSETS_PATH + filepath);
+                auto ptr = Resources<sf::Music>::get(config::ASSETS_PATH + filepath);
+                return ptr ? std::make_optional(ptr) : std::nullopt;
             });
         }
         lua_setfield(lua, -2, "audio");

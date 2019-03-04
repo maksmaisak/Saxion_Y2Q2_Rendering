@@ -23,22 +23,22 @@ void lua::InitializeMetatable<sf::Music>::initializeMetatable(en::LuaState& lua)
     lua.setField("pause", [](const std::shared_ptr<sf::Music>& music) {music->pause();});
     lua.setField("stop" , [](const std::shared_ptr<sf::Music>& music) {music->stop(); });
 
-    lua.setField("volume", lua::property(
+    lua::addProperty(lua, "volume", lua::property(
         [](const std::shared_ptr<sf::Music>& music) {return music->getVolume();},
         [](const std::shared_ptr<sf::Music>& music, float volume) {music->setVolume(volume);}
     ));
 
-    lua.setField("pitch", lua::property(
+    lua::addProperty(lua, "pitch", lua::property(
         [](const std::shared_ptr<sf::Music>& music) {return music->getPitch();},
         [](const std::shared_ptr<sf::Music>& music, float pitch) {music->setPitch(pitch);}
     ));
 
-    lua.setField("playingOffset", lua::property(
+    lua::addProperty(lua, "playingOffset", lua::property(
         [](const std::shared_ptr<sf::Music>& music) {return music->getPlayingOffset().asSeconds();},
         [](const std::shared_ptr<sf::Music>& music, float offset) {music->setPlayingOffset(sf::seconds(offset));}
     ));
 
-    lua.setField("loop", lua::property(
+    lua::addProperty(lua, "loop", lua::property(
         [](const std::shared_ptr<sf::Music>& music) {return music->getLoop();},
         [](const std::shared_ptr<sf::Music>& music, bool loop) {music->setLoop(loop);}
     ));
@@ -47,7 +47,7 @@ void lua::InitializeMetatable<sf::Music>::initializeMetatable(en::LuaState& lua)
         return music->getDuration().asSeconds();
     }));
 
-    lua.setField("status", lua::readonlyProperty(
+    lua::addProperty(lua, "status", lua::readonlyProperty(
         [](const std::shared_ptr<sf::Music>& music) {
             sf::Sound::Status status = music->getStatus();
             switch (status) {

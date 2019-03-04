@@ -19,6 +19,7 @@ namespace en {
         Sound(const std::string& filepath);
         virtual ~Sound() = default;
 
+        bool isValid() const;
         sf::Sound& getUnderlyingSound();
 
         static void initializeMetatable(LuaState& lua);

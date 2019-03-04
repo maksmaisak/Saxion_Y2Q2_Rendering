@@ -21,6 +21,14 @@ local keyMaterial = Game.makeMaterial {
 	normal = 'objects/key/KeyNormal.png',
 }
 
+local function playSoundObject(filepath, offset, loop, volume)
+	local music = Game.audio.getSound(filepath)
+	music.playingOffset = music.duration * offset
+    music.loop = loop
+    music.volume = volume
+    music:play()
+end
+
 function Player:getPositionFromGridPosition(gridPosition)
 
 	return Vector:new {
@@ -421,6 +429,7 @@ end
 function Player:update()
 
 	if Game.keyboard.isDown("escape") then
+		playSoundObject('audio/UIButtonSound.wav',0,false,60)
 		if self.level.isLevelComplete then
 			return
 		end
@@ -439,11 +448,13 @@ function Player:update()
 	end
 
 	if Game.keyboard.isDown("e") then
+		playSoundObject('audio/UIButtonSound.wav',0,false,60)
 		self:redoMove()
 		return
 	end
 
 	if Game.keyboard.isDown("q") then
+		playSoundObject('audio/UIButtonSound.wav',0,false,60)
 		self:undoMove()
 		return
 	end

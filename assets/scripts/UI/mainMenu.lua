@@ -23,6 +23,14 @@ local scenery = {
 
 local scene = {}
 
+local function playSoundObject(filepath, offset, loop, volume)
+	local music = Game.audio.getSound(filepath)
+	music.playingOffset = music.duration * offset
+    music.loop = loop
+    music.volume = volume
+    music:play()
+end
+
 local function keepAspectRatio(actor, theight)
 
 	local sprite = actor:get("Sprite")
@@ -95,6 +103,7 @@ function scene:start()
 		LuaBehavior = {
 			onMouseDown = function(self, button)
 				if button == 1 then
+					playSoundObject('audio/UIButtonSound.wav',0,false,60)
 					Game.loadScene(Config.firstLevelPath)
 				end
 			end,
@@ -138,6 +147,7 @@ function scene:start()
 			onMouseDown = function(self, button)
 				if button == 1 then
 					isChooseLevelOpened = true
+					playSoundObject('audio/UIButtonSound.wav',0,false,60)
 					chooseLevelPanel:get("UIRect").isEnabled = true
 					MainMenuPanel:get("UIRect").isEnabled = false
 				end
@@ -182,6 +192,7 @@ function scene:start()
 		LuaBehavior = {
 			onMouseDown = function(self, button)
 				if button == 1 then
+					playSoundObject('audio/UIButtonSound.wav',0,false,60)
 					creditsPanel:get("UIRect").isEnabled		= true
 					MainMenuPanel:get("UIRect").isEnabled	= false
 				end
@@ -225,6 +236,7 @@ function scene:start()
 		LuaBehavior = {
 			onMouseDown = function(self, button)
 				if button == 1 then
+					playSoundObject('audio/UIButtonSound.wav',0,false,60)
 					Game.quit()
 				end
 			end,
@@ -332,6 +344,9 @@ function scene:start()
 					if(levelIndex < numberOfLevels) then
 						if Game.keyboard.isDown("right") or (Game.mouse.isDown(1) and arrowRight:get("UIRect").isMouseOver) then
 							print("Is pressed right")
+
+							playSoundObject('audio/UIButtonSound.wav',0,false,60)
+
 							levelIndex = levelIndex + 1
 						
 							if (levelIndex > numberOfLevels) then
@@ -359,6 +374,9 @@ function scene:start()
 					if(levelIndex > 1) then
 						if Game.keyboard.isDown("left") or (Game.mouse.isDown(1) and arrowLeft:get("UIRect").isMouseOver) then
 							print("Is pressed left")
+
+							playSoundObject('audio/UIButtonSound.wav',0,false,60)
+
 							levelIndex = levelIndex - 1
 
 							if(levelIndex < 1) then
@@ -388,6 +406,7 @@ function scene:start()
 
 			onMouseDown = function(self, button)
 				if button == 1 then
+					playSoundObject('audio/UIButtonSound.wav',0,false,60)
 					Game.loadScene("assets/scripts/scenes/level"..levelIndex..".lua")
 					print("Loaded scene : " ..levelIndex)
 				end
@@ -420,6 +439,7 @@ function scene:start()
 			onMouseDown = function(self, button)
 				if button == 1 then
 					isChooseLevelOpened = false
+					playSoundObject('audio/UIButtonSound.wav',0,false,60)
 					print("Go back to main")
 					MainMenuPanel:get("UIRect").isEnabled = true
 					chooseLevelPanel:get("UIRect").isEnabled = false
@@ -480,6 +500,7 @@ function scene:start()
 		LuaBehavior = {
 			onMouseDown = function(self, button)
 				if button == 1 then
+					playSoundObject('audio/UIButtonSound.wav',0,false,60)
 					creditsPanel:get("UIRect").isEnabled	 = false
 					MainMenuPanel:get("UIRect").isEnabled = true
 				end

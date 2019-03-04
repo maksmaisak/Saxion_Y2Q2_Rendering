@@ -27,15 +27,38 @@ void TweenSystem::update(float dt) {
             continue;
 
         auto& tween = m_registry->get<Tween>(e);
-        if (tween.target && !m_registry->isAlive(tween.target)) {
+        if (tween.isKillPending || !m_registry->isAlive(tween.target)) {
             markForDestruction(*m_registry, e);
             return;
         }
 
-        tween.progress += dt / tween.duration;
-        if (tween.progress >= 1.f) {
-            tween.progress = 1.f;
-            markForDestruction(*m_registry, e);
+        if (!tween.isPaused) {
+
+            bool isFinished;
+            if (!tween.playsBackward) {
+                tween.progress += dt / tween.duration;
+                isFinished = tween.progress >= 1.f;
+            } else {
+                tween.progress -= dt / tween.duration;
+                isFinished = tween.progress <= 0.f;
+            }
+
+            if (isFinished) {
+
+                switch (tween.loopingBehavior) {
+                    case (Tween::LoopingBehavior::Single):
+                        markForDestruction(*m_registry, e);
+                        break;
+                    case (Tween::LoopingBehavior::Repeat):
+                        tween.progress = tween.playsBackward ? 1.f : 0.f;
+                        break;
+                    case (Tween::LoopingBehavior::Bounce):
+                        tween.playsBackward = !tween.playsBackward;
+                        break;
+                    default:
+                        break;
+                }
+            }
         }
 
         const float t = tween.ease(tween.progress);

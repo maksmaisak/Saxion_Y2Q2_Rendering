@@ -183,7 +183,6 @@ function scene:start()
     Game.makeActor {
         Name = "LightDirectional",
         Transform = {
-            scale = {0.1, 0.1, 0.1},
             rotation = {-45, 0, 0}
         },
         Light = {
@@ -195,7 +194,6 @@ function scene:start()
     Game.makeActor {
         Name = "LightDirectional2",
         Transform = {
-            scale = {0.1, 0.1, 0.1},
             rotation = {0, 0, 0}
         },
         Light = {
@@ -205,9 +203,9 @@ function scene:start()
     }
 
     local tf = Game.find("teapot"):get("Transform")
-    tf:tweenPosition(Vector.from {5, 0, 0} + tf.position, 2)
+    tf:tweenPosition(Vector.from {5, 0, 0} + tf.position, 2):setLoopBounce()
     tf:tweenRotation({0, 180, 0}, 10)
-    tf:tweenScale({2, 2, 2}, 1, ease.inQuad)
+    tf:tweenScale({2, 2, 2}, 1, ease.inQuad):setLoopBounce()
 end
 
 function scene:update(dt)

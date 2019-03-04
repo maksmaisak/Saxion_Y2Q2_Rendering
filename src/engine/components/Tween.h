@@ -16,6 +16,15 @@ namespace en {
 
     struct Tween {
 
+        enum class LoopingBehavior {
+
+            Single = 0,
+            Repeat,
+            Bounce,
+
+            Count
+        };
+
         static void initializeMetatable(LuaState& lua);
         static ComponentReference<Tween> make(
             EntityRegistry& registry,
@@ -31,6 +40,10 @@ namespace en {
         std::function<void(float)>  set;
 
         float progress = 0.f;
+        bool isKillPending = false;
+        bool isPaused      = false;
+        bool playsBackward = false;
+        LoopingBehavior loopingBehavior = LoopingBehavior::Single;
     };
 }
 

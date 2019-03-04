@@ -213,18 +213,56 @@ void Transform::initializeMetatable(LuaState& lua) {
 
     lua.setField("tweenPosition", [](
         const ComponentReference<Transform>& ref,
-        const glm::vec3& targetPosition,
-        std::optional<float> pDuration,
-        std::optional<ease::Ease> pEase
+        const glm::vec3& target,
+        std::optional<float> duration,
+        std::optional<ease::Ease> ease
     ){
-        float duration = pDuration.value_or(1.f);
-        ease::Ease ease = pEase.value_or(ease::inOutQuad);
-
         Transform& tf = *ref;
         const glm::vec3& start = tf.getLocalPosition();
-        tf.m_engine->makeActor().add<en::Tween>(duration, ease, [ref, start, delta = targetPosition - start](float t){
-            ref->setLocalPosition(start + delta * t);
-        });
+
+        tf.m_engine->makeActor().add<en::Tween>(
+            duration.value_or(1.f),
+            ease.value_or(ease::inOutQuad),
+            [ref, start, delta = target - start](float t){
+                if (ref) ref->setLocalPosition(start + delta * t);
+            }
+        );
+    });
+
+    lua.setField("tweenScale", [](
+        const ComponentReference<Transform>& ref,
+        const glm::vec3& target,
+        std::optional<float> duration,
+        std::optional<ease::Ease> ease
+    ){
+        Transform& tf = *ref;
+        const glm::vec3& start = tf.getLocalScale();
+
+        tf.m_engine->makeActor().add<en::Tween>(
+            duration.value_or(1.f),
+            ease.value_or(ease::inOutQuad),
+            [ref, start, delta = target - start](float t){
+                if (ref) ref->setLocalScale(start + delta * t);
+            }
+        );
+    });
+
+    lua.setField("tweenRotation", [](
+        const ComponentReference<Transform>& ref,
+        const glm::vec3& targetEuler,
+        std::optional<float> duration,
+        std::optional<ease::Ease> ease
+    ){
+        Transform& tf = *ref;
+
+        glm::quat start = tf.getLocalRotation();
+        tf.m_engine->makeActor().add<en::Tween>(
+            duration.value_or(1.f),
+            ease.value_or(ease::inOutQuad),
+            [ref, start, target = glm::quat(glm::radians(targetEuler))](float t){
+                if (ref) ref->setLocalRotation(glm::slerp(start, target, t));
+            }
+        );
     });
 }
 

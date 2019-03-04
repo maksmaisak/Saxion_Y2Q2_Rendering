@@ -7,7 +7,7 @@ local MainMenuPanel
 local chooseLevelPanel
 local creditsPanel
 local levelIndex = 1
-local numberOfLevels = 2
+local numberOfLevels = 4
 local ratio
 local buttonSize = 60
 
@@ -259,71 +259,6 @@ function scene:start()
 		},
 	}
 	
-	local chooseLevelImage = Game.makeActor {
-		Name = "ChooseLevelImage",
-		Transform = {
-			parent = "ChooseLevelPanel"
-		},
-		UIRect = {
-			anchorMin = {0.5, 0.6},
-			anchorMax = {0.5, 0.6}
-		},		
-		Sprite = {
-			material = {
-				shader	= "sprite",
-				texture = "textures/level" .. levelIndex .. ".jpg"
-			}
-		},
-		LuaBehavior = {
-			update = function(self, dt)
-				if(isChooseLevelOpened) then
-					if(levelIndex < numberOfLevels) then
-						if Game.keyboard.isDown("right") then
-							print("Is pressed right")
-							levelIndex = levelIndex + 1
-						
-							if(levelIndex > numberOfLevels) then
-								levelIndex = numberOfLevels
-							end
-							self.actor:remove("Sprite")
-							self.actor:add("Sprite", {
-								material = {
-									shader	= "sprite",
-									texture = "textures/level" .. levelIndex .. ".jpg"
-								}
-							})
-						end
-					end
-					
-					if(levelIndex > 1) then
-						if Game.keyboard.isDown("left") then
-							print("Is pressed left")
-							levelIndex = levelIndex - 1
-
-							if(levelIndex < 1) then
-								levelIndex = 1
-							end
-							self.actor:remove("Sprite")
-							self.actor:add("Sprite", {
-								material = {
-									shader	= "sprite",
-									texture = "textures/level" .. levelIndex .. ".jpg"
-								}				
-							})
-						end
-					end
-				end
-			end,
-
-			onMouseDown = function(self, button)
-				if button == 1 then
-					Game.loadScene("assets/scripts/scenes/level"..levelIndex..".lua")
-					print("Loaded scene : " ..levelIndex)
-				end
-			end
-		}
-	}
-
 	local arrowLeft = Game.makeActor {
 		Name = "ArrowLeft",
 		Transform = {
@@ -341,7 +276,7 @@ function scene:start()
 		},
 		LuaBehavior = {
 			update = function(self, dt)
-				if Game.keyboard.isHeld("left") then
+				if Game.keyboard.isHeld("left") or (Game.mouse.isHeld(1) and self.actor:get("UIRect").isMouseOver) then
 					self.actor:get("Transform").scale = {1.2,1.2,1.2}
 				else
 					self.actor:get("Transform").scale = {1,1,1}
@@ -367,10 +302,94 @@ function scene:start()
 		},
 		LuaBehavior = {
 			update = function(self, dt)
-				if Game.keyboard.isHeld("right")then
+				if Game.keyboard.isHeld("right") or (Game.mouse.isHeld(1) and self.actor:get("UIRect").isMouseOver) then
 					self.actor:get("Transform").scale = {1.2,1.2,1.2}
 				else
 					self.actor:get("Transform").scale = {1,1,1}
+				end
+			end
+		}
+	}
+
+	local chooseLevelImage = Game.makeActor {
+		Name = "ChooseLevelImage",
+		Transform = {
+			parent = "ChooseLevelPanel"
+		},
+		UIRect = {
+			anchorMin = {0.5, 0.6},
+			anchorMax = {0.5, 0.6}
+		},		
+		Sprite = {
+			material = {
+				shader	= "sprite",
+				texture = "textures/level" .. levelIndex .. ".jpg"
+			}
+		},
+		LuaBehavior = {
+			update = function(self, dt)
+				if(isChooseLevelOpened) then
+					if(levelIndex < numberOfLevels) then
+						if Game.keyboard.isDown("right") or (Game.mouse.isDown(1) and arrowRight:get("UIRect").isMouseOver) then
+							print("Is pressed right")
+							levelIndex = levelIndex + 1
+						
+							if (levelIndex > numberOfLevels) then
+								levelIndex = numberOfLevels
+							end
+
+							if (levelIndex >= numberOfLevels) then
+								arrowRight:get("UIRect").isEnabled = false
+							end
+
+							if (levelIndex >= 1) then
+								arrowLeft:get("UIRect").isEnabled = true
+							end
+
+							self.actor:remove("Sprite")
+							self.actor:add("Sprite", {
+								material = {
+									shader	= "sprite",
+									texture = "textures/level" .. levelIndex .. ".jpg"
+								}
+							})
+						end
+					end
+					
+					if(levelIndex > 1) then
+						if Game.keyboard.isDown("left") or (Game.mouse.isDown(1) and arrowLeft:get("UIRect").isMouseOver) then
+							print("Is pressed left")
+							levelIndex = levelIndex - 1
+
+							if(levelIndex < 1) then
+								levelIndex = 1
+							end
+
+							if (levelIndex <= 1) then
+								arrowLeft:get("UIRect").isEnabled = false
+							end
+
+
+							if (levelIndex < numberOfLevels) then
+								arrowRight:get("UIRect").isEnabled = true
+							end
+
+							self.actor:remove("Sprite")
+							self.actor:add("Sprite", {
+								material = {
+									shader	= "sprite",
+									texture = "textures/level" .. levelIndex .. ".jpg"
+								}				
+							})
+						end
+					end
+				end
+			end,
+
+			onMouseDown = function(self, button)
+				if button == 1 then
+					Game.loadScene("assets/scripts/scenes/level"..levelIndex..".lua")
+					print("Loaded scene : " ..levelIndex)
 				end
 			end
 		}
@@ -502,6 +521,7 @@ function scene:start()
 
 	creditsPanel:get("UIRect").isEnabled	 = false
 	chooseLevelPanel:get("UIRect").isEnabled = false
+	arrowLeft:get("UIRect").isEnabled = false
 
 	keepAspectRatio(chooseLevelImage,500)
 	keepAspectRatio(backButtonChooseLevel,95)

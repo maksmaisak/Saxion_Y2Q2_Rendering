@@ -5,15 +5,24 @@
 #ifndef SAXION_Y2Q2_RENDERING_TWEEN_H
 #define SAXION_Y2Q2_RENDERING_TWEEN_H
 
-#include "Behavior.h"
 #include <functional>
+#include <optional>
+
 #include "Ease.h"
+#include "EntityRegistry.h"
+#include "ComponentReference.h"
 
 namespace en {
 
     struct Tween {
 
         static void initializeMetatable(LuaState& lua);
+        static ComponentReference<Tween> make(
+            EntityRegistry& registry,
+            const std::optional<float>& duration,
+            const std::optional<ease::Ease>& ease,
+            const std::function<void(float)>& set
+        );
 
         float duration = 1.f;
         std::function<float(float)> ease = ease::inOutQuad;

@@ -220,9 +220,10 @@ void Transform::initializeMetatable(LuaState& lua) {
         Transform& tf = *ref;
         const glm::vec3& start = tf.getLocalPosition();
 
-        tf.m_engine->makeActor().add<en::Tween>(
-            duration.value_or(1.f),
-            ease.value_or(ease::inOutQuad),
+        return en::Tween::make(
+            *tf.m_registry,
+            duration,
+            ease,
             [ref, start, delta = target - start](float t){
                 if (ref) ref->setLocalPosition(start + delta * t);
             }
@@ -238,9 +239,10 @@ void Transform::initializeMetatable(LuaState& lua) {
         Transform& tf = *ref;
         const glm::vec3& start = tf.getLocalScale();
 
-        tf.m_engine->makeActor().add<en::Tween>(
-            duration.value_or(1.f),
-            ease.value_or(ease::inOutQuad),
+        return en::Tween::make(
+            *tf.m_registry,
+            duration,
+            ease,
             [ref, start, delta = target - start](float t){
                 if (ref) ref->setLocalScale(start + delta * t);
             }
@@ -254,11 +256,12 @@ void Transform::initializeMetatable(LuaState& lua) {
         std::optional<ease::Ease> ease
     ){
         Transform& tf = *ref;
+        const glm::quat& start = tf.getLocalRotation();
 
-        glm::quat start = tf.getLocalRotation();
-        tf.m_engine->makeActor().add<en::Tween>(
-            duration.value_or(1.f),
-            ease.value_or(ease::inOutQuad),
+        return en::Tween::make(
+            *tf.m_registry,
+            duration,
+            ease,
             [ref, start, target = glm::quat(glm::radians(targetEuler))](float t){
                 if (ref) ref->setLocalRotation(glm::slerp(start, target, t));
             }

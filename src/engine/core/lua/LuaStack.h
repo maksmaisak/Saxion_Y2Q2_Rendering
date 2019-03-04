@@ -206,10 +206,10 @@ namespace lua {
     struct TypeAdapter<std::optional<T>> {
 
         static bool is(lua_State* L, int index = -1) {
-            return lua_isnil(L, index) || lua::is<T>(L, index);
+            return lua_isnoneornil(L, index) || lua::is<T>(L, index);
         }
         static std::optional<T> to (lua_State* L, int index = -1) {
-            return lua_isnil(L, index) ? std::nullopt : std::make_optional<T>(lua::to<T>(L, index));
+            return lua_isnoneornil(L, index) ? std::nullopt : std::make_optional<T>(lua::to<T>(L, index));
         }
         static std::optional<T> check(lua_State* L, int index = -1) {
             if (!is(L, index))

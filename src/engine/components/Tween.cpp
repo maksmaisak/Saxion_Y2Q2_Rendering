@@ -12,6 +12,7 @@ void Tween::initializeMetatable(LuaState& lua) {
 }
 
 ComponentReference<Tween> Tween::make(EntityRegistry& registry,
+    Entity target,
     const std::optional<float>& duration,
     const std::optional<ease::Ease>& ease,
     const std::function<void(float)>& set
@@ -20,6 +21,7 @@ ComponentReference<Tween> Tween::make(EntityRegistry& registry,
     Entity e = registry.makeEntity();
 
     registry.add<Tween>(e,
+        target,
         duration.value_or(1.f),
         ease.value_or(ease::inOutQuad),
         set

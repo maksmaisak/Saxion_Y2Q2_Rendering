@@ -72,6 +72,14 @@ namespace en {
                 throw utils::Exception("This ComponentReference to " + utils::demangle<T>() + " is invalid");
         }
 
+        inline Entity getEntity() const {
+            return m_entity;
+        };
+
+        inline EntityRegistry* getRegistry() const {
+            return m_registry;
+        }
+
         friend inline bool operator==(const ComponentReference<T>& a, const ComponentReference<T>& b) {
             return a.m_registry == b.m_registry && a.m_entity == b.m_entity;
         }

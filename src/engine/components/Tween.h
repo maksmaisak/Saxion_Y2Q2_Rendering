@@ -19,11 +19,13 @@ namespace en {
         static void initializeMetatable(LuaState& lua);
         static ComponentReference<Tween> make(
             EntityRegistry& registry,
+            Entity target,
             const std::optional<float>& duration,
             const std::optional<ease::Ease>& ease,
             const std::function<void(float)>& set
         );
 
+        Entity target = nullEntity;
         float duration = 1.f;
         std::function<float(float)> ease = ease::inOutQuad;
         std::function<void(float)>  set;

@@ -8,6 +8,7 @@
 #include "Name.h"
 #include "LuaState.h"
 #include "Destroy.h"
+#include "Tween.h"
 
 namespace en {
 
@@ -127,5 +128,23 @@ namespace en {
         lua::addProperty(lua, "isDestroyed", lua::readonlyProperty([](Actor& actor) -> bool {
             return !actor || actor.tryGet<Destroy>();
         }));
+
+        lua.setField("tweenKill", [](const Actor& actor) {
+
+            int count = 0;
+
+            auto& registry = *actor.m_registry;
+            const Entity entity = actor.m_entity;
+
+            for (Entity e : registry.with<Tween>()) {
+
+                if (registry.get<Tween>(e).target == entity && !registry.tryGet<Destroy>(e)) {
+                    registry.add<Destroy>(e);
+                    count += 1;
+                }
+            }
+
+            return count;
+        });
     }
 }

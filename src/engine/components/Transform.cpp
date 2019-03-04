@@ -218,14 +218,12 @@ void Transform::initializeMetatable(LuaState& lua) {
         std::optional<ease::Ease> ease
     ){
         Transform& tf = *ref;
+        Entity entity = ref.getEntity();
         const glm::vec3& start = tf.getLocalPosition();
 
-        return en::Tween::make(
-            *tf.m_registry,
-            duration,
-            ease,
+        return Tween::make(*ref.getRegistry(), ref.getEntity(), duration, ease,
             [ref, start, delta = target - start](float t){
-                if (ref) ref->setLocalPosition(start + delta * t);
+                ref->setLocalPosition(start + delta * t);
             }
         );
     });
@@ -239,12 +237,9 @@ void Transform::initializeMetatable(LuaState& lua) {
         Transform& tf = *ref;
         const glm::vec3& start = tf.getLocalScale();
 
-        return en::Tween::make(
-            *tf.m_registry,
-            duration,
-            ease,
+        return Tween::make(*ref.getRegistry(), ref.getEntity(), duration, ease,
             [ref, start, delta = target - start](float t){
-                if (ref) ref->setLocalScale(start + delta * t);
+                ref->setLocalScale(start + delta * t);
             }
         );
     });
@@ -258,33 +253,33 @@ void Transform::initializeMetatable(LuaState& lua) {
         Transform& tf = *ref;
         const glm::quat& start = tf.getLocalRotation();
 
-        return en::Tween::make(
-            *tf.m_registry,
-            duration,
-            ease,
+        return Tween::make(*ref.getRegistry(), ref.getEntity(), duration, ease,
             [ref, start, target = glm::quat(glm::radians(targetEuler))](float t){
-                if (ref) ref->setLocalRotation(glm::slerp(start, target, t));
+                ref->setLocalRotation(glm::slerp(start, target, t));
             }
         );
     });
 }
 
-void addChildrenFromLua(Actor& actor, Transform& transform, LuaState& lua) {
+namespace {
 
-    if (!lua_istable(lua, -1) && !lua_isuserdata(lua, -1))
-        return;
+    void addChildrenFromLua(Actor& actor, Transform& transform, LuaState& lua) {
 
-    lua_getfield(lua, -1, "children");
-    auto pop = PopperOnDestruct(lua);
+        if (!lua_istable(lua, -1) && !lua_isuserdata(lua, -1))
+            return;
 
-    if (lua_isnil(lua, -1))
-        return;
+        lua_getfield(lua, -1, "children");
+        auto pop = PopperOnDestruct(lua);
 
-    std::vector<Actor> children = ComponentsToLua::makeEntities(lua, actor.getEngine(), -1);
-    for (Actor& child : children) {
-        auto* childTransform = child.tryGet<Transform>();
-        if (childTransform) {
-            childTransform->setParent(actor);
+        if (lua_isnil(lua, -1))
+            return;
+
+        std::vector<Actor> children = ComponentsToLua::makeEntities(lua, actor.getEngine(), -1);
+        for (Actor& child : children) {
+            auto* childTransform = child.tryGet<Transform>();
+            if (childTransform) {
+                childTransform->setParent(actor);
+            }
         }
     }
 }

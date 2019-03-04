@@ -1,4 +1,5 @@
 require ('assets/scripts/level/level')
+require ('assets/scripts/Utility/gameSerializer')
 
 
 local isBlocked = false

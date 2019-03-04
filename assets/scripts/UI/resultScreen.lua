@@ -189,6 +189,15 @@ function ResultScreen:createResultPanel()
 
 	self:keepAspectRatio(mainMenuButton,125)
 	self:keepAspectRatio(nextLevelButton,125)
+
+	local newEntry = { level = self.level.name or "LevelTemp", stars = self.totalNumberOfStars}
+
+	local serializer = Game.serializer
+	if serializer == nil then
+		return
+	end
+
+	serializer:saveNewEntry(newEntry)
 end
 
 function ResultScreen:activate()

@@ -16,6 +16,7 @@ player = 'assets/scripts/player.lua'
 firstLevelPath = 'assets/scripts/scenes/level1.lua'
 laser = 'assets/scripts/laser.lua'
 resultScreen = 'assets/scripts/UI/resultScreen.lua'
+saveFile = 'assets/scripts/save.lua'
 
 -- old stuff
 bulletSpeed = 30

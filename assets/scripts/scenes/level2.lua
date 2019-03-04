@@ -2759,6 +2759,7 @@ local extras = {
 }
 
 return Level:new {
+	name = "level2",
     map = map,
     extras = extras,
     nextLevelPath = 'assets/scripts/scenes/level3.lua',

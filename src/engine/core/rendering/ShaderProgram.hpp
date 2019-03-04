@@ -7,7 +7,7 @@
 #include <memory>
 #include <vector>
 #include "Resources.h"
-#include "mge/config.hpp"
+#include "config.hpp"
 #include "GLSetUniform.h"
 
 namespace en {

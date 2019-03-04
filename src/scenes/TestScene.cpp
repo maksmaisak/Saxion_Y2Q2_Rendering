@@ -8,7 +8,7 @@
 #include "Texture.hpp"
 #include "Resources.h"
 #include "WobblingMaterial.h"
-#include "mge/config.hpp"
+#include "config.hpp"
 
 #include "components/Transform.h"
 #include "components/Camera.h"

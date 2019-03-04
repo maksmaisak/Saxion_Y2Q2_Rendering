@@ -25,6 +25,10 @@ namespace lua {
         /// Try using a property setter from __setters, otherwise just rawset it
         int newindexFunction(lua_State* L);
 
+        /// Same but just forward the call to a table at the first upvalue.
+        int indexFunctionForward(lua_State* L);
+        int newindexFunctionForward(lua_State* L);
+
         template<typename T>
         int onBeforeGarbageCollection(lua_State* L) {
 
@@ -39,71 +43,6 @@ namespace lua {
 
             return 0;
         }
-
-        using InitializeMetatableFunction = std::function<void(en::LuaState&)>;
-        using InitializeEmptyMetatableFunction = std::function<void(en::LuaState&)>;
-
-        template<typename T, typename = void>
-        struct InitializeMetatableFunctionOf {
-
-            inline static void initializeMetatable(en::LuaState&) {}
-        };
-
-        template<typename T>
-        struct InitializeMetatableFunctionOf<T, std::enable_if_t<std::is_convertible_v<decltype(&std::remove_pointer_t<utils::remove_cvref_t<T>>::initializeMetatable), InitializeMetatableFunction>>> {
-
-            inline static void initializeMetatable(en::LuaState& lua) {
-
-                int oldTop = lua_gettop(lua);
-                std::remove_pointer_t<utils::remove_cvref_t<T>>::initializeMetatable(lua);
-                int newTop = lua_gettop(lua);
-                assert(oldTop == newTop);
-            }
-        };
-
-        template<typename T, typename = void>
-        struct InitializeEmptyMetatable {
-
-            inline static void initializeEmptyMetatable(en::LuaState& lua) {
-
-                const int metatableIndex = lua_gettop(lua);
-
-                lua_newtable(lua);
-                lua_pushvalue(lua, -1);
-                lua_setfield(lua, metatableIndex, "__getters");
-                lua_pushvalue(lua, metatableIndex);
-                lua_pushcclosure(lua, &detail::indexFunction, 2);
-                lua_setfield(lua, metatableIndex, "__index");
-
-                lua_newtable(lua);
-                lua_pushvalue(lua, -1);
-                lua_setfield(lua, metatableIndex, "__setters");
-                lua_pushcclosure(lua, &detail::newindexFunction, 1);
-                lua_setfield(lua, metatableIndex, "__newindex");
-
-                if constexpr (utils::is_equatable_v<const T>) {
-                    lua.setField("__eq", utils::equalityComparer<T>{}, metatableIndex);
-                }
-
-                lua.setField("__gc", &onBeforeGarbageCollection<T>, metatableIndex);
-
-                InitializeMetatableFunctionOf<T>::initializeMetatable(lua);
-            }
-        };
-
-        template<typename T>
-        struct InitializeEmptyMetatable<T, std::enable_if_t<std::is_convertible_v<decltype(&std::remove_pointer_t<utils::remove_cvref_t<T>>::initializeEmptyMetatable), InitializeEmptyMetatableFunction>>> {
-
-            inline static void initializeEmptyMetatable(en::LuaState& lua) {
-
-                using TComponent = std::remove_pointer_t<utils::remove_cvref_t<T>>;
-
-                int oldTop = lua_gettop(lua);
-                TComponent::initializeEmptyMetatable(lua);
-                int newTop = lua_gettop(lua);
-                assert(oldTop == newTop);
-            }
-        };
 
         template<typename T, typename Owner>
         inline auto makeGetter(T Owner::* memberPtr) {
@@ -124,6 +63,94 @@ namespace lua {
         }
     }
 
+    using InitializeMetatableFunction      = std::function<void(en::LuaState&)>;
+    using InitializeEmptyMetatableFunction = std::function<void(en::LuaState&)>;
+
+    template<typename T, typename = void>
+    struct InitializeMetatable {
+
+        inline static void initializeMetatable(en::LuaState&) {}
+    };
+
+    template<typename T>
+    struct InitializeMetatable<std::shared_ptr<T>> {
+
+        inline static void initializeMetatable(en::LuaState& lua) {
+
+            const int ownMetatableIndex = lua_gettop(lua);
+
+            getMetatable<T>(lua);
+
+            lua_pushvalue(lua, -1);
+            lua_pushcclosure(lua, detail::indexFunctionForward, 1);
+            lua_setfield(lua, ownMetatableIndex, "__index");
+
+            lua_pushvalue(lua, -1);
+            lua_pushcclosure(lua, detail::newindexFunctionForward, 1);
+            lua_setfield(lua, ownMetatableIndex, "__newindex");
+
+            lua_pop(lua, 1);
+        }
+    };
+
+    // If static T::initializeMetatable(LuaState&) exists
+    template<typename T>
+    struct InitializeMetatable<T, std::enable_if_t<std::is_convertible_v<decltype(&std::remove_pointer_t<utils::remove_cvref_t<T>>::initializeMetatable), InitializeMetatableFunction>>> {
+
+        inline static void initializeMetatable(en::LuaState& lua) {
+
+            int oldTop = lua_gettop(lua);
+            std::remove_pointer_t<utils::remove_cvref_t<T>>::initializeMetatable(lua);
+            int newTop = lua_gettop(lua);
+            assert(oldTop == newTop);
+        }
+    };
+
+    template<typename T, typename = void>
+    struct InitializeEmptyMetatable {
+
+        inline static void initializeEmptyMetatable(en::LuaState& lua) {
+
+            const int metatableIndex = lua_gettop(lua);
+
+            lua_newtable(lua);
+            lua_pushvalue(lua, -1);
+            lua_setfield(lua, metatableIndex, "__getters");
+            lua_pushvalue(lua, metatableIndex);
+            lua_pushcclosure(lua, &detail::indexFunction, 2);
+            lua_setfield(lua, metatableIndex, "__index");
+
+            lua_newtable(lua);
+            lua_pushvalue(lua, -1);
+            lua_setfield(lua, metatableIndex, "__setters");
+            lua_pushcclosure(lua, &detail::newindexFunction, 1);
+            lua_setfield(lua, metatableIndex, "__newindex");
+
+            if constexpr (utils::is_equatable_v<const T>) {
+                lua.setField("__eq", utils::equalityComparer<T>{}, metatableIndex);
+            }
+
+            lua.setField("__gc", &detail::onBeforeGarbageCollection<T>, metatableIndex);
+
+            InitializeMetatable<T>::initializeMetatable(lua);
+        }
+    };
+
+    // If static T::initializeEmptyMetatable(LuaState&) exists
+    template<typename T>
+    struct InitializeEmptyMetatable<T, std::enable_if_t<std::is_convertible_v<decltype(&std::remove_pointer_t<utils::remove_cvref_t<T>>::initializeEmptyMetatable), InitializeEmptyMetatableFunction>>> {
+
+        inline static void initializeEmptyMetatable(en::LuaState& lua) {
+
+            using TComponent = std::remove_pointer_t<utils::remove_cvref_t<T>>;
+
+            int oldTop = lua_gettop(lua);
+            TComponent::initializeEmptyMetatable(lua);
+            int newTop = lua_gettop(lua);
+            assert(oldTop == newTop);
+        }
+    };
+
     // Gets or adds a metatable for a given type.
     // Returns true if the metatable did not exist before.
     template<typename T>
@@ -135,9 +162,7 @@ namespace lua {
             return false;
 
         std::cout << "Created metatable for type " << utils::demangle<T>() << std::endl;
-
-        detail::InitializeEmptyMetatable<T>::initializeEmptyMetatable(lua);
-
+        InitializeEmptyMetatable<T>::initializeEmptyMetatable(lua);
         return true;
     }
 
@@ -232,6 +257,7 @@ namespace lua {
 
     template<typename T, typename Owner>
     inline auto readonlyProperty(T Owner::* memberPtr) {
+
         return PropertyWrapper(detail::makeGetter<T, Owner>(memberPtr), NoAccessor());
     }
 

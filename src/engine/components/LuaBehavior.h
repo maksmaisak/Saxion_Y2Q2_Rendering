@@ -28,11 +28,11 @@ namespace en {
         void onCollision(Entity other) override;
 
         void on(const MouseEnter& enter) override;
-        void on(const MouseOver& over) override;
+        void on(const MouseOver&  over ) override;
         void on(const MouseLeave& leave) override;
-        void on(const MouseDown& down) override;
-        void on(const MouseHold& hold) override;
-        void on(const MouseUp& up) override;
+        void on(const MouseDown&  down ) override;
+        void on(const MouseHold&  hold ) override;
+        void on(const MouseUp&    up   ) override;
 
     private:
 

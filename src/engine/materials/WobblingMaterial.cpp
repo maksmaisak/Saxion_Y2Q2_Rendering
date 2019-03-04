@@ -6,7 +6,7 @@
 #include "glm.hpp"
 
 #include "WobblingMaterial.h"
-#include "mge/config.hpp"
+#include "config.hpp"
 #include "Mesh.hpp"
 #include "ShaderProgram.hpp"
 

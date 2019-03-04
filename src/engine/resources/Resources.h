@@ -24,7 +24,7 @@ namespace en {
 
     template<typename TLoader>
     inline constexpr bool canLoadWithNoArgs_v = canLoadWithNoArgs<TLoader>::value;
-    
+
     template<typename TResource>
     class Resources {
 

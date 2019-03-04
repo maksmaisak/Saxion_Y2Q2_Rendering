@@ -24,15 +24,44 @@ sf::Sound& Sound::getUnderlyingSound() {
 void Sound::initializeMetatable(LuaState& lua) {
 
     lua.setField("play" , [](const std::shared_ptr<Sound>& sound) {sound->getUnderlyingSound().play(); });
-    lua.setField("stop" , [](const std::shared_ptr<Sound>& sound) {sound->getUnderlyingSound().stop(); });
     lua.setField("pause", [](const std::shared_ptr<Sound>& sound) {sound->getUnderlyingSound().pause();});
+    lua.setField("stop" , [](const std::shared_ptr<Sound>& sound) {sound->getUnderlyingSound().stop(); });
 
-    lua.setField("setVolume", [](const std::shared_ptr<Sound>& sound, float volume) {sound->getUnderlyingSound().setVolume(volume);});
-    lua.setField("setPitch" , [](const std::shared_ptr<Sound>& sound, float pitch ) {sound->getUnderlyingSound().setPitch(pitch);});
+    lua.setField("volume", lua::property(
+        [](const std::shared_ptr<Sound>& sound) {return sound->getUnderlyingSound().getVolume();},
+        [](const std::shared_ptr<Sound>& sound, float volume) {sound->getUnderlyingSound().setVolume(volume);}
+    ));
 
-    lua.setField("setPlayingOffset", [](const std::shared_ptr<Sound>& sound, float offset) {
-        sound->getUnderlyingSound().setPlayingOffset(sf::seconds(offset));
-    });
+    lua.setField("pitch", lua::property(
+        [](const std::shared_ptr<Sound>& sound) {return sound->getUnderlyingSound().getPitch();},
+        [](const std::shared_ptr<Sound>& sound, float pitch) {sound->getUnderlyingSound().setPitch(pitch);}
+    ));
+
+    lua.setField("playingOffset", lua::property(
+        [](const std::shared_ptr<Sound>& sound) {return sound->getUnderlyingSound().getPlayingOffset().asSeconds();},
+        [](const std::shared_ptr<Sound>& sound, float offset) {sound->getUnderlyingSound().setPlayingOffset(sf::seconds(offset));}
+    ));
+
+    lua.setField("loop", lua::property(
+        [](const std::shared_ptr<Sound>& sound) {return sound->getUnderlyingSound().getLoop();},
+        [](const std::shared_ptr<Sound>& sound, bool loop) {sound->getUnderlyingSound().setLoop(loop);}
+    ));
+
+    lua.setField("status", lua::readonlyProperty(
+        [](const std::shared_ptr<Sound>& sound) {
+            sf::Sound::Status status = sound->getUnderlyingSound().getStatus();
+            switch (status) {
+                case sf::Sound::Status::Playing:
+                    return "Playing";
+                case sf::Sound::Status::Paused:
+                    return "Paused";
+                case sf::Sound::Status::Stopped:
+                    return "Stopped";
+                default:
+                    return "INVALID_SOUND_STATUS";
+            }
+        }
+    ));
 
     lua::addProperty(lua, "duration", lua::readonlyProperty([](const std::shared_ptr<Sound>& sound) {
         return sound->getUnderlyingSound().getBuffer()->getDuration().asSeconds();

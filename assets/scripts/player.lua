@@ -21,12 +21,17 @@ local keyMaterial = Game.makeMaterial {
 	normal = 'objects/key/KeyNormal.png',
 }
 
-local function playSoundObject(filepath, offset, loop, volume)
-	local music = Game.audio.getSound(filepath)
+local function playSoundObject(filePath, offset, loop, volume)
+	local music = Game.audio.getSound(filePath)
 	music.playingOffset = music.duration * offset
     music.loop = loop
     music.volume = volume
     music:play()
+end
+
+local function stopSoundObject(filePath)
+	local music = Game.audio.getSound(filePath)
+	music:stop()
 end
 
 function Player:getPositionFromGridPosition(gridPosition)
@@ -106,6 +111,9 @@ function Player:activateButton(gridPosition)
 
 	button.isActivated = true
 
+	playSoundObject('audio/pressurePlateLower.wav',0,false,20)
+	stopSoundObject('audio/pressurePlateRise.wav')
+
 	local buttonPosition	  = button.transform.position
 	buttonPosition.y		  = buttonPosition.y - 0.5
 	button.transform.position = buttonPosition
@@ -130,6 +138,9 @@ function Player:disableButton(gridPosition)
 	end
 
 	button.isActivated	= false
+
+	playSoundObject('audio/pressurePlateRise.wav',0,false,20)
+	stopSoundObject('audio/pressurePlateLower.wav')
 
 	local buttonPosition	  = button.transform.position
 	buttonPosition.y		  = buttonPosition.y + 0.5

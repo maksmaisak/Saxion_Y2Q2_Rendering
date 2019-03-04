@@ -202,7 +202,7 @@ function scene:start()
         }
     }
 
-    Game.audio.getSound('audio/test/test.wav'):play()
+    Game.audio.getMusic('audio/test/test.wav'):play()
 end
 
 function scene:update(dt)

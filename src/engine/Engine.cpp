@@ -21,9 +21,11 @@
 #include "ClosureHelper.h"
 #include "Resources.h"
 #include "Material.h"
+
 #include "KeyboardHelper.h"
 #include "MouseHelper.h"
 #include "Sound.h"
+#include "MusicIntegration.h"
 
 using namespace en;
 
@@ -308,6 +310,14 @@ void Engine::initializeLua() {
             lua.setField("getSound", [](const std::string& filepath) {
                 return Resources<Sound>::get(config::ASSETS_PATH + filepath);
             });
+
+            lua.setField("makeMusic", [](const std::string& filepath) {
+                return ResourceLoader<sf::Music>::load(config::ASSETS_PATH + filepath);
+            });
+
+            lua.setField("getMusic", [](const std::string& filepath) {
+                return Resources<sf::Music>::get(config::ASSETS_PATH + filepath);
+            });
         }
         lua_setfield(lua, -2, "audio");
 
@@ -400,4 +410,5 @@ Engine::~Engine() {
     // that causes OpenAL to throw an error. This prevents that.
     Resources<Sound>::clear();
     Resources<sf::SoundBuffer>::clear();
+    Resources<sf::Music>::clear();
 }

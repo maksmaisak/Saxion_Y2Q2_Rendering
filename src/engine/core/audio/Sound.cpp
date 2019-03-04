@@ -47,6 +47,10 @@ void Sound::initializeMetatable(LuaState& lua) {
         [](const std::shared_ptr<Sound>& sound, bool loop) {sound->getUnderlyingSound().setLoop(loop);}
     ));
 
+    lua::addProperty(lua, "duration", lua::readonlyProperty([](const std::shared_ptr<Sound>& sound) {
+        return sound->getUnderlyingSound().getBuffer()->getDuration().asSeconds();
+    }));
+
     lua.setField("status", lua::readonlyProperty(
         [](const std::shared_ptr<Sound>& sound) {
             sf::Sound::Status status = sound->getUnderlyingSound().getStatus();
@@ -62,10 +66,6 @@ void Sound::initializeMetatable(LuaState& lua) {
             }
         }
     ));
-
-    lua::addProperty(lua, "duration", lua::readonlyProperty([](const std::shared_ptr<Sound>& sound) {
-        return sound->getUnderlyingSound().getBuffer()->getDuration().asSeconds();
-    }));
 }
 
 namespace en {

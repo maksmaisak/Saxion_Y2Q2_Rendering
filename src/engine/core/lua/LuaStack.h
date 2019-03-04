@@ -134,10 +134,13 @@ namespace lua {
 
         static std::optional<T> tryGetField(lua_State* L, TKey&& key, int tableIndex = -1) {
 
-            if (!lua_istable(L, tableIndex)) return std::nullopt;
+            if (!lua_istable(L, tableIndex))
+                return std::nullopt;
+
+            tableIndex = lua_absindex(L, tableIndex);
 
             push(L, std::forward<TKey>(key));
-            lua_gettable(L, -2);
+            lua_gettable(L, tableIndex);
             return tryGet<T>(L);
         }
     };
@@ -283,7 +286,7 @@ namespace lua {
         struct Keys {
             std::string key1;
             std::string key2;
-            int key3;
+            int key3 = 0;
         };
 
         inline static const Keys keys[] = {
@@ -302,17 +305,17 @@ namespace lua {
             return to(L, index);
         }
 
-        static T tryGetValue(lua_State* L, const Keys& keys) {
+        static T tryGetValue(lua_State* L, const Keys& keys, int tableIndex) {
 
-            auto opt1 = lua::tryGetField<T>(L, keys.key1);
+            auto opt1 = lua::tryGetField<T>(L, keys.key1, tableIndex);
             if (opt1)
                 return *opt1;
 
-            auto opt2 = lua::tryGetField<T>(L, keys.key2);
+            auto opt2 = lua::tryGetField<T>(L, keys.key2, tableIndex);
             if (opt2)
                 return *opt2;
 
-            auto opt3 = lua::tryGetField<T>(L, keys.key3);
+            auto opt3 = lua::tryGetField<T>(L, keys.key3, tableIndex);
             if (opt3)
                 return *opt3;
 
@@ -323,7 +326,7 @@ namespace lua {
 
             TVec vec;
             for (std::size_t i = 0; i < Length; ++i) {
-                vec[i] = tryGetValue(L, keys[i]);
+                vec[i] = tryGetValue(L, keys[i], index);
             }
 
             //std::cout << "received: (" << result.x << ", " << result.y << ", " << result.z << ")\n";

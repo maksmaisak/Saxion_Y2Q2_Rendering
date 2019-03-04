@@ -205,7 +205,9 @@ function scene:start()
     }
 
     local tf = Game.find("teapot"):get("Transform")
-    tf:tweenPosition(Vector.from {5, 0, 0} + tf.position);
+    local target = Vector.from {5, 0, 0} + tf.position
+    print(target.x, target.y, target.z)
+    tf:tweenPosition(target, 1)
 end
 
 function scene:update(dt)

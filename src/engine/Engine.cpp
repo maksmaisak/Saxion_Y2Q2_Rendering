@@ -26,6 +26,7 @@
 #include "MouseHelper.h"
 #include "Sound.h"
 #include "MusicIntegration.h"
+#include "Ease.h"
 
 using namespace en;
 
@@ -348,6 +349,21 @@ void Engine::initializeLua() {
     lua_setglobal(lua, "Game");
 
     ComponentsToLua::printDebugInfo();
+
+    lua_pushvalue(lua, -1);
+    lua_newtable(lua);
+    {
+        static auto setFieldAsUserdata = [&lua](const std::string& name, const ease::Ease& ease){
+            lua.push(ease);
+            lua_setfield(lua, -2, name.c_str());
+        };
+
+        setFieldAsUserdata("linear"   , ease::linear);
+        setFieldAsUserdata("inQuad"   , ease::inQuad);
+        setFieldAsUserdata("outQuad"  , ease::outQuad);
+        setFieldAsUserdata("inOutQuad", ease::inOutQuad);
+    }
+    lua_setglobal(lua, "ease");
 
     if (lua.doFileInNewEnvironment(config::SCRIPT_PATH + "config.lua")) {
         lua_setglobal(lua, "Config");

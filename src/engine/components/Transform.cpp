@@ -212,7 +212,7 @@ void Transform::initializeMetatable(LuaState& lua) {
     ));
 
     lua.setField("tweenPosition", [](
-        ComponentReference<Transform> ref,
+        const ComponentReference<Transform>& ref,
         const glm::vec3& targetPosition,
         std::optional<float> pDuration,
         std::optional<ease::Ease> pEase

@@ -9,12 +9,22 @@ Level = Object:new {
 	nextLevelPath = nil
 }
 
+local function playSoundObject(filePath, offset, loop, volume)
+	local music = Game.audio.getSound(filePath)
+	music.playingOffset = music.duration * offset
+    music.loop = loop
+    music.volume = volume
+    music:play()
+end
+
 function Level:start()
 
 	if not self.map then
 		print('Level: no map')
 		return
 	end
+
+	playSoundObject('audio/ambiance.wav',0,false,80)
 
 	self.redoUndoButtons = RedoUndoButtons:new{
 		level = self

@@ -9,9 +9,10 @@ using namespace en;
 
 void Tween::initializeMetatable(LuaState& lua) {
 
-    lua.setField("pause", [](const ComponentReference<Tween>& tween){tween->isPaused = true;});
-    lua.setField("play" , [](const ComponentReference<Tween>& tween){tween->isPaused = false;});
-    lua.setField("kill" , [](const ComponentReference<Tween>& tween){tween->isKillPending = true;});
+    lua.setField("pause", [](const ComponentReference<Tween>& tween) {tween->isPaused = true;});
+    lua.setField("play" , [](const ComponentReference<Tween>& tween) {tween->isPaused = false;});
+    lua.setField("kill" , [](const ComponentReference<Tween>& tween) {tween->isKillPending = true;});
+    lua.setField("complete" , [](const ComponentReference<Tween>& tween) {tween->complete();});
 
     lua::addProperty(lua, "progress", lua::property(&Tween::progress));
     lua::addProperty(lua, "duration", lua::property(&Tween::duration));

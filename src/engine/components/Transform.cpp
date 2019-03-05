@@ -90,12 +90,10 @@ void Transform::markWorldDirty() {
 
     m_matrixWorldDirty = true;
 
-    for (Entity child : m_children) {
-
-        auto* childTf = m_registry->tryGet<Transform>(child);
-        if (childTf) childTf->markWorldDirty();
-        // TODO remove children with no transform from the list of children
-    }
+    // TODO remove children with no transform from the list of children
+    for (Entity child : m_children)
+        if (auto* childTf = m_registry->tryGet<Transform>(child))
+            childTf->markWorldDirty();
 }
 
 void Transform::addChild(Entity child) {

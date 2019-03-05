@@ -264,8 +264,6 @@ struct ResourceLoader<sf::SoundBuffer> {
 
 void Engine::initializeLua() {
 
-    LUA_REGISTER_TYPE(Actor);
-
     auto& lua = getLuaState();
 
     lua_newtable(lua);
@@ -348,8 +346,6 @@ void Engine::initializeLua() {
     }
     lua_setglobal(lua, "Game");
 
-    ComponentsToLua::printDebugInfo();
-
     lua_pushvalue(lua, -1);
     lua_newtable(lua);
     {
@@ -391,8 +387,8 @@ void Engine::initializeLua() {
     }
 
     lua_getglobal(lua, "Config");
+    auto pop = PopperOnDestruct(lua);
     m_framerateCap = lua.tryGetField<unsigned int>("framerateCap").value_or(m_framerateCap);
-    lua.pop();
 }
 
 void Engine::testMemberFunction() {

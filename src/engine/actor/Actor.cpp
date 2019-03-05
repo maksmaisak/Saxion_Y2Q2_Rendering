@@ -10,25 +10,9 @@
 #include "Destroy.h"
 #include "Tween.h"
 
-namespace en {
+using namespace en;
 
-    Actor::Actor(Engine& engine, Entity entity) :
-        m_engine(&engine),
-        m_registry(&engine.getRegistry()),
-        m_entity(entity)
-        {}
-
-    std::string Actor::getName() const {
-
-        Name* ptr = tryGet<Name>();
-        if (ptr) return ptr->value;
-        return "unnamed";
-    }
-
-    void Actor::destroy() {
-
-        m_registry->destroy(m_entity);
-    }
+namespace {
 
     int pushByTypeName(lua_State* L) {
 
@@ -93,58 +77,83 @@ namespace en {
                 if (auto* childComponent = tryGetInChildren<TComponent>(registry, child))
                     return childComponent;
     }
+}
 
-    void Actor::initializeMetatable(LuaState& lua) {
+Actor::Actor(Engine& engine, Entity entity) :
+    m_engine(&engine),
+    m_registry(&engine.getRegistry()),
+    m_entity(entity)
+    {}
 
-        lua.setField("get", &pushByTypeName);
-        lua.setField("getInChildren", &pushByTypeNameWithChildren);
-        lua.setField("add", &addByTypeName);
-        lua.setField("remove", &removeByTypeName);
-        lua.setField("destroyImmediate", &Actor::destroy);
-        lua.setField("destroy", [](Actor& actor){
-            if (actor && !actor.tryGet<Destroy>())
-                actor.add<Destroy>();
-        });
+std::string Actor::getName() const {
 
-        lua::addProperty(lua, "name", lua::property(
-            [](Actor& actor){
-                Name* ptr = actor.tryGet<Name>();
-                return ptr ? std::make_optional(ptr->value) : std::nullopt;
-            },
-            [](Actor& actor, const std::string& newName) {
-                Name* nameComponent = actor.tryGet<Name>();
-                if (nameComponent) {
-                    nameComponent->value = newName;
-                } else {
-                    actor.add<Name>(newName);
-                }
+    Name* ptr = tryGet<Name>();
+    if (ptr) return ptr->value;
+    return "unnamed";
+}
+
+void Actor::destroy() {
+
+    m_registry->destroy(m_entity);
+}
+
+void Actor::initializeMetatable(LuaState& lua) {
+
+    lua.setField("get", &pushByTypeName);
+    lua.setField("getInChildren", &pushByTypeNameWithChildren);
+    lua.setField("add", &addByTypeName);
+    lua.setField("remove", &removeByTypeName);
+    lua.setField("destroyImmediate", &Actor::destroy);
+    lua.setField("destroy", [](Actor& actor){
+        if (actor && !actor.tryGet<Destroy>())
+            actor.add<Destroy>();
+    });
+
+    lua::addProperty(lua, "name", lua::property(
+        [](Actor& actor){
+            Name* ptr = actor.tryGet<Name>();
+            return ptr ? std::make_optional(ptr->value) : std::nullopt;
+        },
+        [](Actor& actor, const std::string& newName) {
+            Name* nameComponent = actor.tryGet<Name>();
+            if (nameComponent) {
+                nameComponent->value = newName;
+            } else {
+                actor.add<Name>(newName);
             }
-        ));
+        }
+    ));
 
-        lua::addProperty(lua, "isValid", lua::readonlyProperty([](Actor& actor) -> bool {
-            return actor;
-        }));
+    lua::addProperty(lua, "isValid", lua::readonlyProperty([](Actor& actor) -> bool {
+        return actor;
+    }));
 
-        lua::addProperty(lua, "isDestroyed", lua::readonlyProperty([](Actor& actor) -> bool {
-            return !actor || actor.tryGet<Destroy>();
-        }));
+    lua::addProperty(lua, "isDestroyed", lua::readonlyProperty([](Actor& actor) -> bool {
+        return !actor || actor.tryGet<Destroy>();
+    }));
 
-        lua.setField("tweenKill", [](const Actor& actor) {
+    static auto makeAllTweenModifier = [](const std::function<void(EntityRegistry&, Entity, Tween&)>& action) {
+
+        return [action](const Actor& actor) {
 
             int count = 0;
-
             auto& registry = *actor.m_registry;
             const Entity entity = actor.m_entity;
 
             for (Entity e : registry.with<Tween>()) {
 
-                if (registry.get<Tween>(e).target == entity && !registry.tryGet<Destroy>(e)) {
-                    registry.add<Destroy>(e);
+                auto& tween = registry.get<Tween>(e);
+                if (tween.target == entity && !registry.tryGet<Destroy>(e)) {
+                    action(registry, entity, tween);
                     count += 1;
                 }
             }
 
             return count;
-        });
-    }
+        };
+    };
+
+    lua.setField("tweenPause", makeAllTweenModifier([](EntityRegistry& registry, Entity e, Tween& tween) {tween.isPaused = true;   }));
+    lua.setField("tweenPlay" , makeAllTweenModifier([](EntityRegistry& registry, Entity e, Tween& tween) {tween.isPaused = false;  }));
+    lua.setField("tweenKill" , makeAllTweenModifier([](EntityRegistry& registry, Entity e, Tween& tween) {registry.add<Destroy>(e);}));
 }

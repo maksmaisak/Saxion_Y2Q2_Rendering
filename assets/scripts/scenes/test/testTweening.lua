@@ -101,6 +101,7 @@ function scene:start()
     Game.makeActor {
         Name = "Light",
         Transform = {
+            position = {-8, 2, -8},
             scale = {0.1, 0.1, 0.1}
         },
         RenderInfo = {
@@ -116,7 +117,7 @@ function scene:start()
     Game.makeActor {
         Name = "Light2",
         Transform = {
-            position = {3, 2, 0},
+            position = {8, 2, -8},
             scale = {0.1, 0.1, 0.1}
         },
         RenderInfo = {
@@ -193,8 +194,8 @@ function scene:start()
     local function makeTweenTestOnWall(ease)
 
         local actor = makeTweenTest(
-            Vector.from {-8, 18 - i * 0.5, -10},
-            Vector.from {16, 0, 0},
+            Vector.from {-5, 18 - i * 0.5, -10},
+            Vector.from {10, 0, 0},
             ease
         )
 
@@ -203,43 +204,31 @@ function scene:start()
         return actor
     end
 
-    makeTweenTestOnWall(Ease.linear);
+    makeTweenTestOnWall(Ease.linear)
     skipLine()
-    makeTweenTestOnWall(Ease.inQuad);
-    makeTweenTestOnWall(Ease.inCubic);
-    makeTweenTestOnWall(Ease.inQuart);
-    makeTweenTestOnWall(Ease.inQuint);
-    makeTweenTestOnWall(Ease.inExpo);
-    makeTweenTestOnWall(Ease.inCirc);
-    makeTweenTestOnWall(Ease.inSine);
+    makeTweenTestOnWall(Ease.inQuad )
+    makeTweenTestOnWall(Ease.inCubic)
+    makeTweenTestOnWall(Ease.inQuart)
+    makeTweenTestOnWall(Ease.inQuint)
+    makeTweenTestOnWall(Ease.inExpo )
+    makeTweenTestOnWall(Ease.inCirc )
+    makeTweenTestOnWall(Ease.inSine )
     skipLine()
-    makeTweenTestOnWall(Ease.outQuad);
-    makeTweenTestOnWall(Ease.outCubic);
-    makeTweenTestOnWall(Ease.outQuart);
-    makeTweenTestOnWall(Ease.outQuint);
-    makeTweenTestOnWall(Ease.outExpo);
-    makeTweenTestOnWall(Ease.outCirc);
-    makeTweenTestOnWall(Ease.outSine);
+    makeTweenTestOnWall(Ease.outQuad )
+    makeTweenTestOnWall(Ease.outCubic)
+    makeTweenTestOnWall(Ease.outQuart)
+    makeTweenTestOnWall(Ease.outQuint)
+    makeTweenTestOnWall(Ease.outExpo )
+    makeTweenTestOnWall(Ease.outCirc )
+    makeTweenTestOnWall(Ease.outSine )
     skipLine()
-    makeTweenTestOnWall(Ease.inOutQuad);
-    makeTweenTestOnWall(Ease.inOutCubic);
-    makeTweenTestOnWall(Ease.inOutQuart);
-    makeTweenTestOnWall(Ease.inOutQuint);
-    makeTweenTestOnWall(Ease.inOutExpo);
-    makeTweenTestOnWall(Ease.inOutCirc);
-    makeTweenTestOnWall(Ease.inOutSine);
-end
-
-function scene:update(dt)
-
-    Game.find("Light"):get("Transform").position = {-4, 3 + 2 * math.sin(Game.getTime()), 0}
-    --Game.find("LightDirectional"):get("Transform"):rotate(45 * dt, 1, 0, 0);
-
-    if (Game.keyboard.isHeld("Up")) then
-        Game.find("Light2"):get("Transform"):move(0, 2 * dt, 0)
-    elseif (Game.keyboard.isHeld("Down")) then
-        Game.find("Light2"):get("Transform"):move(0, -2 * dt, 0)
-    end
+    makeTweenTestOnWall(Ease.inOutQuad )
+    makeTweenTestOnWall(Ease.inOutCubic)
+    makeTweenTestOnWall(Ease.inOutQuart)
+    makeTweenTestOnWall(Ease.inOutQuint)
+    makeTweenTestOnWall(Ease.inOutExpo )
+    makeTweenTestOnWall(Ease.inOutCirc )
+    makeTweenTestOnWall(Ease.inOutSine )
 end
 
 return scene

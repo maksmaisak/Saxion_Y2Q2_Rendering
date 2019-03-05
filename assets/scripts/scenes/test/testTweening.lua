@@ -178,9 +178,9 @@ function scene:start()
             Name = "TweenTest",
             Transform = {
                 position = position,
-                scale = {0.1, 0.1, 0.1}
+                scale = {0.2, 0.2, 0.2}
             },
-            RenderInfo = tweenTestRenderInfo
+            RenderInfo = tweenTestRenderInfo,
         }
 
         actor:get("Transform"):tweenPosition(position + delta, 1, ease):setLoopBounce()
@@ -189,11 +189,12 @@ function scene:start()
     end
 
     local i = 0
+    local function skipLine() i = i + 1 end
     local function makeTweenTestOnWall(ease)
 
         local actor = makeTweenTest(
-            Vector.from {-5, 20 - i, -10},
-            Vector.from {10, 0, 0},
+            Vector.from {-8, 18 - i * 0.5, -10},
+            Vector.from {16, 0, 0},
             ease
         )
 
@@ -203,26 +204,30 @@ function scene:start()
     end
 
     makeTweenTestOnWall(Ease.linear);
+    skipLine()
     makeTweenTestOnWall(Ease.inQuad);
     makeTweenTestOnWall(Ease.inCubic);
     makeTweenTestOnWall(Ease.inQuart);
     makeTweenTestOnWall(Ease.inQuint);
     makeTweenTestOnWall(Ease.inExpo);
     makeTweenTestOnWall(Ease.inCirc);
-
+    makeTweenTestOnWall(Ease.inSine);
+    skipLine()
     makeTweenTestOnWall(Ease.outQuad);
     makeTweenTestOnWall(Ease.outCubic);
     makeTweenTestOnWall(Ease.outQuart);
     makeTweenTestOnWall(Ease.outQuint);
     makeTweenTestOnWall(Ease.outExpo);
     makeTweenTestOnWall(Ease.outCirc);
-
+    makeTweenTestOnWall(Ease.outSine);
+    skipLine()
     makeTweenTestOnWall(Ease.inOutQuad);
     makeTweenTestOnWall(Ease.inOutCubic);
     makeTweenTestOnWall(Ease.inOutQuart);
     makeTweenTestOnWall(Ease.inOutQuint);
     makeTweenTestOnWall(Ease.inOutExpo);
     makeTweenTestOnWall(Ease.inOutCirc);
+    makeTweenTestOnWall(Ease.inOutSine);
 end
 
 function scene:update(dt)

@@ -19,6 +19,7 @@ namespace ease {
     float inQuint(float t);
     float inExpo (float t);
     float inCirc (float t);
+    float inSine (float t);
 
     float outQuad (float t);
     float outCubic(float t);
@@ -26,6 +27,7 @@ namespace ease {
     float outQuint(float t);
     float outExpo (float t);
     float outCirc (float t);
+    float outSine (float t);
 
     float inOutQuad (float t);
     float inOutCubic(float t);
@@ -33,6 +35,7 @@ namespace ease {
     float inOutQuint(float t);
     float inOutExpo (float t);
     float inOutCirc (float t);
+    float inOutSine (float t);
 }
 
 #endif //SAXION_Y2Q2_RENDERING_EASE_H

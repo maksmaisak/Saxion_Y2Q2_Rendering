@@ -87,9 +87,8 @@ Actor::Actor(Engine& engine, Entity entity) :
 
 std::string Actor::getName() const {
 
-    Name* ptr = tryGet<Name>();
-    if (ptr) return ptr->value;
-    return "unnamed";
+    const Name* ptr = tryGet<Name>();
+    return ptr ? ptr->value : "unnamed";
 }
 
 void Actor::destroy() {
@@ -132,7 +131,7 @@ void Actor::initializeMetatable(LuaState& lua) {
         return !actor || actor.tryGet<Destroy>();
     }));
 
-    static auto makeAllTweenModifier = [](const std::function<void(EntityRegistry&, Entity, Tween&)>& action) {
+    static const auto makeAllTweenModifier = [](const std::function<void(EntityRegistry&, Entity, Tween&)>& action) {
 
         return [action](const Actor& actor) {
 

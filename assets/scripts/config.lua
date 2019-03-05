@@ -7,7 +7,7 @@ framerateCap = 240
 vsync = true
 --startScene = 'assets/scripts/UI/mainMenu.lua'
 --startScene = 'assets/scripts/scenes/level1.lua'
-startScene = 'assets/scripts/scenes/test/luaScene.lua'
+startScene = 'assets/scripts/scenes/test/testTweening.lua'
 referenceResolution = {1920, 1080}
 
 -- custom

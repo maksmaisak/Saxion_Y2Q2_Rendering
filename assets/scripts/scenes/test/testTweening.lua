@@ -87,20 +87,6 @@ local scenery = {
         RenderInfo = planeRenderInfo
     },
     {
-        Name = "cube",
-        Transform = {
-            position = { x = 0, y = 2, z = 0 },
-            scale    = { x = 1, y = 1, z = 1 }
-        },
-        RenderInfo = {
-            mesh = "models/cube_flat.obj",
-            material = {
-                shader = "pbr",
-                albedo = "textures/container/diffuse.png",
-            }
-        },
-    },
-    {
         Name = "center",
         Transform = {position = {0, 5, 0}},
     }
@@ -179,31 +165,64 @@ function scene:start()
     }
 
     local tweenTestRenderInfo = {
-
+        mesh = "models/sphere2.obj",
+        material = Game.makeMaterial {
+            shader = "pbr",
+            albedoColor = {1, 0, 0}
+        }
     }
 
-    local function makeTweenTest(ease)
-
-        local position = Vector.from {}
-        local delta = Vector.from {}
+    local function makeTweenTest(position, delta, ease)
 
         local actor = Game.makeActor {
             Name = "TweenTest",
             Transform = {
-
+                position = position,
+                scale = {0.1, 0.1, 0.1}
             },
             RenderInfo = tweenTestRenderInfo
         }
 
-        actor:get("Transform"):tweenPosition(position + delta, 1, ease)
+        actor:get("Transform"):tweenPosition(position + delta, 1, ease):setLoopBounce()
+
+        return actor
     end
 
-    makeTweenTest(Ease.inQuad);
+    local i = 0
+    local function makeTweenTestOnWall(ease)
 
-    local tf = Game.find("teapot"):get("Transform")
-    tf:tweenPosition(Vector.from {5, 0, 0} + tf.position, 2):setLoopBounce()
-    tf:tweenRotation({0, 180, 0}, 10)
-    tf:tweenScale({2, 2, 2}, 1, Ease.inQuad):setLoopBounce()
+        local actor = makeTweenTest(
+            Vector.from {-5, 20 - i, -10},
+            Vector.from {10, 0, 0},
+            ease
+        )
+
+        i = i + 1
+
+        return actor
+    end
+
+    makeTweenTestOnWall(Ease.linear);
+    makeTweenTestOnWall(Ease.inQuad);
+    makeTweenTestOnWall(Ease.inCubic);
+    makeTweenTestOnWall(Ease.inQuart);
+    makeTweenTestOnWall(Ease.inQuint);
+    makeTweenTestOnWall(Ease.inExpo);
+    makeTweenTestOnWall(Ease.inCirc);
+
+    makeTweenTestOnWall(Ease.outQuad);
+    makeTweenTestOnWall(Ease.outCubic);
+    makeTweenTestOnWall(Ease.outQuart);
+    makeTweenTestOnWall(Ease.outQuint);
+    makeTweenTestOnWall(Ease.outExpo);
+    makeTweenTestOnWall(Ease.outCirc);
+
+    makeTweenTestOnWall(Ease.inOutQuad);
+    makeTweenTestOnWall(Ease.inOutCubic);
+    makeTweenTestOnWall(Ease.inOutQuart);
+    makeTweenTestOnWall(Ease.inOutQuint);
+    makeTweenTestOnWall(Ease.inOutExpo);
+    makeTweenTestOnWall(Ease.inOutCirc);
 end
 
 function scene:update(dt)

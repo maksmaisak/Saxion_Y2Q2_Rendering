@@ -13,11 +13,26 @@ namespace ease {
 
     float linear(float t);
 
-    float inQuad(float t);
+    float inQuad (float t);
+    float inCubic(float t);
+    float inQuart(float t);
+    float inQuint(float t);
+    float inExpo (float t);
+    float inCirc (float t);
 
     float outQuad (float t);
+    float outCubic(float t);
+    float outQuart(float t);
+    float outQuint(float t);
+    float outExpo (float t);
+    float outCirc (float t);
 
-    float inOutQuad(float t);
+    float inOutQuad (float t);
+    float inOutCubic(float t);
+    float inOutQuart(float t);
+    float inOutQuint(float t);
+    float inOutExpo (float t);
+    float inOutCirc (float t);
 }
 
 #endif //SAXION_Y2Q2_RENDERING_EASE_H

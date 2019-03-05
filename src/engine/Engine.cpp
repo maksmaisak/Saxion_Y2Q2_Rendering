@@ -358,12 +358,30 @@ void Engine::initializeLua() {
             lua_setfield(lua, -2, name.c_str());
         };
 
-        setFieldAsUserdata("linear"   , ease::linear);
-        setFieldAsUserdata("inQuad"   , ease::inQuad);
-        setFieldAsUserdata("outQuad"  , ease::outQuad);
-        setFieldAsUserdata("inOutQuad", ease::inOutQuad);
+        setFieldAsUserdata("linear", ease::linear);
+
+        setFieldAsUserdata("inQuad" , ease::inQuad );
+        setFieldAsUserdata("inCubic", ease::inCubic);
+        setFieldAsUserdata("inQuart", ease::inQuart);
+        setFieldAsUserdata("inQuint", ease::inQuint);
+        setFieldAsUserdata("inExpo" , ease::inExpo );
+        setFieldAsUserdata("inCirc" , ease::inCirc );
+
+        setFieldAsUserdata("outQuad" , ease::inQuad );
+        setFieldAsUserdata("outCubic", ease::inCubic);
+        setFieldAsUserdata("outQuart", ease::inQuart);
+        setFieldAsUserdata("outQuint", ease::inQuint);
+        setFieldAsUserdata("outExpo" , ease::inExpo );
+        setFieldAsUserdata("outCirc" , ease::inCirc );
+
+        setFieldAsUserdata("inOutQuad ", ease::inOutQuad );
+        setFieldAsUserdata("inOutCubic", ease::inOutCubic);
+        setFieldAsUserdata("inOutQuart", ease::inOutQuart);
+        setFieldAsUserdata("inOutQuint", ease::inOutQuint);
+        setFieldAsUserdata("inOutExpo ", ease::inOutExpo );
+        setFieldAsUserdata("inOutCirc ", ease::inOutCirc );
     }
-    lua_setglobal(lua, "ease");
+    lua_setglobal(lua, "Ease");
 
     if (lua.doFileInNewEnvironment(config::SCRIPT_PATH + "config.lua")) {
         lua_setglobal(lua, "Config");

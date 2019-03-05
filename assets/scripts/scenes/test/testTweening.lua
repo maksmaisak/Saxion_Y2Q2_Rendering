@@ -27,7 +27,7 @@ local scenery = {
         },
         Camera = {},
         CameraOrbitBehavior = {
-            target   = "head",
+            target   = "center",
             distance =  10,
             minTilt  = -60,
             maxTilt  =  60,
@@ -101,32 +101,8 @@ local scenery = {
         },
     },
     {
-        Name = "head",
-        Transform = {
-            position = { x = 0, y = 5, z = 0 }
-        },
-        RenderInfo = {
-            mesh = "models/suzanna_flat.obj",
-            material = {
-                shader = "pbr",
-                albedo = "textures/bricks.jpg"
-            }
-        }
-    },
-    {
-        Name = "teapot",
-        Transform = {
-            position = { x = 0, y = 7, z = 0 }
-        },
-        RenderInfo = {
-            mesh = "models/teapot_smooth.obj",
-            material = {
-                shader = "pbr",
-                albedo = "textures/bricks.jpg",
-                metallicMultiplier   = 0.1,
-                smoothnessMultiplier = 0.05,
-            }
-        }
+        Name = "center",
+        Transform = {position = {0, 5, 0}},
     }
 }
 
@@ -201,6 +177,28 @@ function scene:start()
             intensity = 0.1
         }
     }
+
+    local tweenTestRenderInfo = {
+
+    }
+
+    local function makeTweenTest(ease)
+
+        local position = Vector.from {}
+        local delta = Vector.from {}
+
+        local actor = Game.makeActor {
+            Name = "TweenTest",
+            Transform = {
+
+            },
+            RenderInfo = tweenTestRenderInfo
+        }
+
+        actor:get("Transform"):tweenPosition(position + delta, 1, ease)
+    end
+
+    makeTweenTest(Ease.inQuad);
 
     local tf = Game.find("teapot"):get("Transform")
     tf:tweenPosition(Vector.from {5, 0, 0} + tf.position, 2):setLoopBounce()

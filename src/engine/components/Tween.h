@@ -34,15 +34,17 @@ namespace en {
             const std::function<void(float)>& set
         );
 
+        void complete();
+
         Entity target = nullEntity;
         float duration = 1.f;
         std::function<float(float)> ease = ease::inOutQuad;
         std::function<void(float)>  set;
 
         float progress = 0.f;
-        bool isKillPending = false;
-        bool isPaused      = false;
-        bool playsBackward = false;
+        bool isKillPending     = false;
+        bool isPaused          = false;
+        bool playsBackward     = false;
         LoopingBehavior loopingBehavior = LoopingBehavior::Single;
     };
 }

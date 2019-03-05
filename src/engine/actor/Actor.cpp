@@ -131,7 +131,7 @@ void Actor::initializeMetatable(LuaState& lua) {
         return !actor || actor.tryGet<Destroy>();
     }));
 
-    static const auto makeAllTweenModifier = [](const std::function<void(EntityRegistry&, Entity, Tween&)>& action) {
+    static const auto makeAllTweenModifier = [](const std::function<void(Tween&)>& action) {
 
         return [action](const Actor& actor) {
 
@@ -143,7 +143,7 @@ void Actor::initializeMetatable(LuaState& lua) {
 
                 auto& tween = registry.get<Tween>(e);
                 if (tween.target == entity && !registry.tryGet<Destroy>(e)) {
-                    action(registry, entity, tween);
+                    action(tween);
                     count += 1;
                 }
             }
@@ -152,7 +152,8 @@ void Actor::initializeMetatable(LuaState& lua) {
         };
     };
 
-    lua.setField("tweenPause", makeAllTweenModifier([](EntityRegistry& registry, Entity e, Tween& tween) {tween.isPaused = true;   }));
-    lua.setField("tweenPlay" , makeAllTweenModifier([](EntityRegistry& registry, Entity e, Tween& tween) {tween.isPaused = false;  }));
-    lua.setField("tweenKill" , makeAllTweenModifier([](EntityRegistry& registry, Entity e, Tween& tween) {registry.add<Destroy>(e);}));
+    lua.setField("tweenPause"    , makeAllTweenModifier([](Tween& tween) {tween.isPaused      = true; }));
+    lua.setField("tweenPlay"     , makeAllTweenModifier([](Tween& tween) {tween.isPaused      = false;}));
+    lua.setField("tweenKill"     , makeAllTweenModifier([](Tween& tween) {tween.isKillPending = true; }));
+    lua.setField("tweenComplete" , makeAllTweenModifier([](Tween& tween) {tween.complete();}));
 }

@@ -41,3 +41,11 @@ ComponentReference<Tween> Tween::make(EntityRegistry& registry,
 
     return ComponentReference<Tween>(registry, e);
 }
+
+void Tween::complete() {
+
+    isPaused = false;
+    progress = playsBackward ? 0.f : 1.f;
+    set(ease(progress));
+    isKillPending = true;
+}

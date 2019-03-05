@@ -1,3 +1,4 @@
+require('math')
 require('assets/scripts/vector')
 require('assets/scripts/object')
 require('assets/scripts/level/map')
@@ -363,7 +364,13 @@ function Player:moveToPosition(nextPosition, canRegisterMove, didUsePortal)
 		return
 	end
 
-	self.transform.position = self:getPositionFromGridPosition(nextPosition)
+	self.actor:tweenComplete()
+	self.transform:tweenJump(self:getPositionFromGridPosition(nextPosition), 1, 0.2)
+
+	local directionX = self.gridPosition.x - self.lastPosition.x
+	local directionY = self.gridPosition.y - self.lastPosition.y
+	local angle = math.atan2(directionX, directionY) * 180 / math.pi
+	self.transform:tweenRotation({0, angle, 0}, 0.2, Ease.outQuad)
 end
 
 function Player:redoMove()

@@ -257,6 +257,32 @@ void Transform::initializeMetatable(LuaState& lua) {
             }
         );
     });
+
+    lua.setField("tweenJump", [](
+        const ComponentReference<Transform>& ref,
+        const glm::vec3& target,
+        std::optional<float> jumpHeight,
+        std::optional<float> duration
+    ){
+        Transform& tf = *ref;
+        Entity entity = ref.getEntity();
+        const glm::vec3& start = tf.getLocalPosition();
+
+        static const auto easeHeight = [](float t){
+
+            const float halfT = t * 2.f;
+            return halfT < 1.f ? ease::outQuad(halfT) : ease::outQuad(2.f - halfT);
+        };
+
+        return Tween::make(*ref.getRegistry(), ref.getEntity(), duration, ease::inOutQuad,
+            [ref, start, delta = target - start, jumpHeight = jumpHeight.value_or(1.f)](float t) {
+
+                glm::vec3 pos = start + delta * t;
+                pos.y = start.y + jumpHeight * easeHeight(t);
+                ref->setLocalPosition(pos);
+            }
+        );
+    });
 }
 
 namespace {

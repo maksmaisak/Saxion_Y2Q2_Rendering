@@ -50,26 +50,34 @@ namespace en {
             assert(!isNullEntity(entity));
         }
 
-        inline operator T&() {
+        inline operator T&() const {
             return checkValid(), m_registry->get<T>(m_entity);
         }
 
-        inline operator T*() {
+        inline operator T*() const {
             return checkValid(), &m_registry->get<T>(m_entity);
         }
 
-        inline T* operator->() {
+        inline T* operator->() const {
             return operator T*();
         }
 
-        inline operator bool() {
+        inline operator bool() const {
             return m_registry && m_registry->isAlive(m_entity) && m_registry->tryGet<T>(m_entity);
         }
 
-        inline void checkValid() {
+        inline void checkValid() const {
 
             if (!operator bool())
                 throw utils::Exception("This ComponentReference to " + utils::demangle<T>() + " is invalid");
+        }
+
+        inline Entity getEntity() const {
+            return m_entity;
+        };
+
+        inline EntityRegistry* getRegistry() const {
+            return m_registry;
         }
 
         friend inline bool operator==(const ComponentReference<T>& a, const ComponentReference<T>& b) {

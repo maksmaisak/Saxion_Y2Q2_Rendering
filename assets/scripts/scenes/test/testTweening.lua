@@ -27,7 +27,7 @@ local scenery = {
         },
         Camera = {},
         CameraOrbitBehavior = {
-            target   = "head",
+            target   = "center",
             distance =  10,
             minTilt  = -60,
             maxTilt  =  60,
@@ -87,46 +87,8 @@ local scenery = {
         RenderInfo = planeRenderInfo
     },
     {
-        Name = "cube",
-        Transform = {
-            position = { x = 0, y = 2, z = 0 },
-            scale    = { x = 1, y = 1, z = 1 }
-        },
-        RenderInfo = {
-            mesh = "models/cube_flat.obj",
-            material = {
-                shader = "pbr",
-                albedo = "textures/container/diffuse.png",
-            }
-        },
-    },
-    {
-        Name = "head",
-        Transform = {
-            position = { x = 0, y = 5, z = 0 }
-        },
-        RenderInfo = {
-            mesh = "models/suzanna_flat.obj",
-            material = {
-                shader = "pbr",
-                albedo = "textures/bricks.jpg"
-            }
-        }
-    },
-    {
-        Name = "teapot",
-        Transform = {
-            position = { x = 0, y = 7, z = 0 }
-        },
-        RenderInfo = {
-            mesh = "models/teapot_smooth.obj",
-            material = {
-                shader = "pbr",
-                albedo = "textures/bricks.jpg",
-                metallicMultiplier   = 0.1,
-                smoothnessMultiplier = 0.05,
-            }
-        }
+        Name = "center",
+        Transform = {position = {0, 5, 0}},
     }
 }
 
@@ -139,6 +101,7 @@ function scene:start()
     Game.makeActor {
         Name = "Light",
         Transform = {
+            position = {-8, 2, -8},
             scale = {0.1, 0.1, 0.1}
         },
         RenderInfo = {
@@ -154,7 +117,7 @@ function scene:start()
     Game.makeActor {
         Name = "Light2",
         Transform = {
-            position = {3, 2, 0},
+            position = {8, 2, -8},
             scale = {0.1, 0.1, 0.1}
         },
         RenderInfo = {
@@ -202,22 +165,70 @@ function scene:start()
         }
     }
 
-    local tf = Game.find("teapot"):get("Transform")
-    tf:tweenPosition(Vector.from {5, 0, 0} + tf.position, 2):setLoopBounce()
-    tf:tweenRotation({0, 180, 0}, 10)
-    tf:tweenScale({2, 2, 2}, 1, Ease.inQuad):setLoopBounce()
-end
+    local tweenTestRenderInfo = {
+        mesh = "models/sphere2.obj",
+        material = Game.makeMaterial {
+            shader = "pbr",
+            albedoColor = {1, 0, 0}
+        }
+    }
 
-function scene:update(dt)
+    local function makeTweenTest(position, delta, ease)
 
-    Game.find("Light"):get("Transform").position = {-4, 3 + 2 * math.sin(Game.getTime()), 0}
-    --Game.find("LightDirectional"):get("Transform"):rotate(45 * dt, 1, 0, 0);
+        local actor = Game.makeActor {
+            Name = "TweenTest",
+            Transform = {
+                position = position,
+                scale = {0.2, 0.2, 0.2}
+            },
+            RenderInfo = tweenTestRenderInfo,
+        }
 
-    if (Game.keyboard.isHeld("Up")) then
-        Game.find("Light2"):get("Transform"):move(0, 2 * dt, 0)
-    elseif (Game.keyboard.isHeld("Down")) then
-        Game.find("Light2"):get("Transform"):move(0, -2 * dt, 0)
+        actor:get("Transform"):tweenPosition(position + delta, 1, ease):setLoopBounce()
+
+        return actor
     end
+
+    local i = 0
+    local function skipLine() i = i + 1 end
+    local function makeTweenTestOnWall(ease)
+
+        local actor = makeTweenTest(
+            Vector.from {-5, 18 - i * 0.5, -10},
+            Vector.from {10, 0, 0},
+            ease
+        )
+
+        i = i + 1
+
+        return actor
+    end
+
+    makeTweenTestOnWall(Ease.linear)
+    skipLine()
+    makeTweenTestOnWall(Ease.inQuad )
+    makeTweenTestOnWall(Ease.inCubic)
+    makeTweenTestOnWall(Ease.inQuart)
+    makeTweenTestOnWall(Ease.inQuint)
+    makeTweenTestOnWall(Ease.inExpo )
+    makeTweenTestOnWall(Ease.inCirc )
+    makeTweenTestOnWall(Ease.inSine )
+    skipLine()
+    makeTweenTestOnWall(Ease.outQuad )
+    makeTweenTestOnWall(Ease.outCubic)
+    makeTweenTestOnWall(Ease.outQuart)
+    makeTweenTestOnWall(Ease.outQuint)
+    makeTweenTestOnWall(Ease.outExpo )
+    makeTweenTestOnWall(Ease.outCirc )
+    makeTweenTestOnWall(Ease.outSine )
+    skipLine()
+    makeTweenTestOnWall(Ease.inOutQuad )
+    makeTweenTestOnWall(Ease.inOutCubic)
+    makeTweenTestOnWall(Ease.inOutQuart)
+    makeTweenTestOnWall(Ease.inOutQuint)
+    makeTweenTestOnWall(Ease.inOutExpo )
+    makeTweenTestOnWall(Ease.inOutCirc )
+    makeTweenTestOnWall(Ease.inOutSine )
 end
 
 return scene

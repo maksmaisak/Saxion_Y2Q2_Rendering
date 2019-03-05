@@ -8,6 +8,8 @@
 #include "systems/DestroyByTimerSystem.h"
 #include "systems/RenderSystem.h"
 #include "systems/PhysicsSystem.h"
+#include "systems/UIEventSystem.h"
+#include "systems/TweenSystem.h"
 
 #include "components/RenderInfo.h"
 #include "components/Camera.h"
@@ -20,7 +22,6 @@
 #include "LightingScene.h"
 #include "TerrainScene.h"
 #include "LuaScene.h"
-#include "UIEventSystem.h"
 
 int main() {
 
@@ -33,6 +34,7 @@ int main() {
         engine->addSystem<en::TransformHierarchySystem>();
         engine->addSystem<en::RenderSystem>(false);
         engine->addSystem<en::UIEventSystem>();
+        engine->addSystem<en::TweenSystem>();
 
         engine->addSystem<en::PhysicsSystem>().setGravity({0, -9.8, 0});
 

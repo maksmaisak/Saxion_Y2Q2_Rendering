@@ -26,6 +26,7 @@
 #include "MouseHelper.h"
 #include "Sound.h"
 #include "MusicIntegration.h"
+#include "Ease.h"
 
 using namespace en;
 
@@ -263,8 +264,6 @@ struct ResourceLoader<sf::SoundBuffer> {
 
 void Engine::initializeLua() {
 
-    LUA_REGISTER_TYPE(Actor);
-
     auto& lua = getLuaState();
 
     lua_newtable(lua);
@@ -347,15 +346,49 @@ void Engine::initializeLua() {
     }
     lua_setglobal(lua, "Game");
 
-    ComponentsToLua::printDebugInfo();
+    lua_pushvalue(lua, -1);
+    lua_newtable(lua);
+    {
+        static auto setFieldAsUserdata = [&lua](const std::string& name, const ease::Ease& ease){
+            lua.push(ease);
+            lua_setfield(lua, -2, name.c_str());
+        };
+
+        setFieldAsUserdata("linear", ease::linear);
+
+        setFieldAsUserdata("inQuad" , ease::inQuad );
+        setFieldAsUserdata("inCubic", ease::inCubic);
+        setFieldAsUserdata("inQuart", ease::inQuart);
+        setFieldAsUserdata("inQuint", ease::inQuint);
+        setFieldAsUserdata("inExpo" , ease::inExpo );
+        setFieldAsUserdata("inCirc" , ease::inCirc );
+        setFieldAsUserdata("inSine" , ease::inSine );
+
+        setFieldAsUserdata("outQuad" , ease::outQuad );
+        setFieldAsUserdata("outCubic", ease::outCubic);
+        setFieldAsUserdata("outQuart", ease::outQuart);
+        setFieldAsUserdata("outQuint", ease::outQuint);
+        setFieldAsUserdata("outExpo" , ease::outExpo );
+        setFieldAsUserdata("outCirc" , ease::outCirc );
+        setFieldAsUserdata("outSine" , ease::outSine );
+
+        setFieldAsUserdata("inOutQuad ", ease::inOutQuad );
+        setFieldAsUserdata("inOutCubic", ease::inOutCubic);
+        setFieldAsUserdata("inOutQuart", ease::inOutQuart);
+        setFieldAsUserdata("inOutQuint", ease::inOutQuint);
+        setFieldAsUserdata("inOutExpo ", ease::inOutExpo );
+        setFieldAsUserdata("inOutCirc ", ease::inOutCirc );
+        setFieldAsUserdata("inOutSine" , ease::inOutSine );
+    }
+    lua_setglobal(lua, "Ease");
 
     if (lua.doFileInNewEnvironment(config::SCRIPT_PATH + "config.lua")) {
         lua_setglobal(lua, "Config");
     }
 
     lua_getglobal(lua, "Config");
+    auto pop = PopperOnDestruct(lua);
     m_framerateCap = lua.tryGetField<unsigned int>("framerateCap").value_or(m_framerateCap);
-    lua.pop();
 }
 
 void Engine::testMemberFunction() {

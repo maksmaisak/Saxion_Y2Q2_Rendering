@@ -71,10 +71,9 @@ uniform sampler2D albedoMap;
 uniform sampler2D metallicSmoothnessMap;
 uniform sampler2D normalMap;
 uniform sampler2D aoMap;
-uniform vec3 albedoColor = vec3(1,1,1);
+uniform vec4 albedoColor = vec4(1,1,1,1);
 uniform float metallicMultiplier = 1;
 uniform float smoothnessMultiplier = 1;
-uniform float normalMultiplier = 1;
 uniform float aoMultiplier = 1;
 
 const float PI = 3.14159265359;
@@ -98,24 +97,24 @@ void main() {
     vec4 msSample   = texture(metallicSmoothnessMap, texCoords);
     float metallic  = metallicMultiplier * msSample.r;
     float roughness = 1.f - smoothnessMultiplier * msSample.a;
-    vec3  albedo    = albedoColor  * vec3(texture(albedoMap, texCoords));
+    vec4  albedo    = albedoColor  * texture(albedoMap, texCoords);
     float ao        = aoMultiplier * texture(aoMap, texCoords).r;
 
     vec3 color = vec3(0,0,0);
 
     for (int i = 0; i < numDirectionalLights; ++i) {
-        color += CalculateDirectionalLightContribution(i, normal, viewDirection, albedo, metallic, roughness, ao);
+        color += CalculateDirectionalLightContribution(i, normal, viewDirection, albedo.rgb, metallic, roughness, ao);
     }
 
     for (int i = 0; i < numPointLights; ++i) {
-        color += CalculatePointLightContribution(i, normal, viewDirection, albedo, metallic, roughness, ao);
+        color += CalculatePointLightContribution(i, normal, viewDirection, albedo.rgb, metallic, roughness, ao);
     }
 
     for (int i = 0; i < numSpotLights; ++i) {
-        color += CalculateSpotLightContribution(i, normal, viewDirection, albedo, metallic, roughness, ao);
+        color += CalculateSpotLightContribution(i, normal, viewDirection, albedo.rgb, metallic, roughness, ao);
     }
 
-	fragmentColor = vec4(color, 1);
+	fragmentColor = vec4(color, albedo.a);
 }
 
 vec3 GetNormal() {

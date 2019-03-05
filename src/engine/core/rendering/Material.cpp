@@ -54,8 +54,8 @@ static std::map<std::string, std::function<void(LuaState&, Material&)>> readers 
         "lit",
         [](LuaState& lua, Material& m) {
 
-            m.setUniformValue("diffuseColor" , lua.tryGetField<glm::vec3>("diffuseColor").value_or(glm::vec3(1, 1, 1)));
-            m.setUniformValue("specularColor", lua.tryGetField<glm::vec3>("specularColor").value_or(glm::vec3(1, 1, 1)));
+            m.setUniformValue("diffuseColor" , lua.tryGetField<glm::vec3>("diffuseColor").value_or(glm::vec3(1.f)));
+            m.setUniformValue("specularColor", lua.tryGetField<glm::vec3>("specularColor").value_or(glm::vec3(1.f)));
             m.setUniformValue("shininess"    , lua.tryGetField<float>("shininess").value_or(10.f));
 
             m.setUniformValue("diffuseMap" , getTextureFromLua(lua, "diffuse"));
@@ -76,7 +76,7 @@ static std::map<std::string, std::function<void(LuaState&, Material&)>> readers 
             m.setUniformValue("aoMap"       , getTextureFromLua(lua, "ao"    , Textures::white(), GL_RGBA));
             m.setUniformValue("normalMap"   , getTextureFromLua(lua, "normal", Textures::defaultNormalMap(), GL_RGBA));
 
-            m.setUniformValue("albedoColor", lua.tryGetField<glm::vec3>("albedoColor").value_or(glm::vec3(1, 1, 1)));
+            m.setUniformValue("albedoColor", lua.tryGetField<glm::vec4>("albedoColor").value_or(glm::vec4(1)));
             m.setUniformValue("metallicMultiplier"  , lua.tryGetField<float>("metallicMultiplier").value_or(isDefaultMSMap ? 0 : 1));
             m.setUniformValue("smoothnessMultiplier", lua.tryGetField<float>("smoothnessMultiplier").value_or(isDefaultMSMap ? 0.5 : 1));
             m.setUniformValue("aoMultiplier"        , lua.tryGetField<float>("aoMultiplier").value_or(1));
@@ -387,7 +387,7 @@ void Material::setUniformDirectionalLight(
         gl::setUniform(locations.direction, tf.getForward());
 
     gl::setUniform(locations.color       , light.color * light.intensity);
-    gl::setUniform(locations.colorAmbient, light.colorAmbient * light.intensity);
+    gl::setUniform(locations.colorAmbient, light.colorAmbient);
     gl::setUniform(locations.falloffConstant , light.falloff.constant);
     gl::setUniform(locations.falloffLinear   , light.falloff.linear);
     gl::setUniform(locations.falloffQuadratic, light.falloff.quadratic);
@@ -409,7 +409,7 @@ void Material::setUniformSpotLight(
         gl::setUniform(locations.direction, glm::normalize(glm::vec3(tf.getWorldTransform()[2])));
 
     gl::setUniform(locations.color       , light.color * light.intensity);
-    gl::setUniform(locations.colorAmbient, light.colorAmbient * light.intensity);
+    gl::setUniform(locations.colorAmbient, light.colorAmbient);
     gl::setUniform(locations.falloffConstant , light.falloff.constant);
     gl::setUniform(locations.falloffLinear   , light.falloff.linear);
     gl::setUniform(locations.falloffQuadratic, light.falloff.quadratic);

@@ -9,6 +9,7 @@
 #include <string>
 #include <unordered_map>
 #include <tuple>
+#include "glm.hpp"
 #include "AbstractMaterial.hpp"
 #include "ShaderProgram.hpp"
 #include "Texture.hpp"

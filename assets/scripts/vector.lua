@@ -4,6 +4,7 @@
 -- Time: 17:54
 --
 
+require('math')
 require('assets/scripts/object')
 
 Vector = Object:new { x = 0, y = 0, z = 0 }

@@ -363,7 +363,8 @@ function Player:moveToPosition(nextPosition, canRegisterMove, didUsePortal)
 		return
 	end
 
-	self.transform.position = self:getPositionFromGridPosition(nextPosition)
+	self.actor:tweenComplete()
+	self.transform:tweenJump(self:getPositionFromGridPosition(nextPosition), 1, 0.2)
 end
 
 function Player:redoMove()

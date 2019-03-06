@@ -19,8 +19,10 @@ local materials = {
     },
     {
         shader = 'pbr',
-        metallicMultiplier = 0,
-        smoothnessMultiplier = 0.5,
+        albedo = 'objects/tile/Blocks/FoundationBlock/Textures/AlbedoTransparency 1.png',
+        metallicSmoothness = 'objects/tile/Blocks/FoundationBlock/Textures/MetallicSmoothness.png',
+        ao = 'objects/tile/Blocks/FoundationBlock/Textures/Grayscale.png',
+        smoothnessMultiplier = 1,
         aoMultiplier = 1,
     },
     {
@@ -43,7 +45,6 @@ local materials = {
         albedo = 'objects/tile/Blocks/TerrainBlockVar2/Texture/TerrainBlockV2_AlbedoTransparency.png',
         metallicSmoothness = 'objects/tile/Blocks/TerrainBlockVar2/Texture/TerrainBlockV2_MetallicSmoothness.png',
         ao = 'objects/tile/Blocks/TerrainBlockVar2/Texture/TerrainBlockV2_AO.png',
-        albedoColor = {1,1,1},
         smoothnessMultiplier = 1,
         aoMultiplier = 1,
     },
@@ -1078,6 +1079,32 @@ grid[10][9].tile = {
     },
 }
 
+grid[10][10].tile = {
+    Name = "Tile 3 (1)",
+    Transform = {
+        position = {9, 0, 10},
+        children = {
+            {
+                Name = "TerrainBlockV4",
+                Transform = {
+                    position = {0, -1, -0.146},
+                    children = {
+                        {
+                            Name = "TerrainBlockV4LowPoly1",
+                            Transform = {
+                            },
+                            RenderInfo = {
+                                mesh = 'objects/tile/Blocks/TerrainBlockVar4/TerrainBlockV4.obj',
+                                material = materials[9]
+                            }
+                        },
+                    }
+                },
+            },
+        }
+    },
+}
+
 grid[8][10].goal = {
     startActive = true,
     actor = {
@@ -1157,11 +1184,6 @@ local extras = {
             kind = 'directional',
             intensity = 2.21,
             color = {1, 1, 1, 1},
-        },
-        LuaBehavior = {
-            update = function(self, dt)
-                self.actor:get("Transform"):rotate(dt * 10, 0, 1, 0)
-            end
         }
     },
     {
@@ -1286,13 +1308,23 @@ local extras = {
                         position = {2, -1.49, 4},
                         children = {
                             {
-                                Name = "FoundationBlockLow1",
+                                Name = "TerrainBlockV3",
                                 Transform = {
+                                    position = {0, 0, -0.36},
+                                    children = {
+                                        {
+                                            Name = "TerrainBlockV3LowPoly1",
+                                            Transform = {
+                                                position = {-0.3820662, 0, 0.3415085},
+                                                rotation = {0, 89.99983, 0},
+                                            },
+                                            RenderInfo = {
+                                                mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
+                                                material = materials[3]
+                                            }
+                                        },
+                                    }
                                 },
-                                RenderInfo = {
-                                    mesh = 'objects/tile/Blocks/FoundationBlock/FoundationBlockLow.obj',
-                                    material = materials[3]
-                                }
                             },
                         }
                     },
@@ -1303,13 +1335,23 @@ local extras = {
                         position = {1, -1.49, 4},
                         children = {
                             {
-                                Name = "FoundationBlockLow1",
+                                Name = "TerrainBlockV3",
                                 Transform = {
+                                    position = {0, 0, -0.36},
+                                    children = {
+                                        {
+                                            Name = "TerrainBlockV3LowPoly1",
+                                            Transform = {
+                                                position = {-0.3820662, 0, 0.3415085},
+                                                rotation = {0, 89.99983, 0},
+                                            },
+                                            RenderInfo = {
+                                                mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
+                                                material = materials[3]
+                                            }
+                                        },
+                                    }
                                 },
-                                RenderInfo = {
-                                    mesh = 'objects/tile/Blocks/FoundationBlock/FoundationBlockLow.obj',
-                                    material = materials[3]
-                                }
                             },
                         }
                     },
@@ -1320,13 +1362,23 @@ local extras = {
                         position = {0, -1.49, 4},
                         children = {
                             {
-                                Name = "FoundationBlockLow1",
+                                Name = "TerrainBlockV3",
                                 Transform = {
+                                    position = {0, 0, -0.36},
+                                    children = {
+                                        {
+                                            Name = "TerrainBlockV3LowPoly1",
+                                            Transform = {
+                                                position = {-0.3820662, 0, 0.3415085},
+                                                rotation = {0, 89.99983, 0},
+                                            },
+                                            RenderInfo = {
+                                                mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
+                                                material = materials[3]
+                                            }
+                                        },
+                                    }
                                 },
-                                RenderInfo = {
-                                    mesh = 'objects/tile/Blocks/FoundationBlock/FoundationBlockLow.obj',
-                                    material = materials[3]
-                                }
                             },
                         }
                     },
@@ -1337,13 +1389,23 @@ local extras = {
                         position = {1, -0.49, 4},
                         children = {
                             {
-                                Name = "FoundationBlockLow1",
+                                Name = "TerrainBlockV3",
                                 Transform = {
+                                    position = {0, 0, -0.36},
+                                    children = {
+                                        {
+                                            Name = "TerrainBlockV3LowPoly1",
+                                            Transform = {
+                                                position = {-0.3820662, 0, 0.3415085},
+                                                rotation = {0, 89.99983, 0},
+                                            },
+                                            RenderInfo = {
+                                                mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
+                                                material = materials[3]
+                                            }
+                                        },
+                                    }
                                 },
-                                RenderInfo = {
-                                    mesh = 'objects/tile/Blocks/FoundationBlock/FoundationBlockLow.obj',
-                                    material = materials[3]
-                                }
                             },
                         }
                     },
@@ -1354,13 +1416,23 @@ local extras = {
                         position = {2, -0.49, 4},
                         children = {
                             {
-                                Name = "FoundationBlockLow1",
+                                Name = "TerrainBlockV3",
                                 Transform = {
+                                    position = {0, 0, -0.36},
+                                    children = {
+                                        {
+                                            Name = "TerrainBlockV3LowPoly1",
+                                            Transform = {
+                                                position = {-0.3820662, 0, 0.3415085},
+                                                rotation = {0, 89.99983, 0},
+                                            },
+                                            RenderInfo = {
+                                                mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
+                                                material = materials[3]
+                                            }
+                                        },
+                                    }
                                 },
-                                RenderInfo = {
-                                    mesh = 'objects/tile/Blocks/FoundationBlock/FoundationBlockLow.obj',
-                                    material = materials[3]
-                                }
                             },
                         }
                     },
@@ -1371,13 +1443,23 @@ local extras = {
                         position = {0, -0.49, 4},
                         children = {
                             {
-                                Name = "FoundationBlockLow1",
+                                Name = "TerrainBlockV3",
                                 Transform = {
+                                    position = {0, 0, -0.36},
+                                    children = {
+                                        {
+                                            Name = "TerrainBlockV3LowPoly1",
+                                            Transform = {
+                                                position = {-0.3820662, 0, 0.3415085},
+                                                rotation = {0, 89.99983, 0},
+                                            },
+                                            RenderInfo = {
+                                                mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
+                                                material = materials[3]
+                                            }
+                                        },
+                                    }
                                 },
-                                RenderInfo = {
-                                    mesh = 'objects/tile/Blocks/FoundationBlock/FoundationBlockLow.obj',
-                                    material = materials[3]
-                                }
                             },
                         }
                     },
@@ -1388,13 +1470,23 @@ local extras = {
                         position = {0, 0.51, 4},
                         children = {
                             {
-                                Name = "FoundationBlockLow1",
+                                Name = "TerrainBlockV3",
                                 Transform = {
+                                    position = {0, 0, -0.36},
+                                    children = {
+                                        {
+                                            Name = "TerrainBlockV3LowPoly1",
+                                            Transform = {
+                                                position = {-0.3820662, 0, 0.3415085},
+                                                rotation = {0, 89.99983, 0},
+                                            },
+                                            RenderInfo = {
+                                                mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
+                                                material = materials[3]
+                                            }
+                                        },
+                                    }
                                 },
-                                RenderInfo = {
-                                    mesh = 'objects/tile/Blocks/FoundationBlock/FoundationBlockLow.obj',
-                                    material = materials[3]
-                                }
                             },
                         }
                     },
@@ -1405,13 +1497,23 @@ local extras = {
                         position = {1, 0.51, 4},
                         children = {
                             {
-                                Name = "FoundationBlockLow1",
+                                Name = "TerrainBlockV3",
                                 Transform = {
+                                    position = {0, 0, -0.36},
+                                    children = {
+                                        {
+                                            Name = "TerrainBlockV3LowPoly1",
+                                            Transform = {
+                                                position = {-0.3820662, 0, 0.3415085},
+                                                rotation = {0, 89.99983, 0},
+                                            },
+                                            RenderInfo = {
+                                                mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
+                                                material = materials[3]
+                                            }
+                                        },
+                                    }
                                 },
-                                RenderInfo = {
-                                    mesh = 'objects/tile/Blocks/FoundationBlock/FoundationBlockLow.obj',
-                                    material = materials[3]
-                                }
                             },
                         }
                     },
@@ -1441,13 +1543,23 @@ local extras = {
                         position = {-1, -1.49, 4},
                         children = {
                             {
-                                Name = "FoundationBlockLow1",
+                                Name = "TerrainBlockV3",
                                 Transform = {
+                                    position = {0, 0, -0.36},
+                                    children = {
+                                        {
+                                            Name = "TerrainBlockV3LowPoly1",
+                                            Transform = {
+                                                position = {-0.3820662, 0, 0.3415085},
+                                                rotation = {0, 89.99983, 0},
+                                            },
+                                            RenderInfo = {
+                                                mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
+                                                material = materials[3]
+                                            }
+                                        },
+                                    }
                                 },
-                                RenderInfo = {
-                                    mesh = 'objects/tile/Blocks/FoundationBlock/FoundationBlockLow.obj',
-                                    material = materials[3]
-                                }
                             },
                         }
                     },
@@ -1510,13 +1622,23 @@ local extras = {
                         position = {6, -0.49, 4},
                         children = {
                             {
-                                Name = "FoundationBlockLow1",
+                                Name = "TerrainBlockV3",
                                 Transform = {
+                                    position = {0, 0, -0.36},
+                                    children = {
+                                        {
+                                            Name = "TerrainBlockV3LowPoly1",
+                                            Transform = {
+                                                position = {-0.3820662, 0, 0.3415085},
+                                                rotation = {0, 89.99983, 0},
+                                            },
+                                            RenderInfo = {
+                                                mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
+                                                material = materials[3]
+                                            }
+                                        },
+                                    }
                                 },
-                                RenderInfo = {
-                                    mesh = 'objects/tile/Blocks/FoundationBlock/FoundationBlockLow.obj',
-                                    material = materials[3]
-                                }
                             },
                         }
                     },
@@ -1527,13 +1649,23 @@ local extras = {
                         position = {6, -1.49, 4},
                         children = {
                             {
-                                Name = "FoundationBlockLow1",
+                                Name = "TerrainBlockV3",
                                 Transform = {
+                                    position = {0, 0, -0.36},
+                                    children = {
+                                        {
+                                            Name = "TerrainBlockV3LowPoly1",
+                                            Transform = {
+                                                position = {-0.3820662, 0, 0.3415085},
+                                                rotation = {0, 89.99983, 0},
+                                            },
+                                            RenderInfo = {
+                                                mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
+                                                material = materials[3]
+                                            }
+                                        },
+                                    }
                                 },
-                                RenderInfo = {
-                                    mesh = 'objects/tile/Blocks/FoundationBlock/FoundationBlockLow.obj',
-                                    material = materials[3]
-                                }
                             },
                         }
                     },
@@ -1579,13 +1711,23 @@ local extras = {
                         position = {7, -0.49, 4},
                         children = {
                             {
-                                Name = "FoundationBlockLow1",
+                                Name = "TerrainBlockV3",
                                 Transform = {
+                                    position = {0, 0, -0.36},
+                                    children = {
+                                        {
+                                            Name = "TerrainBlockV3LowPoly1",
+                                            Transform = {
+                                                position = {-0.3820662, 0, 0.3415085},
+                                                rotation = {0, 89.99983, 0},
+                                            },
+                                            RenderInfo = {
+                                                mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
+                                                material = materials[3]
+                                            }
+                                        },
+                                    }
                                 },
-                                RenderInfo = {
-                                    mesh = 'objects/tile/Blocks/FoundationBlock/FoundationBlockLow.obj',
-                                    material = materials[3]
-                                }
                             },
                         }
                     },
@@ -1596,13 +1738,23 @@ local extras = {
                         position = {7, -1.49, 4},
                         children = {
                             {
-                                Name = "FoundationBlockLow1",
+                                Name = "TerrainBlockV3",
                                 Transform = {
+                                    position = {0, 0, -0.36},
+                                    children = {
+                                        {
+                                            Name = "TerrainBlockV3LowPoly1",
+                                            Transform = {
+                                                position = {-0.3820662, 0, 0.3415085},
+                                                rotation = {0, 89.99983, 0},
+                                            },
+                                            RenderInfo = {
+                                                mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
+                                                material = materials[3]
+                                            }
+                                        },
+                                    }
                                 },
-                                RenderInfo = {
-                                    mesh = 'objects/tile/Blocks/FoundationBlock/FoundationBlockLow.obj',
-                                    material = materials[3]
-                                }
                             },
                         }
                     },
@@ -1613,13 +1765,23 @@ local extras = {
                         position = {8, -0.49, 4},
                         children = {
                             {
-                                Name = "FoundationBlockLow1",
+                                Name = "TerrainBlockV3",
                                 Transform = {
+                                    position = {0, 0, -0.36},
+                                    children = {
+                                        {
+                                            Name = "TerrainBlockV3LowPoly1",
+                                            Transform = {
+                                                position = {-0.3820662, 0, 0.3415085},
+                                                rotation = {0, 89.99983, 0},
+                                            },
+                                            RenderInfo = {
+                                                mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
+                                                material = materials[3]
+                                            }
+                                        },
+                                    }
                                 },
-                                RenderInfo = {
-                                    mesh = 'objects/tile/Blocks/FoundationBlock/FoundationBlockLow.obj',
-                                    material = materials[3]
-                                }
                             },
                         }
                     },
@@ -1630,13 +1792,23 @@ local extras = {
                         position = {8, -1.49, 4},
                         children = {
                             {
-                                Name = "FoundationBlockLow1",
+                                Name = "TerrainBlockV3",
                                 Transform = {
+                                    position = {0, 0, -0.36},
+                                    children = {
+                                        {
+                                            Name = "TerrainBlockV3LowPoly1",
+                                            Transform = {
+                                                position = {-0.3820662, 0, 0.3415085},
+                                                rotation = {0, 89.99983, 0},
+                                            },
+                                            RenderInfo = {
+                                                mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
+                                                material = materials[3]
+                                            }
+                                        },
+                                    }
                                 },
-                                RenderInfo = {
-                                    mesh = 'objects/tile/Blocks/FoundationBlock/FoundationBlockLow.obj',
-                                    material = materials[3]
-                                }
                             },
                         }
                     },
@@ -1647,13 +1819,23 @@ local extras = {
                         position = {8, -0.49, 3},
                         children = {
                             {
-                                Name = "FoundationBlockLow1",
+                                Name = "TerrainBlockV3",
                                 Transform = {
+                                    position = {0, 0, -0.36},
+                                    children = {
+                                        {
+                                            Name = "TerrainBlockV3LowPoly1",
+                                            Transform = {
+                                                position = {-0.3820662, 0, 0.3415085},
+                                                rotation = {0, 89.99983, 0},
+                                            },
+                                            RenderInfo = {
+                                                mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
+                                                material = materials[3]
+                                            }
+                                        },
+                                    }
                                 },
-                                RenderInfo = {
-                                    mesh = 'objects/tile/Blocks/FoundationBlock/FoundationBlockLow.obj',
-                                    material = materials[3]
-                                }
                             },
                         }
                     },
@@ -1664,13 +1846,23 @@ local extras = {
                         position = {8, -1.49, 3},
                         children = {
                             {
-                                Name = "FoundationBlockLow1",
+                                Name = "TerrainBlockV3",
                                 Transform = {
+                                    position = {0, 0, -0.36},
+                                    children = {
+                                        {
+                                            Name = "TerrainBlockV3LowPoly1",
+                                            Transform = {
+                                                position = {-0.3820662, 0, 0.3415085},
+                                                rotation = {0, 89.99983, 0},
+                                            },
+                                            RenderInfo = {
+                                                mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
+                                                material = materials[3]
+                                            }
+                                        },
+                                    }
                                 },
-                                RenderInfo = {
-                                    mesh = 'objects/tile/Blocks/FoundationBlock/FoundationBlockLow.obj',
-                                    material = materials[3]
-                                }
                             },
                         }
                     },
@@ -1805,13 +1997,23 @@ local extras = {
                         position = {9, -0.49, 4},
                         children = {
                             {
-                                Name = "FoundationBlockLow1",
+                                Name = "TerrainBlockV3",
                                 Transform = {
+                                    position = {0, 0, -0.36},
+                                    children = {
+                                        {
+                                            Name = "TerrainBlockV3LowPoly1",
+                                            Transform = {
+                                                position = {-0.3820662, 0, 0.3415085},
+                                                rotation = {0, 89.99983, 0},
+                                            },
+                                            RenderInfo = {
+                                                mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
+                                                material = materials[3]
+                                            }
+                                        },
+                                    }
                                 },
-                                RenderInfo = {
-                                    mesh = 'objects/tile/Blocks/FoundationBlock/FoundationBlockLow.obj',
-                                    material = materials[3]
-                                }
                             },
                         }
                     },
@@ -1822,13 +2024,23 @@ local extras = {
                         position = {9, -1.49, 4},
                         children = {
                             {
-                                Name = "FoundationBlockLow1",
+                                Name = "TerrainBlockV3",
                                 Transform = {
+                                    position = {0, 0, -0.36},
+                                    children = {
+                                        {
+                                            Name = "TerrainBlockV3LowPoly1",
+                                            Transform = {
+                                                position = {-0.3820662, 0, 0.3415085},
+                                                rotation = {0, 89.99983, 0},
+                                            },
+                                            RenderInfo = {
+                                                mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
+                                                material = materials[3]
+                                            }
+                                        },
+                                    }
                                 },
-                                RenderInfo = {
-                                    mesh = 'objects/tile/Blocks/FoundationBlock/FoundationBlockLow.obj',
-                                    material = materials[3]
-                                }
                             },
                         }
                     },
@@ -1839,13 +2051,23 @@ local extras = {
                         position = {8, -0.49, 2},
                         children = {
                             {
-                                Name = "FoundationBlockLow1",
+                                Name = "TerrainBlockV3",
                                 Transform = {
+                                    position = {0, 0, -0.36},
+                                    children = {
+                                        {
+                                            Name = "TerrainBlockV3LowPoly1",
+                                            Transform = {
+                                                position = {-0.3820662, 0, 0.3415085},
+                                                rotation = {0, 89.99983, 0},
+                                            },
+                                            RenderInfo = {
+                                                mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
+                                                material = materials[3]
+                                            }
+                                        },
+                                    }
                                 },
-                                RenderInfo = {
-                                    mesh = 'objects/tile/Blocks/FoundationBlock/FoundationBlockLow.obj',
-                                    material = materials[3]
-                                }
                             },
                         }
                     },
@@ -1856,13 +2078,23 @@ local extras = {
                         position = {8, -1.49, 2},
                         children = {
                             {
-                                Name = "FoundationBlockLow1",
+                                Name = "TerrainBlockV3",
                                 Transform = {
+                                    position = {0, 0, -0.36},
+                                    children = {
+                                        {
+                                            Name = "TerrainBlockV3LowPoly1",
+                                            Transform = {
+                                                position = {-0.3820662, 0, 0.3415085},
+                                                rotation = {0, 89.99983, 0},
+                                            },
+                                            RenderInfo = {
+                                                mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
+                                                material = materials[3]
+                                            }
+                                        },
+                                    }
                                 },
-                                RenderInfo = {
-                                    mesh = 'objects/tile/Blocks/FoundationBlock/FoundationBlockLow.obj',
-                                    material = materials[3]
-                                }
                             },
                         }
                     },
@@ -1873,13 +2105,23 @@ local extras = {
                         position = {-1, -0.49, 4},
                         children = {
                             {
-                                Name = "FoundationBlockLow1",
+                                Name = "TerrainBlockV3",
                                 Transform = {
+                                    position = {0, 0, -0.36},
+                                    children = {
+                                        {
+                                            Name = "TerrainBlockV3LowPoly1",
+                                            Transform = {
+                                                position = {-0.3820662, 0, 0.3415085},
+                                                rotation = {0, 89.99983, 0},
+                                            },
+                                            RenderInfo = {
+                                                mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
+                                                material = materials[3]
+                                            }
+                                        },
+                                    }
                                 },
-                                RenderInfo = {
-                                    mesh = 'objects/tile/Blocks/FoundationBlock/FoundationBlockLow.obj',
-                                    material = materials[3]
-                                }
                             },
                         }
                     },
@@ -1890,13 +2132,23 @@ local extras = {
                         position = {8, -0.49, 0},
                         children = {
                             {
-                                Name = "FoundationBlockLow1",
+                                Name = "TerrainBlockV3",
                                 Transform = {
+                                    position = {0, 0, -0.36},
+                                    children = {
+                                        {
+                                            Name = "TerrainBlockV3LowPoly1",
+                                            Transform = {
+                                                position = {-0.3820662, 0, 0.3415085},
+                                                rotation = {0, 89.99983, 0},
+                                            },
+                                            RenderInfo = {
+                                                mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
+                                                material = materials[3]
+                                            }
+                                        },
+                                    }
                                 },
-                                RenderInfo = {
-                                    mesh = 'objects/tile/Blocks/FoundationBlock/FoundationBlockLow.obj',
-                                    material = materials[3]
-                                }
                             },
                         }
                     },
@@ -1925,13 +2177,23 @@ local extras = {
                         position = {9, -1.49, 0},
                         children = {
                             {
-                                Name = "FoundationBlockLow1",
+                                Name = "TerrainBlockV3",
                                 Transform = {
+                                    position = {0, 0, -0.36},
+                                    children = {
+                                        {
+                                            Name = "TerrainBlockV3LowPoly1",
+                                            Transform = {
+                                                position = {-0.3820662, 0, 0.3415085},
+                                                rotation = {0, 89.99983, 0},
+                                            },
+                                            RenderInfo = {
+                                                mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
+                                                material = materials[3]
+                                            }
+                                        },
+                                    }
                                 },
-                                RenderInfo = {
-                                    mesh = 'objects/tile/Blocks/FoundationBlock/FoundationBlockLow.obj',
-                                    material = materials[3]
-                                }
                             },
                         }
                     },
@@ -1959,13 +2221,23 @@ local extras = {
                         position = {8, 0.51, 2},
                         children = {
                             {
-                                Name = "FoundationBlockLow1",
+                                Name = "TerrainBlockV3",
                                 Transform = {
+                                    position = {0, 0, -0.36},
+                                    children = {
+                                        {
+                                            Name = "TerrainBlockV3LowPoly1",
+                                            Transform = {
+                                                position = {-0.3820662, 0, 0.3415085},
+                                                rotation = {0, 89.99983, 0},
+                                            },
+                                            RenderInfo = {
+                                                mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
+                                                material = materials[3]
+                                            }
+                                        },
+                                    }
                                 },
-                                RenderInfo = {
-                                    mesh = 'objects/tile/Blocks/FoundationBlock/FoundationBlockLow.obj',
-                                    material = materials[3]
-                                }
                             },
                         }
                     },
@@ -2013,13 +2285,23 @@ local extras = {
                         position = {10, -1.49, 4},
                         children = {
                             {
-                                Name = "FoundationBlockLow1",
+                                Name = "TerrainBlockV3",
                                 Transform = {
+                                    position = {0, 0, -0.36},
+                                    children = {
+                                        {
+                                            Name = "TerrainBlockV3LowPoly1",
+                                            Transform = {
+                                                position = {-0.3820662, 0, 0.3415085},
+                                                rotation = {0, 89.99983, 0},
+                                            },
+                                            RenderInfo = {
+                                                mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
+                                                material = materials[3]
+                                            }
+                                        },
+                                    }
                                 },
-                                RenderInfo = {
-                                    mesh = 'objects/tile/Blocks/FoundationBlock/FoundationBlockLow.obj',
-                                    material = materials[3]
-                                }
                             },
                         }
                     },
@@ -2030,13 +2312,23 @@ local extras = {
                         position = {8, -1.49, 0},
                         children = {
                             {
-                                Name = "FoundationBlockLow1",
+                                Name = "TerrainBlockV3",
                                 Transform = {
+                                    position = {0, 0, -0.36},
+                                    children = {
+                                        {
+                                            Name = "TerrainBlockV3LowPoly1",
+                                            Transform = {
+                                                position = {-0.3820662, 0, 0.3415085},
+                                                rotation = {0, 89.99983, 0},
+                                            },
+                                            RenderInfo = {
+                                                mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
+                                                material = materials[3]
+                                            }
+                                        },
+                                    }
                                 },
-                                RenderInfo = {
-                                    mesh = 'objects/tile/Blocks/FoundationBlock/FoundationBlockLow.obj',
-                                    material = materials[3]
-                                }
                             },
                         }
                     },
@@ -2153,13 +2445,23 @@ local extras = {
                         position = {1, -1.49, 3},
                         children = {
                             {
-                                Name = "FoundationBlockLow1",
+                                Name = "TerrainBlockV3",
                                 Transform = {
+                                    position = {0, 0, -0.36},
+                                    children = {
+                                        {
+                                            Name = "TerrainBlockV3LowPoly1",
+                                            Transform = {
+                                                position = {-0.3820662, 0, 0.3415085},
+                                                rotation = {0, 89.99983, 0},
+                                            },
+                                            RenderInfo = {
+                                                mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
+                                                material = materials[3]
+                                            }
+                                        },
+                                    }
                                 },
-                                RenderInfo = {
-                                    mesh = 'objects/tile/Blocks/FoundationBlock/FoundationBlockLow.obj',
-                                    material = materials[3]
-                                }
                             },
                         }
                     },
@@ -2170,13 +2472,23 @@ local extras = {
                         position = {0, -1.49, 2},
                         children = {
                             {
-                                Name = "FoundationBlockLow1",
+                                Name = "TerrainBlockV3",
                                 Transform = {
+                                    position = {0, 0, -0.36},
+                                    children = {
+                                        {
+                                            Name = "TerrainBlockV3LowPoly1",
+                                            Transform = {
+                                                position = {-0.3820662, 0, 0.3415085},
+                                                rotation = {0, 89.99983, 0},
+                                            },
+                                            RenderInfo = {
+                                                mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
+                                                material = materials[3]
+                                            }
+                                        },
+                                    }
                                 },
-                                RenderInfo = {
-                                    mesh = 'objects/tile/Blocks/FoundationBlock/FoundationBlockLow.obj',
-                                    material = materials[3]
-                                }
                             },
                         }
                     },
@@ -2187,13 +2499,23 @@ local extras = {
                         position = {0, -1.49, 1},
                         children = {
                             {
-                                Name = "FoundationBlockLow1",
+                                Name = "TerrainBlockV3",
                                 Transform = {
+                                    position = {0, 0, -0.36},
+                                    children = {
+                                        {
+                                            Name = "TerrainBlockV3LowPoly1",
+                                            Transform = {
+                                                position = {-0.3820662, 0, 0.3415085},
+                                                rotation = {0, 89.99983, 0},
+                                            },
+                                            RenderInfo = {
+                                                mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
+                                                material = materials[3]
+                                            }
+                                        },
+                                    }
                                 },
-                                RenderInfo = {
-                                    mesh = 'objects/tile/Blocks/FoundationBlock/FoundationBlockLow.obj',
-                                    material = materials[3]
-                                }
                             },
                         }
                     },
@@ -2204,13 +2526,23 @@ local extras = {
                         position = {1, -1.49, 0},
                         children = {
                             {
-                                Name = "FoundationBlockLow1",
+                                Name = "TerrainBlockV3",
                                 Transform = {
+                                    position = {0, 0, -0.36},
+                                    children = {
+                                        {
+                                            Name = "TerrainBlockV3LowPoly1",
+                                            Transform = {
+                                                position = {-0.3820662, 0, 0.3415085},
+                                                rotation = {0, 89.99983, 0},
+                                            },
+                                            RenderInfo = {
+                                                mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
+                                                material = materials[3]
+                                            }
+                                        },
+                                    }
                                 },
-                                RenderInfo = {
-                                    mesh = 'objects/tile/Blocks/FoundationBlock/FoundationBlockLow.obj',
-                                    material = materials[3]
-                                }
                             },
                         }
                     },
@@ -2238,13 +2570,23 @@ local extras = {
                         position = {2, -1.49, 0},
                         children = {
                             {
-                                Name = "FoundationBlockLow1",
+                                Name = "TerrainBlockV3",
                                 Transform = {
+                                    position = {0, 0, -0.36},
+                                    children = {
+                                        {
+                                            Name = "TerrainBlockV3LowPoly1",
+                                            Transform = {
+                                                position = {-0.3820662, 0, 0.3415085},
+                                                rotation = {0, 89.99983, 0},
+                                            },
+                                            RenderInfo = {
+                                                mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
+                                                material = materials[3]
+                                            }
+                                        },
+                                    }
                                 },
-                                RenderInfo = {
-                                    mesh = 'objects/tile/Blocks/FoundationBlock/FoundationBlockLow.obj',
-                                    material = materials[3]
-                                }
                             },
                         }
                     },
@@ -2255,13 +2597,23 @@ local extras = {
                         position = {3, -1.49, -1},
                         children = {
                             {
-                                Name = "FoundationBlockLow1",
+                                Name = "TerrainBlockV3",
                                 Transform = {
+                                    position = {0, 0, -0.36},
+                                    children = {
+                                        {
+                                            Name = "TerrainBlockV3LowPoly1",
+                                            Transform = {
+                                                position = {-0.3820662, 0, 0.3415085},
+                                                rotation = {0, 89.99983, 0},
+                                            },
+                                            RenderInfo = {
+                                                mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
+                                                material = materials[3]
+                                            }
+                                        },
+                                    }
                                 },
-                                RenderInfo = {
-                                    mesh = 'objects/tile/Blocks/FoundationBlock/FoundationBlockLow.obj',
-                                    material = materials[3]
-                                }
                             },
                         }
                     },
@@ -2272,13 +2624,23 @@ local extras = {
                         position = {3, -1.49, -2},
                         children = {
                             {
-                                Name = "FoundationBlockLow1",
+                                Name = "TerrainBlockV3",
                                 Transform = {
+                                    position = {0, 0, -0.36},
+                                    children = {
+                                        {
+                                            Name = "TerrainBlockV3LowPoly1",
+                                            Transform = {
+                                                position = {-0.3820662, 0, 0.3415085},
+                                                rotation = {0, 89.99983, 0},
+                                            },
+                                            RenderInfo = {
+                                                mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
+                                                material = materials[3]
+                                            }
+                                        },
+                                    }
                                 },
-                                RenderInfo = {
-                                    mesh = 'objects/tile/Blocks/FoundationBlock/FoundationBlockLow.obj',
-                                    material = materials[3]
-                                }
                             },
                         }
                     },
@@ -2289,13 +2651,23 @@ local extras = {
                         position = {4, -1.49, -2},
                         children = {
                             {
-                                Name = "FoundationBlockLow1",
+                                Name = "TerrainBlockV3",
                                 Transform = {
+                                    position = {0, 0, -0.36},
+                                    children = {
+                                        {
+                                            Name = "TerrainBlockV3LowPoly1",
+                                            Transform = {
+                                                position = {-0.3820662, 0, 0.3415085},
+                                                rotation = {0, 89.99983, 0},
+                                            },
+                                            RenderInfo = {
+                                                mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
+                                                material = materials[3]
+                                            }
+                                        },
+                                    }
                                 },
-                                RenderInfo = {
-                                    mesh = 'objects/tile/Blocks/FoundationBlock/FoundationBlockLow.obj',
-                                    material = materials[3]
-                                }
                             },
                         }
                     },
@@ -2306,13 +2678,23 @@ local extras = {
                         position = {5, -1.49, -2},
                         children = {
                             {
-                                Name = "FoundationBlockLow1",
+                                Name = "TerrainBlockV3",
                                 Transform = {
+                                    position = {0, 0, -0.36},
+                                    children = {
+                                        {
+                                            Name = "TerrainBlockV3LowPoly1",
+                                            Transform = {
+                                                position = {-0.3820662, 0, 0.3415085},
+                                                rotation = {0, 89.99983, 0},
+                                            },
+                                            RenderInfo = {
+                                                mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
+                                                material = materials[3]
+                                            }
+                                        },
+                                    }
                                 },
-                                RenderInfo = {
-                                    mesh = 'objects/tile/Blocks/FoundationBlock/FoundationBlockLow.obj',
-                                    material = materials[3]
-                                }
                             },
                         }
                     },
@@ -2323,13 +2705,23 @@ local extras = {
                         position = {6, -1.49, -1},
                         children = {
                             {
-                                Name = "FoundationBlockLow1",
+                                Name = "TerrainBlockV3",
                                 Transform = {
+                                    position = {0, 0, -0.36},
+                                    children = {
+                                        {
+                                            Name = "TerrainBlockV3LowPoly1",
+                                            Transform = {
+                                                position = {-0.3820662, 0, 0.3415085},
+                                                rotation = {0, 89.99983, 0},
+                                            },
+                                            RenderInfo = {
+                                                mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
+                                                material = materials[3]
+                                            }
+                                        },
+                                    }
                                 },
-                                RenderInfo = {
-                                    mesh = 'objects/tile/Blocks/FoundationBlock/FoundationBlockLow.obj',
-                                    material = materials[3]
-                                }
                             },
                         }
                     },
@@ -2340,13 +2732,23 @@ local extras = {
                         position = {7, -1.49, -1},
                         children = {
                             {
-                                Name = "FoundationBlockLow1",
+                                Name = "TerrainBlockV3",
                                 Transform = {
+                                    position = {0, 0, -0.36},
+                                    children = {
+                                        {
+                                            Name = "TerrainBlockV3LowPoly1",
+                                            Transform = {
+                                                position = {-0.3820662, 0, 0.3415085},
+                                                rotation = {0, 89.99983, 0},
+                                            },
+                                            RenderInfo = {
+                                                mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
+                                                material = materials[3]
+                                            }
+                                        },
+                                    }
                                 },
-                                RenderInfo = {
-                                    mesh = 'objects/tile/Blocks/FoundationBlock/FoundationBlockLow.obj',
-                                    material = materials[3]
-                                }
                             },
                         }
                     },
@@ -2357,13 +2759,23 @@ local extras = {
                         position = {8, -1.49, -1},
                         children = {
                             {
-                                Name = "FoundationBlockLow1",
+                                Name = "TerrainBlockV3",
                                 Transform = {
+                                    position = {0, 0, -0.36},
+                                    children = {
+                                        {
+                                            Name = "TerrainBlockV3LowPoly1",
+                                            Transform = {
+                                                position = {-0.3820662, 0, 0.3415085},
+                                                rotation = {0, 89.99983, 0},
+                                            },
+                                            RenderInfo = {
+                                                mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
+                                                material = materials[3]
+                                            }
+                                        },
+                                    }
                                 },
-                                RenderInfo = {
-                                    mesh = 'objects/tile/Blocks/FoundationBlock/FoundationBlockLow.obj',
-                                    material = materials[3]
-                                }
                             },
                         }
                     },
@@ -2374,13 +2786,23 @@ local extras = {
                         position = {3, -1.976, 8},
                         children = {
                             {
-                                Name = "FoundationBlockLow1",
+                                Name = "TerrainBlockV3",
                                 Transform = {
+                                    position = {0, 0, -0.36},
+                                    children = {
+                                        {
+                                            Name = "TerrainBlockV3LowPoly1",
+                                            Transform = {
+                                                position = {-0.3820662, 0, 0.3415085},
+                                                rotation = {0, 89.99983, 0},
+                                            },
+                                            RenderInfo = {
+                                                mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
+                                                material = materials[3]
+                                            }
+                                        },
+                                    }
                                 },
-                                RenderInfo = {
-                                    mesh = 'objects/tile/Blocks/FoundationBlock/FoundationBlockLow.obj',
-                                    material = materials[3]
-                                }
                             },
                         }
                     },
@@ -2391,13 +2813,23 @@ local extras = {
                         position = {9, -1.49, -1},
                         children = {
                             {
-                                Name = "FoundationBlockLow1",
+                                Name = "TerrainBlockV3",
                                 Transform = {
+                                    position = {0, 0, -0.36},
+                                    children = {
+                                        {
+                                            Name = "TerrainBlockV3LowPoly1",
+                                            Transform = {
+                                                position = {-0.3820662, 0, 0.3415085},
+                                                rotation = {0, 89.99983, 0},
+                                            },
+                                            RenderInfo = {
+                                                mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
+                                                material = materials[3]
+                                            }
+                                        },
+                                    }
                                 },
-                                RenderInfo = {
-                                    mesh = 'objects/tile/Blocks/FoundationBlock/FoundationBlockLow.obj',
-                                    material = materials[3]
-                                }
                             },
                         }
                     },
@@ -2408,13 +2840,23 @@ local extras = {
                         position = {1, -1.49, 1},
                         children = {
                             {
-                                Name = "FoundationBlockLow1",
+                                Name = "TerrainBlockV3",
                                 Transform = {
+                                    position = {0, 0, -0.36},
+                                    children = {
+                                        {
+                                            Name = "TerrainBlockV3LowPoly1",
+                                            Transform = {
+                                                position = {-0.3820662, 0, 0.3415085},
+                                                rotation = {0, 89.99983, 0},
+                                            },
+                                            RenderInfo = {
+                                                mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
+                                                material = materials[3]
+                                            }
+                                        },
+                                    }
                                 },
-                                RenderInfo = {
-                                    mesh = 'objects/tile/Blocks/FoundationBlock/FoundationBlockLow.obj',
-                                    material = materials[3]
-                                }
                             },
                         }
                     },
@@ -2443,13 +2885,23 @@ local extras = {
                         position = {3, -1.49, 0},
                         children = {
                             {
-                                Name = "FoundationBlockLow1",
+                                Name = "TerrainBlockV3",
                                 Transform = {
+                                    position = {0, 0, -0.36},
+                                    children = {
+                                        {
+                                            Name = "TerrainBlockV3LowPoly1",
+                                            Transform = {
+                                                position = {-0.3820662, 0, 0.3415085},
+                                                rotation = {0, 89.99983, 0},
+                                            },
+                                            RenderInfo = {
+                                                mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
+                                                material = materials[3]
+                                            }
+                                        },
+                                    }
                                 },
-                                RenderInfo = {
-                                    mesh = 'objects/tile/Blocks/FoundationBlock/FoundationBlockLow.obj',
-                                    material = materials[3]
-                                }
                             },
                         }
                     },
@@ -2478,13 +2930,23 @@ local extras = {
                         position = {-1, -1.49, 3},
                         children = {
                             {
-                                Name = "FoundationBlockLow1",
+                                Name = "TerrainBlockV3",
                                 Transform = {
+                                    position = {0, 0, -0.36},
+                                    children = {
+                                        {
+                                            Name = "TerrainBlockV3LowPoly1",
+                                            Transform = {
+                                                position = {-0.3820662, 0, 0.3415085},
+                                                rotation = {0, 89.99983, 0},
+                                            },
+                                            RenderInfo = {
+                                                mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
+                                                material = materials[3]
+                                            }
+                                        },
+                                    }
                                 },
-                                RenderInfo = {
-                                    mesh = 'objects/tile/Blocks/FoundationBlock/FoundationBlockLow.obj',
-                                    material = materials[3]
-                                }
                             },
                         }
                     },
@@ -2495,13 +2957,23 @@ local extras = {
                         position = {0, -1.49, 3},
                         children = {
                             {
-                                Name = "FoundationBlockLow1",
+                                Name = "TerrainBlockV3",
                                 Transform = {
+                                    position = {0, 0, -0.36},
+                                    children = {
+                                        {
+                                            Name = "TerrainBlockV3LowPoly1",
+                                            Transform = {
+                                                position = {-0.3820662, 0, 0.3415085},
+                                                rotation = {0, 89.99983, 0},
+                                            },
+                                            RenderInfo = {
+                                                mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
+                                                material = materials[3]
+                                            }
+                                        },
+                                    }
                                 },
-                                RenderInfo = {
-                                    mesh = 'objects/tile/Blocks/FoundationBlock/FoundationBlockLow.obj',
-                                    material = materials[3]
-                                }
                             },
                         }
                     },
@@ -2529,13 +3001,23 @@ local extras = {
                         position = {9, -1.49, 1},
                         children = {
                             {
-                                Name = "FoundationBlockLow1",
+                                Name = "TerrainBlockV3",
                                 Transform = {
+                                    position = {0, 0, -0.36},
+                                    children = {
+                                        {
+                                            Name = "TerrainBlockV3LowPoly1",
+                                            Transform = {
+                                                position = {-0.3820662, 0, 0.3415085},
+                                                rotation = {0, 89.99983, 0},
+                                            },
+                                            RenderInfo = {
+                                                mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
+                                                material = materials[3]
+                                            }
+                                        },
+                                    }
                                 },
-                                RenderInfo = {
-                                    mesh = 'objects/tile/Blocks/FoundationBlock/FoundationBlockLow.obj',
-                                    material = materials[3]
-                                }
                             },
                         }
                     },
@@ -2563,13 +3045,23 @@ local extras = {
                         position = {9, -1.49, 1},
                         children = {
                             {
-                                Name = "FoundationBlockLow1",
+                                Name = "TerrainBlockV3",
                                 Transform = {
+                                    position = {0, 0, -0.36},
+                                    children = {
+                                        {
+                                            Name = "TerrainBlockV3LowPoly1",
+                                            Transform = {
+                                                position = {-0.3820662, 0, 0.3415085},
+                                                rotation = {0, 89.99983, 0},
+                                            },
+                                            RenderInfo = {
+                                                mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
+                                                material = materials[3]
+                                            }
+                                        },
+                                    }
                                 },
-                                RenderInfo = {
-                                    mesh = 'objects/tile/Blocks/FoundationBlock/FoundationBlockLow.obj',
-                                    material = materials[3]
-                                }
                             },
                         }
                     },
@@ -2597,13 +3089,23 @@ local extras = {
                         position = {9, -1.49, 2},
                         children = {
                             {
-                                Name = "FoundationBlockLow1",
+                                Name = "TerrainBlockV3",
                                 Transform = {
+                                    position = {0, 0, -0.36},
+                                    children = {
+                                        {
+                                            Name = "TerrainBlockV3LowPoly1",
+                                            Transform = {
+                                                position = {-0.3820662, 0, 0.3415085},
+                                                rotation = {0, 89.99983, 0},
+                                            },
+                                            RenderInfo = {
+                                                mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
+                                                material = materials[3]
+                                            }
+                                        },
+                                    }
                                 },
-                                RenderInfo = {
-                                    mesh = 'objects/tile/Blocks/FoundationBlock/FoundationBlockLow.obj',
-                                    material = materials[3]
-                                }
                             },
                         }
                     },
@@ -2614,13 +3116,23 @@ local extras = {
                         position = {10, -1.49, 3},
                         children = {
                             {
-                                Name = "FoundationBlockLow1",
+                                Name = "TerrainBlockV3",
                                 Transform = {
+                                    position = {0, 0, -0.36},
+                                    children = {
+                                        {
+                                            Name = "TerrainBlockV3LowPoly1",
+                                            Transform = {
+                                                position = {-0.3820662, 0, 0.3415085},
+                                                rotation = {0, 89.99983, 0},
+                                            },
+                                            RenderInfo = {
+                                                mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
+                                                material = materials[3]
+                                            }
+                                        },
+                                    }
                                 },
-                                RenderInfo = {
-                                    mesh = 'objects/tile/Blocks/FoundationBlock/FoundationBlockLow.obj',
-                                    material = materials[3]
-                                }
                             },
                         }
                     },
@@ -2631,13 +3143,23 @@ local extras = {
                         position = {4, -1.976, 8},
                         children = {
                             {
-                                Name = "FoundationBlockLow1",
+                                Name = "TerrainBlockV3",
                                 Transform = {
+                                    position = {0, 0, -0.36},
+                                    children = {
+                                        {
+                                            Name = "TerrainBlockV3LowPoly1",
+                                            Transform = {
+                                                position = {-0.3820662, 0, 0.3415085},
+                                                rotation = {0, 89.99983, 0},
+                                            },
+                                            RenderInfo = {
+                                                mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
+                                                material = materials[3]
+                                            }
+                                        },
+                                    }
                                 },
-                                RenderInfo = {
-                                    mesh = 'objects/tile/Blocks/FoundationBlock/FoundationBlockLow.obj',
-                                    material = materials[3]
-                                }
                             },
                         }
                     },
@@ -2648,13 +3170,23 @@ local extras = {
                         position = {11, -1.49, 5},
                         children = {
                             {
-                                Name = "FoundationBlockLow1",
+                                Name = "TerrainBlockV3",
                                 Transform = {
+                                    position = {0, 0, -0.36},
+                                    children = {
+                                        {
+                                            Name = "TerrainBlockV3LowPoly1",
+                                            Transform = {
+                                                position = {-0.3820662, 0, 0.3415085},
+                                                rotation = {0, 89.99983, 0},
+                                            },
+                                            RenderInfo = {
+                                                mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
+                                                material = materials[3]
+                                            }
+                                        },
+                                    }
                                 },
-                                RenderInfo = {
-                                    mesh = 'objects/tile/Blocks/FoundationBlock/FoundationBlockLow.obj',
-                                    material = materials[3]
-                                }
                             },
                         }
                     },
@@ -2665,13 +3197,23 @@ local extras = {
                         position = {4, -1.49, 11},
                         children = {
                             {
-                                Name = "FoundationBlockLow1",
+                                Name = "TerrainBlockV3",
                                 Transform = {
+                                    position = {0, 0, -0.36},
+                                    children = {
+                                        {
+                                            Name = "TerrainBlockV3LowPoly1",
+                                            Transform = {
+                                                position = {-0.3820662, 0, 0.3415085},
+                                                rotation = {0, 89.99983, 0},
+                                            },
+                                            RenderInfo = {
+                                                mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
+                                                material = materials[3]
+                                            }
+                                        },
+                                    }
                                 },
-                                RenderInfo = {
-                                    mesh = 'objects/tile/Blocks/FoundationBlock/FoundationBlockLow.obj',
-                                    material = materials[3]
-                                }
                             },
                         }
                     },
@@ -2682,13 +3224,23 @@ local extras = {
                         position = {3, -1.49, 10},
                         children = {
                             {
-                                Name = "FoundationBlockLow1",
+                                Name = "TerrainBlockV3",
                                 Transform = {
+                                    position = {0, 0, -0.36},
+                                    children = {
+                                        {
+                                            Name = "TerrainBlockV3LowPoly1",
+                                            Transform = {
+                                                position = {-0.3820662, 0, 0.3415085},
+                                                rotation = {0, 89.99983, 0},
+                                            },
+                                            RenderInfo = {
+                                                mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
+                                                material = materials[3]
+                                            }
+                                        },
+                                    }
                                 },
-                                RenderInfo = {
-                                    mesh = 'objects/tile/Blocks/FoundationBlock/FoundationBlockLow.obj',
-                                    material = materials[3]
-                                }
                             },
                         }
                     },
@@ -2699,13 +3251,23 @@ local extras = {
                         position = {5, -1.976, 8},
                         children = {
                             {
-                                Name = "FoundationBlockLow1",
+                                Name = "TerrainBlockV3",
                                 Transform = {
+                                    position = {0, 0, -0.36},
+                                    children = {
+                                        {
+                                            Name = "TerrainBlockV3LowPoly1",
+                                            Transform = {
+                                                position = {-0.3820662, 0, 0.3415085},
+                                                rotation = {0, 89.99983, 0},
+                                            },
+                                            RenderInfo = {
+                                                mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
+                                                material = materials[3]
+                                            }
+                                        },
+                                    }
                                 },
-                                RenderInfo = {
-                                    mesh = 'objects/tile/Blocks/FoundationBlock/FoundationBlockLow.obj',
-                                    material = materials[3]
-                                }
                             },
                         }
                     },
@@ -2716,13 +3278,23 @@ local extras = {
                         position = {3, -1.49, 9},
                         children = {
                             {
-                                Name = "FoundationBlockLow1",
+                                Name = "TerrainBlockV3",
                                 Transform = {
+                                    position = {0, 0, -0.36},
+                                    children = {
+                                        {
+                                            Name = "TerrainBlockV3LowPoly1",
+                                            Transform = {
+                                                position = {-0.3820662, 0, 0.3415085},
+                                                rotation = {0, 89.99983, 0},
+                                            },
+                                            RenderInfo = {
+                                                mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
+                                                material = materials[3]
+                                            }
+                                        },
+                                    }
                                 },
-                                RenderInfo = {
-                                    mesh = 'objects/tile/Blocks/FoundationBlock/FoundationBlockLow.obj',
-                                    material = materials[3]
-                                }
                             },
                         }
                     },
@@ -2733,13 +3305,23 @@ local extras = {
                         position = {6, -1.976, 7},
                         children = {
                             {
-                                Name = "FoundationBlockLow1",
+                                Name = "TerrainBlockV3",
                                 Transform = {
+                                    position = {0, 0, -0.36},
+                                    children = {
+                                        {
+                                            Name = "TerrainBlockV3LowPoly1",
+                                            Transform = {
+                                                position = {-0.3820662, 0, 0.3415085},
+                                                rotation = {0, 89.99983, 0},
+                                            },
+                                            RenderInfo = {
+                                                mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
+                                                material = materials[3]
+                                            }
+                                        },
+                                    }
                                 },
-                                RenderInfo = {
-                                    mesh = 'objects/tile/Blocks/FoundationBlock/FoundationBlockLow.obj',
-                                    material = materials[3]
-                                }
                             },
                         }
                     },
@@ -2750,13 +3332,23 @@ local extras = {
                         position = {1, -1.49, 8},
                         children = {
                             {
-                                Name = "FoundationBlockLow1",
+                                Name = "TerrainBlockV3",
                                 Transform = {
+                                    position = {0, 0, -0.36},
+                                    children = {
+                                        {
+                                            Name = "TerrainBlockV3LowPoly1",
+                                            Transform = {
+                                                position = {-0.3820662, 0, 0.3415085},
+                                                rotation = {0, 89.99983, 0},
+                                            },
+                                            RenderInfo = {
+                                                mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
+                                                material = materials[3]
+                                            }
+                                        },
+                                    }
                                 },
-                                RenderInfo = {
-                                    mesh = 'objects/tile/Blocks/FoundationBlock/FoundationBlockLow.obj',
-                                    material = materials[3]
-                                }
                             },
                         }
                     },
@@ -2767,13 +3359,23 @@ local extras = {
                         position = {1, -1.49, 7},
                         children = {
                             {
-                                Name = "FoundationBlockLow1",
+                                Name = "TerrainBlockV3",
                                 Transform = {
+                                    position = {0, 0, -0.36},
+                                    children = {
+                                        {
+                                            Name = "TerrainBlockV3LowPoly1",
+                                            Transform = {
+                                                position = {-0.3820662, 0, 0.3415085},
+                                                rotation = {0, 89.99983, 0},
+                                            },
+                                            RenderInfo = {
+                                                mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
+                                                material = materials[3]
+                                            }
+                                        },
+                                    }
                                 },
-                                RenderInfo = {
-                                    mesh = 'objects/tile/Blocks/FoundationBlock/FoundationBlockLow.obj',
-                                    material = materials[3]
-                                }
                             },
                         }
                     },
@@ -2784,13 +3386,23 @@ local extras = {
                         position = {8, 0.51, 4},
                         children = {
                             {
-                                Name = "FoundationBlockLow1",
+                                Name = "TerrainBlockV3",
                                 Transform = {
+                                    position = {0, 0, -0.36},
+                                    children = {
+                                        {
+                                            Name = "TerrainBlockV3LowPoly1",
+                                            Transform = {
+                                                position = {-0.3820662, 0, 0.3415085},
+                                                rotation = {0, 89.99983, 0},
+                                            },
+                                            RenderInfo = {
+                                                mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
+                                                material = materials[3]
+                                            }
+                                        },
+                                    }
                                 },
-                                RenderInfo = {
-                                    mesh = 'objects/tile/Blocks/FoundationBlock/FoundationBlockLow.obj',
-                                    material = materials[3]
-                                }
                             },
                         }
                     },
@@ -2801,13 +3413,23 @@ local extras = {
                         position = {0, -1.49, 6},
                         children = {
                             {
-                                Name = "FoundationBlockLow1",
+                                Name = "TerrainBlockV3",
                                 Transform = {
+                                    position = {0, 0, -0.36},
+                                    children = {
+                                        {
+                                            Name = "TerrainBlockV3LowPoly1",
+                                            Transform = {
+                                                position = {-0.3820662, 0, 0.3415085},
+                                                rotation = {0, 89.99983, 0},
+                                            },
+                                            RenderInfo = {
+                                                mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
+                                                material = materials[3]
+                                            }
+                                        },
+                                    }
                                 },
-                                RenderInfo = {
-                                    mesh = 'objects/tile/Blocks/FoundationBlock/FoundationBlockLow.obj',
-                                    material = materials[3]
-                                }
                             },
                         }
                     },
@@ -2818,13 +3440,23 @@ local extras = {
                         position = {0, -1.49, 5},
                         children = {
                             {
-                                Name = "FoundationBlockLow1",
+                                Name = "TerrainBlockV3",
                                 Transform = {
+                                    position = {0, 0, -0.36},
+                                    children = {
+                                        {
+                                            Name = "TerrainBlockV3LowPoly1",
+                                            Transform = {
+                                                position = {-0.3820662, 0, 0.3415085},
+                                                rotation = {0, 89.99983, 0},
+                                            },
+                                            RenderInfo = {
+                                                mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
+                                                material = materials[3]
+                                            }
+                                        },
+                                    }
                                 },
-                                RenderInfo = {
-                                    mesh = 'objects/tile/Blocks/FoundationBlock/FoundationBlockLow.obj',
-                                    material = materials[3]
-                                }
                             },
                         }
                     },
@@ -3015,13 +3647,23 @@ local extras = {
                         position = {6, 0.51, 4},
                         children = {
                             {
-                                Name = "FoundationBlockLow1",
+                                Name = "TerrainBlockV3",
                                 Transform = {
+                                    position = {0, 0, -0.36},
+                                    children = {
+                                        {
+                                            Name = "TerrainBlockV3LowPoly1",
+                                            Transform = {
+                                                position = {-0.3820662, 0, 0.3415085},
+                                                rotation = {0, 89.99983, 0},
+                                            },
+                                            RenderInfo = {
+                                                mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
+                                                material = materials[3]
+                                            }
+                                        },
+                                    }
                                 },
-                                RenderInfo = {
-                                    mesh = 'objects/tile/Blocks/FoundationBlock/FoundationBlockLow.obj',
-                                    material = materials[3]
-                                }
                             },
                         }
                     },
@@ -3050,13 +3692,23 @@ local extras = {
                         position = {1, -1.49, 9},
                         children = {
                             {
-                                Name = "FoundationBlockLow1",
+                                Name = "TerrainBlockV3",
                                 Transform = {
+                                    position = {0, 0, -0.36},
+                                    children = {
+                                        {
+                                            Name = "TerrainBlockV3LowPoly1",
+                                            Transform = {
+                                                position = {-0.3820662, 0, 0.3415085},
+                                                rotation = {0, 89.99983, 0},
+                                            },
+                                            RenderInfo = {
+                                                mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
+                                                material = materials[3]
+                                            }
+                                        },
+                                    }
                                 },
-                                RenderInfo = {
-                                    mesh = 'objects/tile/Blocks/FoundationBlock/FoundationBlockLow.obj',
-                                    material = materials[3]
-                                }
                             },
                         }
                     },
@@ -3067,13 +3719,23 @@ local extras = {
                         position = {7, 0.51, 4},
                         children = {
                             {
-                                Name = "FoundationBlockLow1",
+                                Name = "TerrainBlockV3",
                                 Transform = {
+                                    position = {0, 0, -0.36},
+                                    children = {
+                                        {
+                                            Name = "TerrainBlockV3LowPoly1",
+                                            Transform = {
+                                                position = {-0.3820662, 0, 0.3415085},
+                                                rotation = {0, 89.99983, 0},
+                                            },
+                                            RenderInfo = {
+                                                mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
+                                                material = materials[3]
+                                            }
+                                        },
+                                    }
                                 },
-                                RenderInfo = {
-                                    mesh = 'objects/tile/Blocks/FoundationBlock/FoundationBlockLow.obj',
-                                    material = materials[3]
-                                }
                             },
                         }
                     },
@@ -3107,6 +3769,25 @@ local extras = {
                                 RenderInfo = {
                                     mesh = 'objects/decorations/MenuFloor/MenuFLoor_01.obj',
                                     material = materials[5]
+                                }
+                            },
+                        }
+                    },
+                },
+                {
+                    Name = "vine_02 (3)",
+                    Transform = {
+                        position = {5.063, 2.206, 7.61},
+                        rotation = {343.5566, 270.0001, 358.2078},
+                        scale = {1.4196, 1.2025, 0.9999999},
+                        children = {
+                            {
+                                Name = "vine_02",
+                                Transform = {
+                                },
+                                RenderInfo = {
+                                    mesh = 'objects/decorations/Plants/vine_02.obj',
+                                    material = materials[7]
                                 }
                             },
                         }

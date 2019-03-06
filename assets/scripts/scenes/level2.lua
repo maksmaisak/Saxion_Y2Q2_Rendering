@@ -57,10 +57,19 @@ local materials = {
     },
     {
         shader = 'pbr',
-        metallicMultiplier = 0,
-        smoothnessMultiplier = 0,
+        albedo = 'objects/Door/Texture/Door_01_AlbedoTransparency.png',
+        metallicSmoothness = 'objects/Door/Texture/Door_01_MetallicSmoothness.png',
+        ao = 'objects/Door/Texture/Door_01_AO.png',
+        smoothnessMultiplier = 1,
         aoMultiplier = 1,
-        albedoColor = {0.8, 0.8, 0.8, 1}
+    },
+    {
+        shader = 'pbr',
+        albedo = 'objects/Door/Texture/DoorPilars_01_AlbedoTransparency.png',
+        metallicSmoothness = 'objects/Door/Texture/DoorPilars_01_MetallicSmoothness.png',
+        ao = 'objects/Door/Texture/DoorPilars_01_AO.png',
+        smoothnessMultiplier = 1,
+        aoMultiplier = 1,
     },
 }
 
@@ -1092,6 +1101,60 @@ grid[8][4].tile = {
     },
 }
 
+grid[3][6].obstacle = {
+    Name = "PillarRight",
+    Transform = {
+        position = {2, 0, 5},
+        children = {
+            {
+                Name = "DoorPilars_03",
+                Transform = {
+                    position = {1.281, 0, -0.003225},
+                    children = {
+                        {
+                            Name = "DoorPilars_01",
+                            Transform = {
+                                rotation = {0, 89.99983, 0},
+                            },
+                            RenderInfo = {
+                                mesh = 'objects/Door/DoorPilars_03.obj',
+                                material = materials[9]
+                            }
+                        },
+                    }
+                },
+            },
+        }
+    },
+}
+
+grid[5][6].obstacle = {
+    Name = "PillarLeft",
+    Transform = {
+        position = {4, 0, 5},
+        children = {
+            {
+                Name = "DoorPilars_02",
+                Transform = {
+                    position = {-1.305, -0.004, 0.02299982},
+                    rotation = {0, 89.99984, 0},
+                    children = {
+                        {
+                            Name = "DoorPilars_02",
+                            Transform = {
+                            },
+                            RenderInfo = {
+                                mesh = 'objects/Door/DoorPilars_02.obj',
+                                material = materials[9]
+                            }
+                        },
+                    }
+                },
+            },
+        }
+    },
+}
+
 grid[4][8].goal = {
     startActive = true,
     actor = {
@@ -1160,67 +1223,6 @@ grid[4][6].door = {
         Name = "Door",
         Transform = {
             position = {3, 0, 5},
-            children = {
-                {
-                    Name = "cube_flat",
-                    Transform = {
-                        position = {-0.5, 0.5, 0},
-                        scale = {0.1, 0.52, 0.2},
-                        children = {
-                            {
-                                Name = "default",
-                                Transform = {
-                                },
-                                RenderInfo = {
-                                    mesh = 'objects/tile/cube_flat.obj',
-                                    material = materials[8]
-                                }
-                            },
-                        }
-                    },
-                },
-                {
-                    Name = "cube_flat (1)",
-                    Transform = {
-                        position = {0.5, 0.5, 0},
-                        scale = {0.1, 0.52, 0.2},
-                        children = {
-                            {
-                                Name = "default",
-                                Transform = {
-                                },
-                                RenderInfo = {
-                                    mesh = 'objects/tile/cube_flat.obj',
-                                    material = materials[8]
-                                }
-                            },
-                        }
-                    },
-                },
-                {
-                    Name = "DoorModelLow",
-                    Transform = {
-                        position = {-2.909737, -0.76, 4.147103},
-                        children = {
-                            {
-                                Name = "Door_DoorLow_DoorLow1",
-                                Transform = {
-                                },
-                            },
-                            {
-                                Name = "Door_DoorLow_DoorLow2",
-                                Transform = {
-                                },
-                            },
-                            {
-                                Name = "DoorColumns_Door_DoorLow",
-                                Transform = {
-                                },
-                            },
-                        }
-                    },
-                },
-            }
         },
     },
     swingLeft = {
@@ -1229,17 +1231,18 @@ grid[4][6].door = {
             position = {0.5, 0, 0},
             children = {
                 {
-                    Name = "cube_flat",
+                    Name = "Door_01",
                     Transform = {
-                        position = {-0.25, 0.5, 0},
-                        scale = {0.25, 0.5, 0.09999999},
+                        position = {-0.497, 0, -4.3889E-07},
+                        rotation = {0, 270.0002, 0},
+                        scale = {1, 1, 0.6418437},
                         children = {
                             {
-                                Name = "default",
+                                Name = "Door_01",
                                 Transform = {
                                 },
                                 RenderInfo = {
-                                    mesh = 'objects/tile/cube_flat.obj',
+                                    mesh = 'objects/Door/Door_01.obj',
                                     material = materials[8]
                                 }
                             },
@@ -1255,17 +1258,18 @@ grid[4][6].door = {
             position = {-0.5, 0, 0},
             children = {
                 {
-                    Name = "cube_flat",
+                    Name = "Door_01 (1)",
                     Transform = {
-                        position = {0.25, 0.5, 0},
-                        scale = {0.25, 0.5, 0.1},
+                        position = {-0.04400003, 0, 0},
+                        rotation = {0, 270.0002, 0},
+                        scale = {1, 1, 0.6418437},
                         children = {
                             {
-                                Name = "default",
+                                Name = "Door_01",
                                 Transform = {
                                 },
                                 RenderInfo = {
-                                    mesh = 'objects/tile/cube_flat.obj',
+                                    mesh = 'objects/Door/Door_01.obj',
                                     material = materials[8]
                                 }
                             },
@@ -2742,6 +2746,14 @@ local extras = {
     {
         Name = "Doors",
         Transform = {
+            children = {
+                {
+                    Name = "Door",
+                    Transform = {
+                        position = {3, 0, 5},
+                    },
+                },
+            }
         },
     },
 }

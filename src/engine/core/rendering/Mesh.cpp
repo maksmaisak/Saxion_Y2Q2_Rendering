@@ -4,6 +4,7 @@
 #include <fstream>
 #include <assimp/mesh.h>
 #include <functional>
+#include <utils/Meta.h>
 
 #include "Mesh.hpp"
 #include "GLHelpers.h"
@@ -374,43 +375,30 @@ void Mesh::generateTangentsAndBitangents() {
 	}
 
 	for (std::size_t index = 0; index < numVertices; ++index) {
-		m_tangents  [index] = glm::normalize(m_tangents[index]);
+		m_tangents  [index] = glm::normalize(m_tangents  [index]);
 		m_bitangents[index] = glm::normalize(m_bitangents[index]);
 	}
 }
 
 void Mesh::buffer() {
 
-	glGenBuffers(1, &m_indexBufferId);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBufferId);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_indices.size() * sizeof(unsigned), m_indices.data(), GL_STATIC_DRAW);
-	glCheckError();
+	static auto bufferVector = [](GLuint& bufferId, const auto& vec, GLenum bufferKind = GL_ARRAY_BUFFER) {
 
-	glGenBuffers(1, &m_vertexBufferId);
-	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBufferId);
-	glBufferData(GL_ARRAY_BUFFER, m_vertices.size() * sizeof(glm::vec3), m_vertices.data(), GL_STATIC_DRAW);
-	glCheckError();
+		using T = typename utils::remove_cvref_t<decltype(vec)>::value_type;
 
-	glGenBuffers(1, &m_normalBufferId);
-	glBindBuffer(GL_ARRAY_BUFFER, m_normalBufferId);
-	glBufferData(GL_ARRAY_BUFFER, m_normals.size() * sizeof(glm::vec3), m_normals.data(), GL_STATIC_DRAW);
-	glCheckError();
+		glGenBuffers(1, &bufferId);
+		glBindBuffer(bufferKind, bufferId);
+		glBufferData(bufferKind, vec.size() * sizeof(T), vec.data(), GL_STATIC_DRAW);
+		glCheckError();
+	};
 
-	glGenBuffers(1, &m_uvBufferId);
-	glBindBuffer(GL_ARRAY_BUFFER, m_uvBufferId);
-	glBufferData(GL_ARRAY_BUFFER, m_uvs.size() * sizeof(glm::vec2), m_uvs.data(), GL_STATIC_DRAW);
-	glCheckError();
+	bufferVector(m_indexBufferId, m_indices, GL_ELEMENT_ARRAY_BUFFER);
 
-	glGenBuffers(1, &m_tangentBufferId);
-	glBindBuffer(GL_ARRAY_BUFFER, m_tangentBufferId);
-	glBufferData(GL_ARRAY_BUFFER, m_tangents.size() * sizeof(glm::vec3), m_tangents.data(), GL_STATIC_DRAW);
-	glCheckError();
-
-	glGenBuffers(1, &m_bitangentBufferId);
-	glBindBuffer(GL_ARRAY_BUFFER, m_bitangentBufferId);
-	glBufferData(GL_ARRAY_BUFFER, m_bitangents.size() * sizeof(glm::vec3), m_bitangents.data(), GL_STATIC_DRAW);
-	glCheckError();
-
+	bufferVector(m_vertexBufferId   , m_vertices  );
+	bufferVector(m_normalBufferId   , m_normals   );
+	bufferVector(m_uvBufferId       , m_uvs       );
+	bufferVector(m_tangentBufferId  , m_tangents  );
+	bufferVector(m_bitangentBufferId, m_bitangents);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	glGenVertexArrays(1, &m_vao);

@@ -117,10 +117,6 @@ function Player:activateButton(gridPosition)
 	playSoundObject('audio/pressurePlateLower.wav',0,false,20)
 	stopSoundObject('audio/pressurePlateRise.wav')
 
-	local buttonPosition	  = button.transform.position
-	buttonPosition.y		  = buttonPosition.y - 0.5
-	button.transform.position = buttonPosition
-
 	self:activateButtonTarget(button)
 
 	print("Button activated")
@@ -144,10 +140,6 @@ function Player:disableButton(gridPosition)
 
 	playSoundObject('audio/pressurePlateRise.wav',0,false,20)
 	stopSoundObject('audio/pressurePlateLower.wav')
-
-	local buttonPosition	  = button.transform.position
-	buttonPosition.y		  = buttonPosition.y + 0.5
-	button.transform.position = buttonPosition
 
 	self:deactivateButtonTarget(button)
 	print("Button Deactivated")

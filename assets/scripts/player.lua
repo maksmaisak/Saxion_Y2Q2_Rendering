@@ -158,13 +158,6 @@ function Player:activateButtonTarget(button)
 			print("Activating goal")
 			local goal = target.goal
 
-			-- play goal activation "animation" this is a placeholder (it moves the position)
-			-- replace it when with the real one when is done
-			local goalPosition		= goal.transform.position
-			goalPosition.y 			=
-			goalPosition.y + 0.5
-			goal.transform.position	= goalPosition
-
 		elseif target.door ~= nil then
 
 			print("Activating door")
@@ -188,12 +181,6 @@ function Player:deactivateButtonTarget(button)
 			print("Deactivating goal")
 
 			local goal = target.goal
-
-			-- play goal activation "animation" this is a placeholder (it moves the position)
-			-- replace it when with the real one when is done
-			local goalPosition		= goal.transform.position
-			goalPosition.y 			= goalPosition.y - 0.5
-			goal.transform.position	= goalPosition
 
 		elseif target.door ~= nil then
 

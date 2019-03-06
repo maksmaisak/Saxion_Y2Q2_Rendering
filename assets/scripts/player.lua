@@ -378,7 +378,7 @@ function Player:moveToPosition(nextPosition, canRegisterMove, didUsePortal)
 
 	local directionX = self.gridPosition.x - self.lastPosition.x
 	local directionY = self.gridPosition.y - self.lastPosition.y
-	local angle = math.atan2(directionX, directionY) * 180 / math.pi
+	local angle = math.atan(directionX, directionY) * 180 / math.pi
 	self.transform:tweenRotation({0, angle, 0}, 0.2, Ease.outQuad)
 end
 

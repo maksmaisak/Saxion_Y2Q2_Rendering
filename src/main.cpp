@@ -44,16 +44,16 @@ int main() {
         engine->addSystem<en::DestroySystem>();
     }
 
-//    en::LuaState& lua = engine->getLuaState();
-//    lua_getglobal(lua, "Config");
-//    auto popConfig = lua::PopperOnDestruct(lua);
-//    std::optional<std::string> startScene = lua.tryGetField<std::string>("startScene");
-//    if (startScene)
-//        engine->getSceneManager().setCurrentScene<en::LuaScene>(engine->getLuaState(), *startScene);
-//    lua.pop();
+    en::LuaState& lua = engine->getLuaState();
+    lua_getglobal(lua, "Config");
+    auto popConfig = lua::PopperOnDestruct(lua);
+    std::optional<std::string> startScene = lua.tryGetField<std::string>("startScene");
+    if (startScene)
+        engine->getSceneManager().setCurrentScene<en::LuaScene>(engine->getLuaState(), *startScene);
+    lua.pop();
 
     //engine->getSceneManager().setCurrentScene<TestScene>();
-    engine->getSceneManager().setCurrentScene<LightingScene>();
+    //engine->getSceneManager().setCurrentScene<LightingScene>();
     //engine->getSceneManager().setCurrentScene<TerrainScene>();
 
     engine->run();

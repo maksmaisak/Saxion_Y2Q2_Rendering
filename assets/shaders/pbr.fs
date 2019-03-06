@@ -257,7 +257,16 @@ float CalculateDirectionalShadowMultiplier(int i, float biasMultiplier) {
         return 1;
 
     float bias = max(0.005 * biasMultiplier, 0.001);
-    return texture(directionalDepthMaps, vec4(projected.xy, i, currentDepth - bias));
+    //return texture(directionalDepthMaps, vec4(projected.xy, i, currentDepth - bias));
+
+    float shadow = 0.0;
+    vec3 texelSize = 1.0 / textureSize(directionalDepthMaps, 0);
+    for (int x = -1; x <= 1; ++x)
+        for (int y = -1; y <= 1; ++y)
+            shadow += texture(directionalDepthMaps, vec4(projected.xy + vec2(x, y) * texelSize.xy, i, currentDepth - bias));
+    shadow /= 9.0;
+
+    return shadow;
 }
 
 float CalculatePointShadowMultiplier(int i, vec3 fromLight, float distance, float biasMultiplier) {

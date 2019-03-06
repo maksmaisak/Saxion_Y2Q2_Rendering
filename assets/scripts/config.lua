@@ -5,8 +5,8 @@ height = 1080
 fullscreen = false
 framerateCap = 240
 vsync = true
-startScene = 'assets/scripts/UI/mainMenu.lua'
---startScene = 'assets/scripts/scenes/level1.lua'
+--startScene = 'assets/scripts/UI/mainMenu.lua'
+startScene = 'assets/scripts/scenes/level1.lua'
 --startScene = 'assets/scripts/scenes/test/testTweening.lua'
 referenceResolution = {1920, 1080}
 

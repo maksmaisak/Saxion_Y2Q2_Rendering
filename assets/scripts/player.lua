@@ -117,10 +117,6 @@ function Player:activateButton(gridPosition)
 	playSoundObject('audio/pressurePlateLower.wav',0,false,20)
 	stopSoundObject('audio/pressurePlateRise.wav')
 
-	local buttonPosition	  = button.transform.position
-	buttonPosition.y		  = buttonPosition.y - 0.5
-	button.transform.position = buttonPosition
-
 	self:activateButtonTarget(button)
 
 	print("Button activated")
@@ -145,10 +141,6 @@ function Player:disableButton(gridPosition)
 	playSoundObject('audio/pressurePlateRise.wav',0,false,20)
 	stopSoundObject('audio/pressurePlateLower.wav')
 
-	local buttonPosition	  = button.transform.position
-	buttonPosition.y		  = buttonPosition.y + 0.5
-	button.transform.position = buttonPosition
-
 	self:deactivateButtonTarget(button)
 	print("Button Deactivated")
 end
@@ -166,19 +158,17 @@ function Player:activateButtonTarget(button)
 			print("Activating goal")
 			local goal = target.goal
 
-			-- play goal activation "animation" this is a placeholder (it moves the position)
-			-- replace it when with the real one when is done
-			local goalPosition		= goal.transform.position
-			goalPosition.y 			=
-			goalPosition.y + 0.5
-			goal.transform.position	= goalPosition
-
 		elseif target.door ~= nil then
 
 			print("Activating door")
 			local door = target.door
-			door.swingLeftTransform:rotate ( 90, 0, 1, 0)
-			door.swingRightTransform:rotate(-90, 0, 1, 0)
+
+			
+			door.swingLeft:tweenKill()
+			door.swingRight:tweenKill()
+
+			door.swingLeftTransform:tweenRotation{ 0, 90, 0}
+			door.swingRightTransform:tweenRotation{0, -90, 0}
 		end
 	end
 end
@@ -197,19 +187,17 @@ function Player:deactivateButtonTarget(button)
 
 			local goal = target.goal
 
-			-- play goal activation "animation" this is a placeholder (it moves the position)
-			-- replace it when with the real one when is done
-			local goalPosition		= goal.transform.position
-			goalPosition.y 			= goalPosition.y - 0.5
-			goal.transform.position	= goalPosition
-
 		elseif target.door ~= nil then
 
 			print("Deactivating door")
 
 			local door = target.door
-			door.swingLeftTransform:rotate (-90, 0, 1, 0)
-			door.swingRightTransform:rotate( 90, 0, 1, 0)
+
+			door.swingLeft:tweenKill()
+			door.swingRight:tweenKill()
+
+			door.swingLeftTransform:tweenRotation {0, 0, 0}
+			door.swingRightTransform:tweenRotation{0, 0, 0}
 		end
 	end
 end

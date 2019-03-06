@@ -162,8 +162,13 @@ function Player:activateButtonTarget(button)
 
 			print("Activating door")
 			local door = target.door
-			door.swingLeftTransform:rotate ( 90, 0, 1, 0)
-			door.swingRightTransform:rotate(-90, 0, 1, 0)
+
+			
+			door.swingLeft:tweenKill()
+			door.swingRight:tweenKill()
+
+			door.swingLeftTransform:tweenRotation{ 0, 90, 0}
+			door.swingRightTransform:tweenRotation{0, -90, 0}
 		end
 	end
 end
@@ -187,8 +192,12 @@ function Player:deactivateButtonTarget(button)
 			print("Deactivating door")
 
 			local door = target.door
-			door.swingLeftTransform:rotate (-90, 0, 1, 0)
-			door.swingRightTransform:rotate( 90, 0, 1, 0)
+
+			door.swingLeft:tweenKill()
+			door.swingRight:tweenKill()
+
+			door.swingLeftTransform:tweenRotation {0, 0, 0}
+			door.swingRightTransform:tweenRotation{0, 0, 0}
 		end
 	end
 end

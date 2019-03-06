@@ -11,8 +11,6 @@
 #include <cassert>
 #include <memory>
 
-
-
 namespace en {
 
     struct NoLoader {};

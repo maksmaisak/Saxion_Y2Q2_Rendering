@@ -23,6 +23,8 @@
 #include "TerrainScene.h"
 #include "LuaScene.h"
 
+#include "Model.h"
+
 int main() {
 
     std::cout << "Starting Game" << std::endl;
@@ -44,6 +46,7 @@ int main() {
 
     en::LuaState& lua = engine->getLuaState();
     lua_getglobal(lua, "Config");
+    auto popConfig = lua::PopperOnDestruct(lua);
     std::optional<std::string> startScene = lua.tryGetField<std::string>("startScene");
     if (startScene)
         engine->getSceneManager().setCurrentScene<en::LuaScene>(engine->getLuaState(), *startScene);
@@ -52,19 +55,6 @@ int main() {
     //engine->getSceneManager().setCurrentScene<TestScene>();
     //engine->getSceneManager().setCurrentScene<LightingScene>();
     //engine->getSceneManager().setCurrentScene<TerrainScene>();
-
-    std::function<void()> update;
-    update = [&, engine = engine.get()](){
-
-        const auto* text = engine->findByName("TextElement").tryGet<en::Text>();
-        auto* sprite = engine->findByName("FontAtlasView").tryGet<en::Sprite>();
-        if (!text || !sprite)
-            return;
-
-        sprite->material->setUniformValue("spriteTexture", en::Material::FontAtlas{text->getFont(), text->getCharacterSize()});
-        engine->getScheduler().delay(sf::seconds(0.01f), update);
-    };
-    engine->getScheduler().delay(sf::seconds(0.01f), update);
 
     engine->run();
 

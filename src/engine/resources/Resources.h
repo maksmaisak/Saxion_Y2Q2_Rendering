@@ -11,7 +11,7 @@
 #include <type_traits>
 #include <algorithm>
 #include "Texture.hpp"
-#include "Mesh.hpp"
+#include "Model.h"
 #include "config.hpp"
 
 namespace en {
@@ -98,7 +98,7 @@ namespace en {
     template<typename TResource>
     std::map<std::string, std::shared_ptr<TResource>> Resources<TResource>::m_resources;
 
-    using Meshes = Resources<Mesh>;
+    using Models = Resources<Model>;
 
     struct Textures : Resources<Texture> {
 

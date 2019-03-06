@@ -44,7 +44,7 @@ namespace en {
              const glm::mat4& projectionMatrix
         );
         void render(
-            Mesh* mesh,
+            const Mesh* mesh,
             Engine* engine,
             DepthMaps* depthMaps,
             const glm::mat4& modelMatrix,
@@ -205,6 +205,7 @@ namespace en {
             "This type is unsupported for custom uniforms."
         );
 
+        // TODO Type checking for custom uniforms.
         auto& values = std::get<LocationToUniformValue<T>>(m_uniformValues);
         values[it->second.location] = value;
     }

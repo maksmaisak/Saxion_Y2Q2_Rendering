@@ -14,7 +14,8 @@
 
 WobblingMaterial::WobblingMaterial(std::shared_ptr<Texture> pDiffuseTexture) : m_diffuseTexture(std::move(pDiffuseTexture)) {
 
-    if (!m_shader) m_shader = en::Resources<en::ShaderProgram>::get("wobble");
+    if (!m_shader)
+        m_shader = en::Resources<en::ShaderProgram>::get("wobble");
 }
 
 WobblingMaterial::WobblingMaterial(const std::string& filename) : WobblingMaterial(en::Resources<Texture>::get(filename)) {}
@@ -23,7 +24,7 @@ void WobblingMaterial::setDiffuseTexture(std::shared_ptr<Texture> pDiffuseTextur
     m_diffuseTexture = pDiffuseTexture;
 }
 
-void WobblingMaterial::render(Mesh* mesh, en::Engine* engine, en::DepthMaps* depthMaps, const glm::mat4& pModelMatrix, const glm::mat4& pViewMatrix, const glm::mat4& pProjectionMatrix) {
+void WobblingMaterial::render(const en::Mesh* mesh, en::Engine* engine, en::DepthMaps* depthMaps, const glm::mat4& pModelMatrix, const glm::mat4& pViewMatrix, const glm::mat4& pProjectionMatrix) {
 
     m_shader->use();
 

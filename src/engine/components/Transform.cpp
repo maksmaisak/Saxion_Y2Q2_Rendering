@@ -155,7 +155,12 @@ glm::quat Transform::getWorldRotation() const {
 }
 
 glm::vec3 Transform::getForward() const {
-    return glm::normalize(glm::vec3(getWorldTransform()[2]));
+
+    // Since -z is forward, the forward direction of a matrix is the opposite of it's z axis
+    // (the vector onto which it maps (0,0,1))
+    auto dir = glm::vec3(getWorldTransform()[2]);
+    dir.z = -dir.z;
+    return glm::normalize(dir);
 }
 
 void Transform::initializeMetatable(LuaState& lua) {

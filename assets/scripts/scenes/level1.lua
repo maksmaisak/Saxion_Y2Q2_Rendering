@@ -1178,12 +1178,15 @@ local extras = {
         Name = "Directional Light",
         Transform = {
             position = {1, 3, 2},
-            rotation = {331.14, 235.539, -3.899392E-06},
+            rotation = {28.86, 124.461, 0},
         },
         Light = {
             kind = 'directional',
             intensity = 2.21,
             color = {1, 1, 1, 1},
+        },
+        LuaBehavior = {
+            --update = function(self, dt) self.actor:get("Transform"):rotate(dt * 10, 0, 1, 0) end
         }
     },
     {

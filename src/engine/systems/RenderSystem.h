@@ -36,7 +36,7 @@ namespace en {
 
         Actor getMainCamera();
         void updateDepthMapsDirectionalLights(const std::vector<Entity>& directionalLights);
-        void updateDepthMapsPositionalLights(const std::vector<Entity>& pointLights);
+        void updateDepthMapsPositionalLights (const std::vector<Entity>& pointLights);
 
         void renderUIRect(Entity entity, UIRect& rect);
         glm::vec2 getWindowSize();

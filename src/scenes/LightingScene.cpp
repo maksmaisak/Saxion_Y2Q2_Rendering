@@ -28,7 +28,7 @@ void LightingScene::open() {
 
     auto camera = engine.makeActor("Camera");
     camera.add<en::Camera>();
-    camera.add<en::Transform>();
+    camera.add<en::Transform>().move({0, 2, 7});
     camera.add<CameraOrbitBehavior>(7, -45.f, 89.f);
 
     auto ambientLight = engine.makeActor("AmbientLight");
@@ -43,7 +43,8 @@ void LightingScene::open() {
     auto directionalLight = engine.makeActor("DirectionalLight");
     directionalLight.add<RotatingBehavior>(glm::vec3(0, 1, 0), glm::radians(10.f));
     directionalLight.add<en::Transform>()
-        .setLocalRotation(glm::toQuat(glm::orientate4(glm::radians(glm::vec3(-45,0,-90)))));
+        //.rotate(glm::radians(0.f), {1, 0, 0});
+        .setLocalRotation(glm::toQuat(glm::orientate4(glm::radians(glm::vec3(45,0,0)))));
     {
         auto& l = directionalLight.add<en::Light>(en::Light::Kind::DIRECTIONAL);
         l.intensity = 0.2f;

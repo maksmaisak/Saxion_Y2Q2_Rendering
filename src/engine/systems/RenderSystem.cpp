@@ -299,7 +299,7 @@ glm::mat4 getDirectionalLightspaceTransform(const Light& light, const Transform&
         light.nearPlaneDistance, light.farPlaneDistance
     );
 
-    glm::mat4 lightViewMatrix = glm::lookAt(lightTransform.getForward() * 10, {0, 0, 0}, {0, 1, 0});
+    glm::mat4 lightViewMatrix = glm::lookAt(-lightTransform.getForward() * 10, {0, 0, 0}, {0, 1, 0});
 
     return lightProjectionMatrix * lightViewMatrix;
 }

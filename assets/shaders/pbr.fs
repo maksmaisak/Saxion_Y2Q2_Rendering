@@ -135,9 +135,10 @@ vec3 CalculateDirectionalLightContribution(int i, vec3 N, vec3 V, vec3 albedo, f
 
     DirectionalLight light = directionalLights[i];
 
-    vec3 brdf = CookTorranceBRDF(N, V, light.direction, albedo, metallic, roughness);
+    vec3 L = -light.direction;
+    vec3 brdf = CookTorranceBRDF(N, V, L, albedo, metallic, roughness);
 
-    float NdotL = max(dot(N, light.direction), 0.0);
+    float NdotL = max(dot(N, L), 0.0);
     float shadowMultiplier = CalculateDirectionalShadowMultiplier(i, 1 - NdotL);
 
     vec3 ambient = light.colorAmbient * albedo * ao;
@@ -237,7 +238,7 @@ vec3 CookTorranceBRDF(vec3 N, vec3 V, vec3 L, vec3 albedo, float metallic, float
     vec3  F   = FresnelSchlick(max(HdotV, 0.0), mix(vec3(0.04), albedo, metallic));
 
     vec3  nominator   = NDF * G * F;
-    float denominator = 4 * max(NdotV, 0.0) * max(NdotL, 0.0) + 0.001; // 0.001 to prevent divide by zero.
+    float denominator = 4 * max(NdotV, 0.0) * max(NdotL, 0.0) + 0.001; // 0.001 to prevent divide by zero
     vec3  specular = nominator / denominator;
 
     vec3 kS = F;
@@ -255,7 +256,7 @@ float CalculateDirectionalShadowMultiplier(int i, float biasMultiplier) {
     if (currentDepth > 1.f)
         return 1;
 
-    float bias = max(0.002 * biasMultiplier, 0.001);
+    float bias = max(0.05 * biasMultiplier, 0.005);
     return texture(directionalDepthMaps, vec4(projected.xy, i, currentDepth - bias));
 }
 

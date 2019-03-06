@@ -27,7 +27,7 @@ class AbstractMaterial {
          * Render the given mesh in the given engine using the given mvp matrices. Implement in subclass.
          */
         virtual void render(
-            en::Mesh* mesh,
+            const en::Mesh* mesh,
             en::Engine* pEngine,
             en::DepthMaps* depthMaps,
             const glm::mat4& matrixModel,

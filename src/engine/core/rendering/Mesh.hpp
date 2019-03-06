@@ -26,19 +26,27 @@ namespace en {
          */
 		static Mesh* load(std::string pFilename);
 		Mesh(const aiMesh* aiMesh);
+		Mesh(const Mesh& other) = delete;
+		Mesh& operator=(const Mesh& other) = delete;
+		Mesh(Mesh&& other) = default;
+		Mesh& operator=(Mesh&& other) = default;
 		~Mesh();
 
 		/**
          * Streams the mesh to opengl using the given indexes for the different attributes
          */
-		void render(GLint verticesAttrib = -1, GLint normalsAttrib = -1, GLint uvsAttrib = -1, GLint tangentAttrib = -1,
-					GLint bitangentAttrib = -1);
+		void render(
+			GLint verticesAttrib = -1,
+			GLint normalsAttrib = -1,
+			GLint uvsAttrib = -1,
+			GLint tangentAttrib = -1,
+			GLint bitangentAttrib = -1
+		) const;
 
 		/**
          * Draws debug info (normals) for the mesh using the given matrices)
          */
-		void
-		drawDebugInfo(const glm::mat4& pModelMatrix, const glm::mat4& pViewMatrix, const glm::mat4& pProjectionMatrix);
+		void drawDebugInfo(const glm::mat4& pModelMatrix, const glm::mat4& pViewMatrix, const glm::mat4& pProjectionMatrix);
 
 	protected:
 

@@ -8,7 +8,7 @@
 #define SAXION_Y2Q2_RENDERING_RENDERINFO_H
 
 #include <memory>
-#include "Mesh.hpp"
+#include "Model.h"
 #include "AbstractMaterial.hpp"
 #include "ComponentsToLua.h"
 
@@ -20,7 +20,7 @@ namespace en {
         static RenderInfo& addFromLua(Actor& actor, LuaState& lua);
         static void initializeMetatable(LuaState& lua);
 
-        std::shared_ptr<Mesh> mesh;
+        std::shared_ptr<Model> model;
         std::shared_ptr<AbstractMaterial> material;
 
         bool isEnabled = true;

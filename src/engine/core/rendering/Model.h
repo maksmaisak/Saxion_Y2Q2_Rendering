@@ -18,6 +18,10 @@ namespace en {
 
     public:
         static std::shared_ptr<Model> load(const std::string& filepath);
+        Model() = default;
+        Model(Mesh&& mesh);
+
+        const std::vector<Mesh>& getMeshes() const;
 
     private:
         std::string m_filepath;

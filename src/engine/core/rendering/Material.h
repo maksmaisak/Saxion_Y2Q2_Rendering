@@ -44,7 +44,7 @@ namespace en {
              const glm::mat4& projectionMatrix
         );
         void render(
-            Mesh* mesh,
+            const Mesh* mesh,
             Engine* engine,
             DepthMaps* depthMaps,
             const glm::mat4& modelMatrix,

@@ -78,31 +78,34 @@ void RenderSystem::start() {
     m_referenceResolution = lua.tryGetField<glm::vec2>("referenceResolution").value_or(glm::vec2(1920, 1080));
 }
 
-glm::mat4 getProjectionMatrix(Engine& engine, Camera& camera) {
+namespace {
 
-    auto size = engine.getWindow().getSize();
-    float aspectRatio = (float)size.x / size.y;
+    glm::mat4 getProjectionMatrix(Engine& engine, Camera& camera) {
 
-    if (camera.isOrthographic) {
+        auto size = engine.getWindow().getSize();
+        float aspectRatio = (float) size.x / size.y;
 
-        glm::vec2 halfSize = {
-            camera.orthographicHalfSize * aspectRatio,
-            camera.orthographicHalfSize
-        };
+        if (camera.isOrthographic) {
 
-        return glm::ortho(
-            -halfSize.x, halfSize.x,
-            -halfSize.y, halfSize.y,
-            camera.nearPlaneDistance, camera.farPlaneDistance
+            glm::vec2 halfSize = {
+                camera.orthographicHalfSize * aspectRatio,
+                camera.orthographicHalfSize
+            };
+
+            return glm::ortho(
+                -halfSize.x, halfSize.x,
+                -halfSize.y, halfSize.y,
+                camera.nearPlaneDistance, camera.farPlaneDistance
+            );
+        }
+
+        return glm::perspective(
+            glm::radians(camera.fov),
+            (float) size.x / size.y,
+            camera.nearPlaneDistance,
+            camera.farPlaneDistance
         );
     }
-
-    return glm::perspective(
-        glm::radians(camera.fov),
-        (float)size.x / size.y,
-        camera.nearPlaneDistance,
-        camera.farPlaneDistance
-    );
 }
 
 void RenderSystem::draw() {
@@ -152,17 +155,21 @@ void RenderSystem::renderEntities() {
     for (Entity e : m_registry->with<Transform, RenderInfo>()) {
 
         auto& renderInfo = m_registry->get<RenderInfo>(e);
-        if (!renderInfo.isEnabled || !renderInfo.material || !renderInfo.mesh)
+        if (!renderInfo.isEnabled || !renderInfo.material || !renderInfo.model)
             continue;
 
         const glm::mat4& matrixModel = m_registry->get<Transform>(e).getWorldTransform();
-        renderInfo.material->render(renderInfo.mesh.get(), m_engine, &m_depthMaps, matrixModel, matrixView, matrixProjection);
+        for (const Mesh& mesh : renderInfo.model->getMeshes()) {
+            renderInfo.material->render(&mesh,
+                m_engine,
+                &m_depthMaps,
+                matrixModel,
+                matrixView,
+                matrixProjection
+            );
+        }
 
         checkRenderingError(m_engine->actor(e));
-
-        if (m_displayMeshDebugInfo) {
-            renderInfo.mesh->drawDebugInfo(matrixModel, matrixView, matrixProjection);
-        }
     }
 }
 
@@ -322,15 +329,15 @@ void RenderSystem::updateDepthMapsDirectionalLights(const std::vector<Entity>& d
     for (Entity e : m_registry->with<Transform, RenderInfo>()) {
 
         auto& renderInfo = m_registry->get<RenderInfo>(e);
-        if (!renderInfo.isEnabled || !renderInfo.mesh)
+        if (!renderInfo.isEnabled || !renderInfo.model)
             continue;
         const glm::mat4& modelTransform = m_registry->get<Transform>(e).getWorldTransform();
         m_directionalDepthShader->setUniformValue("matrixModel", modelTransform);
-        renderInfo.mesh->render(0, -1, -1);
+        for (const Mesh& mesh : renderInfo.model->getMeshes())
+            mesh.render(0, -1, -1);
 
         checkRenderingError(m_engine->actor(e));
     }
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
@@ -390,12 +397,13 @@ void RenderSystem::updateDepthMapsPositionalLights(const std::vector<Entity>& po
     for (Entity e : m_registry->with<Transform, RenderInfo>()) {
 
         auto& renderInfo = m_registry->get<RenderInfo>(e);
-        if (!renderInfo.isEnabled || !renderInfo.mesh)
+        if (!renderInfo.isEnabled || !renderInfo.model)
             continue;
 
         const glm::mat4& modelTransform = m_registry->get<Transform>(e).getWorldTransform();
         m_positionalDepthShader->setUniformValue("matrixModel", modelTransform);
-        renderInfo.mesh->render(0, -1, -1);
+        for (const Mesh& mesh : renderInfo.model->getMeshes())
+            mesh.render(0, -1, -1);
         glCheckError();
     }
 

@@ -25,6 +25,7 @@ Mesh::~Mesh() {
 }
 
 Mesh::Mesh(const aiMesh* aiMesh) :
+	m_indices   (aiMesh->mNumFaces * 3),
 	m_vertices  (aiMesh->mNumVertices),
 	m_uvs       (aiMesh->mNumVertices),
 	m_normals   (aiMesh->mNumVertices),
@@ -35,8 +36,15 @@ Mesh::Mesh(const aiMesh* aiMesh) :
 	static const auto toGlmVec3D = [](const aiVector3D& vec) -> glm::vec3 {return {vec.x, vec.y, vec.z};};
 	static const auto toGlmVec2D = [](const aiVector3D& vec) -> glm::vec2 {return {vec.x, vec.y};};
 
-	static_assert(std::is_same_v<decltype(*aiMesh->mVertices), aiVector3D&>);
-	static_assert(std::is_same_v<decltype(*aiMesh->mTextureCoords[0]), aiVector3D&>);
+	unsigned int counter = 0;
+	for (unsigned int i = 0; i < aiMesh->mNumFaces; ++i) {
+		const aiFace& face = aiMesh->mFaces[i];
+		assert(face.mNumIndices == 3 && "Detected non-triangular face in mesh.");
+
+		for (unsigned int j = 0; j < face.mNumIndices; ++j) {
+			m_indices[counter++] = face.mIndices[j];
+		}
+	}
 
 	if (aiMesh->HasPositions())
 		std::transform(aiMesh->mVertices, aiMesh->mVertices + aiMesh->mNumVertices, m_vertices.begin(), toGlmVec3D);
@@ -134,7 +142,7 @@ Mesh* Mesh::load(std::string pFilename) {
 		}
 
 		//so create a new index value, and map our triplet to it
-		const unsigned index = static_cast<unsigned>(mappedTriplets.size());
+		const auto index = static_cast<unsigned>(mappedTriplets.size());
 		mappedTriplets[triplet] = index;
 
 		//now record this index
@@ -233,43 +241,55 @@ Mesh* Mesh::load(std::string pFilename) {
 	return mesh;
 }
 
-void Mesh::render(GLint verticesAttrib, GLint normalsAttrib, GLint uvsAttrib, GLint tangentAttrib, GLint bitangentAttrib) {
+void Mesh::render(GLint verticesAttrib, GLint normalsAttrib, GLint uvsAttrib, GLint tangentAttrib, GLint bitangentAttrib) const {
 
+	glCheckError();
 	glBindVertexArray(m_vao);
+	glCheckError();
 
 	if (verticesAttrib > -1) {
 		glBindBuffer(GL_ARRAY_BUFFER, m_vertexBufferId);
+		glCheckError();
 		glEnableVertexAttribArray(static_cast<GLuint>(verticesAttrib));
+		glCheckError();
 		glVertexAttribPointer(static_cast<GLuint>(verticesAttrib), 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+		glCheckError();
 	}
+	glCheckError();
 
 	if (normalsAttrib > -1) {
 		glBindBuffer(GL_ARRAY_BUFFER, m_normalBufferId);
 		glEnableVertexAttribArray(static_cast<GLuint>(normalsAttrib));
 		glVertexAttribPointer(static_cast<GLuint>(normalsAttrib), 3, GL_FLOAT, GL_TRUE, 0, nullptr);
 	}
+	glCheckError();
 
 	if (uvsAttrib > -1) {
 		glBindBuffer(GL_ARRAY_BUFFER, m_uvBufferId);
 		glEnableVertexAttribArray(static_cast<GLuint>(uvsAttrib));
 		glVertexAttribPointer(static_cast<GLuint>(uvsAttrib), 2, GL_FLOAT, GL_FALSE, 0, nullptr);
 	}
+	glCheckError();
 
 	if (tangentAttrib > -1) {
 		glBindBuffer(GL_ARRAY_BUFFER, m_tangentBufferId);
 		glEnableVertexAttribArray(static_cast<GLuint>(tangentAttrib));
 		glVertexAttribPointer(static_cast<GLuint>(tangentAttrib), 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 	}
+	glCheckError();
 
 	if (bitangentAttrib > -1) {
 		glBindBuffer(GL_ARRAY_BUFFER, m_bitangentBufferId);
 		glEnableVertexAttribArray(static_cast<GLuint>(bitangentAttrib));
 		glVertexAttribPointer(static_cast<GLuint>(bitangentAttrib), 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 	}
+	glCheckError();
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBufferId);
 
-	glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(m_indices.size()), GL_UNSIGNED_INT, (GLvoid*)0);
+	glCheckError();
+	glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(m_indices.size()), GL_UNSIGNED_INT, nullptr);
+	glCheckError();
 
 	if (bitangentAttrib > -1) glDisableVertexAttribArray(static_cast<GLuint>(bitangentAttrib));
 	if (tangentAttrib   > -1) glDisableVertexAttribArray(static_cast<GLuint>(tangentAttrib));
@@ -364,28 +384,35 @@ void Mesh::buffer() {
 	glGenBuffers(1, &m_indexBufferId);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBufferId);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_indices.size() * sizeof(unsigned), m_indices.data(), GL_STATIC_DRAW);
+	glCheckError();
 
 	glGenBuffers(1, &m_vertexBufferId);
 	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBufferId);
 	glBufferData(GL_ARRAY_BUFFER, m_vertices.size() * sizeof(glm::vec3), m_vertices.data(), GL_STATIC_DRAW);
+	glCheckError();
 
 	glGenBuffers(1, &m_normalBufferId);
 	glBindBuffer(GL_ARRAY_BUFFER, m_normalBufferId);
 	glBufferData(GL_ARRAY_BUFFER, m_normals.size() * sizeof(glm::vec3), m_normals.data(), GL_STATIC_DRAW);
+	glCheckError();
 
 	glGenBuffers(1, &m_uvBufferId);
 	glBindBuffer(GL_ARRAY_BUFFER, m_uvBufferId);
 	glBufferData(GL_ARRAY_BUFFER, m_uvs.size() * sizeof(glm::vec2), m_uvs.data(), GL_STATIC_DRAW);
+	glCheckError();
 
 	glGenBuffers(1, &m_tangentBufferId);
 	glBindBuffer(GL_ARRAY_BUFFER, m_tangentBufferId);
 	glBufferData(GL_ARRAY_BUFFER, m_tangents.size() * sizeof(glm::vec3), m_tangents.data(), GL_STATIC_DRAW);
+	glCheckError();
 
 	glGenBuffers(1, &m_bitangentBufferId);
 	glBindBuffer(GL_ARRAY_BUFFER, m_bitangentBufferId);
 	glBufferData(GL_ARRAY_BUFFER, m_bitangents.size() * sizeof(glm::vec3), m_bitangents.data(), GL_STATIC_DRAW);
+	glCheckError();
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	glGenVertexArrays(1, &m_vao);
+	glCheckError();
 }

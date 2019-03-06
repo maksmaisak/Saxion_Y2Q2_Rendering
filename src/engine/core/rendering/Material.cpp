@@ -116,7 +116,7 @@ void Material::use(
 }
 
 void Material::render(
-    Mesh* mesh,
+    const Mesh* mesh,
     Engine* engine,
     DepthMaps* depthMaps,
     const glm::mat4& modelMatrix,

@@ -114,7 +114,11 @@ void main() {
         color += CalculateSpotLightContribution(i, normal, viewDirection, albedo.rgb, metallic, roughness, ao);
     }
 
-	fragmentColor = vec4(color, albedo.a);
+    #ifdef RENDER_MODE_TRANSPARENCY
+	    fragmentColor = vec4(color, albedo.a);
+	#else
+        fragmentColor = vec4(color, 1);
+	#endif
 }
 
 vec3 GetNormal() {

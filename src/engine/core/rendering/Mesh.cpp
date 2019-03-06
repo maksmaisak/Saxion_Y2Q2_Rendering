@@ -242,61 +242,40 @@ Mesh* Mesh::load(std::string pFilename) {
 	return mesh;
 }
 
-void Mesh::render(GLint verticesAttrib, GLint normalsAttrib, GLint uvsAttrib, GLint tangentAttrib, GLint bitangentAttrib) const {
+void Mesh::render(GLint verticesAttrib, GLint normalsAttrib, GLint uvsAttrib, GLint tangentsAttrib, GLint bitangentsAttrib) const {
 
 	glCheckError();
 	glBindVertexArray(m_vao);
 	glCheckError();
 
-	if (verticesAttrib > -1) {
-		glBindBuffer(GL_ARRAY_BUFFER, m_vertexBufferId);
+	static const auto enableVertexAttribArray = [](GLint attributeLocation, GLuint bufferId, GLint numComponents, bool normalize) {
+
+		if (attributeLocation < 0)
+			return;
+
+		const auto location = static_cast<GLuint>(attributeLocation);
+
+		glBindBuffer(GL_ARRAY_BUFFER, bufferId);
+		glEnableVertexAttribArray(location);
+		glVertexAttribPointer(location, numComponents, GL_FLOAT, normalize ? GL_TRUE : GL_FALSE, 0, nullptr);
 		glCheckError();
-		glEnableVertexAttribArray(static_cast<GLuint>(verticesAttrib));
-		glCheckError();
-		glVertexAttribPointer(static_cast<GLuint>(verticesAttrib), 3, GL_FLOAT, GL_FALSE, 0, nullptr);
-		glCheckError();
-	}
-	glCheckError();
+	};
 
-	if (normalsAttrib > -1) {
-		glBindBuffer(GL_ARRAY_BUFFER, m_normalBufferId);
-		glEnableVertexAttribArray(static_cast<GLuint>(normalsAttrib));
-		glVertexAttribPointer(static_cast<GLuint>(normalsAttrib), 3, GL_FLOAT, GL_TRUE, 0, nullptr);
-	}
-	glCheckError();
-
-	if (uvsAttrib > -1) {
-		glBindBuffer(GL_ARRAY_BUFFER, m_uvBufferId);
-		glEnableVertexAttribArray(static_cast<GLuint>(uvsAttrib));
-		glVertexAttribPointer(static_cast<GLuint>(uvsAttrib), 2, GL_FLOAT, GL_FALSE, 0, nullptr);
-	}
-	glCheckError();
-
-	if (tangentAttrib > -1) {
-		glBindBuffer(GL_ARRAY_BUFFER, m_tangentBufferId);
-		glEnableVertexAttribArray(static_cast<GLuint>(tangentAttrib));
-		glVertexAttribPointer(static_cast<GLuint>(tangentAttrib), 3, GL_FLOAT, GL_FALSE, 0, nullptr);
-	}
-	glCheckError();
-
-	if (bitangentAttrib > -1) {
-		glBindBuffer(GL_ARRAY_BUFFER, m_bitangentBufferId);
-		glEnableVertexAttribArray(static_cast<GLuint>(bitangentAttrib));
-		glVertexAttribPointer(static_cast<GLuint>(bitangentAttrib), 3, GL_FLOAT, GL_FALSE, 0, nullptr);
-	}
-	glCheckError();
-
+	enableVertexAttribArray(verticesAttrib  , m_vertexBufferId   , 3, false);
+	enableVertexAttribArray(normalsAttrib   , m_normalBufferId   , 3, true );
+	enableVertexAttribArray(uvsAttrib       , m_uvBufferId       , 2, false);
+	enableVertexAttribArray(tangentsAttrib  , m_tangentBufferId  , 3, false);
+	enableVertexAttribArray(bitangentsAttrib, m_bitangentBufferId, 3, false);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBufferId);
-
-	glCheckError();
 	glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(m_indices.size()), GL_UNSIGNED_INT, nullptr);
+
 	glCheckError();
 
-	if (bitangentAttrib > -1) glDisableVertexAttribArray(static_cast<GLuint>(bitangentAttrib));
-	if (tangentAttrib   > -1) glDisableVertexAttribArray(static_cast<GLuint>(tangentAttrib));
-	if (uvsAttrib       > -1) glDisableVertexAttribArray(static_cast<GLuint>(uvsAttrib));
-	if (normalsAttrib   > -1) glDisableVertexAttribArray(static_cast<GLuint>(normalsAttrib));
-	if (verticesAttrib  > -1) glDisableVertexAttribArray(static_cast<GLuint>(verticesAttrib));
+	if (bitangentsAttrib > -1) glDisableVertexAttribArray(static_cast<GLuint>(bitangentsAttrib));
+	if (tangentsAttrib   > -1) glDisableVertexAttribArray(static_cast<GLuint>(tangentsAttrib  ));
+	if (uvsAttrib        > -1) glDisableVertexAttribArray(static_cast<GLuint>(uvsAttrib       ));
+	if (normalsAttrib    > -1) glDisableVertexAttribArray(static_cast<GLuint>(normalsAttrib   ));
+	if (verticesAttrib   > -1) glDisableVertexAttribArray(static_cast<GLuint>(verticesAttrib  ));
 
 	glBindVertexArray(0);
 }
@@ -382,7 +361,7 @@ void Mesh::generateTangentsAndBitangents() {
 
 void Mesh::buffer() {
 
-	static auto bufferVector = [](GLuint& bufferId, const auto& vec, GLenum bufferKind = GL_ARRAY_BUFFER) {
+	static const auto bufferVector = [](GLuint& bufferId, const auto& vec, GLenum bufferKind = GL_ARRAY_BUFFER) {
 
 		using T = typename utils::remove_cvref_t<decltype(vec)>::value_type;
 

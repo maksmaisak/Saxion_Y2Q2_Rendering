@@ -49,6 +49,8 @@ std::shared_ptr<Model> Model::load(const std::string& filepath) {
 
     ModelImpl::addNode(*model, scene, scene->mRootNode);
 
+    std::cout << "Loaded model from " << filepath << ", " << model->m_meshes.size() << " mesh(es)." << std::endl;
+
     return model;
 }
 

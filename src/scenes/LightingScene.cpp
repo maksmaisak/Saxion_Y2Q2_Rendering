@@ -14,7 +14,6 @@
 #include "RotatingBehavior.hpp"
 #include "LightPropertyAnimator.h"
 #include "Resources.h"
-#include "Mesh.hpp"
 #include "Texture.hpp"
 #include "Material.h"
 #include "glm.hpp"
@@ -111,7 +110,7 @@ void LightingScene::open() {
         material->setUniformValue("metallicSmoothnessMap", en::Textures::get(config::TEXTURE_PATH + "testPBR/rust/metallic_smoothness.psd", GL_RGBA));
         material->setUniformValue("normalMap", en::Textures::get(config::TEXTURE_PATH + "testPBR/rust/normal.png", GL_RGBA));
         material->setUniformValue("aoMap", en::Textures::white());
-        material->setUniformValue("albedoColor"         , glm::vec3(1));
+        material->setUniformValue("albedoColor"         , glm::vec4(1));
         material->setUniformValue("metallicMultiplier"  , 1.f);
         material->setUniformValue("smoothnessMultiplier", 1.f);
         material->setUniformValue("aoMultiplier"        , 1.f);
@@ -128,7 +127,7 @@ void LightingScene::open() {
         material->setUniformValue("metallicSmoothnessMap", en::Textures::get(config::TEXTURE_PATH + "testPBR/pillar/Pilars_MetallicSmoothness.png", GL_RGBA));
         material->setUniformValue("normalMap", en::Textures::get(config::TEXTURE_PATH + "testPBR/pillar/Pilars_Normal.png", GL_RGBA));
         material->setUniformValue("aoMap", en::Textures::get(config::TEXTURE_PATH + "testPBR/pillar/Pilars_AO.png", GL_RGBA));
-        material->setUniformValue("albedoColor"         , glm::vec3(1));
+        material->setUniformValue("albedoColor"         , glm::vec4(1));
         material->setUniformValue("metallicMultiplier"  , 1.f);
         material->setUniformValue("smoothnessMultiplier", 1.f);
         material->setUniformValue("aoMultiplier"        , 1.f);
@@ -144,7 +143,7 @@ void LightingScene::open() {
         material->setUniformValue("metallicSmoothnessMap", en::Textures::get(config::TEXTURE_PATH + "testPBR/oldTiledStone/tiledstone1_metallicSmoothness.psd", GL_RGBA));
         material->setUniformValue("normalMap"   , en::Textures::get(config::TEXTURE_PATH + "testPBR/oldTiledStone/tiledstone1_normal.png", GL_RGBA));
         material->setUniformValue("aoMap"       , en::Textures::get(config::TEXTURE_PATH + "testPBR/oldTiledStone/tiledstone1_AO.png"    , GL_RGBA));
-        material->setUniformValue("albedoColor"         , glm::vec3(1));
+        material->setUniformValue("albedoColor"         , glm::vec4(1));
         material->setUniformValue("metallicMultiplier"  , 1.f);
         material->setUniformValue("smoothnessMultiplier", 1.f);
         material->setUniformValue("aoMultiplier"        , 1.f);

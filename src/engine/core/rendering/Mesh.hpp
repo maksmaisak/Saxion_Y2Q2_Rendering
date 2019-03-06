@@ -39,8 +39,8 @@ namespace en {
 			GLint verticesAttrib = -1,
 			GLint normalsAttrib = -1,
 			GLint uvsAttrib = -1,
-			GLint tangentAttrib = -1,
-			GLint bitangentAttrib = -1
+			GLint tangentsAttrib = -1,
+			GLint bitangentsAttrib = -1
 		) const;
 
 		/**

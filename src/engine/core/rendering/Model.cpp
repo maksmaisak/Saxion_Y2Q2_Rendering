@@ -54,10 +54,6 @@ std::shared_ptr<Model> Model::load(const std::string& filepath) {
     return model;
 }
 
-Model::Model(Mesh&& mesh) {
-    m_meshes.push_back(std::move(mesh));
-}
-
 const std::vector<Mesh>& Model::getMeshes() const {
     return m_meshes;
 }

@@ -186,8 +186,8 @@ namespace lua {
         static void push (lua_State* L, T value) { lua_pushnumber(L, value); }
     };
 
-    template<>
-    struct TypeAdapter<std::string> {
+    template<typename T>
+    struct TypeAdapter<T, std::enable_if_t<utils::is_string_v<T>>> {
         static bool        is   (lua_State* L, int index = -1) { return lua_isstring(L, index); }
         static std::string to   (lua_State* L, int index = -1) { return lua_tostring(L, index); }
         static std::string check(lua_State* L, int index = -1) { return luaL_checkstring(L, index); }

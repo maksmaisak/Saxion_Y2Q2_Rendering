@@ -22,6 +22,19 @@ local keyMaterial = Game.makeMaterial {
 	normal = 'objects/key/KeyNormal.png',
 }
 
+local function playSoundObject(filePath, offset, loop, volume)
+	local music = Game.audio.getSound(filePath)
+	music.playingOffset = music.duration * offset
+    music.loop = loop
+    music.volume = volume
+    music:play()
+end
+
+local function stopSoundObject(filePath)
+	local music = Game.audio.getSound(filePath)
+	music:stop()
+end
+
 function Player:getPositionFromGridPosition(gridPosition)
 
 	return Vector:new {
@@ -79,10 +92,12 @@ function Player:activateGoal(gridPosition)
 	self.canControl = false
 	self.level.isLevelComplete = true
 	
-	local resultScreen = Game.makeActor {
+	local resultScreen = Game.makeActor {	
 		Name = "ResultScreen",
 		LuaBehavior = Config.resultScreen
 	}
+
+	playSoundObject('audio/pressurePlateRise.wav',0,false,60)
 
 	resultScreen:get("LuaBehavior").level = self.level
 	resultScreen:get("LuaBehavior"):activate()
@@ -98,6 +113,9 @@ function Player:activateButton(gridPosition)
 	end
 
 	button.isActivated = true
+
+	playSoundObject('audio/pressurePlateLower.wav',0,false,20)
+	stopSoundObject('audio/pressurePlateRise.wav')
 
 	local buttonPosition	  = button.transform.position
 	buttonPosition.y		  = buttonPosition.y - 0.5
@@ -123,6 +141,9 @@ function Player:disableButton(gridPosition)
 	end
 
 	button.isActivated	= false
+
+	playSoundObject('audio/pressurePlateRise.wav',0,false,20)
+	stopSoundObject('audio/pressurePlateLower.wav')
 
 	local buttonPosition	  = button.transform.position
 	buttonPosition.y		  = buttonPosition.y + 0.5
@@ -428,6 +449,7 @@ end
 function Player:update()
 
 	if Game.keyboard.isDown("escape") then
+		playSoundObject('audio/UIButtonSound.wav',0,false,60)
 		if self.level.isLevelComplete then
 			return
 		end
@@ -446,11 +468,13 @@ function Player:update()
 	end
 
 	if Game.keyboard.isDown("e") then
+		playSoundObject('audio/UIButtonSound.wav',0,false,60)
 		self:redoMove()
 		return
 	end
 
 	if Game.keyboard.isDown("q") then
+		playSoundObject('audio/UIButtonSound.wav',0,false,60)
 		self:undoMove()
 		return
 	end
@@ -475,6 +499,7 @@ function Player:update()
 	local input = {x = 0, y = 0 }
 	for key, value in pairs(inputKeys) do
 		if (not disabledKeys[key] and Game.keyboard.isDown(key)) then
+			playSoundObject('audio/UIButtonSound.wav',0,false,60)
 			input.x = input.x + value.x
 			input.y = input.y + value.y
 			break;

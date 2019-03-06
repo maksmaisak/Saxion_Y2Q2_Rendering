@@ -17,6 +17,14 @@ function ResultScreen:keepAspectRatio(actor , tHeight)
 	actor:get("UIRect").offsetMax = { width / 2, height / 2}
 end
 
+local function playSoundObject(filepath, offset, loop, volume)
+	local music = Game.audio.getSound(filepath)
+	music.playingOffset = music.duration * offset
+    music.loop = loop
+    music.volume = volume
+    music:play()
+end
+
 function ResultScreen:createStar(aMinX,aMinY,aMaxX,aMaxY)
 	
 	local star = Game.makeActor{
@@ -109,6 +117,7 @@ function ResultScreen:createResultPanel()
 		LuaBehavior = {
 			onMouseDown = function(self, button)
 				if button == 1 then
+					playSoundObject('audio/UIButtonSound.wav',0,false,60)
 					Game.loadScene(self.level.nextLevelPath)
 				end
 			end,
@@ -151,6 +160,7 @@ function ResultScreen:createResultPanel()
 		LuaBehavior = {
 			onMouseDown = function(self, button)
 				if button == 1 then
+					playSoundObject('audio/UIButtonSound.wav',0,false,60)
 					Game.loadScene(Config.startScene)
 				end
 			end,

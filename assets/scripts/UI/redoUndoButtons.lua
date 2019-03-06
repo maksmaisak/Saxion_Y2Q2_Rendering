@@ -19,6 +19,14 @@ local function keepAspectRatio(actor , theight)
 	actor:get("UIRect").offsetMax = { width / 2, height / 2}
 end
 
+local function playSoundObject(filepath, offset, loop, volume)
+	local music = Game.audio.getSound(filepath)
+	music.playingOffset = music.duration * offset
+    music.loop = loop
+    music.volume = volume
+    music:play()
+end
+
 function RedoUndoButtons:createButtons()
 
 	local level = self.level
@@ -61,14 +69,13 @@ function RedoUndoButtons:createButtons()
 					end
 				
 					if Game.mouse.isDown(1) and self.actor:get("UIRect").isMouseOver then
+						playSoundObject('audio/UIButtonSound.wav',0,false,60)
 						level.player:undoMove()
 					end
 				end
 			end,
 		}
 	}
-
-
 
 	self.redoButton = Game.makeActor {
 		Name = "RedoButton",
@@ -97,6 +104,7 @@ function RedoUndoButtons:createButtons()
 					end
 
 					if Game.mouse.isDown(1) and self.actor:get("UIRect").isMouseOver then
+						playSoundObject('audio/UIButtonSound.wav',0,false,60)
 						level.player:redoMove()
 					end
 				end

@@ -91,10 +91,12 @@ function Player:activateGoal(gridPosition)
 	self.canControl = false
 	self.level.isLevelComplete = true
 	
-	local resultScreen = Game.makeActor {
+	local resultScreen = Game.makeActor {	
 		Name = "ResultScreen",
 		LuaBehavior = Config.resultScreen
 	}
+
+	playSoundObject('audio/pressurePlateRise.wav',0,false,60)
 
 	resultScreen:get("LuaBehavior").level = self.level
 	resultScreen:get("LuaBehavior"):activate()
@@ -490,6 +492,7 @@ function Player:update()
 	local input = {x = 0, y = 0 }
 	for key, value in pairs(inputKeys) do
 		if (not disabledKeys[key] and Game.keyboard.isDown(key)) then
+			playSoundObject('audio/UIButtonSound.wav',0,false,60)
 			input.x = input.x + value.x
 			input.y = input.y + value.y
 			break;

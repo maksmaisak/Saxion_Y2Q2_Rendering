@@ -4,17 +4,12 @@
 #include <vector>
 #include <GL/glew.h>
 #include "glm.hpp"
-
 #include "ResourceLoader.h"
 
-class aiMesh;
+struct aiMesh;
 
 namespace en {
 
-	/**
-	 * A mesh represents an .OBJ file. It knows how it is constructed, how its data should be buffered to OpenGL
-	 * and how it should be streamed to OpenGL
-	 */
 	class Mesh final {
 
 	public:

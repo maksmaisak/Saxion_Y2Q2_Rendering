@@ -15,11 +15,10 @@ local disabledKeys = {left = false, right = false, up = false, down = false}
 local inputKeys = { left = { x = 1, y = 0}, right = {x = -1, y = 0}, up = {x = 0, y = 1}, down = {x = 0, y = -1} }
 local keyMaterial = Game.makeMaterial {
 	shader = 'pbr',
-	metallicMultiplier = 0,
-    smoothnessMultiplier = 0.5,
-    aoMultiplier = 1,
-	albedoColor = {1, 0.6, 0.5, 1},
-	normal = 'objects/key/KeyNormal.png',
+	albedo = 'objects/key/KeyTile_AlbedoTransparency.png',
+	metallicSmoothness = 'objects/key/KeyTile_MetallicSmoothness.png',
+	normal = 'objects/key/KeyTile_Normal.png',
+	ao     = 'objects/key/KeyTile_AO.png'
 }
 
 local function playSoundObject(filePath, offset, loop, volume)

@@ -89,7 +89,7 @@ void LightingScene::open() {
         auto light = engine.makeActor("Light");
         light.add<en::Transform>()
             .setParent(rotatingLights)
-            .move(glm::rotate(glm::vec3(0,0,2), 2.f * glm::pi<float>() * (i + 1.f) / NumRotatingLights, glm::vec3(0,1,0)))
+            .move(glm::rotate(glm::vec3(0,0,2), glm::two_pi<float>() * (i + 1.f) / NumRotatingLights, glm::vec3(0,1,0)))
             .scale(glm::vec3(0.1f));
 
         glm::vec3 lightColor = glm::abs(glm::make_vec3(glm::circularRand(1.f)));

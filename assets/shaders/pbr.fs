@@ -256,7 +256,7 @@ float CalculateDirectionalShadowMultiplier(int i, float biasMultiplier) {
     if (currentDepth > 1.f)
         return 1;
 
-    float bias = max(0.05 * biasMultiplier, 0.005);
+    float bias = max(0.005 * biasMultiplier, 0.001);
     return texture(directionalDepthMaps, vec4(projected.xy, i, currentDepth - bias));
 }
 

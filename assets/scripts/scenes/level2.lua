@@ -1324,7 +1324,7 @@ local extras = {
         Name = "Directional Light",
         Transform = {
             position = {0, 3, 0},
-            rotation = {331.14, 235.539, -3.899392E-06},
+            rotation = {28.86, 124.461, 0},
         },
         Light = {
             kind = 'directional',

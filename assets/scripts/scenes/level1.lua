@@ -1184,9 +1184,6 @@ local extras = {
             kind = 'directional',
             intensity = 2.21,
             color = {1, 1, 1, 1},
-        },
-        LuaBehavior = {
-            --update = function(self, dt) self.actor:get("Transform"):rotate(dt * 10, 0, 1, 0) end
         }
     },
     {

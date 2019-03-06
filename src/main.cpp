@@ -23,6 +23,8 @@
 #include "TerrainScene.h"
 #include "LuaScene.h"
 
+#include "Model.h"
+
 int main() {
 
     std::cout << "Starting Game" << std::endl;
@@ -53,18 +55,7 @@ int main() {
     //engine->getSceneManager().setCurrentScene<LightingScene>();
     //engine->getSceneManager().setCurrentScene<TerrainScene>();
 
-    std::function<void()> update;
-    update = [&, engine = engine.get()](){
-
-        const auto* text = engine->findByName("TextElement").tryGet<en::Text>();
-        auto* sprite = engine->findByName("FontAtlasView").tryGet<en::Sprite>();
-        if (!text || !sprite)
-            return;
-
-        sprite->material->setUniformValue("spriteTexture", en::Material::FontAtlas{text->getFont(), text->getCharacterSize()});
-        engine->getScheduler().delay(sf::seconds(0.01f), update);
-    };
-    engine->getScheduler().delay(sf::seconds(0.01f), update);
+    auto model = en::Model::load(config::MODEL_PATH + "/sphere2.obj");
 
     engine->run();
 

@@ -2,9 +2,14 @@
 #include <map>
 #include <string>
 #include <fstream>
+#include <assimp/mesh.h>
+#include <functional>
 
 #include "Mesh.hpp"
 #include "GLHelpers.h"
+#include "Demangle.h"
+
+using namespace en;
 
 Mesh::~Mesh() {
 
@@ -17,6 +22,33 @@ Mesh::~Mesh() {
 	glDeleteBuffers(1, &m_bitangentBufferId);
 
 	glDeleteVertexArrays(1, &m_vao);
+}
+
+Mesh::Mesh(const aiMesh* aiMesh) :
+	m_vertices  (aiMesh->mNumVertices),
+	m_uvs       (aiMesh->mNumVertices),
+	m_normals   (aiMesh->mNumVertices),
+	m_tangents  (aiMesh->mNumVertices),
+	m_bitangents(aiMesh->mNumVertices)
+{
+
+	static const auto toGlmVec3D = [](const aiVector3D& vec) -> glm::vec3 {return {vec.x, vec.y, vec.z};};
+	static const auto toGlmVec2D = [](const aiVector3D& vec) -> glm::vec2 {return {vec.x, vec.y};};
+
+	static_assert(std::is_same_v<decltype(*aiMesh->mVertices), aiVector3D&>);
+	static_assert(std::is_same_v<decltype(*aiMesh->mTextureCoords[0]), aiVector3D&>);
+
+	if (aiMesh->HasPositions())
+		std::transform(aiMesh->mVertices, aiMesh->mVertices + aiMesh->mNumVertices, m_vertices.begin(), toGlmVec3D);
+
+	if (aiMesh->HasNormals())
+		std::transform(aiMesh->mNormals , aiMesh->mNormals + aiMesh->mNumVertices , m_normals.begin(), toGlmVec3D);
+
+	if (aiMesh->HasTextureCoords(0))
+		std::transform(aiMesh->mTextureCoords[0], aiMesh->mTextureCoords[0] + aiMesh->mNumVertices, m_uvs.begin(), toGlmVec2D);
+
+	generateTangentsAndBitangents();
+	buffer();
 }
 
 /**

@@ -23,7 +23,7 @@ void WobblingMaterial::setDiffuseTexture(std::shared_ptr<Texture> pDiffuseTextur
     m_diffuseTexture = pDiffuseTexture;
 }
 
-void WobblingMaterial::render(Mesh* mesh, en::Engine* engine, en::DepthMaps* depthMaps, const glm::mat4& pModelMatrix, const glm::mat4& pViewMatrix, const glm::mat4& pProjectionMatrix) {
+void WobblingMaterial::render(en::Mesh* mesh, en::Engine* engine, en::DepthMaps* depthMaps, const glm::mat4& pModelMatrix, const glm::mat4& pViewMatrix, const glm::mat4& pProjectionMatrix) {
 
     m_shader->use();
 

@@ -133,10 +133,10 @@ void TestScene::open() {
 
     // load a bunch of meshes we will be using throughout this demo
     // F is flat shaded, S is smooth shaded (normals aligned or not), check the models folder!
-    std::shared_ptr<Mesh> planeMeshDefault = en::Meshes::get(config::MODEL_PATH + "plane.obj");
-    std::shared_ptr<Mesh> cubeMeshF        = en::Meshes::get(config::MODEL_PATH + "cube_flat.obj");
-    std::shared_ptr<Mesh> sphereMeshS      = en::Meshes::get(config::MODEL_PATH + "sphere_smooth.obj");
-    std::shared_ptr<Mesh> testObjectMeshS  = en::Meshes::get(config::MODEL_PATH + "sphere2.obj");
+    std::shared_ptr<en::Mesh> planeMeshDefault = en::Meshes::get(config::MODEL_PATH + "plane.obj");
+    std::shared_ptr<en::Mesh> cubeMeshF        = en::Meshes::get(config::MODEL_PATH + "cube_flat.obj");
+    std::shared_ptr<en::Mesh> sphereMeshS      = en::Meshes::get(config::MODEL_PATH + "sphere_smooth.obj");
+    std::shared_ptr<en::Mesh> testObjectMeshS  = en::Meshes::get(config::MODEL_PATH + "sphere2.obj");
 
     // MATERIALS
     auto runicStoneMaterial = en::Resources<en::Material>::get("runicStoneMaterial", "texture");

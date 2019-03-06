@@ -6,7 +6,9 @@
 #include "ShaderProgram.hpp"
 #include "DepthMaps.h"
 
-class Mesh;
+namespace en {
+    class Mesh;
+}
 
 /**
  * Base calss for a material. Wraps around a shader. For most use cases just use en::Material.
@@ -25,7 +27,7 @@ class AbstractMaterial {
          * Render the given mesh in the given engine using the given mvp matrices. Implement in subclass.
          */
         virtual void render(
-            Mesh* mesh,
+            en::Mesh* mesh,
             en::Engine* pEngine,
             en::DepthMaps* depthMaps,
             const glm::mat4& matrixModel,

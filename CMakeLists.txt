@@ -48,6 +48,7 @@ find_package(glm REQUIRED)
 find_package(GLEW REQUIRED)
 find_package(Freetype 2 REQUIRED)
 include_directories(${FREETYPE_INCLUDE_DIR_freetype2})
+find_package(assimp REQUIRED)
 
 if(WIN32)
     find_package(SFML 2.5 COMPONENTS audio graphics window system main REQUIRED)
@@ -67,4 +68,4 @@ else()
 	set(FREETYPELIB freetype)
 endif()
 
-target_link_libraries(Saxion_Y2Q2_Rendering ${LUALIB} glm ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} ${SFMLLIB} ${FREETYPELIB})
+target_link_libraries(Saxion_Y2Q2_Rendering ${LUALIB} glm ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} ${SFMLLIB} ${FREETYPELIB} assimp)

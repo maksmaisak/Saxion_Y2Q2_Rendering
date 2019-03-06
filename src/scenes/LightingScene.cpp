@@ -83,7 +83,7 @@ void LightingScene::open() {
     rotatingLights.add<en::Transform>();
     rotatingLights.add<RotatingBehavior>(glm::vec3(0,1,0));
 
-    auto lightMesh = en::Resources<Mesh>::get(config::MODEL_PATH + "cube_flat.obj");
+    auto lightMesh = en::Resources<en::Mesh>::get(config::MODEL_PATH + "cube_flat.obj");
     for (int i = 0; i < NumRotatingLights; ++i) {
 
         auto light = engine.makeActor("Light");
@@ -105,7 +105,7 @@ void LightingScene::open() {
     auto sphere = engine.makeActor("Sphere");
     sphere.add<en::Transform>().move({0, 0, 0});
     {
-        auto mesh = en::Resources<Mesh>::get(config::MODEL_PATH + "sphere2.obj");
+        auto mesh = en::Resources<en::Mesh>::get(config::MODEL_PATH + "sphere2.obj");
         auto material = std::make_shared<en::Material>("pbr");
         material->setUniformValue("albedoMap", en::Textures::get(config::TEXTURE_PATH + "testPBR/rust/albedo.png"));
         material->setUniformValue("metallicSmoothnessMap", en::Textures::get(config::TEXTURE_PATH + "testPBR/rust/metallic_smoothness.psd", GL_RGBA));
@@ -122,7 +122,7 @@ void LightingScene::open() {
     auto pillar = engine.makeActor("Pillar");
     pillar.add<en::Transform>().move({-4, -1, 0}).scale(glm::vec3(0.01f));
     {
-        auto mesh = en::Resources<Mesh>::get(config::MODEL_PATH + "Pillar_tall.obj");
+        auto mesh = en::Resources<en::Mesh>::get(config::MODEL_PATH + "Pillar_tall.obj");
         auto material = std::make_shared<en::Material>("pbr");
         material->setUniformValue("albedoMap", en::Textures::get(config::TEXTURE_PATH + "testPBR/pillar/Pilars_AlbedoTransparency.png"));
         material->setUniformValue("metallicSmoothnessMap", en::Textures::get(config::TEXTURE_PATH + "testPBR/pillar/Pilars_MetallicSmoothness.png", GL_RGBA));
@@ -138,7 +138,7 @@ void LightingScene::open() {
     auto plane = engine.makeActor("Plane");
     plane.add<en::Transform>().move({0, -1, 0}).setLocalScale(glm::vec3(7));
     {
-        auto mesh = en::Resources<Mesh>::get(config::MODEL_PATH + "plane.obj");
+        auto mesh = en::Resources<en::Mesh>::get(config::MODEL_PATH + "plane.obj");
         auto material = std::make_shared<en::Material>("pbr");
         material->setUniformValue("albedoMap"   , en::Textures::get(config::TEXTURE_PATH + "testPBR/oldTiledStone/tiledstone1_basecolor.png"));
         material->setUniformValue("metallicSmoothnessMap", en::Textures::get(config::TEXTURE_PATH + "testPBR/oldTiledStone/tiledstone1_metallicSmoothness.psd", GL_RGBA));

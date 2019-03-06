@@ -547,8 +547,8 @@ function scene:start()
 	keepAspectRatio(chooseLevelImage,500)
 	keepAspectRatio(backButtonChooseLevel,95)
 	keepAspectRatio(backButtonCredits,95)
-	keepAspectRatio(arrowLeft,256)
-	keepAspectRatio(arrowRight,256)
+	keepAspectRatio(arrowLeft,300)
+	keepAspectRatio(arrowRight,300)
 
 end
 

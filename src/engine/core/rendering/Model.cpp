@@ -39,7 +39,7 @@ std::shared_ptr<Model> Model::load(const std::string& filepath) {
     model->m_filepath = filepath;
 
     Assimp::Importer importer;
-    const aiScene* scene = importer.ReadFile(filepath, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_OptimizeMeshes);
+    const aiScene* scene = importer.ReadFile(filepath, aiProcess_Triangulate | aiProcess_OptimizeMeshes);
 
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
 

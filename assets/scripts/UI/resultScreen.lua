@@ -33,7 +33,7 @@ function ResultScreen:createStar(aMinX,aMinY,aMaxX,aMaxY)
 		Transform = {
 			scale = {0, 0, 0},
 			parent = "ResultPanel",
-			rotation = {0,0, 180}
+			rotation = {0,0, -180}
 		},
 		UIRect = {
 			anchorMin = {aMinX, aMinY},

@@ -93,58 +93,6 @@ function ResultScreen:createResultPanel()
 		}
 	}
 
-	local nextLevelButton = Game.makeActor {
-		Name = "NextLevelButton",
-		Transform = {
-			scale  = {1,1,1},
-			parent = "ResultPanel"
-		},
-		Text = {
-			font   = "fonts/kenyanCoffee.ttf",
-			color  = {0, 0, 0, 1},
-			string = "Next Level"
-        },
-		UIRect = {
-			anchorMin = {0.6, 0.45},
-			anchorMax = {0.6, 0.45}
-		},
-		Sprite = {
-			material = {
-				shader	= "sprite",
-				texture	= "textures/button.png",
-			}
-		},
-		LuaBehavior = {
-			onMouseDown = function(self, button)
-				if button == 1 then
-					playSoundObject('audio/UIButtonSound.wav',0,false,60)
-					Game.currentLevel = Game.currentLevel + 1
-
-					-- this condition should be checked somewhere else
-					-- ex: When the player finishes the last level the nextLevelButton
-					-- should not be shown
-					if Game.currentLevel > Game.maxLevel then
-						return
-					end
-
-					Game.loadScene(Game.levels[Game.currentLevel].path)
-				end
-			end,
-
-			--Mouse Over Start
-			onMouseEnter = function(self, button)
-				self.actor:get("Transform").scale = {1.2,1.2,1.2}
-			end,
-
-			onMouseLeave = function(self, button)
-				self.actor:get("Transform").scale = {1,1,1}
-			end
-			--Mouse Over End
-		}
-	}
-
-	nextLevelButton:get("LuaBehavior").level = self.level
-
 	local mainMenuButton = Game.makeActor {
 		Name = "MainMenuButton",
 		Transform = {
@@ -186,6 +134,61 @@ function ResultScreen:createResultPanel()
 		}
 	}
 
+	self:keepAspectRatio(mainMenuButton,125)
+
+	if Game.currentLevel >= Game.maxLevel then
+		local mainMenuButtonUIRect = mainMenuButton:get("UIRect")
+		mainMenuButtonUIRect.anchorMin = {0.5,0.45}
+		mainMenuButtonUIRect.anchorMax = {0.5,0.45}
+	end
+
+	if Game.currentLevel < Game.maxLevel then		
+		local nextLevelButton = Game.makeActor {
+			Name = "NextLevelButton",
+			Transform = {
+				scale  = {1,1,1},
+				parent = "ResultPanel"
+			},
+			Text = {
+				font   = "fonts/kenyanCoffee.ttf",
+				color  = {0, 0, 0, 1},
+				string = "Next Level"
+			},
+			UIRect = {
+				anchorMin = {0.6, 0.45},
+				anchorMax = {0.6, 0.45}
+			},
+			Sprite = {
+				material = {
+					shader	= "sprite",
+					texture	= "textures/button.png",
+				}
+			},
+			LuaBehavior = {
+				onMouseDown = function(self, button)
+					if button == 1 then
+						playSoundObject('audio/UIButtonSound.wav',0,false,60)
+						Game.currentLevel = Game.currentLevel + 1
+						Game.loadScene(Game.levels[Game.currentLevel].path)
+					end
+				end,
+
+				--Mouse Over Start
+				onMouseEnter = function(self, button)
+					self.actor:get("Transform").scale = {1.2,1.2,1.2}
+				end,
+
+				onMouseLeave = function(self, button)
+					self.actor:get("Transform").scale = {1,1,1}
+				end
+				--Mouse Over End
+			}
+		}
+
+		nextLevelButton:get("LuaBehavior").level = self.level
+		self:keepAspectRatio(nextLevelButton,125)
+	end
+
 	self.totalNumberOfStars = self:CalculateTotalStars()
 
 	local anchorValue = 0.4
@@ -195,9 +198,6 @@ function ResultScreen:createResultPanel()
 		self:createStar(anchorValue,0.6,anchorValue,0.6)
 		anchorValue = anchorValue + anchorStep
 	end
-
-	self:keepAspectRatio(mainMenuButton,125)
-	self:keepAspectRatio(nextLevelButton,125)
 
 	local entry = { level = "level"..Game.currentLevel, stars = self.totalNumberOfStars}
 

@@ -35,22 +35,19 @@ namespace en {
 	public:
 
 		ShaderProgram();
-
 		virtual ~ShaderProgram();
 
-		//add a shader of a specific type (eg GL_VERTEX_SHADER / GL_FRAGMENT_SHADER)
+		// Add a shader of a specific type (eg GL_VERTEX_SHADER / GL_FRAGMENT_SHADER)
 		bool addShader(GLuint shaderType, const std::string& filepath);
-
-		//link and compile all added shaders
+		// Link and compile all added shaders
 		void finalize();
 
-		//tell opengl this is now the current shader program
 		void use();
 
-		//get access to uniforms within the shader
+		// Get access to uniforms within the shader
 		GLint getUniformLocation(const std::string& pName);
 
-		//get access to attributes within the shader
+		// Get access to attributes within the shader
 		GLint getAttribLocation(const std::string& pName);
 
 		template<typename T>

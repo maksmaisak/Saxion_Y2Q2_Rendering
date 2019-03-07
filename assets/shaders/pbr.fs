@@ -114,8 +114,6 @@ void main() {
         color += CalculateSpotLightContribution(i, normal, viewDirection, albedo.rgb, metallic, roughness, ao);
     }
 
-    //color *= 4.59;
-
     #ifdef RENDER_MODE_TRANSPARENCY
 	    fragmentColor = vec4(color, albedo.a);
 	#else
@@ -263,16 +261,33 @@ float CalculateDirectionalShadowMultiplier(int i, float biasMultiplier) {
     float shadow = 0.0;
     vec3 texelSize = 1.0 / textureSize(directionalDepthMaps, 0);
     vec2 scale = texelSize.xy * (1 + currentDepth * 0.1);
-    for (float x = -1.5; x <= 1.5; x += 1)
-        for (float y = -1; y <= 1.5; y += 1)
+    for (float x = -1; x <= 1; x += 1)
+        for (float y = -1; y <= 1; y += 1)
             shadow += texture(directionalDepthMaps, vec4(projected.xy + vec2(x, y) * scale, i, currentDepth - bias));
-    shadow /= 16.0;
+    shadow /= 9.0;
 
     return shadow;
 }
 
+const vec3 sampleOffsetDirections[20] = vec3[]
+(
+   vec3( 1,  1,  1), vec3( 1, -1,  1), vec3(-1, -1,  1), vec3(-1,  1,  1),
+   vec3( 1,  1, -1), vec3( 1, -1, -1), vec3(-1, -1, -1), vec3(-1,  1, -1),
+   vec3( 1,  1,  0), vec3( 1, -1,  0), vec3(-1, -1,  0), vec3(-1,  1,  0),
+   vec3( 1,  0,  1), vec3(-1,  0,  1), vec3( 1,  0, -1), vec3(-1,  0, -1),
+   vec3( 0,  1,  1), vec3( 0, -1,  1), vec3( 0, -1, -1), vec3( 0,  1, -1)
+);
+
 float CalculatePointShadowMultiplier(int i, vec3 fromLight, float distance, float biasMultiplier) {
 
-    float bias = max(0.1 * biasMultiplier, 0.05);
-    return texture(depthCubeMaps, vec4(fromLight, i), (distance - bias) / pointLights[i].farPlaneDistance);
+    float shadow = 0.0;
+    float bias = max(0.05 * biasMultiplier, 0.005);
+    int samples = 20;
+    float depth = distance / pointLights[i].farPlaneDistance - bias;
+    float viewDistance = length(viewPosition - worldPosition);
+    float diskRadius = (1.0 + (viewDistance / pointLights[i].farPlaneDistance)) / 25.0;
+    for (int j = 0; j < samples; ++j)
+        shadow += texture(depthCubeMaps, vec4(fromLight + sampleOffsetDirections[j] * diskRadius, i), depth);
+    shadow /= float(samples);
+    return shadow;
 }

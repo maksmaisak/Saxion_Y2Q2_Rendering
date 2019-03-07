@@ -66,7 +66,7 @@ static std::map<std::string, std::function<void(LuaState&, Material&)>> readers 
         "pbr",
         [](LuaState& lua, Material& m) {
 
-            m.setUniformValue("albedoMap", getTextureFromLua(lua, "albedo"));
+            m.setUniformValue("albedoMap", getTextureFromLua(lua, "albedo", Textures::white()));
 
             const auto defaultMetallicSmoothnessMap = Textures::white();
             const auto metallicSmoothnessMap = getTextureFromLua(lua, "metallicSmoothness", defaultMetallicSmoothnessMap, GL_RGBA);

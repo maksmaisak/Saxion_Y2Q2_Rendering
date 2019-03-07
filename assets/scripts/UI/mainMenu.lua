@@ -3,7 +3,7 @@ require ('assets/scripts/Utility/gameSerializer')
 
 
 local isBlocked = false
-
+local isChooseLevelOpened
 local mainMenuPanel
 local chooseLevelPanel
 local creditsPanel
@@ -12,6 +12,7 @@ local levelIndex = 1
 local numberOfLevels = 4
 local buttonSize = 60
 
+local stars = {}
 local ratio
 
 local scenery = {
@@ -49,6 +50,25 @@ local function keepAspectRatio(actor, theight)
 	actor:get("UIRect").offsetMax = { width / 2, height / 2}
 end
 
+local function createStar(aMinX,aMinY,aMaxX,aMaxY)
+	return Game.makeActor{
+		Name = "Star",
+		Transform = {
+			parent = "ChooseLevelPanel"
+		},
+		UIRect = {
+			anchorMin = {aMinX, aMinY},
+			anchorMax = {aMaxX, aMaxY}
+		},
+		Sprite = {
+			material = {
+				shader	= "sprite",
+				texture	= "textures/star.png",
+			}
+		}
+	}
+end
+
 function makeButton(name,parent,textString,anchorMin,anchorMax,textureFilePath)
 	
 	buttonActor = Game.makeActor {
@@ -83,6 +103,7 @@ function makeButton(name,parent,textString,anchorMin,anchorMax,textureFilePath)
 					end
 
 					if name == "ChooseLevelButton" then
+						isChooseLevelOpened = true
 						chooseLevelPanel:get("UIRect").isEnabled	= true
 						mainMenuPanel:get("UIRect").isEnabled		= false
 					end
@@ -97,6 +118,7 @@ function makeButton(name,parent,textString,anchorMin,anchorMax,textureFilePath)
 					end
 
 					if name == "BackButtonChooseLevel" then
+						isChooseLevelOpened = false
 						chooseLevelPanel:get("UIRect").isEnabled	= false
 						mainMenuPanel:get("UIRect").isEnabled	= true
 					end
@@ -122,7 +144,6 @@ function makeButton(name,parent,textString,anchorMin,anchorMax,textureFilePath)
 
 	keepAspectRatio(buttonActor,64)
 end
-
 
 function scene:start()
 
@@ -237,8 +258,18 @@ function scene:start()
 			}
 		},
 		LuaBehavior = {
+			start = function(self)
+				self.isFirstUpdate = true
+			end,
 			update = function(self, dt)
 				if(isChooseLevelOpened) then
+					local isLevelChanged = false
+					
+					if self.isFirstUpdate then
+						self.isFirstUpdate = false
+						isLevelChanged = true
+					end
+
 					if(levelIndex < numberOfLevels) then
 						if Game.keyboard.isDown("right") or (Game.mouse.isDown(1) and arrowRight:get("UIRect").isMouseOver) then
 							print("Is pressed right")
@@ -259,13 +290,7 @@ function scene:start()
 								arrowLeft:get("UIRect").isEnabled = true
 							end
 
-							self.actor:remove("Sprite")
-							self.actor:add("Sprite", {
-								material = {
-									shader	= "sprite",
-									texture = "textures/level" .. levelIndex .. ".jpg"
-								}
-							})
+							isLevelChanged = true
 						end
 					end
 					
@@ -290,13 +315,56 @@ function scene:start()
 								arrowRight:get("UIRect").isEnabled = true
 							end
 
+							isLevelChanged = true
+						end
+					end
+
+					if isLevelChanged then
+						isLevelChanged = false
+
+						-- destroy all the stars from previous level before creating
+						-- the new ones
+						for k,v in ipairs(stars) do
+							if v ~= nil then
+								v:remove("Sprite")
+								v = nil
+							end
+						end
+
+						local totalNumberOfStars = 0
+						local savedLevel = Game.savedData[levelIndex]
+
+						if savedLevel ~= nil then
+							totalNumberOfStars = savedLevel.stars
+
+						self.actor:remove("Sprite")
+						self.actor:add("Sprite", {
+							material = {
+								shader	= "sprite",
+								texture = "textures/level" .. levelIndex .. ".jpg"
+							}				
+						})
+						end
+
+						local anchorValue = 0.4
+						local anchorStep  = 0.1
+
+						if savedLevel == nil then
 							self.actor:remove("Sprite")
 							self.actor:add("Sprite", {
-								material = {
-									shader	= "sprite",
-									texture = "textures/level" .. levelIndex .. ".jpg"
-								}				
+							material = {
+								shader	= "sprite",
+								texture = "textures/black.png"
+							}				
 							})
+						end
+
+						for i = 1, totalNumberOfStars do
+							print("Created star")
+							self.starActor = createStar(anchorValue,0.3,anchorValue,0.3)
+							stars[#stars + 1] = self.starActor
+							keepAspectRatio(self.starActor,100)
+							anchorValue = anchorValue + anchorStep
 						end
 					end
 				end
@@ -304,9 +372,16 @@ function scene:start()
 
 			onMouseDown = function(self, button)
 				if button == 1 then
+					local level = Game.savedData[levelIndex]
+					
+					if level == nil then
+						return
+					end
+
 					playSoundObject('audio/UIButtonSound.wav',0,false,60)
 					Game.loadScene("assets/scripts/scenes/level"..levelIndex..".lua")
 					print("Loaded scene : " ..levelIndex)
+					Game.currentLevel = levelIndex
 				end
 			end
 		}

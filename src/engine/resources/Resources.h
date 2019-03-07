@@ -92,8 +92,8 @@ namespace en {
             m_resources.clear();
         }
 
-        inline static iterator begin() {return m_resources.begin();}
-        inline static iterator end()   {return m_resources.end();  }
+        inline static iterator begin() {return m_resources.cbegin();}
+        inline static iterator end()   {return m_resources.cend();  }
 
     private:
         static std::map<std::string, std::shared_ptr<TResource>> m_resources;

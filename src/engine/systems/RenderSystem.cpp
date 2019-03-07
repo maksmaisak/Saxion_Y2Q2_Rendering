@@ -38,7 +38,7 @@ RenderSystem::RenderSystem(bool displayMeshDebugInfo) :
     m_displayMeshDebugInfo(displayMeshDebugInfo),
     m_directionalDepthShader(Resources<ShaderProgram>::get("depthDirectional")),
     m_positionalDepthShader (Resources<ShaderProgram>::get("depthPositional")),
-    m_depthMaps(4, {1024, 1024}, 10, {512, 512}),
+    m_depthMaps(4, {1024, 1024}, 10, {64, 64}),
     m_vertexRenderer(4096)
 {}
 
@@ -62,7 +62,7 @@ void RenderSystem::start() {
     //glClearColor((float)0x2d / 0xff, (float)0x6b / 0xff, (float)0xce / 0xff, 1.0f);
     glClearColor(0, 0, 0, 1);
 
-    // Convert ouput from fragment shaders from linear to sRGB
+    // Convert output from fragment shaders from linear to sRGB
     glEnable(GL_FRAMEBUFFER_SRGB);
 
     // Disable byte-alignment restriction
@@ -291,17 +291,20 @@ Actor RenderSystem::getMainCamera() {
     return m_engine->actor(entity);
 }
 
-glm::mat4 getDirectionalLightspaceTransform(const Light& light, const Transform& lightTransform) {
+namespace {
 
-    glm::mat4 lightProjectionMatrix = glm::ortho(
-        -20.f, 20.f,
-        -20.f, 20.f,
-        light.nearPlaneDistance, light.farPlaneDistance
-    );
+    glm::mat4 getDirectionalLightspaceTransform(const Light& light, const Transform& lightTransform) {
 
-    glm::mat4 lightViewMatrix = glm::lookAt(-lightTransform.getForward() * 10, {0, 0, 0}, {0, 1, 0});
+        glm::mat4 lightProjectionMatrix = glm::ortho(
+            -20.f, 20.f,
+            -20.f, 20.f,
+            light.nearPlaneDistance, light.farPlaneDistance
+        );
 
-    return lightProjectionMatrix * lightViewMatrix;
+        glm::mat4 lightViewMatrix = glm::lookAt(-lightTransform.getForward() * 10, {0, 0, 0}, {0, 1, 0});
+
+        return lightProjectionMatrix * lightViewMatrix;
+    }
 }
 
 void RenderSystem::updateDepthMapsDirectionalLights(const std::vector<Entity>& directionalLights) {
@@ -341,31 +344,34 @@ void RenderSystem::updateDepthMapsDirectionalLights(const std::vector<Entity>& d
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
+namespace {
+
 std::tuple<float, glm::vec3, std::array<glm::mat4, 6>> getPointLightUniforms(const DepthMaps& depthMaps, const Light& light, const Transform& lightTransform) {
 
-    float nearPlaneDistance = light.nearPlaneDistance;
-    float farPlaneDistance  = light.farPlaneDistance;
-    glm::mat4 lightProjectionMatrix = glm::perspective(
-        glm::radians(90.f),
-        (float)depthMaps.getCubemapResolution().x / (float)depthMaps.getCubemapResolution().y,
-        nearPlaneDistance,
-        farPlaneDistance
-    );
+        float nearPlaneDistance = light.nearPlaneDistance;
+        float farPlaneDistance  = light.farPlaneDistance;
+        glm::mat4 lightProjectionMatrix = glm::perspective(
+            glm::radians(90.f),
+            (float)depthMaps.getCubemapResolution().x / (float)depthMaps.getCubemapResolution().y,
+            nearPlaneDistance,
+            farPlaneDistance
+        );
 
-    glm::vec3 lightPosition = lightTransform.getWorldPosition();
+        glm::vec3 lightPosition = lightTransform.getWorldPosition();
 
-    return {
-        farPlaneDistance,
-        lightPosition,
-        {
-            lightProjectionMatrix * glm::lookAt(lightPosition, lightPosition + glm::vec3( 1.0f, 0.0f, 0.0f), glm::vec3(0.0f,-1.0f, 0.0f)),
-            lightProjectionMatrix * glm::lookAt(lightPosition, lightPosition + glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f,-1.0f, 0.0f)),
-            lightProjectionMatrix * glm::lookAt(lightPosition, lightPosition + glm::vec3( 0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f)),
-            lightProjectionMatrix * glm::lookAt(lightPosition, lightPosition + glm::vec3( 0.0f,-1.0f, 0.0f), glm::vec3(0.0f, 0.0f,-1.0f)),
-            lightProjectionMatrix * glm::lookAt(lightPosition, lightPosition + glm::vec3( 0.0f, 0.0f, 1.0f), glm::vec3(0.0f,-1.0f, 0.0f)),
-            lightProjectionMatrix * glm::lookAt(lightPosition, lightPosition + glm::vec3( 0.0f, 0.0f,-1.0f), glm::vec3(0.0f,-1.0f, 0.0f))
-        }
-    };
+        return {
+            farPlaneDistance,
+            lightPosition,
+            {
+                lightProjectionMatrix * glm::lookAt(lightPosition, lightPosition + glm::vec3( 1.0f, 0.0f, 0.0f), glm::vec3(0.0f,-1.0f, 0.0f)),
+                lightProjectionMatrix * glm::lookAt(lightPosition, lightPosition + glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f,-1.0f, 0.0f)),
+                lightProjectionMatrix * glm::lookAt(lightPosition, lightPosition + glm::vec3( 0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f)),
+                lightProjectionMatrix * glm::lookAt(lightPosition, lightPosition + glm::vec3( 0.0f,-1.0f, 0.0f), glm::vec3(0.0f, 0.0f,-1.0f)),
+                lightProjectionMatrix * glm::lookAt(lightPosition, lightPosition + glm::vec3( 0.0f, 0.0f, 1.0f), glm::vec3(0.0f,-1.0f, 0.0f)),
+                lightProjectionMatrix * glm::lookAt(lightPosition, lightPosition + glm::vec3( 0.0f, 0.0f,-1.0f), glm::vec3(0.0f,-1.0f, 0.0f))
+            }
+        };
+    }
 }
 
 void RenderSystem::updateDepthMapsPositionalLights(const std::vector<Entity>& pointLights) {

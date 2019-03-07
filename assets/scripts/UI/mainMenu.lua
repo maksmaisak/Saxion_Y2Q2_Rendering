@@ -2,14 +2,16 @@ require ('assets/scripts/level/level')
 
 
 local isBlocked = false
-local isChooseLevelOpened = false
-local MainMenuPanel
+
+local mainMenuPanel
 local chooseLevelPanel
 local creditsPanel
+
 local levelIndex = 1
 local numberOfLevels = 4
-local ratio
 local buttonSize = 60
+
+local ratio
 
 local scenery = {
 	{
@@ -32,7 +34,7 @@ local function playSoundObject(filepath, offset, loop, volume)
 end
 
 local function keepAspectRatio(actor, theight)
-
+	
 	local sprite = actor:get("Sprite")
 	if not sprite then return end
 
@@ -46,14 +48,85 @@ local function keepAspectRatio(actor, theight)
 	actor:get("UIRect").offsetMax = { width / 2, height / 2}
 end
 
+function makeButton(name,parent,textString,anchorMin,anchorMax,textureFilePath)
+	
+	buttonActor = Game.makeActor {
+		Name = name,
+		Transform = {
+			parent = parent
+		},
+		Text = {
+			font   = "fonts/kenyanCoffee.ttf",
+			fontSize = 50,
+			color  = {1,1,1,1},
+			string = textString
+        },
+		UIRect = {
+			anchorMin = anchorMin,
+			anchorMax = anchorMax,
+		},
+		Sprite = {
+			material = {
+				shader	= "sprite",
+				texture = textureFilePath
+			}
+		},
+		LuaBehavior = {
+			onMouseDown = function(self, button)
+				if button == 1 then
+					playSoundObject('audio/UIButtonSound.wav',0,false,60)
+					
+					if name == "StartButton" then
+						Game.loadScene(Config.firstLevelPath)
+					end
+
+					if name == "ChooseLevelButton" then
+						chooseLevelPanel:get("UIRect").isEnabled	= true
+						mainMenuPanel:get("UIRect").isEnabled		= false
+					end
+
+					if name == "CreditsButton" then
+						creditsPanel:get("UIRect").isEnabled	= true
+						mainMenuPanel:get("UIRect").isEnabled	= false
+					end
+
+					if name == "ExitButton" then
+						Game.quit()
+					end
+
+					if name == "BackButtonChooseLevel" then
+						chooseLevelPanel:get("UIRect").isEnabled	= false
+						mainMenuPanel:get("UIRect").isEnabled	= true
+					end
+
+					if name == "BackButtonCredits" then
+						creditsPanel:get("UIRect").isEnabled	= false
+						mainMenuPanel:get("UIRect").isEnabled	= true
+					end
+				end
+			end,
+
+			--Mouse Over Start
+			onMouseEnter = function(self, button)
+				self.actor:get("Transform").scale = {1.2,1.2,1.2}
+			end,
+
+			onMouseLeave = function(self, button)
+				self.actor:get("Transform").scale = {1,1,1}
+			end
+			--Mouse Over End
+		}
+	}
+
+	keepAspectRatio(buttonActor,64)
+end
+
 
 function scene:start()
 
-	IsMenuOpened = true
-
 	Game.makeActors(scenery)
 
-	-- Start Main Buttons Panel
+-- Start Main Buttons Panel
    	Game.makeActor {
 		Name = "MainMenuPanel",
 		Transform = {},
@@ -63,195 +136,10 @@ function scene:start()
 		}
 	}
 
-	Game.makeActor {
-		Name = "ButtonsPanel",
-		Transform = {
-			parent = "MainMenuPanel"
-		},
-		UIRect = {
-			anchorMin	= {0.85, 0.05},
-			anchorMax	= {0.85, 0.35},
-			offsetMin	= {-150, 0},
-			offsetMax	= { 150, 0}
-		},
-	}
-
-	local startButton = Game.makeActor {
-		Name = "StartButton",
-		Transform = {
-			scale  = {1,1,1},
-			parent = "ButtonsPanel"
-		},
-		Text = {
-			font   = "fonts/kenyanCoffee.ttf",
-			fontSize = 50,
-			color  = {1, 1, 1, 1},
-			string = "Start"
-        },
-		UIRect = {
-			anchorMin = {0, 0.75},
-			anchorMax = {1, 1},
-			offsetMin = {0,5},
-			offsetMax = {0,-5}
-		},
-		Sprite = {
-			material = {
-				shader	= "sprite",
-				texture = "textures/transparent.png"
-			}
-		},
-		LuaBehavior = {
-			onMouseDown = function(self, button)
-				if button == 1 then
-					playSoundObject('audio/UIButtonSound.wav',0,false,60)
-					Game.loadScene(Config.firstLevelPath)
-				end
-			end,
-
-			--Mouse Over Start
-			onMouseEnter = function(self, button)
-				self.actor:get("Transform").scale = {1.2,1.2,1.2}
-			end,
-
-			onMouseLeave = function(self, button)
-				self.actor:get("Transform").scale = {1,1,1}
-			end
-			--Mouse Over End
-		}
-	}
-
-	local chooseLevelButton = Game.makeActor {
-		Name = "ChooseLevelButton",
-		Transform = {
-			parent = "ButtonsPanel"
-		},
-		Text = {
-			font = "fonts/kenyanCoffee.ttf",
-			fontSize = 50,
-			color = {1, 1, 1, 1},
-			string = "Choose Level"
-        },
-		UIRect = {
-			anchorMin = {0, 0.5},
-			anchorMax = {1, 0.75},
-			offsetMin = {0,5},
-			offsetMax = {0,-5}
-		},
-		Sprite = {
-			material = {
-				shader	= "sprite",
-				texture = "textures/transparent.png"
-			}
-		},
-		LuaBehavior = {
-			onMouseDown = function(self, button)
-				if button == 1 then
-					isChooseLevelOpened = true
-					playSoundObject('audio/UIButtonSound.wav',0,false,60)
-					chooseLevelPanel:get("UIRect").isEnabled = true
-					MainMenuPanel:get("UIRect").isEnabled = false
-				end
-			end,
-
-			--Mouse Over Start
-			onMouseEnter = function(self, button)
-				self.actor:get("Transform").scale = {1.2,1.2,1.2}
-			end,
-
-			onMouseLeave = function(self, button)
-				self.actor:get("Transform").scale = {1,1,1}
-			end
-			--Mouse Over End
-		}
-	}
-
-	local creditsButton = Game.makeActor {
-		Name = "CreditsButton",
-		Transform = {
-			parent = "ButtonsPanel"
-		},
-		UIRect = {
-			anchorMin = {0, 0.25},
-			anchorMax = {1, 0.5},
-			offsetMin = {0,5},
-			offsetMax = {0,-5}
-
-		},
-		Text = {
-			font = "fonts/kenyanCoffee.ttf",
-			fontSize = 50,
-			color = {1, 1, 1, 1},
-			string = "Credits"
-        },
-		Sprite = {
-			material = {
-				shader	= "sprite",
-				texture = "textures/transparent.png"
-			}
-		},
-		LuaBehavior = {
-			onMouseDown = function(self, button)
-				if button == 1 then
-					playSoundObject('audio/UIButtonSound.wav',0,false,60)
-					creditsPanel:get("UIRect").isEnabled		= true
-					MainMenuPanel:get("UIRect").isEnabled	= false
-				end
-			end,
-
-			--Mouse Over Start
-			onMouseEnter = function(self, button)
-				self.actor:get("Transform").scale = {1.2,1.2,1.2}
-			end,
-
-			onMouseLeave = function(self, button)
-				self.actor:get("Transform").scale = {1,1,1}
-			end
-			--Mouse Over End
-		}
-	}
-
-	local exitButton = Game.makeActor {
-		Name = "ExitButton",
-		Transform = {
-			parent = "ButtonsPanel"
-		},
-		UIRect = {
-			anchorMin = {0, 0},
-			anchorMax = {1, 0.25},
-			offsetMin = {0,5},
-			offsetMax = {0,-5}
-		},
-		Text = {
-			font = "fonts/kenyanCoffee.ttf",
-			fontSize = 50,
-			color = {1, 1, 1, 1},
-			string = "Exit"
-        },
-		Sprite = {
-			material = {
-				shader	= "sprite",
-				texture = "textures/transparent.png"
-			}
-		},
-		LuaBehavior = {
-			onMouseDown = function(self, button)
-				if button == 1 then
-					playSoundObject('audio/UIButtonSound.wav',0,false,60)
-					Game.quit()
-				end
-			end,
-
-			--Mouse Over Start
-			onMouseEnter = function(self, button)
-				self.actor:get("Transform").scale = {1.2,1.2,1.2}
-			end,
-
-			onMouseLeave = function(self, button)
-				self.actor:get("Transform").scale = {1,1,1}
-			end
-			--Mouse Over End
-		}
-	}
+	makeButton("StartButton","MainMenuPanel","Start",{0.5,0.8},{0.5,0.8},"textures/buttonBackground.png")
+	makeButton("ChooseLevelButton","MainMenuPanel","Choose Level",{0.5,0.7},{0.5,0.7},"textures/buttonBackground.png")
+	makeButton("CreditsButton","MainMenuPanel","Credits",{0.5,0.6},{0.5,0.6},"textures/buttonBackground.png")
+	makeButton("ExitButton","MainMenuPanel","Exit",{0.5,0.5},{0.5,0.5},"textures/buttonBackground.png")
 --End Main Buttons Panel
 
 --Start ChooseLevel Panel
@@ -414,49 +302,7 @@ function scene:start()
 		}
 	}
 
-	local backButtonChooseLevel = Game.makeActor {
-		Name = "BackButtonChooseLevel",
-		Transform = {
-			parent = "ChooseLevelPanel"
-		},
-		UIRect = {
-			anchorMin = {0.5, 0.15},
-			anchorMax = {0.5, 0.1},
-		},
-		Text = {
-			font = "fonts/kenyanCoffee.ttf",
-			fontSize = 50,
-			color = {1, 1, 1, 1},
-			string = "Back"
-        },
-		Sprite = {
-			material = {
-				shader	= "sprite",
-				texture = "textures/transparent.png"
-			}
-		},
-		LuaBehavior = {
-			onMouseDown = function(self, button)
-				if button == 1 then
-					isChooseLevelOpened = false
-					playSoundObject('audio/UIButtonSound.wav',0,false,60)
-					print("Go back to main")
-					MainMenuPanel:get("UIRect").isEnabled = true
-					chooseLevelPanel:get("UIRect").isEnabled = false
-				end
-			end,
-
-			--Mouse Over Start
-			onMouseEnter = function(self, button)
-				self.actor:get("Transform").scale = {1.2,1.2,1.2}
-			end,
-
-			onMouseLeave = function(self, button)
-				self.actor:get("Transform").scale = {1,1,1}
-			end
-			--Mouse Over End
-		}
-	}
+	makeButton("BackButtonChooseLevel","ChooseLevelPanel","Back",{0.5,0.1},{0.5,0.1},"textures/buttonBackground.png")
 --End ChooseLevel Panel
 
 --Start Credits Panel
@@ -476,53 +322,12 @@ function scene:start()
         },
 	}
 
-	local backButtonCredits = Game.makeActor {
-		Name = "BackButtonCredits",
-		Transform = {
-			parent = "CreditsPanel"
-		},
-		UIRect = {
-			anchorMin = {0.5, 0.1},
-			anchorMax = {0.5, 0.1}
-		},
-		Text = {
-			font	= "fonts/kenyanCoffee.ttf",
-			fontSize = 50,
-			color	= {1, 1, 1, 1},
-			string	= "Back"
-        },
-		Sprite = {
-			material = {
-				shader	= "sprite",
-				texture = "textures/transparent.png"
-			}
-		},
-		LuaBehavior = {
-			onMouseDown = function(self, button)
-				if button == 1 then
-					playSoundObject('audio/UIButtonSound.wav',0,false,60)
-					creditsPanel:get("UIRect").isEnabled	 = false
-					MainMenuPanel:get("UIRect").isEnabled = true
-				end
-			end,
-
-			--Mouse Over Start
-			onMouseEnter = function(self, button)
-				self.actor:get("Transform").scale = {1.2,1.2,1.2}
-			end,
-
-			onMouseLeave = function(self, button)
-				self.actor:get("Transform").scale = {1,1,1}
-			end
-			--Mouse Over End
-		}
-	}
-
+	makeButton("BackButtonCredits","CreditsPanel","Back",{0.5,0.1},{0.5,0.1},"textures/buttonBackground.png")
 
 --End Credits Panel
 
 	Game.makeActor {
-		Name = "MainPanel",
+		Name = "MainPanelImage",
 		Transform = {},
 		UIRect = {
 			anchorMin = {0,0},
@@ -536,17 +341,16 @@ function scene:start()
 		}
 	}
 
-	MainMenuPanel = Game.find("MainMenuPanel")
+	mainMenuPanel = Game.find("MainMenuPanel")
 	chooseLevelPanel = Game.find("ChooseLevelPanel")
 	creditsPanel	 = Game.find("CreditsPanel")
+
 
 	creditsPanel:get("UIRect").isEnabled	 = false
 	chooseLevelPanel:get("UIRect").isEnabled = false
 	arrowLeft:get("UIRect").isEnabled = false
 
 	keepAspectRatio(chooseLevelImage,500)
-	keepAspectRatio(backButtonChooseLevel,95)
-	keepAspectRatio(backButtonCredits,95)
 	keepAspectRatio(arrowLeft,300)
 	keepAspectRatio(arrowRight,300)
 

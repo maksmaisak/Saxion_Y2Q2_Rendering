@@ -30,6 +30,8 @@ namespace en {
 
     public:
 
+        using iterator = typename std::map<std::string, std::shared_ptr<TResource>>::const_iterator;
+
         /// Gets a resource by given key.
         /// If not already present, tries create one using a load function.
         /// The load function is one of these, in order of priority:
@@ -89,6 +91,9 @@ namespace en {
         inline static void clear() {
             m_resources.clear();
         }
+
+        inline static iterator begin() {return m_resources.cbegin();}
+        inline static iterator end()   {return m_resources.cend();  }
 
     private:
         static std::map<std::string, std::shared_ptr<TResource>> m_resources;

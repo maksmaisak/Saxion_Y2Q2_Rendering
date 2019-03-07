@@ -18,7 +18,7 @@ function Level:start()
 
 	local music = Game.audio.getMusic('audio/ambiance.wav')
 	if music.status ~= "Playing" then
-		print("Music Status",music.status)
+		print("Music Status", music.status)
 		music.loop	= true
 		music.volume = 100
 		music:play()

@@ -78,7 +78,7 @@ function PauseMenu:createPanel()
 		Sprite = {
 			material = {
 				shader	= "sprite",
-				texture	= "textures/button.png",
+				texture	= "textures/buttonBackground.png",
 			}
 		},
 		LuaBehavior = {
@@ -114,13 +114,13 @@ function PauseMenu:createPanel()
 			string = "Main Menu"
         },
 		UIRect = {
-			anchorMin = {0.5, 0.4},
-			anchorMax = {0.5, 0.4}
+			anchorMin = {0.5, 0.5},
+			anchorMax = {0.5, 0.5}
 		},
 		Sprite = {
 			material = {
 				shader	= "sprite",
-				texture	= "textures/button.png",
+				texture	= "textures/buttonBackground.png",
 			}
 		},
 		LuaBehavior = {
@@ -145,8 +145,8 @@ function PauseMenu:createPanel()
 
 	pauseCanvas	= Game.find("PauseMenuPanel")
 
-	keepAspectRatio(mainMenuButton,125)
-	keepAspectRatio(self.resumeButton,125)
+	keepAspectRatio(mainMenuButton,64)
+	keepAspectRatio(self.resumeButton,64)
 end
 
 function PauseMenu:activate()

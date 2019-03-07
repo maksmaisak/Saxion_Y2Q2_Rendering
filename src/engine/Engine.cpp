@@ -247,21 +247,6 @@ int loadScene(lua_State* L) {
     return 0;
 }
 
-template<>
-struct ResourceLoader<sf::SoundBuffer> {
-
-    inline static std::shared_ptr<sf::SoundBuffer> load(const std::string& filepath) {
-
-        auto buffer = std::make_shared<sf::SoundBuffer>();
-        if (!buffer->loadFromFile(filepath)) {
-            std::cerr << "Couldn't load sound from: " << filepath << std::endl;
-            return nullptr;
-        }
-
-        return buffer;
-    }
-};
-
 void Engine::initializeLua() {
 
     auto& lua = getLuaState();
@@ -320,6 +305,23 @@ void Engine::initializeLua() {
             lua.setField("getMusic", [](const std::string& filepath) {
                 auto ptr = Resources<sf::Music>::get(config::ASSETS_PATH + filepath);
                 return ptr ? std::make_optional(ptr) : std::nullopt;
+            });
+
+            lua.setField("stopAll", []() {
+
+                std::size_t count = 0;
+
+                std::for_each(Resources<Sound>::begin(), Resources<Sound>::end(), [&count](const auto& pair){
+                    pair.second->getUnderlyingSound().stop();
+                    count += 1;
+                });
+
+                std::for_each(Resources<sf::Music>::begin(), Resources<sf::Music>::end(), [&count](const auto& pair){
+                    pair.second->stop();
+                    count += 1;
+                });
+
+                return count;
             });
         }
         lua_setfield(lua, -2, "audio");

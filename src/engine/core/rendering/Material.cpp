@@ -34,7 +34,6 @@ Material::Material(std::shared_ptr<ShaderProgram> shader) : m_shader(std::move(s
 
 namespace {
 
-
     std::string getShaderNameFromLua(LuaState& lua) {
 
         if (!lua_istable(lua, -1) && !lua_isuserdata(lua, -1))

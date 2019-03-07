@@ -98,7 +98,7 @@ function GameSerializer:saveNewEntry(newEntry)
 
 	for k, v in ipairs(Game.savedData) do
 		if v.level == newEntry.level then
-			if(v.stars < newEntry.stars) then
+			if(v.stars > newEntry.stars) then
 				v.stars = newEntry.stars
 			end
 			Game.savedData[k].stars = newEntry.stars

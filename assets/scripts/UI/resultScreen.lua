@@ -228,7 +228,9 @@ function ResultScreen:update(dt)
 	end
 
 	if self.animationTimer >= self.maxAnimationTimer and not allowButtonControl then
-		playSoundObject('audio/UIButtonSound.wav',0,false,60) -- TODO: replace this sound with the actual one
+		if totalStars > 0 then
+			playSoundObject('audio/UIButtonSound.wav',0,false,60) -- TODO: replace this sound with the actual one
+		end
 		allowButtonControl = true
 	end
 end

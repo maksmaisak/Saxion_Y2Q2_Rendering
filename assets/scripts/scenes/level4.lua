@@ -3455,7 +3455,7 @@ local extras = {
 return Level:new {
     map = map,
     extras = extras,
-    nextLevelPath = 'assets/scripts/scenes/level4.lua',
+    nextLevelPath = 'assets/scripts/scenes/level5.lua',
     maxNumUndos = {
         threeStars = 2,
         twoStars = 4,

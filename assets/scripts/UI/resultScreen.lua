@@ -3,6 +3,7 @@ require('assets/scripts/object')
 ResultScreen = Object:new()
 
 local stars = {}
+local allowButtonControl = false
 
 function ResultScreen:keepAspectRatio(actor , tHeight)
 
@@ -30,8 +31,9 @@ function ResultScreen:createStar(aMinX,aMinY,aMaxX,aMaxY)
 	local star = Game.makeActor{
 		Name = "Star",
 		Transform = {
-			scale = {0.1,0.1,0.1},
-			parent = "ResultPanel"
+			scale = {0, 0, 0},
+			parent = "ResultPanel",
+			rotation = {0,0, 180}
 		},
 		UIRect = {
 			anchorMin = {aMinX, aMinY},
@@ -50,21 +52,12 @@ function ResultScreen:createStar(aMinX,aMinY,aMaxX,aMaxY)
 	stars[#stars + 1] = star
 end
 
-local function lerp(a, b, t)
-	return (1 - t) * a + t * b;
-end
-
-function ResultScreen:animateStar(actor, dt)
+function ResultScreen:animateStar(actor, scaleTarget, rotationTarget, duration)
 
     local tf = actor:get("Transform")
 
-	local temp = {x = tf.scale.x, y = tf.scale.y, z = tf.scale.z}
-
-	temp.x = lerp(temp.x, 1, 2 * dt)
-	temp.y = lerp(temp.y, 1, 2 * dt)
-	temp.z = lerp(temp.z, 1, 2 * dt)
-
-	tf.scale = temp
+	tf:tweenScale(scaleTarget, duration)
+	tf:tweenRotation(rotationTarget, duration)
 end
 
 function ResultScreen:CalculateTotalStars()
@@ -111,12 +104,13 @@ function ResultScreen:createResultPanel()
 		Sprite = {
 			material = {
 				shader	= "sprite",
-				texture	= "textures/button.png",
+				texture	= "textures/buttonBackground.png",
 			}
 		},
 		LuaBehavior = {
 			onMouseDown = function(self, button)
 				if button == 1 then
+					if not allowButtonControl then return end
 					playSoundObject('audio/UIButtonSound.wav',0,false,60)
 					Game.loadScene(Config.startScene)
 				end
@@ -124,6 +118,7 @@ function ResultScreen:createResultPanel()
 
 			--Mouse Over Start
 			onMouseEnter = function(self, button)
+				if not allowButtonControl then return end
 				self.actor:get("Transform").scale = {1.2,1.2,1.2}
 			end,
 
@@ -134,7 +129,7 @@ function ResultScreen:createResultPanel()
 		}
 	}
 
-	self:keepAspectRatio(mainMenuButton,125)
+	self:keepAspectRatio(mainMenuButton,64)
 
 	if Game.currentLevel >= Game.maxLevel then
 		local mainMenuButtonUIRect = mainMenuButton:get("UIRect")
@@ -161,12 +156,13 @@ function ResultScreen:createResultPanel()
 			Sprite = {
 				material = {
 					shader	= "sprite",
-					texture	= "textures/button.png",
+					texture	= "textures/buttonBackground.png",
 				}
 			},
 			LuaBehavior = {
 				onMouseDown = function(self, button)
 					if button == 1 then
+						if not allowButtonControl then return end
 						playSoundObject('audio/UIButtonSound.wav',0,false,60)
 						Game.currentLevel = Game.currentLevel + 1
 						Game.loadScene(Game.levels[Game.currentLevel].path)
@@ -175,6 +171,7 @@ function ResultScreen:createResultPanel()
 
 				--Mouse Over Start
 				onMouseEnter = function(self, button)
+					if not allowButtonControl then return end
 					self.actor:get("Transform").scale = {1.2,1.2,1.2}
 				end,
 
@@ -186,7 +183,7 @@ function ResultScreen:createResultPanel()
 		}
 
 		nextLevelButton:get("LuaBehavior").level = self.level
-		self:keepAspectRatio(nextLevelButton,125)
+		self:keepAspectRatio(nextLevelButton,64)
 	end
 
 	self.totalNumberOfStars = self:CalculateTotalStars()
@@ -199,6 +196,16 @@ function ResultScreen:createResultPanel()
 		anchorValue = anchorValue + anchorStep
 	end
 
+	self.animationTargetScale	 = { x = 1, y = 1, z = 1 }
+	self.animationTargetRotation = { x = 0, y = 0, z = 0 }
+	self.animationDuration		 = 1
+	 
+	allowButtonControl	       = false
+	self.animatedStarIndex     = 1
+	self.nextAnimatedStartTime = 0
+	self.animationTimer		   = 0
+	self.maxAnimationTimer     = self.totalNumberOfStars * self.animationDuration + 0.05
+
 	local entry = { level = "level"..Game.currentLevel, stars = self.totalNumberOfStars}
 
 	local serializer = Game.serializer
@@ -209,16 +216,25 @@ function ResultScreen:createResultPanel()
 	serializer:saveNewEntry(entry)
 end
 
-function ResultScreen:activate()
-	self:createResultPanel()
+function ResultScreen:update(dt)
+	self.animationTimer = self.animationTimer + dt
+
+	local totalStars = self.totalNumberOfStars
+	if self.animatedStarIndex <= totalStars and self.animationTimer >= self.nextAnimatedStartTime then	
+		playSoundObject('audio/UIButtonSound.wav',0,false,60) -- TODO: replace this sound with the actual one
+		self:animateStar(stars[self.animatedStarIndex], self.animationTargetScale, self.animationTargetRotation, self.animationDuration)
+		self.animatedStarIndex     = self.animatedStarIndex + 1
+		self.nextAnimatedStartTime = self.nextAnimatedStartTime + self.animationDuration
+	end
+
+	if self.animationTimer >= self.maxAnimationTimer and not allowButtonControl then
+		playSoundObject('audio/UIButtonSound.wav',0,false,60) -- TODO: replace this sound with the actual one
+		allowButtonControl = true
+	end
 end
 
-function ResultScreen:update(dt)
-	if self.totalNumberOfStars > 0 then
-		for i=1, self.totalNumberOfStars do
-			self:animateStar(stars[i], dt)
-		end
-	end
+function ResultScreen:activate()
+	self:createResultPanel()
 end
 
 return function(o)

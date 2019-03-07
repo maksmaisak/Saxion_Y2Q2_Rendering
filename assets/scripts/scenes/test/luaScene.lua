@@ -127,7 +127,7 @@ local scenery = {
                 smoothnessMultiplier = 0.05,
             }
         }
-    }
+    },
 }
 
 local scene = {}
@@ -169,10 +169,7 @@ function scene:start()
 
     Game.makeActor {
         Name = "LightAmbient",
-        Transform = {
-            scale = {0.1, 0.1, 0.1},
-            rotation = {-45, 0, 0}
-        },
+        Transform = {},
         Light = {
             kind = "directional",
             intensity = 0,
@@ -183,7 +180,7 @@ function scene:start()
     Game.makeActor {
         Name = "LightDirectional",
         Transform = {
-            rotation = {-45, 0, 0}
+            rotation = {45, 0, 0}
         },
         Light = {
             kind = "directional",
@@ -206,6 +203,36 @@ function scene:start()
     tf:tweenPosition(Vector.from {5, 0, 0} + tf.position, 2):setLoopBounce()
     tf:tweenRotation({0, 180, 0}, 10)
     tf:tweenScale({2, 2, 2}, 1, Ease.inQuad):setLoopBounce()
+
+    local z = 2
+    local function makeTest()
+
+        local actor = Game.makeActor {
+            Transform = {
+                position = { x = -6, y = 12, z = z },
+                scale = {4, 4, 4},
+            },
+            RenderInfo = {
+                mesh = 'objects/decorations/Plants/vine_01.obj',
+                material = {
+                    shader = 'pbr',
+                    renderMode = 'cutout',
+                    albedo = 'objects/decorations/Plants/Material/Plant_All (3).tga',
+                    metallicMultiplier = 0,
+                    smoothnessMultiplier = 0,
+                    aoMultiplier = 1,
+                }
+            }
+        }
+
+        z = z - 1
+
+        return actor
+    end
+
+    for i = 1,5 do
+        makeTest()
+    end
 end
 
 function scene:update(dt)

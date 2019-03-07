@@ -335,6 +335,7 @@ void RenderSystem::updateDepthMapsDirectionalLights(const std::vector<Entity>& d
         auto& renderInfo = m_registry->get<RenderInfo>(e);
         if (!renderInfo.isEnabled || !renderInfo.model)
             continue;
+
         const glm::mat4& modelTransform = m_registry->get<Transform>(e).getWorldTransform();
         m_directionalDepthShader->setUniformValue("matrixModel", modelTransform);
         for (const Mesh& mesh : renderInfo.model->getMeshes())

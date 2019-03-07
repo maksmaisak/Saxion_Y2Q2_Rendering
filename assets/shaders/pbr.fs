@@ -91,7 +91,7 @@ float CalculatePointShadowMultiplier(int i, vec3 fromLight, float distance, floa
 
 void main() {
 
-    vec4 msSample   = texture(metallicSmoothnessMap, texCoords);
+    vec4  msSample  = texture(metallicSmoothnessMap, texCoords);
     float metallic  = metallicMultiplier * msSample.r;
     float roughness = 1.f - smoothnessMultiplier * msSample.a;
     vec4  albedo    = albedoColor  * texture(albedoMap, texCoords);

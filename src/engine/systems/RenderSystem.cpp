@@ -59,8 +59,9 @@ void RenderSystem::start() {
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    //glClearColor((float)0x2d / 0xff, (float)0x6b / 0xff, (float)0xce / 0xff, 1.0f);
-    glClearColor(0, 0, 0, 1);
+    //glClearColor(0, 0, 0, 1);
+    const glm::vec3 color = glm::pow(glm::vec3(62.f / 255, 84.f / 255, 92.f / 255), glm::vec3(2.2f));
+    glClearColor(color.x, color.y, color.z, 1.f);
 
     // Convert output from fragment shaders from linear to sRGB
     glEnable(GL_FRAMEBUFFER_SRGB);
@@ -334,6 +335,7 @@ void RenderSystem::updateDepthMapsDirectionalLights(const std::vector<Entity>& d
         auto& renderInfo = m_registry->get<RenderInfo>(e);
         if (!renderInfo.isEnabled || !renderInfo.model)
             continue;
+
         const glm::mat4& modelTransform = m_registry->get<Transform>(e).getWorldTransform();
         m_directionalDepthShader->setUniformValue("matrixModel", modelTransform);
         for (const Mesh& mesh : renderInfo.model->getMeshes())

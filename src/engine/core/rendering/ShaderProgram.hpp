@@ -6,64 +6,64 @@
 #include <string>
 #include <memory>
 #include <vector>
+#include <optional>
 #include "Resources.h"
 #include "config.hpp"
 #include "GLSetUniform.h"
 
 namespace en {
 
-	struct UniformInfo {
+	struct PreprocessorDefinition {
+		std::string name;
+		std::optional<std::string> value = std::nullopt;
+	};
 
+	using PreprocessorDefinitions = std::vector<PreprocessorDefinition>;
+
+	struct UniformInfo {
 		GLint location = -1;
 		std::string name;
 	};
 
     /**
      * Generic shader program to which you can add separate shaders.
-     * Nice exercise for the reader: make it possible to add shaders by passing in the code as a string instead of through a file.
-     *
      * Usage:
      *  -create shader program
      *  -add shaders
      *  -finalize shader program
      *  -use shader program
-     *
-     * See the example material classes for a demo.
      */
 	class ShaderProgram {
 
 	public:
 
 		ShaderProgram();
-
+		ShaderProgram(const ShaderProgram& other) = delete;
+		ShaderProgram& operator=(const ShaderProgram& other) = delete;
+		ShaderProgram(ShaderProgram&& other) = default;
+		ShaderProgram& operator=(ShaderProgram&& other) = default;
 		virtual ~ShaderProgram();
 
-		//add a shader of a specific type (eg GL_VERTEX_SHADER / GL_FRAGMENT_SHADER)
-		bool addShader(GLuint shaderType, const std::string& filepath);
-
-		//link and compile all added shaders
+		// Add a shader of a specific type (eg GL_VERTEX_SHADER / GL_FRAGMENT_SHADER)
+		bool addShader(GLuint shaderType, const std::string& filepath, const PreprocessorDefinitions& preprocessorDefinitions = {});
+		// Link and compile all added shaders
 		void finalize();
 
-		//tell opengl this is now the current shader program
-		void use();
+		void use() const;
 
-		//get access to uniforms within the shader
-		GLint getUniformLocation(const std::string& pName);
-
-		//get access to attributes within the shader
-		GLint getAttribLocation(const std::string& pName);
+		GLint getUniformLocation(const std::string& pName) const;
+		GLint getAttribLocation (const std::string& pName) const;
 
 		template<typename T>
 		void setUniformValue(const std::string& name, T&& value);
-
-		std::vector<UniformInfo> getAllUniforms();
+		std::vector<UniformInfo> getAllUniforms() const;
 
 	private:
 
+		GLuint compileShader(GLuint shaderType, const std::string& shaderSource);
+
 		GLuint m_programId = 0;
 		std::vector<GLuint> m_shaderIds;
-
-		GLuint compileShader(GLuint pShaderType, const std::string& pShaderSource);
 	};
 
 	template<typename T>
@@ -79,32 +79,45 @@ namespace en {
 	template<>
 	struct ResourceLoader<ShaderProgram> {
 
-        inline static std::shared_ptr<ShaderProgram> load(const std::string& vertexShaderPath, const std::string& fragmentShaderPath) {
+        inline static std::shared_ptr<ShaderProgram> load(
+        	const std::string& vertexShaderPath,
+        	const std::string& fragmentShaderPath,
+			const PreprocessorDefinitions& preprocessorDefinitions = {}
+		) {
 
             auto shader = std::make_shared<ShaderProgram>();
-            shader->addShader(GL_VERTEX_SHADER, vertexShaderPath);
-            shader->addShader(GL_FRAGMENT_SHADER, fragmentShaderPath);
+            shader->addShader(GL_VERTEX_SHADER  , vertexShaderPath  , preprocessorDefinitions);
+            shader->addShader(GL_FRAGMENT_SHADER, fragmentShaderPath, preprocessorDefinitions);
             shader->finalize();
             return shader;
         }
 
-		inline static std::shared_ptr<ShaderProgram> load(const std::string& vertexShaderPath, const std::string& fragmentShaderPath, const std::string& geometryShaderPath) {
+		inline static std::shared_ptr<ShaderProgram> load(
+			const std::string& vertexShaderPath,
+			const std::string& fragmentShaderPath,
+			const std::string& geometryShaderPath,
+			const PreprocessorDefinitions& preprocessorDefinitions = {}
+		) {
 
 			auto shader = std::make_shared<ShaderProgram>();
-			shader->addShader(GL_VERTEX_SHADER  , vertexShaderPath);
-			shader->addShader(GL_GEOMETRY_SHADER, geometryShaderPath);
-			shader->addShader(GL_FRAGMENT_SHADER, fragmentShaderPath);
+			shader->addShader(GL_VERTEX_SHADER  , vertexShaderPath  , preprocessorDefinitions);
+			shader->addShader(GL_GEOMETRY_SHADER, geometryShaderPath, preprocessorDefinitions);
+			shader->addShader(GL_FRAGMENT_SHADER, fragmentShaderPath, preprocessorDefinitions);
 			shader->finalize();
 			return shader;
 		}
 
-        inline static std::shared_ptr<ShaderProgram> load(const std::string& name) {
+        inline static std::shared_ptr<ShaderProgram> load(
+        	const std::string& name,
+        	const PreprocessorDefinitions& preprocessorDefinitions = {}
+		) {
 
         	std::string prefix = config::SHADER_PATH + name;
             return load(
                 prefix + ".vs",
                 prefix + ".fs",
-                prefix + ".gs"
+                prefix + ".gs",
+				preprocessorDefinitions
 			);
         }
     };

@@ -1,27 +1,54 @@
+#include "ShaderProgram.hpp"
 #include <iostream>
 #include <fstream>
-#include <optional>
-#include "ShaderProgram.hpp"
+#include <sstream>
 #include "GLHelpers.h"
 
 using namespace en;
 
-std::optional<std::string> readFile(const std::string& pShaderPath) {
+namespace {
 
-    std::string contents;
-    std::ifstream file(pShaderPath, std::ios::in);
-    if (!file.is_open()) {
-        std::cout << "Error reading shader " << pShaderPath << std::endl;
-        return std::nullopt;
+    std::optional<std::string> getSource(const std::string& filepath, const PreprocessorDefinitions& preprocessorDefinitions) {
+
+        std::ifstream file(filepath, std::ios::in);
+        if (!file.is_open()) {
+            std::cout << "Error reading shader " << filepath << std::endl;
+            return std::nullopt;
+        }
+
+        std::stringstream text;
+        std::cout << "Reading shader file... " << filepath << std::endl;
+
+        std::string line;
+        if (getline(file, line)) {
+            text << line;
+
+            for (const auto& definition : preprocessorDefinitions) {
+
+                text << "#define " << definition.name;
+                if (definition.value)
+                    text << *definition.value;
+                text << "\n";
+            }
+        }
+
+        while (getline(file, line))
+            text << "\n" << line;
+
+        file.close();
+
+        return text.str();
     }
 
-    std::cout << "Reading shader file... " << pShaderPath << std::endl;
-    std::string line;
-    while (getline(file, line))
-        contents += "\n" + line;
-    file.close();
+    void printProgramError(GLuint programId) {
 
-    return contents;
+        int infoLogLength;
+        glGetProgramiv(programId, GL_INFO_LOG_LENGTH, &infoLogLength);
+        auto errorMessage = std::make_unique<char[]>(infoLogLength + 1);
+
+        glGetProgramInfoLog(programId, infoLogLength, nullptr, errorMessage.get());
+        std::cerr << errorMessage.get() << std::endl << std::endl;
+    }
 }
 
 ShaderProgram::ShaderProgram() {
@@ -35,9 +62,9 @@ ShaderProgram::~ShaderProgram() {
     glDeleteProgram(m_programId);
 }
 
-bool ShaderProgram::addShader(GLuint shaderType, const std::string& filepath) {
+bool ShaderProgram::addShader(GLuint shaderType, const std::string& filepath, const PreprocessorDefinitions& preprocessorDefinitions) {
 
-    std::optional<std::string> shaderCode = readFile(filepath);
+    std::optional<std::string> shaderCode = getSource(filepath, preprocessorDefinitions);
     if (!shaderCode)
         return false;
 
@@ -51,7 +78,7 @@ bool ShaderProgram::addShader(GLuint shaderType, const std::string& filepath) {
 
 void ShaderProgram::finalize() {
 
-    for (unsigned int shaderId : m_shaderIds)
+    for (GLuint shaderId : m_shaderIds)
         glAttachShader(m_programId, shaderId);
     glLinkProgram(m_programId);
 
@@ -60,88 +87,69 @@ void ShaderProgram::finalize() {
     glGetProgramiv(m_programId, GL_LINK_STATUS, &didLinkSuccessfully);
 
     if (didLinkSuccessfully) {
-
         std::cout << "Program linked ok." << std::endl << std::endl;
-
-    } else { // error, show message
-
+    } else {
         std::cerr << "Program linkage error:" << std::endl;
-        int infoLogLength;
-        glGetProgramiv(m_programId, GL_INFO_LOG_LENGTH, &infoLogLength);
-        char* errorMessage = new char[infoLogLength + 1];
-        glGetProgramInfoLog(m_programId, infoLogLength, nullptr, errorMessage);
-        std::cerr << errorMessage << std::endl << std::endl;
-        delete[] errorMessage;
+        printProgramError(m_programId);
     }
 
-    for (unsigned int shaderId : m_shaderIds) {
+    for (GLuint shaderId : m_shaderIds)
         glDeleteShader(shaderId);
-    }
 }
 
-void ShaderProgram::use() {
-
+void ShaderProgram::use() const {
     glUseProgram(m_programId);
 }
 
-GLint ShaderProgram::getUniformLocation(const std::string& pName) {
-
-    return glGetUniformLocation(m_programId, pName.c_str());
+GLint ShaderProgram::getUniformLocation(const std::string& uniformName) const {
+    return glGetUniformLocation(m_programId, uniformName.c_str());
 }
 
-GLint ShaderProgram::getAttribLocation(const std::string& pName) {
-
-    return glGetAttribLocation(m_programId, pName.c_str());
+GLint ShaderProgram::getAttribLocation(const std::string& attributeName) const {
+    return glGetAttribLocation(m_programId, attributeName.c_str());
 }
 
 // compile the code, and detect errors.
-GLuint ShaderProgram::compileShader(GLuint pShaderType, const std::string& pShaderSource) {
+GLuint ShaderProgram::compileShader(GLuint shaderType, const std::string& shaderSource) {
 
     std::cout << "Compiling shader... " << std::endl;
-    const char* sourcePointer = pShaderSource.c_str();
-    GLuint shaderId = glCreateShader(pShaderType);
-    glShaderSource(shaderId, 1, &sourcePointer, NULL);
+
+    GLuint shaderId = glCreateShader(shaderType);
+    const char* const sourcePointer = shaderSource.c_str();
+    glShaderSource(shaderId, 1, &sourcePointer, nullptr);
     glCompileShader(shaderId);
 
     GLint compilerResult = GL_FALSE;
     glGetShaderiv(shaderId, GL_COMPILE_STATUS, &compilerResult);
-
-    if (compilerResult) {
+    if (compilerResult == GL_TRUE) {
         std::cout << "Shader compiled ok." << std::endl;
         return shaderId;
-    } else { // get error message
-        std::cout << "Shader error:" << std::endl;
-        int infoLogLength;
-        glGetShaderiv(shaderId, GL_INFO_LOG_LENGTH, &infoLogLength);
-        char* errorMessage = new char[infoLogLength + 1];
-        glGetShaderInfoLog(shaderId, infoLogLength, NULL, errorMessage);
-        std::cout << errorMessage << std::endl << std::endl;
-        delete[] errorMessage;
-        return 0;
     }
+
+    std::cout << "Shader error:" << std::endl;
+    printProgramError(m_programId);
+    return 0;
 }
 
-std::vector<UniformInfo> ShaderProgram::getAllUniforms() {
+std::vector<UniformInfo> ShaderProgram::getAllUniforms() const {
 
-    std::vector<UniformInfo> vector;
+    std::vector<UniformInfo> infos;
 
     GLint count;
-
-    GLint size;
-    GLenum uniformType;
-
-    const GLsizei nameBufferSize = 128;
-    GLchar nameBuffer[nameBufferSize];
-    GLsizei nameLength;
-
     glGetProgramiv(m_programId, GL_ACTIVE_UNIFORMS, &count);
+
     for (GLint i = 0; i < count; ++i) {
 
+        const GLsizei nameBufferSize = 128;
+        GLchar nameBuffer[nameBufferSize];
+        GLsizei nameLength;
+        GLint size;
+        GLenum uniformType;
         glGetActiveUniform(m_programId, (GLuint)i, nameBufferSize, &nameLength, &size, &uniformType, nameBuffer);
 
         auto name = std::string(nameBuffer, static_cast<std::size_t>(nameLength));
-        vector.push_back({getUniformLocation(name), name});
+        infos.push_back({getUniformLocation(name), name});
     }
 
-    return vector;
+    return infos;
 }

@@ -1131,10 +1131,6 @@ grid[8][10].goal = {
                         }
                     },
                 },
-                {
-                    Transform = {position = {0, 2, 0}},
-                    Light = {color = {0, 1, 0}, intensity = 10, farPlaneDistance = 5}
-                }
             }
         },
     }

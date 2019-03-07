@@ -50,6 +50,7 @@ local materials = {
     },
     {
         shader = 'pbr',
+        renderMode = 'cutout',
         albedo = 'objects/decorations/Plants/Material/Plant_All (3).tga',
         metallicMultiplier = 0,
         smoothnessMultiplier = 0,
@@ -57,7 +58,7 @@ local materials = {
     },
     {
         shader = 'pbr',
-        albedo = 'objects/Door/Texture/Door_01_AlbedoTransparency.png',
+        albedo = 'objects/Door/Texture/Door_01_AlbedoTransparency 1.png',
         metallicSmoothness = 'objects/Door/Texture/Door_01_MetallicSmoothness.png',
         ao = 'objects/Door/Texture/Door_01_AO.png',
         smoothnessMultiplier = 1,
@@ -65,7 +66,7 @@ local materials = {
     },
     {
         shader = 'pbr',
-        albedo = 'objects/Door/Texture/DoorPilars_01_AlbedoTransparency.png',
+        albedo = 'objects/Door/Texture/DoorPilars_01_AlbedoTransparency 1.png',
         metallicSmoothness = 'objects/Door/Texture/DoorPilars_01_MetallicSmoothness.png',
         ao = 'objects/Door/Texture/DoorPilars_01_AO.png',
         smoothnessMultiplier = 1,

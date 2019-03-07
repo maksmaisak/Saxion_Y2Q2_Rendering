@@ -60,7 +60,7 @@ void RenderSystem::start() {
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     //glClearColor(0, 0, 0, 1);
-    const glm::vec3 color = glm::pow(glm::vec3((float)62 / 255, (float)84 / 255, (float)92 / 255), glm::vec3(2.2f));
+    const glm::vec3 color = glm::pow(glm::vec3(62.f / 255, 84.f / 255, 92.f / 255), glm::vec3(2.2f));
     glClearColor(color.x, color.y, color.z, 1.f);
 
     // Convert output from fragment shaders from linear to sRGB

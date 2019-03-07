@@ -91,14 +91,19 @@ float CalculatePointShadowMultiplier(int i, vec3 fromLight, float distance, floa
 
 void main() {
 
-    vec3 normal = GetNormal();
-    vec3 viewDirection = normalize(viewPosition - worldPosition);
-
     vec4 msSample   = texture(metallicSmoothnessMap, texCoords);
     float metallic  = metallicMultiplier * msSample.r;
     float roughness = 1.f - smoothnessMultiplier * msSample.a;
     vec4  albedo    = albedoColor  * texture(albedoMap, texCoords);
     float ao        = aoMultiplier * texture(aoMap, texCoords).r;
+
+//#ifdef RENDER_MODE_CUTOUT
+//    if (albedo.a < 0.5f)
+//        discard;
+//#endif
+
+    vec3 normal = GetNormal();
+    vec3 viewDirection = normalize(viewPosition - worldPosition);
 
     vec3 color = vec3(0,0,0);
 
@@ -114,11 +119,11 @@ void main() {
         color += CalculateSpotLightContribution(i, normal, viewDirection, albedo.rgb, metallic, roughness, ao);
     }
 
-    #ifdef RENDER_MODE_TRANSPARENCY
-	    fragmentColor = vec4(color, albedo.a);
-	#else
-        fragmentColor = vec4(color, 1);
-	#endif
+#ifdef RENDER_MODE_TRANSPARENCY
+    fragmentColor = vec4(color, albedo.a);
+#else
+    fragmentColor = vec4(color, 1);
+#endif
 }
 
 vec3 GetNormal() {

@@ -18,6 +18,7 @@
 #include "LuaState.h"
 
 using namespace en;
+using namespace std::string_literals;
 
 Material::Material(const std::string& shaderFilename) :
     Material(Resources<ShaderProgram>::get(shaderFilename)) {}
@@ -31,66 +32,95 @@ Material::Material(std::shared_ptr<ShaderProgram> shader) : m_shader(std::move(s
     detectAllUniforms();
 }
 
-std::string getShaderNameFromLua(LuaState& lua) {
+namespace {
 
-    if (!lua_istable(lua, -1) && !lua_isuserdata(lua, -1))
-        luaL_error(lua, "Can't make a material out of given %s", luaL_typename(lua, -1));
 
-    return lua.tryGetField<std::string>("shader").value_or("lit");
-}
+    std::string getShaderNameFromLua(LuaState& lua) {
 
-std::shared_ptr<Texture> getTextureFromLua(LuaState& lua, const std::string& fieldName, const std::shared_ptr<Texture>& defaultTexture = Textures::white(), GLenum textureInternalFormat = GL_SRGB_ALPHA) {
+        if (!lua_istable(lua, -1) && !lua_isuserdata(lua, -1))
+            luaL_error(lua, "Can't make a material out of given %s", luaL_typename(lua, -1));
 
-    std::optional<std::string> path = lua.tryGetField<std::string>(fieldName);
-    if (path)
-        return Textures::get(config::ASSETS_PATH + *path, textureInternalFormat);
-    else
-        return defaultTexture;
-}
-
-// Readers of properties for different shaders.
-static std::map<std::string, std::function<void(LuaState&, Material&)>> readers = {
-    {
-        "lit",
-        [](LuaState& lua, Material& m) {
-
-            m.setUniformValue("diffuseColor" , lua.tryGetField<glm::vec3>("diffuseColor").value_or(glm::vec3(1.f)));
-            m.setUniformValue("specularColor", lua.tryGetField<glm::vec3>("specularColor").value_or(glm::vec3(1.f)));
-            m.setUniformValue("shininess"    , lua.tryGetField<float>("shininess").value_or(10.f));
-
-            m.setUniformValue("diffuseMap" , getTextureFromLua(lua, "diffuse"));
-            m.setUniformValue("specularMap", getTextureFromLua(lua, "specular"));
-        }
-    },
-    {
-        "pbr",
-        [](LuaState& lua, Material& m) {
-
-            m.setUniformValue("albedoMap", getTextureFromLua(lua, "albedo", Textures::white()));
-
-            const auto defaultMetallicSmoothnessMap = Textures::white();
-            const auto metallicSmoothnessMap = getTextureFromLua(lua, "metallicSmoothness", defaultMetallicSmoothnessMap, GL_RGBA);
-            const bool isDefaultMSMap = metallicSmoothnessMap == defaultMetallicSmoothnessMap;
-            m.setUniformValue("metallicSmoothnessMap", metallicSmoothnessMap);
-
-            m.setUniformValue("aoMap"       , getTextureFromLua(lua, "ao"    , Textures::white(), GL_RGBA));
-            m.setUniformValue("normalMap"   , getTextureFromLua(lua, "normal", Textures::defaultNormalMap(), GL_RGBA));
-
-            m.setUniformValue("albedoColor", lua.tryGetField<glm::vec4>("albedoColor").value_or(glm::vec4(1)));
-            m.setUniformValue("metallicMultiplier"  , lua.tryGetField<float>("metallicMultiplier").value_or(isDefaultMSMap ? 0 : 1));
-            m.setUniformValue("smoothnessMultiplier", lua.tryGetField<float>("smoothnessMultiplier").value_or(isDefaultMSMap ? 0.5 : 1));
-            m.setUniformValue("aoMultiplier"        , lua.tryGetField<float>("aoMultiplier").value_or(1));
-        }
-    },
-    {
-        "sprite",
-        [](LuaState& lua, Material& m) {
-            m.setUniformValue("spriteTexture", getTextureFromLua(lua, "texture"));
-        }
+        return lua.tryGetField<std::string>("shader").value_or("lit");
     }
-};
 
-Material::Material(LuaState& lua) : Material(getShaderNameFromLua(lua)) {
+    std::shared_ptr<ShaderProgram> getShader(LuaState& lua) {
+
+        const std::string shaderName = getShaderNameFromLua(lua);
+        if (shaderName != "pbr")
+            return Resources<ShaderProgram>::get(shaderName);
+
+        // Special handling for "pbr" to handle conditionally-compiled shader variants
+
+        const std::string renderMode = lua.tryGetField<std::string>("renderMode").value_or("opaque");
+
+        using Defs = PreprocessorDefinitions;
+        static const std::map<std::string, std::function<std::shared_ptr<ShaderProgram>()>> renderModeGetters = {
+            {"opaque", [](){return Resources<ShaderProgram>::get("pbr");}},
+            {"cutout", [](){return Resources<ShaderProgram>::get("pbr-cutout", "pbr", Defs{{"RENDER_MODE_CUTOUT"}});}},
+            {"fade"  , [](){return Resources<ShaderProgram>::get("pbr-fade"  , "pbr", Defs{{"RENDER_MODE_FADE"  }});}}
+        };
+
+        auto it = renderModeGetters.find(renderMode);
+        if (it == renderModeGetters.end())
+            throw utils::Exception("Unknown renderMode for a material: " + renderMode);
+
+        const auto& get = it->second;
+        return get();
+    }
+
+    std::shared_ptr<Texture> getTextureFromLua(LuaState& lua, const std::string& fieldName, const std::shared_ptr<Texture>& defaultTexture = Textures::white(), GLenum textureInternalFormat = GL_SRGB_ALPHA) {
+
+        std::optional<std::string> path = lua.tryGetField<std::string>(fieldName);
+        if (path)
+            return Textures::get(config::ASSETS_PATH + *path, textureInternalFormat);
+        else
+            return defaultTexture;
+    }
+
+    // Readers of properties for different shaders.
+    static std::map<std::string, std::function<void(LuaState&, Material&)>> readers = {
+        {
+            "lit",
+            [](LuaState& lua, Material& m) {
+
+                m.setUniformValue("diffuseColor" , lua.tryGetField<glm::vec3>("diffuseColor").value_or(glm::vec3(1.f)));
+                m.setUniformValue("specularColor", lua.tryGetField<glm::vec3>("specularColor").value_or(glm::vec3(1.f)));
+                m.setUniformValue("shininess"    , lua.tryGetField<float>("shininess").value_or(10.f));
+
+                m.setUniformValue("diffuseMap" , getTextureFromLua(lua, "diffuse"));
+                m.setUniformValue("specularMap", getTextureFromLua(lua, "specular"));
+            }
+        },
+        {
+            "pbr",
+            [](LuaState& lua, Material& m) {
+
+                m.setUniformValue("albedoMap", getTextureFromLua(lua, "albedo", Textures::white()));
+
+                const auto defaultMetallicSmoothnessMap = Textures::white();
+                const auto metallicSmoothnessMap = getTextureFromLua(lua, "metallicSmoothness", defaultMetallicSmoothnessMap, GL_RGBA);
+                const bool isDefaultMSMap = metallicSmoothnessMap == defaultMetallicSmoothnessMap;
+                m.setUniformValue("metallicSmoothnessMap", metallicSmoothnessMap);
+
+                m.setUniformValue("aoMap"       , getTextureFromLua(lua, "ao"    , Textures::white(), GL_RGBA));
+                m.setUniformValue("normalMap"   , getTextureFromLua(lua, "normal", Textures::defaultNormalMap(), GL_RGBA));
+
+                m.setUniformValue("albedoColor", lua.tryGetField<glm::vec4>("albedoColor").value_or(glm::vec4(1)));
+                m.setUniformValue("metallicMultiplier"  , lua.tryGetField<float>("metallicMultiplier").value_or(isDefaultMSMap ? 0 : 1));
+                m.setUniformValue("smoothnessMultiplier", lua.tryGetField<float>("smoothnessMultiplier").value_or(isDefaultMSMap ? 0.5 : 1));
+                m.setUniformValue("aoMultiplier"        , lua.tryGetField<float>("aoMultiplier").value_or(1));
+            }
+        },
+        {
+            "sprite",
+            [](LuaState& lua, Material& m) {
+                m.setUniformValue("spriteTexture", getTextureFromLua(lua, "texture"));
+            }
+        }
+    };
+}
+
+Material::Material(LuaState& lua) : Material(getShader(lua)) {
 
     std::string shaderName = getShaderNameFromLua(lua);
 
@@ -145,7 +175,6 @@ void Material::setBuiltinUniforms(
     const auto& u = m_builtinUniformLocations;
 
     // glUniform functions do nothing if location is -1, so checks are only necessary for avoiding calculations.
-
     gl::setUniform(u.model     , modelMatrix     );
     gl::setUniform(u.view      , viewMatrix      );
     gl::setUniform(u.projection, perspectiveMatrix);

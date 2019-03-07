@@ -97,10 +97,10 @@ void main() {
     vec4  albedo    = albedoColor  * texture(albedoMap, texCoords);
     float ao        = aoMultiplier * texture(aoMap, texCoords).r;
 
-//#ifdef RENDER_MODE_CUTOUT
-//    if (albedo.a < 0.5f)
-//        discard;
-//#endif
+#ifdef RENDER_MODE_CUTOUT
+    if (albedo.a < 0.5f)
+        discard;
+#endif
 
     vec3 normal = GetNormal();
     vec3 viewDirection = normalize(viewPosition - worldPosition);
@@ -119,7 +119,7 @@ void main() {
         color += CalculateSpotLightContribution(i, normal, viewDirection, albedo.rgb, metallic, roughness, ao);
     }
 
-#ifdef RENDER_MODE_TRANSPARENCY
+#ifdef RENDER_MODE_FADE
     fragmentColor = vec4(color, albedo.a);
 #else
     fragmentColor = vec4(color, 1);
@@ -287,12 +287,14 @@ float CalculatePointShadowMultiplier(int i, vec3 fromLight, float distance, floa
 
     float shadow = 0.0;
     float bias = max(0.05 * biasMultiplier, 0.005);
-    int samples = 20;
+    int numSamples = 20;
     float depth = distance / pointLights[i].farPlaneDistance - bias;
     float viewDistance = length(viewPosition - worldPosition);
     float diskRadius = (1.0 + (viewDistance / pointLights[i].farPlaneDistance)) / 25.0;
-    for (int j = 0; j < samples; ++j)
+
+    for (int j = 0; j < numSamples; ++j)
         shadow += texture(depthCubeMaps, vec4(fromLight + sampleOffsetDirections[j] * diskRadius, i), depth);
-    shadow /= float(samples);
+    shadow /= float(numSamples);
+
     return shadow;
 }

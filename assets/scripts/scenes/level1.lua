@@ -50,6 +50,7 @@ local materials = {
     },
     {
         shader = 'pbr',
+        renderMode = 'cutout',
         albedo = 'objects/decorations/Plants/Material/Plant_All (3).tga',
         metallicMultiplier = 0,
         smoothnessMultiplier = 0,

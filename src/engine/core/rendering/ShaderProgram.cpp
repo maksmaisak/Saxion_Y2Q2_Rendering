@@ -93,9 +93,8 @@ void ShaderProgram::finalize() {
         printProgramError(m_programId);
     }
 
-    for (GLuint shaderId : m_shaderIds) {
+    for (GLuint shaderId : m_shaderIds)
         glDeleteShader(shaderId);
-    }
 }
 
 void ShaderProgram::use() const {

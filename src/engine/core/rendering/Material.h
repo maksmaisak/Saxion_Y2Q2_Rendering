@@ -73,9 +73,9 @@ namespace en {
         template<typename... T>
         using UniformValues = std::tuple<LocationToUniformValue<T>...>;
 
-        static constexpr int MAX_NUM_POINT_LIGHTS = 10;
+        static constexpr int MAX_NUM_POINT_LIGHTS       = 10;
         static constexpr int MAX_NUM_DIRECTIONAL_LIGHTS = 10;
-        static constexpr int MAX_NUM_SPOT_LIGHTS = 10;
+        static constexpr int MAX_NUM_SPOT_LIGHTS        = 10;
 
         std::shared_ptr<ShaderProgram> m_shader;
 
@@ -162,7 +162,7 @@ namespace en {
         std::unordered_map<std::string, UniformInfo> m_uniforms;
 
         // Values of custom material-specific uniforms.
-        // A tuple of maps between locations and values.
+        // A tuple of maps float location to value.
         // Only types listed here will be supported as custom uniform values,
         // i.e settable via material.setUniform
         UniformValues<
@@ -185,11 +185,11 @@ namespace en {
         template<typename T>
         void setCustomUniformsOfType(const LocationToUniformValue<T>& values);
 
-        void setUniformsPointLight(const BuiltinUniformLocations::PointLightLocations& locations, const Light& light, const Transform& tf);
-        void setUniformDirectionalLight(const BuiltinUniformLocations::DirectionalLightLocations& locations, const Light& light, const Transform& tf);
-        void setUniformSpotLight(const BuiltinUniformLocations::SpotLightLocations& locations, const Light& light, const Transform& tf);
-
         bool setUniformTexture(GLint uniformLocation, GLuint textureId, GLenum textureTarget = GL_TEXTURE_2D);
+
+        void setUniformsPointLight     (const BuiltinUniformLocations::PointLightLocations&       locations, const Light& light, const Transform& tf);
+        void setUniformDirectionalLight(const BuiltinUniformLocations::DirectionalLightLocations& locations, const Light& light, const Transform& tf);
+        void setUniformSpotLight       (const BuiltinUniformLocations::SpotLightLocations&        locations, const Light& light, const Transform& tf);
     };
 
     template<typename T>

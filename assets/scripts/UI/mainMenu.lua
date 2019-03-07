@@ -9,7 +9,6 @@ local chooseLevelPanel
 local creditsPanel
 
 local levelIndex = 1
-local numberOfLevels = 4
 local buttonSize = 60
 
 local stars = {}
@@ -270,7 +269,7 @@ function scene:start()
 						isLevelChanged = true
 					end
 
-					if(levelIndex < numberOfLevels) then
+					if levelIndex < Game.maxLevel then
 						if Game.keyboard.isDown("right") or (Game.mouse.isDown(1) and arrowRight:get("UIRect").isMouseOver) then
 							print("Is pressed right")
 
@@ -278,15 +277,15 @@ function scene:start()
 
 							levelIndex = levelIndex + 1
 						
-							if (levelIndex > numberOfLevels) then
-								levelIndex = numberOfLevels
+							if levelIndex > Game.maxLevel then
+								levelIndex = Game.maxLevel
 							end
 
-							if (levelIndex >= numberOfLevels) then
+							if levelIndex >= Game.maxLevel then
 								arrowRight:get("UIRect").isEnabled = false
 							end
 
-							if (levelIndex >= 1) then
+							if levelIndex >= 1 then
 								arrowLeft:get("UIRect").isEnabled = true
 							end
 
@@ -294,7 +293,7 @@ function scene:start()
 						end
 					end
 					
-					if(levelIndex > 1) then
+					if levelIndex > 1 then
 						if Game.keyboard.isDown("left") or (Game.mouse.isDown(1) and arrowLeft:get("UIRect").isMouseOver) then
 							print("Is pressed left")
 
@@ -302,16 +301,16 @@ function scene:start()
 
 							levelIndex = levelIndex - 1
 
-							if(levelIndex < 1) then
+							if levelIndex < 1 then
 								levelIndex = 1
 							end
 
-							if (levelIndex <= 1) then
+							if levelIndex <= 1 then
 								arrowLeft:get("UIRect").isEnabled = false
 							end
 
 
-							if (levelIndex < numberOfLevels) then
+							if levelIndex < Game.maxLevel then
 								arrowRight:get("UIRect").isEnabled = true
 							end
 
@@ -355,6 +354,7 @@ function scene:start()
 							material = {
 								shader	= "sprite",
 								texture = "textures/black.png"
+								--texture = "textures/levelUncompleted"..levelIndex..".png"
 							}				
 							})
 						end

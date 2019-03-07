@@ -1,4 +1,5 @@
 require ('assets/scripts/level/level')
+require ('assets/scripts/Utility/gameSerializer')
 
 
 local isBlocked = false
@@ -77,6 +78,7 @@ function makeButton(name,parent,textString,anchorMin,anchorMax,textureFilePath)
 					playSoundObject('audio/UIButtonSound.wav',0,false,60)
 					
 					if name == "StartButton" then
+						Game.currentLevel = 1
 						Game.loadScene(Config.firstLevelPath)
 					end
 
@@ -125,6 +127,14 @@ end
 function scene:start()
 
 	Game.makeActors(scenery)
+
+	-- load saved data
+	local serializer = GameSerializer:new()
+	Game.serializer  = serializer
+	Game.savedData   = serializer:load(Config.saveFile)
+
+	Game.levels   = dofile(Config.levelsDefinition)
+	Game.maxLevel = #Game.levels
 
 -- Start Main Buttons Panel
    	Game.makeActor {

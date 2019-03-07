@@ -290,14 +290,6 @@ function scene:start()
 								arrowLeft:get("UIRect").isEnabled = true
 							end
 
-							self.actor:remove("Sprite")
-							self.actor:add("Sprite", {
-								material = {
-									shader	= "sprite",
-									texture = "textures/level" .. levelIndex .. ".jpg"
-								}
-							})
-
 							isLevelChanged = true
 						end
 					end
@@ -323,14 +315,6 @@ function scene:start()
 								arrowRight:get("UIRect").isEnabled = true
 							end
 
-							self.actor:remove("Sprite")
-							self.actor:add("Sprite", {
-								material = {
-									shader	= "sprite",
-									texture = "textures/level" .. levelIndex .. ".jpg"
-								}				
-							})
-
 							isLevelChanged = true
 						end
 					end
@@ -352,10 +336,28 @@ function scene:start()
 
 						if savedLevel ~= nil then
 							totalNumberOfStars = savedLevel.stars
+
+						self.actor:remove("Sprite")
+						self.actor:add("Sprite", {
+							material = {
+								shader	= "sprite",
+								texture = "textures/level" .. levelIndex .. ".jpg"
+							}				
+						})
 						end
 
 						local anchorValue = 0.4
 						local anchorStep  = 0.1
+
+						if savedLevel == nil then
+							self.actor:remove("Sprite")
+							self.actor:add("Sprite", {
+							material = {
+								shader	= "sprite",
+								texture = "textures/black.png"
+							}				
+							})
+						end
 
 						for i = 1, totalNumberOfStars do
 							print("Created star")
@@ -370,9 +372,16 @@ function scene:start()
 
 			onMouseDown = function(self, button)
 				if button == 1 then
+					local level = Game.savedData[levelIndex]
+					
+					if level == nil then
+						return
+					end
+
 					playSoundObject('audio/UIButtonSound.wav',0,false,60)
 					Game.loadScene("assets/scripts/scenes/level"..levelIndex..".lua")
 					print("Loaded scene : " ..levelIndex)
+					Game.currentLevel = levelIndex
 				end
 			end
 		}

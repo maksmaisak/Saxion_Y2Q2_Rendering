@@ -123,7 +123,7 @@ function ResultScreen:createResultPanel()
 					-- this condition should be checked somewhere else
 					-- ex: When the player finishes the last level the nextLevelButton
 					-- should not be shown
-					if Game.currentLevel > Game.maxLevels then
+					if Game.currentLevel > Game.maxLevel then
 						return
 					end
 

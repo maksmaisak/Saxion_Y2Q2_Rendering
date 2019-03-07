@@ -325,16 +325,29 @@ function Player:moveToPosition(nextPosition, canRegisterMove, didUsePortal)
 		return
 	end
 
-	if gridItem.door and not gridItem.isButtonTargetEnabled then
-		return
-	end
-
 	if nextPosition.x == self.gridPosition.x and nextPosition.y == self.gridPosition.y then
 		return
 	end
 
+	local oldLastPosition = { x = self.lastPosition.x, y = self.lastPosition.y }
+
 	self.lastPosition.x = self.gridPosition.x
 	self.lastPosition.y = self.gridPosition.y
+
+	-- if the tile changed then we gotta check if there was a button and disable it
+	if self.lastPosition.x ~= nextPosition.x or self.lastPosition.y ~= nextPosition.y then
+		if self.map:getGridAt(self.lastPosition).button then
+			self:disableButton(self.lastPosition)
+		end
+	end
+
+	if gridItem.door and not gridItem.isButtonTargetEnabled then
+		self:activateButton(self.lastPosition)
+
+		self.lastPosition.x = oldLastPosition.x
+		self.lastPosition.y = oldLastPosition.y
+		return
+	end
 
 	self.gridPosition.x = nextPosition.x
 	self.gridPosition.y = nextPosition.y
@@ -354,13 +367,6 @@ function Player:moveToPosition(nextPosition, canRegisterMove, didUsePortal)
 
 	if gridItem.button then
 		self:activateButton(self.gridPosition)
-	end
-
-	-- if the tile changed then we gotta check if there was a button and disable it
-	if self.lastPosition.x ~= self.gridPosition.x or self.lastPosition.y ~= self.gridPosition.y then
-		if self.map:getGridAt(self.lastPosition).button then
-			self:disableButton(self.lastPosition)
-		end
 	end
 
 	if gridItem.goal then

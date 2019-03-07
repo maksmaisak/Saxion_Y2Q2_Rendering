@@ -118,7 +118,16 @@ function ResultScreen:createResultPanel()
 			onMouseDown = function(self, button)
 				if button == 1 then
 					playSoundObject('audio/UIButtonSound.wav',0,false,60)
-					Game.loadScene(self.level.nextLevelPath)
+					Game.currentLevel = Game.currentLevel + 1
+
+					-- this condition should be checked somewhere else
+					-- ex: When the player finishes the last level the nextLevelButton
+					-- should not be shown
+					if Game.currentLevel > Game.maxLevels then
+						return
+					end
+
+					Game.loadScene(Game.levels[Game.currentLevel].path)
 				end
 			end,
 
@@ -190,14 +199,14 @@ function ResultScreen:createResultPanel()
 	self:keepAspectRatio(mainMenuButton,125)
 	self:keepAspectRatio(nextLevelButton,125)
 
-	local newEntry = { level = self.level.name or "LevelTemp", stars = self.totalNumberOfStars}
+	local entry = { level = "level"..Game.currentLevel, stars = self.totalNumberOfStars}
 
 	local serializer = Game.serializer
 	if serializer == nil then
 		return
 	end
 
-	serializer:saveNewEntry(newEntry)
+	serializer:saveNewEntry(entry)
 end
 
 function ResultScreen:activate()

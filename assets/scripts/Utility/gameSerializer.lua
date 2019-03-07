@@ -67,10 +67,11 @@ function GameSerializer:load(fileName)
 	local data = {}
 
 	for i = 1, #lines do
-		local line = lines[i]
-		print("Read: "..line)
+
+		local line		 = lines[i]
 		local tempArray  = self:Split(line, ", ")
 		local savedEntry = {level = "", stars = 0}
+
 		for i = 1, #tempArray do
 			local valueArray = self:Split(tempArray[i], ": ")
 			local value		 = valueArray[2]
@@ -82,7 +83,6 @@ function GameSerializer:load(fileName)
 			end
 		end
 
-		print("############################################################")
 		data[#data + 1] = savedEntry
 	end
 
@@ -97,10 +97,11 @@ function GameSerializer:saveNewEntry(newEntry)
 	local found = false
 
 	for k, v in ipairs(Game.savedData) do
-		if(v.level == newEntry.level) then
+		if v.level == newEntry.level then
 			if(v.stars < newEntry.stars) then
 				v.stars = newEntry.stars
 			end
+			Game.savedData[k].stars = newEntry.stars
 			found = true
 			break
 		end

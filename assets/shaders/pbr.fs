@@ -274,14 +274,15 @@ float CalculatePointShadowMultiplier(int i, vec3 fromLight, float distance, floa
 
     float shadow = 0.0;
     float bias = max(0.05 * biasMultiplier, 0.005);
-    int numSamples = 20;
+    int numSamples = 1;
     float depth = distance / pointLights[i].farPlaneDistance - bias;
     float viewDistance = length(viewPosition - worldPosition);
     float diskRadius = (1.0 + (viewDistance / pointLights[i].farPlaneDistance)) / 25.0;
 
-    for (int j = 0; j < numSamples; ++j)
-        shadow += texture(depthCubeMaps, vec4(fromLight + sampleOffsetDirections[j] * diskRadius, i), depth);
-    shadow /= float(numSamples);
+    //for (int j = 0; j < numSamples; ++j)
+    //    shadow += texture(depthCubeMaps, vec4(fromLight + sampleOffsetDirections[j] * diskRadius, i), depth);
+    //shadow /= float(numSamples);
+    //return shadow;
 
-    return shadow;
+    return texture(depthCubeMaps, vec4(fromLight, i), depth);
 }

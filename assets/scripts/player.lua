@@ -232,6 +232,8 @@ function Player:blockKey(key, canRegisterMove)
 	local keys = self.map:getDroppedKeysGridAt(self.gridPosition).keys
 	keys[#keys + 1] = pair
 
+	self.level.hudArrows:dropKey(key)
+
 	self.transform.position = self:getPositionFromGridPosition(self.gridPosition)
 
 	if canRegisterMove then
@@ -247,6 +249,8 @@ function Player:unblockKey(key, canRegisterMove)
 	print(key.." key unblocked")
 	disabledKeys[key] = false
 	self.map:getDroppedKeysGridAt(self.gridPosition).hasKeyDropped[key] = false
+
+	self.level.hudArrows:pickUpKey(key)
 
 	for k, v in pairs(self.map:getDroppedKeysGridAt(self.gridPosition).keys) do
 		local currentActor = v[key]

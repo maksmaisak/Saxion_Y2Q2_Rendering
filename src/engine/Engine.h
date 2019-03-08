@@ -18,12 +18,15 @@
 #include "BehaviorSystem.h"
 #include "Scheduler.h"
 #include "SceneManager.h"
+#include "CompoundSystem.h"
 
 namespace en {
 
     class Behavior;
     class Actor;
     class LuaState;
+
+    class BehaviorsSystem : public CompoundSystem {};
 
     /// The root object of the entire engine. Manages system execution and owns the various submodules of the engine:
     /// EntityRegistry: manages entities and their components.
@@ -64,20 +67,18 @@ namespace en {
         template<typename TBehavior>
         bool ensureBehaviorSystem();
 
-        void testMemberFunction();
-
     protected:
         virtual void initializeWindow(sf::RenderWindow& window);
 
     private:
-
         std::unique_ptr<LuaState> m_lua;
         EntityRegistry m_registry;
         Scheduler m_scheduler;
         sf::RenderWindow m_window;
         SceneManager m_sceneManager;
 
-        std::vector<std::unique_ptr<System>> m_systems;
+        CompoundSystem m_systems;
+        BehaviorsSystem* m_behaviors = nullptr;
         utils::CustomTypeMap<struct Dummy, bool> m_behaviorSystemPresence;
 
         unsigned int m_framerateCap = 240;
@@ -96,14 +97,14 @@ namespace en {
     };
 
     template<typename TSystem, typename... Args>
-    TSystem& Engine::addSystem(Args&&... args) {
+    inline TSystem& Engine::addSystem(Args&&... args) {
+        return m_systems.addSystem<TSystem>(std::forward<Args>(args)...);
+    }
 
-        auto ptr = std::make_unique<TSystem>(std::forward<Args>(args)...);
-        TSystem& system = *ptr;
-        m_systems.push_back(std::move(ptr));
-
-        system.init(*this);
-        system.start();
+    template<>
+    inline BehaviorsSystem& Engine::addSystem<BehaviorsSystem>() {
+        auto& system = m_systems.addSystem<BehaviorsSystem>();
+        m_behaviors = &system;
         return system;
     }
 
@@ -112,14 +113,14 @@ namespace en {
 
         static_assert(std::is_base_of_v<Behavior, TBehavior>);
 
-        if (!m_behaviorSystemPresence.get<TBehavior>()) {
+        if (m_behaviorSystemPresence.get<TBehavior>())
+            return false;
 
-            addSystem<BehaviorSystem<TBehavior>>();
-            m_behaviorSystemPresence.set<TBehavior>(true);
-            return true;
-        }
-
-        return false;
+        if (!m_behaviors)
+            addSystem<BehaviorsSystem>();
+        m_behaviors->addSystem<BehaviorSystem<TBehavior>>();
+        m_behaviorSystemPresence.set<TBehavior>(true);
+        return true;
     }
 }
 

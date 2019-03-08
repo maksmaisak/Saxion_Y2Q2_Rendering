@@ -26,6 +26,7 @@ namespace en {
     private:
         void init(Engine& engine);
         friend class Engine;
+        friend class CompoundSystem;
     };
 }
 

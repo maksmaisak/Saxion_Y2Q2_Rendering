@@ -9,6 +9,7 @@
 #include <GL/glew.h>
 #include "ComponentReference.h"
 #include "Transform.h"
+#include "Tween.h"
 #include "GLHelpers.h"
 
 using namespace en;
@@ -22,10 +23,9 @@ Light::Kind readKind(LuaState& lua) {
 
     static const std::map<std::string, Light::Kind> kinds = {
         {"DIRECTIONAL", Light::Kind::DIRECTIONAL},
-        {"POINT", Light::Kind::POINT},
-        {"SPOT", Light::Kind::SPOT}
+        {"POINT"      , Light::Kind::POINT},
+        {"SPOT"       , Light::Kind::SPOT}
     };
-
     std::string name = *kindName;
     std::transform(name.begin(), name.end(), name.begin(), ::toupper);
 
@@ -45,9 +45,25 @@ void Light::addFromLua(Actor& actor, LuaState& lua) {
 
 void Light::initializeMetatable(LuaState& lua) {
 
-    lua::addProperty(lua, "intensity", property(&Light::intensity));
-    lua::addProperty(lua, "color", property(&Light::color));
+    lua::addProperty(lua, "intensity"   , property(&Light::intensity   ));
+    lua::addProperty(lua, "color"       , property(&Light::color       ));
     lua::addProperty(lua, "ambientColor", property(&Light::colorAmbient));
+
+    lua.setField("tweenIntensity", [](
+        const ComponentReference<Light>& ref,
+        float target,
+        std::optional<float> duration,
+        std::optional<ease::Ease> ease
+    ){
+        Light& light = *ref;
+        Entity entity = ref.getEntity();
+        const float start = light.intensity;
+        return Tween::make(*ref.getRegistry(), ref.getEntity(), duration, ease,
+           [ref, start, delta = target - start](float t){
+               ref->intensity = start + delta * t;
+           }
+        );
+    });
 }
 
 Light::Light(Kind kind) : kind(kind) {}

@@ -98,7 +98,7 @@ function scene:start()
 
     Game.makeActors(scenery)
 
-    Game.makeActor {
+    local lightActor = Game.makeActor {
         Name = "Light",
         Transform = {
             position = {-8, 2, -8},
@@ -113,6 +113,9 @@ function scene:start()
             intensity = 100
         }
     }
+    local light = lightActor:get("Light")
+    light.intensity = 0
+    light:tweenIntensity(100):setLoopBounce()
 
     Game.makeActor {
         Name = "Light2",
@@ -132,10 +135,7 @@ function scene:start()
 
     Game.makeActor {
         Name = "LightAmbient",
-        Transform = {
-            scale = {0.1, 0.1, 0.1},
-            rotation = {-45, 0, 0}
-        },
+        Transform = {},
         Light = {
             kind = "directional",
             intensity = 0,
@@ -146,7 +146,7 @@ function scene:start()
     Game.makeActor {
         Name = "LightDirectional",
         Transform = {
-            rotation = {-45, 0, 0}
+            rotation = {45, 0, 0}
         },
         Light = {
             kind = "directional",

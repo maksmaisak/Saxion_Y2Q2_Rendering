@@ -96,7 +96,7 @@ function Player:activateGoal(gridPosition)
 		LuaBehavior = Config.resultScreen
 	}
 
-	playSoundObject('audio/pressurePlateRise.wav',0,false,60)
+	playSoundObject('audio/doorOpen.wav',0,false,60)
 
 	resultScreen:get("LuaBehavior").level = self.level
 	resultScreen:get("LuaBehavior"):activate()

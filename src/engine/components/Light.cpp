@@ -49,6 +49,16 @@ void Light::initializeMetatable(LuaState& lua) {
     lua::addProperty(lua, "color"       , property(&Light::color       ));
     lua::addProperty(lua, "ambientColor", property(&Light::colorAmbient));
 
+    lua::addProperty(lua, "falloff", property(
+        [](const ComponentReference<Light>& ref) {
+            const auto& falloff = ref->falloff;
+            return glm::vec3(falloff.constant, falloff.linear, falloff.quadratic);
+        },
+        [](const ComponentReference<Light>& ref, const glm::vec3& vec) {
+            ref->falloff = {vec.x, vec.y, vec.z};
+        }
+    ));
+
     lua.setField("tweenIntensity", [](
         const ComponentReference<Light>& ref,
         float target,

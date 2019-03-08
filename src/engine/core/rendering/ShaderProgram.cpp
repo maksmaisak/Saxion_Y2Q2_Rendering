@@ -49,6 +49,16 @@ namespace {
         glGetProgramInfoLog(programId, infoLogLength, nullptr, errorMessage.get());
         std::cerr << errorMessage.get() << std::endl << std::endl;
     }
+
+    void printShaderError(GLuint shaderId) {
+
+        int infoLogLength;
+        glGetShaderiv(shaderId, GL_INFO_LOG_LENGTH, &infoLogLength);
+        auto errorMessage = std::make_unique<char[]>(infoLogLength + 1);
+
+        glGetShaderInfoLog(shaderId, infoLogLength, nullptr, errorMessage.get());
+        std::cerr << errorMessage.get() << std::endl << std::endl;
+    }
 }
 
 ShaderProgram::ShaderProgram() {
@@ -121,13 +131,13 @@ GLuint ShaderProgram::compileShader(GLuint shaderType, const std::string& shader
 
     GLint compilerResult = GL_FALSE;
     glGetShaderiv(shaderId, GL_COMPILE_STATUS, &compilerResult);
-    if (compilerResult == GL_TRUE) {
+    if (compilerResult) {
         std::cout << "Shader compiled ok." << std::endl;
         return shaderId;
     }
 
     std::cout << "Shader error:" << std::endl;
-    printProgramError(m_programId);
+    printShaderError(shaderId);
     return 0;
 }
 

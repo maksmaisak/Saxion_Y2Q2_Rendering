@@ -18,10 +18,13 @@ namespace en {
         void draw() override;
 
         template<typename TSystem, typename... Args>
-        TSystem& addSystem(Args&& ... args);
+        TSystem& addSystem(Args&&... args);
 
     private:
+        void startNotStartedSystems();
+
         std::vector<std::unique_ptr<System>> m_systems;
+        std::vector<System*> m_notStarted;
     };
 
     template<typename TSystem, typename... Args>

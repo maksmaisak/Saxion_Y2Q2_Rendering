@@ -42,16 +42,18 @@ void Engine::initialize() {
     initializeWindow(m_window);
     printGLContextVersionInfo();
     initializeGlew();
+    m_systems.init(*this);
 }
 
 void Engine::run() {
 
+    m_systems.start();
+
+    const float timestepFixedSeconds = TimestepFixed.asSeconds();
     sf::Clock fixedUpdateClock;
     sf::Time fixedUpdateLag = sf::Time::Zero;
 
-    const float timestepFixedSeconds = TimestepFixed.asSeconds();
     const sf::Time timestepDraw = sf::microseconds((sf::Int64)(1000000.0 / m_framerateCap));
-
     sf::Clock drawClock;
 
     while (m_window.isOpen()) {
@@ -70,6 +72,7 @@ void Engine::run() {
             m_frameTimeMicroseconds = frameClock.getElapsedTime().asMicroseconds();
 
         } else {
+
             do sf::sleep(sf::microseconds(1));
             while (drawClock.getElapsedTime() < timestepDraw && fixedUpdateLag + fixedUpdateClock.getElapsedTime() < TimestepFixed);
         }
@@ -83,9 +86,7 @@ void Engine::update(float dt) {
     auto* currentScene = m_sceneManager.getCurrentScene();
     if (currentScene) currentScene->update(dt);
 
-    for (auto& pSystem : m_systems)
-        pSystem->update(dt);
-
+    m_systems.update(dt);
     m_scheduler.update(dt);
 
     utils::KeyboardHelper::update();
@@ -95,9 +96,7 @@ void Engine::update(float dt) {
 void Engine::draw() {
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    for (auto& pSystem : m_systems)
-        pSystem->draw();
-
+    m_systems.draw();
     m_window.display();
 }
 
@@ -156,12 +155,6 @@ void Engine::initializeGlew() {
     } else {
         std::cerr << "Initialized GLEW: FAILED" << std::endl;
     }
-}
-
-std::string testFreeFunction() {
-
-    std::cout << "Free function called from lua" << std::endl;
-    return "Result returned from free function";
 }
 
 int makeActors(lua_State* L) {
@@ -253,9 +246,6 @@ void Engine::initializeLua() {
 
     lua_newtable(lua);
     {
-        lua.setField("testValue", 3.1415926f);
-        lua.setField("testFreeFunction", &testFreeFunction);
-        lua.setField("testMemberFunction", &Engine::testMemberFunction, this);
         lua.setField("find", [this](const std::string& name) -> std::optional<Actor> {
             Actor actor = findByName(name);
             if (actor)
@@ -391,11 +381,6 @@ void Engine::initializeLua() {
     lua_getglobal(lua, "Config");
     auto pop = PopperOnDestruct(lua);
     m_framerateCap = lua.tryGetField<unsigned int>("framerateCap").value_or(m_framerateCap);
-}
-
-void Engine::testMemberFunction() {
-
-    std::cout << "Member function called from lua" << std::endl;
 }
 
 void Engine::processWindowEvents() {

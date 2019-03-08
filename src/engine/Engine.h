@@ -26,6 +26,8 @@ namespace en {
     class Actor;
     class LuaState;
 
+    class BehaviorsSystem : public CompoundSystem {};
+
     /// The root object of the entire engine. Manages system execution and owns the various submodules of the engine:
     /// EntityRegistry: manages entities and their components.
     /// sf::RenderWindow: the SFML window to which the game renders.
@@ -65,8 +67,6 @@ namespace en {
         template<typename TBehavior>
         bool ensureBehaviorSystem();
 
-        void testMemberFunction();
-
     protected:
         virtual void initializeWindow(sf::RenderWindow& window);
 
@@ -77,8 +77,8 @@ namespace en {
         sf::RenderWindow m_window;
         SceneManager m_sceneManager;
 
-        std::vector<std::unique_ptr<System>> m_systems;
-        int m_behaviorsSystemIndex = -1;
+        CompoundSystem m_systems;
+        BehaviorsSystem* m_behaviors = nullptr;
         utils::CustomTypeMap<struct Dummy, bool> m_behaviorSystemPresence;
 
         unsigned int m_framerateCap = 240;
@@ -98,29 +98,13 @@ namespace en {
 
     template<typename TSystem, typename... Args>
     inline TSystem& Engine::addSystem(Args&&... args) {
-
-        auto ptr = std::make_unique<TSystem>(std::forward<Args>(args)...);
-        TSystem& system = *ptr;
-        m_systems.push_back(std::move(ptr));
-
-        system.init(*this);
-        system.start();
-        return system;
+        return m_systems.addSystem<TSystem>(std::forward<Args>(args)...);
     }
-
-    class BehaviorsSystem : public CompoundSystem {};
 
     template<>
     inline BehaviorsSystem& Engine::addSystem<BehaviorsSystem>() {
-
-        m_behaviorsSystemIndex = static_cast<int>(m_systems.size());
-
-        auto ptr = std::make_unique<BehaviorsSystem>();
-        BehaviorsSystem& system = *ptr;
-        m_systems.push_back(std::move(ptr));
-
-        system.init(*this);
-        system.start();
+        auto& system = m_systems.addSystem<BehaviorsSystem>();
+        m_behaviors = &system;
         return system;
     }
 
@@ -132,10 +116,9 @@ namespace en {
         if (m_behaviorSystemPresence.get<TBehavior>())
             return false;
 
-        if (m_behaviorsSystemIndex < 0)
+        if (!m_behaviors)
             addSystem<BehaviorsSystem>();
-        auto* behaviorsSystem = (BehaviorsSystem*)m_systems[m_behaviorsSystemIndex].get();
-        behaviorsSystem->addSystem<BehaviorSystem<TBehavior>>();
+        m_behaviors->addSystem<BehaviorSystem<TBehavior>>();
         m_behaviorSystemPresence.set<TBehavior>(true);
         return true;
     }

@@ -53,7 +53,7 @@ void LightingScene::open() {
 
     auto spotLight = engine.makeActor("SpotLight");
     spotLight.add<en::Transform>()
-        .move({0, 0, -2});
+        .move({0, 0, 2});
     {
         glm::vec3 spotLightColor = {0, 1, 1};
 

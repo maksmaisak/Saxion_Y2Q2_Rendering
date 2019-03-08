@@ -209,7 +209,9 @@ float GeometrySmith(vec3 N, vec3 V, vec3 L, float NdotL, float NdotV, float roug
 
 vec3 FresnelSchlick(float cosTheta, vec3 F0) {
 
-    return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
+    float t = 1.0 - cosTheta;
+    float t2 = t * t;
+    return F0 + (1.0 - F0) * (t2 * t2 * t);
 }
 
 vec3 CookTorranceBRDF(vec3 N, vec3 V, vec3 L, float NdotL, vec3 albedo, float metallic, float roughness) {

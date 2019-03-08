@@ -35,10 +35,10 @@ int main() {
     {
         engine->addSystem<en::TransformHierarchySystem>();
         engine->addSystem<en::RenderSystem>(false);
-        engine->addSystem<en::UIEventSystem>();
 
         engine->addSystem<en::PhysicsSystem>().setGravity({0, -9.8, 0});
 
+        engine->addSystem<en::UIEventSystem>();
         engine->addSystem<en::BehaviorsSystem>();
 
         engine->addSystem<en::TweenSystem>();
@@ -49,7 +49,7 @@ int main() {
     en::LuaState& lua = engine->getLuaState();
     lua_getglobal(lua, "Config");
     auto popConfig = lua::PopperOnDestruct(lua);
-    std::optional<std::string> startScene = lua.tryGetField<std::string>("startScene");
+    auto startScene = lua.tryGetField<std::string>("startScene");
     if (startScene)
         engine->getSceneManager().setCurrentScene<en::LuaScene>(engine->getLuaState(), *startScene);
     lua.pop();

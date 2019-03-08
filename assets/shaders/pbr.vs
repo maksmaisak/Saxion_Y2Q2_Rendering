@@ -28,12 +28,9 @@ void main(void) {
     gl_Position = matrixProjection * matrixView * vec4(worldPosition, 1);
 
     mat3 normalModelToWorld = mat3(transpose(inverse(matrixModel)));
-    worldNormal    = normalModelToWorld * normal;
-    worldTangent   = normalModelToWorld * tangent;
-
-    // Ensure orthonormality of the (normal,tangent,bitangent) basis.
-    worldTangent = normalize(worldTangent - dot(worldTangent, worldNormal) * worldNormal);
-    worldBitangent = cross(worldNormal, worldTangent);
+    worldNormal    = normalize(normalModelToWorld * normal);
+    worldTangent   = normalize(normalModelToWorld * tangent);
+    worldBitangent = normalize(normalModelToWorld * bitangent);
 
     texCoords = uv;
 

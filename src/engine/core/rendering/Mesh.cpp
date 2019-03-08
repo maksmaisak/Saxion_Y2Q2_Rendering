@@ -55,7 +55,13 @@ Mesh::Mesh(const aiMesh* aiMesh) :
 	if (aiMesh->HasTextureCoords(0))
 		std::transform(aiMesh->mTextureCoords[0], aiMesh->mTextureCoords[0] + aiMesh->mNumVertices, m_uvs.begin(), toGlmVec2D);
 
-	generateTangentsAndBitangents();
+	if (aiMesh->HasTangentsAndBitangents()) {
+		std::transform(aiMesh->mTangents  , aiMesh->mTangents   + aiMesh->mNumVertices, m_tangents.begin()  , toGlmVec3D);
+		std::transform(aiMesh->mBitangents, aiMesh->mBitangents + aiMesh->mNumVertices, m_bitangents.begin(), toGlmVec3D);
+	} else {
+		generateTangentsAndBitangents();
+	}
+
 	buffer();
 }
 

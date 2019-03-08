@@ -110,12 +110,12 @@ function scene:start()
         },
         Light = {
             color = {1, 0, 0},
-            intensity = 100
+            intensity = 10
         }
     }
     local light = lightActor:get("Light")
     light.intensity = 0
-    light:tweenIntensity(100):setLoopBounce()
+    light:tweenIntensity(10):setLoopBounce()
 
     Game.makeActor {
         Name = "Light2",
@@ -129,7 +129,7 @@ function scene:start()
         },
         Light = {
             color = {0, 1, 0},
-			intensity = 20
+			intensity = 10
 		}
     }
 

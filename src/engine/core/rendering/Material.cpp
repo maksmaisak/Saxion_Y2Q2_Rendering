@@ -397,7 +397,7 @@ void Material::setUniformsPointLight(
     if (valid(locations.position))
         gl::setUniform(locations.position, tf.getWorldPosition());
 
-    gl::setUniform(locations.color       , light.color * light.intensity);
+    gl::setUniform(locations.color       , glm::pow(light.color * light.intensity, glm::vec3(2.2f)));
     gl::setUniform(locations.colorAmbient, light.colorAmbient);
     gl::setUniform(locations.falloffConstant , light.falloff.constant);
     gl::setUniform(locations.falloffLinear   , light.falloff.linear);
@@ -414,7 +414,7 @@ void Material::setUniformDirectionalLight(
     if (valid(locations.direction))
         gl::setUniform(locations.direction, tf.getForward());
 
-    gl::setUniform(locations.color       , light.color * light.intensity);
+    gl::setUniform(locations.color       , glm::pow(light.color * light.intensity, glm::vec3(2.2f)));
     gl::setUniform(locations.colorAmbient, light.colorAmbient);
     gl::setUniform(locations.falloffConstant , light.falloff.constant);
     gl::setUniform(locations.falloffLinear   , light.falloff.linear);
@@ -436,7 +436,7 @@ void Material::setUniformSpotLight(
     if (valid(locations.direction))
         gl::setUniform(locations.direction, glm::normalize(glm::vec3(tf.getWorldTransform()[2])));
 
-    gl::setUniform(locations.color       , light.color * light.intensity);
+    gl::setUniform(locations.color       , glm::pow(light.color * light.intensity, glm::vec3(2.2f)));
     gl::setUniform(locations.colorAmbient, light.colorAmbient);
     gl::setUniform(locations.falloffConstant , light.falloff.constant);
     gl::setUniform(locations.falloffLinear   , light.falloff.linear);

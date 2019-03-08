@@ -31,13 +31,15 @@ function createArrow(rotation,offsetMin,offsetMax)
 end
 
 function HudArrows:dropKey(key)
-	self.arrows[key].actor:tweenKill()
-	self.arrows[key].actor:get("Transform"):tweenScale({0,0,0}, 0.3, Ease.inOutQuart)
+	local actor = self.arrows[key].actor
+	actor:tweenKill()
+	actor:get("Transform"):tweenScale({0,0,0}, 0.3, Ease.inOutQuart)
 end
 
 function HudArrows:pickUpKey(key)
-	self.arrows[key].actor:tweenKill()
-	self.arrows[key].actor:get("Transform"):tweenScale({1,1,1}, 0.3, Ease.inOutQuart)
+	local actor = self.arrows[key].actor
+	actor:tweenKill()
+	actor:get("Transform"):tweenScale({1,1,1}, 0.3, Ease.inOutQuart)
 end
 
 

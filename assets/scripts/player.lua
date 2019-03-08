@@ -113,9 +113,6 @@ function Player:activateButton(gridPosition)
 
 	button.isActivated = true
 
-	playSoundObject('audio/pressurePlateLower.wav',0,false,20)
-	stopSoundObject('audio/pressurePlateRise.wav')
-
 	self:activateButtonTarget(button)
 
 	print("Button activated")
@@ -136,9 +133,6 @@ function Player:disableButton(gridPosition)
 	end
 
 	button.isActivated	= false
-
-	playSoundObject('audio/pressurePlateRise.wav',0,false,20)
-	stopSoundObject('audio/pressurePlateLower.wav')
 
 	self:deactivateButtonTarget(button)
 	print("Button Deactivated")
@@ -162,7 +156,9 @@ function Player:activateButtonTarget(button)
 			print("Activating door")
 			local door = target.door
 
-			
+			playSoundObject('audio/doorOpen.wav',0,false,20)
+			stopSoundObject('audio/doorClose.wav')
+						
 			door.swingLeft:tweenKill()
 			door.swingRight:tweenKill()
 
@@ -191,6 +187,9 @@ function Player:deactivateButtonTarget(button)
 			print("Deactivating door")
 
 			local door = target.door
+
+			playSoundObject('audio/doorClose.wav',0,false,20)
+			stopSoundObject('audio/doorOpen.wav')
 
 			door.swingLeft:tweenKill()
 			door.swingRight:tweenKill()

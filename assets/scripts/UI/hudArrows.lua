@@ -8,19 +8,7 @@ function HudArrows:init()
 	self:createArrows()
 end
 
-local function keepAspectRatio(actor , theight)
-	local textureSize = actor:get("Sprite").textureSize
-
-	ratio = textureSize.x/textureSize.y
-	local height = theight
-	local width = height * ratio
-	local minWidth = (width / 2) * -1
-	local minHeight =  (height / 2) * -1
-	actor:get("UIRect").offsetMin = { minWidth, minHeight }
-	actor:get("UIRect").offsetMax = { width / 2, height / 2}
-end
-
-function createArrow(rotation,anchorMin,anchorMax)
+function createArrow(rotation,offsetMin,offsetMax)
 	return Game.makeActor {
 		Name = "Arrow",
 		Transform = {
@@ -28,8 +16,10 @@ function createArrow(rotation,anchorMin,anchorMax)
 			rotation = rotation
 		},
 		UIRect = {
-			anchorMin = anchorMin,
-			anchorMax = anchorMax,
+			anchorMin = {0,0},
+			anchorMax = {0,0},
+			offsetMin = offsetMin,
+			offsetMax = offsetMax,
 		},
 		Sprite = {
 			material = {
@@ -56,19 +46,14 @@ function HudArrows:createArrows()
 		Name = "ArrowsPanel",
 		Transform = {},
 		UIRect = {
-			anchorMin = {0, 0},
-			anchorMax = {1, 1}
+			anchorMin = {0.1, 0.9},
+			anchorMax = {0.1, 0.9}
 		},
 	}
 
-	self.arrows["up"].actor  = createArrow({0,0,0},{0.1,0.9},{0.1,0.9})
-	self.arrows["left"].actor  = createArrow({0,0,90},{0.075,0.85},{0.075,0.85})
-	self.arrows["down"].actor  = createArrow({0,0,180},{0.1,0.8},{0.1,0.8})
-	self.arrows["right"].actor  = createArrow({0,0,-90},{0.125,0.85},{0.125,0.85})
-
-
-	for k, v in pairs(self.arrows) do
-		keepAspectRatio(self.arrows[k].actor, 90)
-	end
+	self.arrows["up"].actor  = createArrow({0,0,0},{-40,-40},{40,40})
+	self.arrows["left"].actor  = createArrow({0,0,90},{-80,-80},{0,0})
+	self.arrows["down"].actor  = createArrow({0,0,180},{-40,-120},{40,-40})
+	self.arrows["right"].actor  = createArrow({0,0,-90},{0,-80},{80,0})
 
 end

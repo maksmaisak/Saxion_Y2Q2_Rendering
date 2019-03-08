@@ -25,10 +25,9 @@ namespace {
 
             for (const auto& definition : preprocessorDefinitions) {
 
-                text << "#define " << definition.name;
+                text << "\n" << "#define " << definition.name;
                 if (definition.value)
                     text << *definition.value;
-                text << "\n";
             }
         }
 

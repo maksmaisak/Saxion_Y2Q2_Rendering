@@ -190,39 +190,25 @@ vec3 CalculateSpotLightContribution(int i, vec3 N, vec3 V, vec3 albedo, float me
     return ambient + brdf * light.color * NdotL * attenuation * shadowMultiplier;
 }
 
-float DistributionGGX(vec3 N, vec3 H, float roughness) {
+float DistributionGGX(vec3 N, vec3 H, float NdotH, float roughness) {
 
     float a = roughness * roughness;
     float a2 = a * a;
-    float NdotH  = max(dot(N, H), 0.0);
-    float NdotH2 = NdotH * NdotH;
 
     float nom   = a2;
-    float denom = NdotH2 * (a2 - 1.0) + 1.0;
+    float denom = NdotH * NdotH * (a2 - 1.0) + 1.0;
     denom = PI * denom * denom;
 
     return nom / denom;
 }
 
-float GeometrySchlickGGX(float NdotV, float roughness) {
+float GeometrySmith(vec3 N, vec3 V, vec3 L, float NdotL, float NdotV, float roughness) {
 
     float r = roughness + 1.0;
     float k = r * r / 8.0;
+    float oneMinusK = 1.0 - k;
 
-    float nom   = NdotV;
-    float denom = NdotV * (1.0 - k) + k;
-
-    return nom / denom;
-}
-
-float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness) {
-
-    float NdotV = max(dot(N, V), 0.0);
-    float NdotL = max(dot(N, L), 0.0);
-    float ggx2 = GeometrySchlickGGX(NdotV, roughness);
-    float ggx1 = GeometrySchlickGGX(NdotL, roughness);
-
-    return ggx1 * ggx2;
+    return (NdotL * NdotV) / ((NdotL * oneMinusK + k) * (NdotV * oneMinusK + k));
 }
 
 vec3 FresnelSchlick(float cosTheta, vec3 F0) {
@@ -232,18 +218,19 @@ vec3 FresnelSchlick(float cosTheta, vec3 F0) {
 
 vec3 CookTorranceBRDF(vec3 N, vec3 V, vec3 L, vec3 albedo, float metallic, float roughness) {
 
-    float NdotL = dot(N, L);
-    float NdotV = dot(N, V);
+    float NdotL = max(dot(N, L), 0.0);
+    float NdotV = max(dot(N, V), 0.0);
 
     vec3 H = normalize(V + L);
-    float HdotV = dot(H, V);
+    float NdotH = max(dot(N, H), 0.0);
+    float HdotV = max(dot(H, V), 0.0);
 
-    float NDF = DistributionGGX(N, H, roughness);
-    float G   = GeometrySmith(N, V, L, roughness);
-    vec3  F   = FresnelSchlick(max(HdotV, 0.0), mix(vec3(0.04), albedo, metallic));
+    float NDF = DistributionGGX(N, H, NdotH, roughness);
+    float G   = GeometrySmith(N, V, L, NdotL, NdotV, roughness);
+    vec3  F   = FresnelSchlick(HdotV, mix(vec3(0.04), albedo, metallic));
 
     vec3  nominator   = NDF * G * F;
-    float denominator = 4 * max(NdotV, 0.0) * max(NdotL, 0.0) + 0.001; // 0.001 to prevent divide by zero
+    float denominator = 4 * NdotV * NdotL + 0.001; // 0.001 to prevent divide by zero
     vec3  specular = nominator / denominator;
 
     vec3 kS = F;

@@ -85,7 +85,7 @@ vec3 CalculatePointLightContribution(int i, vec3 N, vec3 V, vec3 albedo, float m
 vec3 CalculateSpotLightContribution (int i, vec3 N, vec3 V, vec3 albedo, float metallic, float roughness, float ao);
 
 vec3 GetNormal();
-vec3 CookTorranceBRDF(vec3 N, vec3 V, vec3 L, vec3 albedo, float metallic, float roughness);
+vec3 CookTorranceBRDF(vec3 N, vec3 V, vec3 L, float NdotL, vec3 albedo, float metallic, float roughness);
 float CalculateDirectionalShadowMultiplier(int i, float biasMultiplier);
 float CalculatePointShadowMultiplier(int i, vec3 fromLight, float distance, float biasMultiplier);
 
@@ -141,9 +141,9 @@ vec3 CalculateDirectionalLightContribution(int i, vec3 N, vec3 V, vec3 albedo, f
     DirectionalLight light = directionalLights[i];
 
     vec3 L = -light.direction;
-    vec3 brdf = CookTorranceBRDF(N, V, L, albedo, metallic, roughness);
-
     float NdotL = max(dot(N, L), 0.0);
+    vec3 brdf = CookTorranceBRDF(N, V, L, NdotL, albedo, metallic, roughness);
+
     float shadowMultiplier = CalculateDirectionalShadowMultiplier(i, 1 - NdotL);
 
     vec3 ambient = light.colorAmbient * albedo * ao;
@@ -160,13 +160,11 @@ vec3 CalculatePointLightContribution(int i, vec3 N, vec3 V, vec3 albedo, float m
     vec3  L = delta / distance;
     float attenuation = 1.f / (light.falloffConstant + light.falloffLinear * distance + light.falloffQuadratic * distance * distance);
 
-    vec3 brdf = CookTorranceBRDF(N, V, L, albedo, metallic, roughness);
-
     float NdotL = max(dot(N, L), 0.0);
+    vec3 brdf = CookTorranceBRDF(N, V, L, NdotL, albedo, metallic, roughness);
+
     float shadowMultiplier =  CalculatePointShadowMultiplier(i, -delta, distance, 1 - NdotL);
-
     vec3 ambient = light.colorAmbient * albedo * ao;
-
     return ambient + brdf * light.color * NdotL * attenuation * shadowMultiplier;
 }
 
@@ -180,13 +178,11 @@ vec3 CalculateSpotLightContribution(int i, vec3 N, vec3 V, vec3 albedo, float me
     float attenuation = 1.f / (light.falloffConstant + light.falloffLinear * distance + light.falloffQuadratic * distance * distance);
     attenuation *= smoothstep(light.outerCutoff, light.innerCutoff, dot(-L, light.direction));
 
-    vec3 brdf = CookTorranceBRDF(N, V, L, albedo, metallic, roughness);
-
     float NdotL = max(dot(N, L), 0.0);
+    vec3 brdf = CookTorranceBRDF(N, V, L, NdotL, albedo, metallic, roughness);
+
     float shadowMultiplier =  CalculatePointShadowMultiplier(i, -delta, distance, 1 - NdotL);
-
     vec3 ambient = light.colorAmbient * albedo * ao;
-
     return ambient + brdf * light.color * NdotL * attenuation * shadowMultiplier;
 }
 
@@ -216,12 +212,10 @@ vec3 FresnelSchlick(float cosTheta, vec3 F0) {
     return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
 }
 
-vec3 CookTorranceBRDF(vec3 N, vec3 V, vec3 L, vec3 albedo, float metallic, float roughness) {
-
-    float NdotL = max(dot(N, L), 0.0);
-    float NdotV = max(dot(N, V), 0.0);
+vec3 CookTorranceBRDF(vec3 N, vec3 V, vec3 L, float NdotL, vec3 albedo, float metallic, float roughness) {
 
     vec3 H = normalize(V + L);
+    float NdotV = max(dot(N, V), 0.0);
     float NdotH = max(dot(N, H), 0.0);
     float HdotV = max(dot(H, V), 0.0);
 

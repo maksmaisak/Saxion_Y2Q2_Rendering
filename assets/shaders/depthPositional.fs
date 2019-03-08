@@ -15,5 +15,5 @@ uniform LightInfo lights[MAX_NUM_LIGHTS];
 
 void main() {
 
-   gl_FragDepth = length(worldspacePosition.xyz - lights[lightIndex].position) / lights[lightIndex].farPlaneDistance;
+    gl_FragDepth = length(worldspacePosition.xyz - lights[lightIndex].position) / lights[lightIndex].farPlaneDistance;
 }

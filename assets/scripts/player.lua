@@ -47,7 +47,7 @@ function Player:makeKey(gridPosition, keyName)
 
     local position = {
         x = gridPosition.x - 1,
-        y = 0.2 + self.map:calculateYOffset(gridPosition),
+        y = self.map:calculateYOffset(gridPosition),
         z = gridPosition.y - 1
     }
 
@@ -91,7 +91,7 @@ function Player:activateGoal(gridPosition)
 	self.canControl = false
 	self.level.isLevelComplete = true
 	
-	local resultScreen = Game.makeActor {	
+	local resultScreen = Game.makeActor {
 		Name = "ResultScreen",
 		LuaBehavior = Config.resultScreen
 	}

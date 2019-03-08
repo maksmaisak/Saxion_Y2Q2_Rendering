@@ -18,6 +18,7 @@
 #include "BehaviorSystem.h"
 #include "Scheduler.h"
 #include "SceneManager.h"
+#include "CompoundSystem.h"
 
 namespace en {
 
@@ -70,7 +71,6 @@ namespace en {
         virtual void initializeWindow(sf::RenderWindow& window);
 
     private:
-
         std::unique_ptr<LuaState> m_lua;
         EntityRegistry m_registry;
         Scheduler m_scheduler;
@@ -78,6 +78,7 @@ namespace en {
         SceneManager m_sceneManager;
 
         std::vector<std::unique_ptr<System>> m_systems;
+        int m_behaviorsSystemIndex = -1;
         utils::CustomTypeMap<struct Dummy, bool> m_behaviorSystemPresence;
 
         unsigned int m_framerateCap = 240;
@@ -96,10 +97,26 @@ namespace en {
     };
 
     template<typename TSystem, typename... Args>
-    TSystem& Engine::addSystem(Args&&... args) {
+    inline TSystem& Engine::addSystem(Args&&... args) {
 
         auto ptr = std::make_unique<TSystem>(std::forward<Args>(args)...);
         TSystem& system = *ptr;
+        m_systems.push_back(std::move(ptr));
+
+        system.init(*this);
+        system.start();
+        return system;
+    }
+
+    class BehaviorsSystem : public CompoundSystem {};
+
+    template<>
+    inline BehaviorsSystem& Engine::addSystem<BehaviorsSystem>() {
+
+        m_behaviorsSystemIndex = static_cast<int>(m_systems.size());
+
+        auto ptr = std::make_unique<BehaviorsSystem>();
+        BehaviorsSystem& system = *ptr;
         m_systems.push_back(std::move(ptr));
 
         system.init(*this);
@@ -112,14 +129,15 @@ namespace en {
 
         static_assert(std::is_base_of_v<Behavior, TBehavior>);
 
-        if (!m_behaviorSystemPresence.get<TBehavior>()) {
+        if (m_behaviorSystemPresence.get<TBehavior>())
+            return false;
 
-            addSystem<BehaviorSystem<TBehavior>>();
-            m_behaviorSystemPresence.set<TBehavior>(true);
-            return true;
-        }
-
-        return false;
+        if (m_behaviorsSystemIndex < 0)
+            addSystem<BehaviorsSystem>();
+        auto* behaviorsSystem = (BehaviorsSystem*)m_systems[m_behaviorsSystemIndex].get();
+        behaviorsSystem->addSystem<BehaviorSystem<TBehavior>>();
+        m_behaviorSystemPresence.set<TBehavior>(true);
+        return true;
     }
 }
 

@@ -383,7 +383,7 @@ function Player:moveToPosition(nextPosition, canRegisterMove, didUsePortal, play
 	end
 
 	self.actor:tweenComplete()
-	
+
 	if not playBackTween then
 		self.transform:tweenJump(self:getPositionFromGridPosition(nextPosition), 1, 0.2)
 

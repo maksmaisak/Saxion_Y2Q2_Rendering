@@ -36,10 +36,12 @@ int main() {
         engine->addSystem<en::TransformHierarchySystem>();
         engine->addSystem<en::RenderSystem>(false);
         engine->addSystem<en::UIEventSystem>();
-        engine->addSystem<en::TweenSystem>();
 
         engine->addSystem<en::PhysicsSystem>().setGravity({0, -9.8, 0});
 
+        engine->addSystem<en::BehaviorsSystem>();
+
+        engine->addSystem<en::TweenSystem>();
         engine->addSystem<en::DestroyByTimerSystem>();
         engine->addSystem<en::DestroySystem>();
     }

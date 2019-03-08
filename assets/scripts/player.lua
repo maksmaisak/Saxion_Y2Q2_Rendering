@@ -317,7 +317,7 @@ function Player:moveByInput(input)
 	self:moveToPosition(nextPosition, true)
 end
 
-function Player:moveToPosition(nextPosition, canRegisterMove, didUsePortal)
+function Player:moveToPosition(nextPosition, canRegisterMove, didUsePortal, playBackTween, rotation)
 	local gridItem = self.map:getGridAt(nextPosition);
 
 	if gridItem.obstacle or not gridItem.tile then
@@ -353,13 +353,14 @@ function Player:moveToPosition(nextPosition, canRegisterMove, didUsePortal)
 
 	local lastPosition = { x = self.lastPosition.x, y = self.lastPosition.y }
 	local gridPosition = { x = self.gridPosition.x, y = self.gridPosition.y }
+	local currentRotation = self.transform.rotation
 	if canRegisterMove then
 		self:registerMove(
 			function()
-				self:moveToPosition(lastPosition, false)
+				self:moveToPosition(lastPosition, false, true, true, currentRotation)
 			end,
 			function()
-				self:moveToPosition(gridPosition, false)
+				self:moveToPosition(gridPosition, false, true)
 			end
 		)
 	end
@@ -378,12 +379,27 @@ function Player:moveToPosition(nextPosition, canRegisterMove, didUsePortal)
 	end
 
 	self.actor:tweenComplete()
-	self.transform:tweenJump(self:getPositionFromGridPosition(nextPosition), 1, 0.2)
+	
+	if not playBackTween then
+		self.transform:tweenJump(self:getPositionFromGridPosition(nextPosition), 1, 0.2)
 
-	local directionX = self.gridPosition.x - self.lastPosition.x
-	local directionY = self.gridPosition.y - self.lastPosition.y
-	local angle = math.atan(directionX, directionY) * 180 / math.pi
-	self.transform:tweenRotation({0, angle, 0}, 0.2, Ease.outQuad)
+		local directionX	= self.gridPosition.x - self.lastPosition.x
+		local directionY	= self.gridPosition.y - self.lastPosition.y
+		local angle			= math.atan(directionX, directionY) * 180 / math.pi
+		local rotationTween = self.transform:tweenRotation({0, angle, 0}, 0.2, Ease.outQuad)
+	else
+		self.transform.position		= self:getPositionFromGridPosition(nextPosition)
+		local positionTween			= self.transform:tweenJump(self:getPositionFromGridPosition(lastPosition), 1, 0.2)
+		positionTween.playsBackward = true
+		positionTween.progress		= 1
+
+		local currentRotation	= self.transform.rotation
+		self.transform.rotation = rotation
+		local rotationTween		= self.transform:tweenRotation(currentRotation, 0.2, Ease.outQuad)
+
+		rotationTween.playsBackward = true
+		rotationTween.progress		= 1
+	end
 end
 
 function Player:redoMove()

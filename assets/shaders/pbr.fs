@@ -91,17 +91,16 @@ float CalculatePointShadowMultiplier(int i, vec3 fromLight, float distance, floa
 
 void main() {
 
-    vec4  msSample  = texture(metallicSmoothnessMap, texCoords);
-    float metallic  = metallicMultiplier * msSample.r;
-    float roughness = 1.f - smoothnessMultiplier * msSample.a;
-    vec4  albedo    = albedoColor  * texture(albedoMap, texCoords);
-    float ao        = aoMultiplier * texture(aoMap, texCoords).r;
-
+    vec4 albedo = albedoColor * texture(albedoMap, texCoords);
 #ifdef RENDER_MODE_CUTOUT
     if (albedo.a < 0.5f)
         discard;
 #endif
 
+    vec4  msSample  = texture(metallicSmoothnessMap, texCoords);
+    float metallic  = metallicMultiplier * msSample.r;
+    float roughness = 1.f - smoothnessMultiplier * msSample.a;
+    float ao        = aoMultiplier * texture(aoMap, texCoords).r;
     vec3 normal = GetNormal();
     vec3 viewDirection = normalize(viewPosition - worldPosition);
 
@@ -118,6 +117,9 @@ void main() {
     for (int i = 0; i < numSpotLights; ++i) {
         color += CalculateSpotLightContribution(i, normal, viewDirection, albedo.rgb, metallic, roughness, ao);
     }
+
+    //color /= color + vec3(1);
+    //color = vec3(1.0) - exp(-color);
 
 #ifdef RENDER_MODE_FADE
     fragmentColor = vec4(color, albedo.a);
@@ -233,7 +235,8 @@ vec3 CookTorranceBRDF(vec3 N, vec3 V, vec3 L, float NdotL, vec3 albedo, float me
     vec3 kD = vec3(1.0) - kS;
     kD *= 1.0 - metallic;
 
-    return kD * albedo / PI + specular;
+    //return kD * albedo / PI + specular;
+    return kD * albedo + specular * PI; // Multiplied by PI to match Unity's BRDF implementation
 }
 
 float CalculateDirectionalShadowMultiplier(int i, float biasMultiplier) {

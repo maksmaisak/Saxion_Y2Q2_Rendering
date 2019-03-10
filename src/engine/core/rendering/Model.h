@@ -12,6 +12,7 @@
 
 namespace en {
 
+    /// A collection of meshes imported from a file.
     class Model {
 
         friend class ModelImpl;

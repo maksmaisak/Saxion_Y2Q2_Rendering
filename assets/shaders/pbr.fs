@@ -188,7 +188,7 @@ vec3 CalculateSpotLightContribution(int i, vec3 N, vec3 V, vec3 albedo, float me
     return ambient + brdf * light.color * NdotL * attenuation * shadowMultiplier;
 }
 
-float DistributionGGX(vec3 N, vec3 H, float NdotH, float roughness) {
+float DistributionGGX(float NdotH, float roughness) {
 
     float a = roughness * roughness;
     float a2 = a * a;
@@ -200,20 +200,22 @@ float DistributionGGX(vec3 N, vec3 H, float NdotH, float roughness) {
     return nom / denom;
 }
 
-float GeometrySmith(vec3 N, vec3 V, vec3 L, float NdotL, float NdotV, float roughness) {
+// Incorporates the division by 4 * NdotL * NdotV
+float GeometrySmith(float NdotL, float NdotV, float roughness) {
 
     float r = roughness + 1.0;
-    float k = r * r / 8.0;
-    float oneMinusK = 1.0 - k;
+    float a = r * r * 0.125f; // r * r / 8.0
+    float oneMinusA = 1.0 - a;
+    return 0.25f / ((NdotL * oneMinusA + a) * (NdotV * oneMinusA + a) + 0.0001f);
+}
 
-    return (NdotL * NdotV) / ((NdotL * oneMinusK + k) * (NdotV * oneMinusK + k));
+float Pow5(float t) {
+    float t2 = t * t;
+    return t2 * t2 * t;
 }
 
 vec3 FresnelSchlick(float cosTheta, vec3 F0) {
-
-    float t = 1.0 - cosTheta;
-    float t2 = t * t;
-    return F0 + (1.0 - F0) * (t2 * t2 * t);
+    return F0 + (1.0 - F0) * Pow5(1.0 - cosTheta);
 }
 
 vec3 CookTorranceBRDF(vec3 N, vec3 V, vec3 L, float NdotL, vec3 albedo, float metallic, float roughness) {
@@ -223,20 +225,15 @@ vec3 CookTorranceBRDF(vec3 N, vec3 V, vec3 L, float NdotL, vec3 albedo, float me
     float NdotH = max(dot(N, H), 0.0);
     float HdotV = max(dot(H, V), 0.0);
 
-    float NDF = DistributionGGX(N, H, NdotH, roughness);
-    float G   = GeometrySmith(N, V, L, NdotL, NdotV, roughness);
+    float NDF = DistributionGGX(NdotH, roughness);
+    float G   = GeometrySmith(NdotL, NdotV, roughness);
     vec3  F   = FresnelSchlick(HdotV, mix(vec3(0.04), albedo, metallic));
-
-    vec3  nominator   = NDF * G * F;
-    float denominator = 4 * NdotV * NdotL + 0.001; // 0.001 to prevent divide by zero
-    vec3  specular = nominator / denominator;
 
     vec3 kS = F;
     vec3 kD = vec3(1.0) - kS;
     kD *= 1.0 - metallic;
 
-    //return kD * albedo / PI + specular;
-    return kD * albedo + specular * PI; // Multiplied by PI to match Unity's BRDF implementation
+    return kD * (albedo / PI) + kS * (NDF * G);
 }
 
 float CalculateDirectionalShadowMultiplier(int i, float biasMultiplier) {

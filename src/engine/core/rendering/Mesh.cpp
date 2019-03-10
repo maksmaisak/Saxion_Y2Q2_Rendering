@@ -25,6 +25,31 @@ Mesh::~Mesh() {
 	glDeleteVertexArrays(1, &m_vao);
 }
 
+Mesh::Mesh(Mesh&& other) noexcept :
+	m_indexBufferId(std::exchange(other.m_indexBufferId, 0)),
+	m_vertexBufferId   (std::exchange(other.m_vertexBufferId,    0)),
+	m_normalBufferId   (std::exchange(other.m_normalBufferId,    0)),
+	m_uvBufferId       (std::exchange(other.m_uvBufferId,        0)),
+	m_tangentBufferId  (std::exchange(other.m_tangentBufferId,   0)),
+	m_bitangentBufferId(std::exchange(other.m_bitangentBufferId, 0)),
+	m_vao(std::exchange(other.m_vao, 0))
+{}
+
+Mesh& Mesh::operator=(Mesh&& other) noexcept {
+
+	m_indexBufferId = std::exchange(other.m_indexBufferId, 0);
+
+	m_vertexBufferId    = std::exchange(other.m_vertexBufferId,    0);
+	m_normalBufferId    = std::exchange(other.m_normalBufferId,    0);
+	m_uvBufferId        = std::exchange(other.m_uvBufferId,        0);
+	m_tangentBufferId   = std::exchange(other.m_tangentBufferId,   0);
+	m_bitangentBufferId = std::exchange(other.m_bitangentBufferId, 0);
+
+	m_vao = std::exchange(other.m_vao, 0);
+
+	return *this;
+}
+
 Mesh::Mesh(const aiMesh* aiMesh) :
 	m_indices   (aiMesh->mNumFaces * 3),
 	m_vertices  (aiMesh->mNumVertices),

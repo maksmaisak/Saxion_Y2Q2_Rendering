@@ -147,7 +147,7 @@ function scene:start()
         },
         Light = {
             color = {1, 0, 0},
-            intensity = 10
+            intensity = 40
         }
     }
 
@@ -163,7 +163,7 @@ function scene:start()
         },
         Light = {
             color = {0, 1, 0},
-			intensity = 10
+			intensity = 40
 		}
     }
 

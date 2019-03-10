@@ -18,10 +18,10 @@ namespace en {
 	public:
 
 		Mesh(const aiMesh* aiMesh);
-		Mesh(const Mesh& other) = delete;
-		Mesh& operator=(const Mesh& other) = delete;
-		Mesh(Mesh&& other) = default;
-		Mesh& operator=(Mesh&& other) = default;
+		Mesh(const Mesh&) = delete;
+		Mesh& operator=(const Mesh&) = delete;
+		Mesh(Mesh&& other) noexcept;
+		Mesh& operator=(Mesh&& other) noexcept;
 		~Mesh();
 
         /// Activates attributes at given attribute locations and assign vertex attribute buffers to them.

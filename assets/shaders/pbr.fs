@@ -228,14 +228,12 @@ vec3 CookTorranceBRDF(vec3 N, vec3 V, vec3 L, float NdotL, vec3 albedo, float me
     float NDF = DistributionGGX(NdotH, roughness);
     float G   = GeometrySmith(NdotL, NdotV, roughness);
     vec3  F   = FresnelSchlick(HdotV, mix(vec3(0.04), albedo, metallic));
-    vec3  specular = NDF * G * F;
 
     vec3 kS = F;
     vec3 kD = vec3(1.0) - kS;
     kD *= 1.0 - metallic;
 
-    //return kD * albedo / PI + specular;
-    return kD * albedo + specular * PI; // Multiplied by PI to match Unity's BRDF implementation
+    return kD * (albedo / PI) + kS * (NDF * G);
 }
 
 float CalculateDirectionalShadowMultiplier(int i, float biasMultiplier) {

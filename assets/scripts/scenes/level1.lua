@@ -1135,7 +1135,7 @@ grid[8][10].goal = {
                     Transform = {position = {0, 2, 0}},
                     Light = {
                         color = {0, 1, 0},
-                        intensity = 2,
+                        intensity = 2 * 3.14,
                         falloff = {1, 1, 0}
                     }
                 }
@@ -1191,7 +1191,7 @@ local extras = {
         },
         Light = {
             kind = 'directional',
-            intensity = 2.21,
+            intensity = 2.21 * 3.14,
             color = {1, 1, 1, 1},
         }
     },

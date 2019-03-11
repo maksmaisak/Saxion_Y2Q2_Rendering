@@ -6,6 +6,7 @@
 #define SAXION_Y2Q2_RENDERING_SCENE_H
 
 #include <cassert>
+#include "RenderSettings.h"
 
 namespace en {
 
@@ -23,6 +24,11 @@ namespace en {
 
         Engine& getEngine();
         void setEngine(Engine& engine);
+
+        RenderSettings& getRenderSettings();
+
+    protected:
+        RenderSettings m_renderSettings;
 
     private:
         en::Engine* m_engine = nullptr;

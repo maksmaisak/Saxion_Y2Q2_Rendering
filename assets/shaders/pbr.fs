@@ -66,6 +66,8 @@ uniform int numSpotLights = 0;
 
 uniform vec3 viewPosition;
 
+uniform vec3 ambientColor;
+
 // Custom uniforms
 uniform sampler2D albedoMap;
 uniform sampler2D metallicSmoothnessMap;
@@ -89,6 +91,15 @@ vec3 CookTorranceBRDF(vec3 N, vec3 V, vec3 L, float NdotL, vec3 albedo, float me
 float CalculateDirectionalShadowMultiplier(int i, float biasMultiplier);
 float CalculatePointShadowMultiplier(int i, vec3 fromLight, float distance, float biasMultiplier);
 
+float Pow5(float t) {
+    float t2 = t * t;
+    return t2 * t2 * t;
+}
+
+vec3 FresnelSchlick(float cosTheta, vec3 F0) {
+    return F0 + (1.0 - F0) * Pow5(1.0 - cosTheta);
+}
+
 void main() {
 
     vec4 albedo = albedoColor * texture(albedoMap, texCoords);
@@ -104,8 +115,16 @@ void main() {
     vec3 normal = GetNormal();
     vec3 viewDirection = normalize(viewPosition - worldPosition);
 
-    vec3 color = vec3(0,0,0);
+    float NdotV = max(dot(normal, viewDirection), 0.0);
 
+    vec3 kS = FresnelSchlick(NdotV, mix(vec3(0.04f), albedo.xyz, metallic));
+    vec3 kD = 1.0 - kS;
+    kD *= 1.0 - metallic;
+    vec3 irradiance = ambientColor * 0.5f / PI;
+    vec3 diffuse = irradiance * albedo.xyz;
+    vec3 ambient = (kD * diffuse) * ao;
+    vec3 color = ambient;
+    
     for (int i = 0; i < numDirectionalLights; ++i) {
         color += CalculateDirectionalLightContribution(i, normal, viewDirection, albedo.rgb, metallic, roughness, ao);
     }
@@ -207,15 +226,6 @@ float GeometrySmith(float NdotL, float NdotV, float roughness) {
     float a = r * r * 0.125f; // r * r / 8.0
     float oneMinusA = 1.0 - a;
     return 0.25f / ((NdotL * oneMinusA + a) * (NdotV * oneMinusA + a) + 0.0001f);
-}
-
-float Pow5(float t) {
-    float t2 = t * t;
-    return t2 * t2 * t;
-}
-
-vec3 FresnelSchlick(float cosTheta, vec3 F0) {
-    return F0 + (1.0 - F0) * Pow5(1.0 - cosTheta);
 }
 
 vec3 CookTorranceBRDF(vec3 N, vec3 V, vec3 L, float NdotL, vec3 albedo, float metallic, float roughness) {

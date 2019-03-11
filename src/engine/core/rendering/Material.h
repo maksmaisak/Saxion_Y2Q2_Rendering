@@ -104,6 +104,8 @@ namespace en {
 
             GLint viewPosition = -1;
 
+            GLint ambientColor = -1;
+
             GLint depthCubemaps = -1;
             GLint directionalDepthMaps = -1;
 

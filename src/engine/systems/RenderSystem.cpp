@@ -487,8 +487,6 @@ void RenderSystem::updateDepthMapsPositionalLights(const std::vector<Entity>& po
 
         const glm::mat4& modelTransform = m_registry->get<Transform>(e).getWorldTransform();
         if (std::none_of(lightSpheres.begin(), lightSpheres.end(), [pos = glm::vec3(modelTransform[3])](const Sphere& sphere){
-
-            std::cout << glm::distance2(pos, sphere.position) << '\n';
             return glm::distance2(pos, sphere.position) < sphere.radius * sphere.radius;
         }))
             continue;

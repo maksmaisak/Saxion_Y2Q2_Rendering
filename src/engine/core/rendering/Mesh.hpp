@@ -13,7 +13,7 @@ namespace en {
 	/// Stores mesh data
 	/// Owns OpenGL buffers and a VAO.
 	/// Can render with given vertex attribute locations.
-	class Mesh {
+	class Mesh final {
 
 	public:
 
@@ -23,7 +23,7 @@ namespace en {
 		Mesh& operator=(const Mesh&) = delete;
 		Mesh(Mesh&& other) noexcept;
 		Mesh& operator=(Mesh&& other) noexcept;
-		virtual ~Mesh();
+		~Mesh();
 
         /// Activates attributes at given attribute locations and assign vertex attribute buffers to them.
         /// Then performs a draw call.

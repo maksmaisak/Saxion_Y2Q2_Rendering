@@ -116,6 +116,7 @@ void Engine::initializeWindow(sf::RenderWindow& window) {
     auto contextSettings = sf::ContextSettings(24, 8, 8, 4, 5, sf::ContextSettings::Attribute::Core | sf::ContextSettings::Attribute::Debug);
     window.create(sf::VideoMode(width, height), windowTitle, fullscreen ? sf::Style::Fullscreen : sf::Style::Default, contextSettings);
     window.setVerticalSyncEnabled(vsync);
+    window.setKeyRepeatEnabled(false);
     window.setFramerateLimit(0);
     window.setActive(true);
 

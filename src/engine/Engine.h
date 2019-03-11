@@ -19,6 +19,7 @@
 #include "Scheduler.h"
 #include "SceneManager.h"
 #include "CompoundSystem.h"
+#include "KeyboardHelper.h"
 
 namespace en {
 
@@ -80,6 +81,8 @@ namespace en {
         CompoundSystem m_systems;
         BehaviorsSystem* m_behaviors = nullptr;
         utils::CustomTypeMap<struct Dummy, bool> m_behaviorSystemPresence;
+
+        utils::KeyboardHelper m_keyboardHelper;
 
         unsigned int m_framerateCap = 240;
         double m_fps = 0.f;

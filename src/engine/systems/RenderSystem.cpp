@@ -161,7 +161,7 @@ void RenderSystem::updateBatches() {
     }
 
     for (auto& [material, batch] : m_batches) {
-        //batch.removeDestroyed();
+        //batch.removeDestroyedEntities();
         batch.updateBuffers();
     }
 }
@@ -496,6 +496,11 @@ float RenderSystem::getUIScaleFactor() {
 
     const glm::vec2 windowSize = getWindowSize();
     return std::sqrt((windowSize.x / m_referenceResolution.x) * (windowSize.y / m_referenceResolution.y));
+}
+
+void RenderSystem::receive(const SceneManager::OnSceneClosed& info) {
+
+    m_batches.clear();
 }
 
 namespace {

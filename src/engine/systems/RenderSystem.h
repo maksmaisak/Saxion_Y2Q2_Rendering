@@ -16,6 +16,8 @@
 #include "DepthMaps.h"
 #include "VertexRenderer.h"
 #include "ComponentPool.h"
+#include "Receiver.h"
+#include "SceneManager.h"
 
 class AbstractMaterial;
 
@@ -25,7 +27,7 @@ namespace en {
     class UIRect;
     class Mesh;
 
-    class RenderSystem : public System {
+    class RenderSystem : public System, Receiver<SceneManager::OnSceneClosed> {
 
     public:
         explicit RenderSystem(bool displayMeshDebugInfo = false);
@@ -33,6 +35,8 @@ namespace en {
         void draw() override;
 
     private:
+        void receive(const SceneManager::OnSceneClosed& info) override;
+
         void updateBatches();
         void updateDepthMaps();
         void renderEntities();

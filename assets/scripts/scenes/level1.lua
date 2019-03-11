@@ -1419,6 +1419,7 @@ grid[8][10].goal = {
         Light = {
             kind = 'point',
             intensity = 6.283185,
+            range = 5.16487,
             falloff = {1, 1, 0},
             color = {0, 1, 0, 1},
         }
@@ -1455,6 +1456,7 @@ grid[8][10].goal = {
                     Light = {
                         kind = 'point',
                         intensity = 6.283185,
+                        range = 5.16487,
                         falloff = {1, 1, 0},
                         color = {0, 1, 0, 1},
                     }

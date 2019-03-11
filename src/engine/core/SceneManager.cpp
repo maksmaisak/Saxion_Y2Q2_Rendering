@@ -4,6 +4,7 @@
 
 #include "SceneManager.h"
 #include "Engine.h"
+#include "Receiver.h"
 
 namespace en {
 
@@ -15,6 +16,7 @@ namespace en {
         if (m_currentScene) {
             m_currentScene->setEngine(*m_engine);
             m_currentScene->open();
+            Receiver<OnSceneOpened>::broadcast({this});
         }
     }
 
@@ -29,5 +31,6 @@ namespace en {
 
         m_currentScene->close();
         m_engine->getRegistry().destroyAll();
+        Receiver<OnSceneClosed>::broadcast({this});
     }
 }

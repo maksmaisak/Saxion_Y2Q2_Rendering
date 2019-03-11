@@ -43,6 +43,15 @@ namespace en {
              const glm::mat4& viewMatrix,
              const glm::mat4& projectionMatrix
         );
+
+        void setAttributesAndDraw(const Mesh* mesh);
+
+        /// Sets the built-in uniforms related to the model matrix.
+        /// Useful if you're rendering multiple meshes with the same material and want to avoid unnecessary state changes.
+        /// Only call this if the material is in use.
+        void updateModelMatrix(const glm::mat4& modelMatrix);
+
+        /// A shortcut for `use` followed by `setAttributesAndDraw`
         void render(
             const Mesh* mesh,
             Engine* engine,

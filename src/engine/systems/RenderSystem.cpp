@@ -203,28 +203,28 @@ void RenderSystem::renderEntities() {
     }
 
     int numBatched = 0;
-    Material* prevMaterial;
+    Material* prevMaterial = nullptr;
     for (Entity e : m_registry->with<Transform, RenderInfo>()) {
 
         auto& renderInfo = m_registry->get<RenderInfo>(e);
+        if (!renderInfo.isEnabled || !renderInfo.material || !renderInfo.model)
+            continue;
+
         if (renderInfo.isInBatch) {
             numBatched += 1;
             continue;
         }
 
-        if (!renderInfo.isEnabled || !renderInfo.material || !renderInfo.model)
-            continue;
-
         const glm::mat4& matrixModel = m_registry->get<Transform>(e).getWorldTransform();
-        for (const Mesh& mesh : renderInfo.model->getMeshes()) {
-            renderInfo.material->render(&mesh,
-                m_engine,
-                &m_depthMaps,
-                matrixModel,
-                matrixView,
-                matrixProjection
-            );
-        }
+        if (renderInfo.material.get() != prevMaterial)
+            renderInfo.material->use(m_engine, &m_depthMaps, matrixModel, matrixView, matrixProjection);
+        else
+            renderInfo.material->updateModelMatrix(matrixModel);
+
+        for (const Mesh& mesh : renderInfo.model->getMeshes())
+            renderInfo.material->setAttributesAndDraw(&mesh);
+
+        prevMaterial = renderInfo.material.get();
 
         checkRenderingError(m_engine->actor(e));
     }

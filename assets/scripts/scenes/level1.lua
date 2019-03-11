@@ -1451,7 +1451,7 @@ grid[8][10].goal = {
                 {
                     Name = "Point Light",
                     Transform = {
-                        position = {0, 1, 1},
+                        position = {0, 2, 0},
                     },
                     Light = {
                         kind = 'point',

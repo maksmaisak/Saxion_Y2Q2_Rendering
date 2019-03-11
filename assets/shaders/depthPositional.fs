@@ -1,6 +1,6 @@
 #version 330
 
-const int MAX_NUM_LIGHTS = 12;
+const int MAX_NUM_LIGHTS = 4;
 
 in vec4 worldspacePosition;
 flat in int lightIndex;

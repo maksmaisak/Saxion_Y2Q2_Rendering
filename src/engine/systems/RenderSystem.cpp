@@ -8,6 +8,7 @@
 #include <string>
 #include <sstream>
 #include <cmath>
+#include <algorithm>
 #include "components/RenderInfo.h"
 #include "components/Transform.h"
 #include "components/Camera.h"
@@ -34,8 +35,7 @@ void checkRenderingError(const Actor& actor) {
     std::cerr << "Error while rendering " << name << std::endl;
 }
 
-RenderSystem::RenderSystem(bool displayMeshDebugInfo) :
-    m_displayMeshDebugInfo(displayMeshDebugInfo),
+RenderSystem::RenderSystem() :
     m_directionalDepthShader(Resources<ShaderProgram>::get("depthDirectional")),
     m_positionalDepthShader (Resources<ShaderProgram>::get("depthPositional")),
     m_depthMaps(4, {1024, 1024}, 10, {64, 64}),
@@ -76,7 +76,9 @@ void RenderSystem::start() {
     auto& lua = m_engine->getLuaState();
     lua_getglobal(lua, "Config");
     auto popConfig = lua::PopperOnDestruct(lua);
-    m_referenceResolution = lua.tryGetField<glm::vec2>("referenceResolution").value_or(glm::vec2(1920, 1080));
+
+    m_referenceResolution  = lua.tryGetField<glm::vec2>("referenceResolution").value_or(glm::vec2(1920, 1080));
+    m_enableStaticBatching = lua.tryGetField<bool>("enableStaticBatching").value_or(true);
 }
 
 namespace {
@@ -115,7 +117,8 @@ void RenderSystem::draw() {
         std::cerr << "Uncaught openGL error(s) before rendering." << std::endl;
     }
 
-    updateBatches();
+    if (m_enableStaticBatching)
+        updateBatches();
 
     updateDepthMaps();
     renderEntities();
@@ -446,12 +449,19 @@ void RenderSystem::updateDepthMapsPositionalLights(const std::vector<Entity>& po
 
     m_positionalDepthShader->use();
 
+    struct Sphere {
+        float radius = 0.f;
+        glm::vec3 position;
+    };
+
+    std::vector<Sphere> lightSpheres;
     int i = 0;
     for (Entity e : pointLights) {
 
         auto& light = m_registry->get<Light>(e);
         auto& tf = m_registry->get<Transform>(e);
         auto [farPlaneDistance, lightPosition, pvMatrices] = getPointLightUniforms(m_depthMaps, light, tf);
+        lightSpheres.push_back({light.range, lightPosition});
 
         for (unsigned int face = 0; face < 6; ++face)
             m_positionalDepthShader->setUniformValue("matrixPV[" + std::to_string(i * 6 + face) + "]", pvMatrices[face]);
@@ -464,21 +474,28 @@ void RenderSystem::updateDepthMapsPositionalLights(const std::vector<Entity>& po
     }
     m_positionalDepthShader->setUniformValue("numLights", i);
 
-    m_positionalDepthShader->setUniformValue("matrixModel", glm::mat4(1));
-    for (const auto& [material, mesh] : m_batches) {
-        mesh.render(0, -1, -1);
-    }
+//    m_positionalDepthShader->setUniformValue("matrixModel", glm::mat4(1));
+//    for (const auto& [material, mesh] : m_batches) {
+//        mesh.render(0);
+//    }
 
     for (Entity e : m_registry->with<Transform, RenderInfo>()) {
 
         auto& renderInfo = m_registry->get<RenderInfo>(e);
-        if (renderInfo.isInBatch || !renderInfo.isEnabled || !renderInfo.model)
+        if (/*renderInfo.isInBatch ||*/ !renderInfo.isEnabled || !renderInfo.model)
             continue;
 
         const glm::mat4& modelTransform = m_registry->get<Transform>(e).getWorldTransform();
+        if (std::none_of(lightSpheres.begin(), lightSpheres.end(), [pos = glm::vec3(modelTransform[3])](const Sphere& sphere){
+
+            std::cout << glm::distance2(pos, sphere.position) << '\n';
+            return glm::distance2(pos, sphere.position) < sphere.radius * sphere.radius;
+        }))
+            continue;
+
         m_positionalDepthShader->setUniformValue("matrixModel", modelTransform);
         for (const Mesh& mesh : renderInfo.model->getMeshes())
-            mesh.render(0, -1, -1);
+            mesh.render(0);
         glCheckError();
     }
 

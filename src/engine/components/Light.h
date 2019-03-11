@@ -40,7 +40,7 @@ namespace en {
         glm::vec3 colorAmbient = {0, 0, 0};
         glm::vec3 color = {1, 1, 1};
         float intensity = 1;
-        float range = 100;
+        float range = 10;
         Falloff falloff = {1, 0, 1};
 
         Kind kind = Kind::POINT;

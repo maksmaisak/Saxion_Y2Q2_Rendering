@@ -19,12 +19,11 @@
 #include "Receiver.h"
 #include "SceneManager.h"
 
-class AbstractMaterial;
-
 namespace en {
 
     class ShaderProgram;
     class UIRect;
+    class Material;
     class Mesh;
 
     class RenderSystem : public System, Receiver<SceneManager::OnSceneClosed> {
@@ -55,7 +54,7 @@ namespace en {
         std::shared_ptr<ShaderProgram> m_directionalDepthShader;
         std::shared_ptr<ShaderProgram> m_positionalDepthShader;
 
-        std::unordered_map<std::shared_ptr<AbstractMaterial>, Mesh> m_batches;
+        std::unordered_map<std::shared_ptr<Material>, Mesh> m_batches;
 
         VertexRenderer m_vertexRenderer;
         glm::vec2 m_referenceResolution;

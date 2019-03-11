@@ -9,7 +9,7 @@
 
 #include <memory>
 #include "Model.h"
-#include "AbstractMaterial.hpp"
+#include "Material.h"
 #include "ComponentsToLua.h"
 
 namespace en {
@@ -21,7 +21,7 @@ namespace en {
         static void initializeMetatable(LuaState& lua);
 
         std::shared_ptr<Model> model;
-        std::shared_ptr<AbstractMaterial> material;
+        std::shared_ptr<Material> material;
 
         bool isEnabled = true;
 

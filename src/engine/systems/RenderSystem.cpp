@@ -21,7 +21,6 @@
 #include "Material.h"
 #include "Exception.h"
 #include "UIRect.h"
-#include "AbstractMaterial.hpp"
 
 using namespace en;
 
@@ -204,6 +203,7 @@ void RenderSystem::renderEntities() {
     }
 
     int numBatched = 0;
+    Material* prevMaterial;
     for (Entity e : m_registry->with<Transform, RenderInfo>()) {
 
         auto& renderInfo = m_registry->get<RenderInfo>(e);

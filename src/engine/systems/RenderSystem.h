@@ -7,6 +7,7 @@
 
 #include <memory>
 #include <vector>
+#include <unordered_map>
 #include <GL/glew.h>
 #include "Entity.h"
 #include "System.h"
@@ -15,6 +16,8 @@
 #include "DepthMaps.h"
 #include "VertexRenderer.h"
 #include "ComponentPool.h"
+
+class AbstractMaterial;
 
 namespace en {
 
@@ -30,6 +33,7 @@ namespace en {
         void draw() override;
 
     private:
+        void updateBatches();
         void updateDepthMaps();
         void renderEntities();
         void renderUI();
@@ -43,11 +47,11 @@ namespace en {
         glm::vec2 getWindowSize();
         float getUIScaleFactor();
 
-        ComponentPool<std::shared_ptr<Mesh>> m_batches;
-
         DepthMaps m_depthMaps;
         std::shared_ptr<ShaderProgram> m_directionalDepthShader;
         std::shared_ptr<ShaderProgram> m_positionalDepthShader;
+
+        std::unordered_map<std::shared_ptr<AbstractMaterial>, Mesh> m_batches;
 
         VertexRenderer m_vertexRenderer;
         glm::vec2 m_referenceResolution;

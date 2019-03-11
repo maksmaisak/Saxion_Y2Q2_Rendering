@@ -14,7 +14,8 @@ local planeRenderInfo = {
         metallicSmoothness = "textures/testPBR/oldTiledStone/tiledstone1_metallicSmoothness.psd",
         normal             = "textures/testPBR/oldTiledStone/tiledstone1_normal.png",
         ao                 = "textures/testPBR/oldTiledStone/tiledstone1_AO.png",
-    }
+    },
+    isBatchingStatic = true
 }
 
 local defaultMaterial = Game.makeMaterial {shader = "pbr"}
@@ -97,7 +98,8 @@ local scenery = {
             material = {
                 shader = "pbr",
                 albedo = "textures/container/diffuse.png",
-            }
+            },
+            isBatchingStatic = true
         },
     },
     {
@@ -147,7 +149,7 @@ function scene:start()
         },
         Light = {
             color = {1, 0, 0},
-            intensity = 40
+            intensity = 100
         }
     }
 
@@ -221,7 +223,8 @@ function scene:start()
                     metallicMultiplier = 0,
                     smoothnessMultiplier = 0,
                     aoMultiplier = 1,
-                }
+                },
+                isBatchingStatic = true
             }
         }
 

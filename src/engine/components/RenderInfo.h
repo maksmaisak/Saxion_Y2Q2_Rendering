@@ -26,7 +26,7 @@ namespace en {
         bool isEnabled = true;
 
         bool isBatchingStatic = false;
-        bool isAlreadyBatched = false;
+        bool isInBatch = false;
     };
 }
 

@@ -17,6 +17,7 @@ namespace en {
 
 	public:
 
+		Mesh() = default;
 		Mesh(const aiMesh* aiMesh);
 		Mesh(const Mesh&) = delete;
 		Mesh& operator=(const Mesh&) = delete;
@@ -34,10 +35,19 @@ namespace en {
 			GLint bitangentsAttrib = -1
 		) const;
 
+		/// Add the geometry of another mesh to this, optionally pretransforming it with a given transformation matrix.
+		/// Useful for batching. Call updateBuffers after adding the data.
+		void add(const Mesh& mesh, const glm::mat4& transform = glm::mat4(1));
+		/// Update the OpenGL buffers.
+		bool updateBuffers();
+
 	private:
 
 		void generateTangentsAndBitangents();
 		void buffer();
+		void deleteBuffers();
+
+		bool m_buffersNeedUpdating = false;
 
 		GLuint m_vao = 0;
 

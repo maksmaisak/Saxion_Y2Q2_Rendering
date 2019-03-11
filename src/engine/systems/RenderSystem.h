@@ -14,17 +14,18 @@
 #include "DebugHud.hpp"
 #include "DepthMaps.h"
 #include "VertexRenderer.h"
+#include "ComponentPool.h"
 
 namespace en {
 
     class ShaderProgram;
     class UIRect;
-    class Transform;
+    class Mesh;
 
     class RenderSystem : public System {
 
     public:
-        RenderSystem(bool displayMeshDebugInfo = false);
+        explicit RenderSystem(bool displayMeshDebugInfo = false);
         void start() override;
         void draw() override;
 
@@ -41,6 +42,8 @@ namespace en {
         void renderUIRect(Entity entity, UIRect& rect);
         glm::vec2 getWindowSize();
         float getUIScaleFactor();
+
+        ComponentPool<std::shared_ptr<Mesh>> m_batches;
 
         DepthMaps m_depthMaps;
         std::shared_ptr<ShaderProgram> m_directionalDepthShader;

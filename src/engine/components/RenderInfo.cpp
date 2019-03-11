@@ -6,6 +6,7 @@
 #include <memory>
 #include "Material.h"
 #include "Resources.h"
+#include "Exception.h"
 
 using namespace en;
 
@@ -24,7 +25,9 @@ std::shared_ptr<Material> readMaterial(RenderInfo& renderInfo, LuaState& lua) {
 RenderInfo& RenderInfo::addFromLua(Actor& actor, LuaState& lua) {
 
     auto& renderInfo = actor.add<en::RenderInfo>();
+
     renderInfo.material = readMaterial(renderInfo, lua);
+
     return renderInfo;
 }
 
@@ -35,4 +38,16 @@ void RenderInfo::initializeMetatable(LuaState& lua) {
     lua::addProperty(lua, "mesh", lua::writeonlyProperty([](ComponentReference<RenderInfo>& renderInfo, const std::string& value) {
         renderInfo->model = Resources<Model>::get("assets/" + value);
     }));
+
+    lua::addProperty(lua, "isBatchingStatic", lua::property(
+        [](ComponentReference<RenderInfo>& ref) {return ref->isBatchingStatic;},
+        [](ComponentReference<RenderInfo>& ref, bool isBatchingStatic) {
+
+            auto& renderInfo = *ref;
+            if (renderInfo.isAlreadyBatched && !isBatchingStatic)
+                throw utils::Exception("You can't set isBatchingStatic to false after the mesh has already been batched.");
+
+            renderInfo.isBatchingStatic = isBatchingStatic;
+        }
+    ));
 }

@@ -24,6 +24,9 @@ namespace en {
         std::shared_ptr<AbstractMaterial> material;
 
         bool isEnabled = true;
+
+        bool isBatchingStatic = false;
+        bool isAlreadyBatched = false;
     };
 }
 

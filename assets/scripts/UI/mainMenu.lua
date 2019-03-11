@@ -379,7 +379,7 @@ function scene:start()
 					end
 
 					playSoundObject('audio/UIButtonSound.wav',0,false,60)
-					Game.loadScene("assets/scripts/scenes/level"..levelIndex..".lua")
+					Game.loadScene(Game.levels[levelIndex].path)
 					print("Loaded scene : " ..levelIndex)
 					Game.currentLevel = levelIndex
 				end

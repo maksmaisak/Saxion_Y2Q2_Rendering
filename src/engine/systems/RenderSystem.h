@@ -29,7 +29,7 @@ namespace en {
     class RenderSystem : public System, Receiver<SceneManager::OnSceneClosed> {
 
     public:
-        explicit RenderSystem(bool displayMeshDebugInfo = false);
+        RenderSystem();
         void start() override;
         void draw() override;
 
@@ -59,8 +59,9 @@ namespace en {
         VertexRenderer m_vertexRenderer;
         glm::vec2 m_referenceResolution;
 
+        bool m_enableStaticBatching = true;
+
         std::unique_ptr<DebugHud> m_debugHud;
-        bool m_displayMeshDebugInfo = false;
     };
 }
 

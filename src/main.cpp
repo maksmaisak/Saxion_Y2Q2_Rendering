@@ -34,7 +34,7 @@ int main() {
 
     {
         engine->addSystem<en::TransformHierarchySystem>();
-        engine->addSystem<en::RenderSystem>(false);
+        engine->addSystem<en::RenderSystem>();
 
         engine->addSystem<en::PhysicsSystem>().setGravity({0, -9.8, 0});
 

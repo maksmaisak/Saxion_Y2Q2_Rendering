@@ -1,7 +1,7 @@
 require('assets/scripts/level/level')
 
 local materials = {
-    {
+    Game.makeMaterial {
         shader = 'pbr',
         albedo = 'objects/Player/Texture/Main_Character_01_AlbedoTransparency.png',
         metallicSmoothness = 'objects/Player/Texture/Main_Character_01_MetallicSmoothness.png',
@@ -9,7 +9,7 @@ local materials = {
         smoothnessMultiplier = 1,
         aoMultiplier = 1,
     },
-    {
+    Game.makeMaterial {
         shader = 'pbr',
         albedo = 'objects/tile/Blocks/FoundationBlock/Textures/AlbedoTransparency 1.png',
         metallicSmoothness = 'objects/tile/Blocks/FoundationBlock/Textures/MetallicSmoothness.png',
@@ -17,7 +17,7 @@ local materials = {
         smoothnessMultiplier = 1,
         aoMultiplier = 1,
     },
-    {
+    Game.makeMaterial {
         shader = 'pbr',
         albedo = 'objects/ExitFinish/Textures/AlbedoTransparency.png',
         metallicSmoothness = 'objects/ExitFinish/Textures/MetallicSmoothness.png',
@@ -25,7 +25,7 @@ local materials = {
         smoothnessMultiplier = 1,
         aoMultiplier = 1,
     },
-    {
+    Game.makeMaterial {
         shader = 'pbr',
         albedo = 'objects/tile/Blocks/TerrainBlockVar1/Texture/TerrainBlockV1_AlbedoTransparency.png',
         metallicSmoothness = 'objects/tile/Blocks/TerrainBlockVar1/Texture/TerrainBlockV1_MetallicSmoothness.png',
@@ -33,14 +33,14 @@ local materials = {
         smoothnessMultiplier = 1,
         aoMultiplier = 1,
     },
-    {
+    Game.makeMaterial {
         shader = 'pbr',
         albedo = 'objects/decorations/MenuFloor/Texture/UvMappedFlooring_initialShadingGroup_AlbedoTransparency.png',
         metallicSmoothness = 'objects/decorations/MenuFloor/Texture/UvMappedFlooring_initialShadingGroup_MetallicSmoothness.png',
         smoothnessMultiplier = 1,
         aoMultiplier = 1,
     },
-    {
+    Game.makeMaterial {
         shader = 'pbr',
         albedo = 'objects/tile/Blocks/TerrainBlockVar2/Texture/TerrainBlockV2_AlbedoTransparency.png',
         metallicSmoothness = 'objects/tile/Blocks/TerrainBlockVar2/Texture/TerrainBlockV2_MetallicSmoothness.png',
@@ -48,7 +48,7 @@ local materials = {
         smoothnessMultiplier = 1,
         aoMultiplier = 1,
     },
-    {
+    Game.makeMaterial {
         shader = 'pbr',
         renderMode = 'cutout',
         albedo = 'objects/decorations/Plants/Material/Plant_All (3).tga',
@@ -56,7 +56,7 @@ local materials = {
         smoothnessMultiplier = 0,
         aoMultiplier = 1,
     },
-    {
+    Game.makeMaterial {
         shader = 'pbr',
         albedo = 'objects/tile/Blocks/TerrainBlockVar3/Texture/TerrainBlockV3_AlbedoTransparency.png',
         metallicSmoothness = 'objects/tile/Blocks/TerrainBlockVar3/Texture/TerrainBlockV3_MetallicSmoothness.png',
@@ -64,7 +64,7 @@ local materials = {
         smoothnessMultiplier = 1,
         aoMultiplier = 1,
     },
-    {
+    Game.makeMaterial {
         shader = 'pbr',
         albedo = 'objects/tile/Blocks/TerrainBlockVar4/Texture/TerrainBlockV4_AlbedoTransparency.png',
         metallicSmoothness = 'objects/tile/Blocks/TerrainBlockVar4/Texture/TerrainBlockV4_MetallicSmoothness.png',
@@ -1450,7 +1450,7 @@ grid[8][10].goal = {
                 {
                     Name = "Point Light",
                     Transform = {
-                        position = {0, 2, 0},
+                        position = {0, 1, 1},
                     },
                     Light = {
                         kind = 'point',
@@ -4185,7 +4185,7 @@ return Level:new {
     map = map,
     extras = extras,
     nextLevelPath = 'assets/scripts/scenes/level2.lua',
-    ambientLighting = {color = {0.212, 0.227, 0.259, 1}},
+    ambientLighting = {color = {1.010478, 1.854524, 2.270603, 1}},
     maxNumUndos = {
         threeStars = 2,
         twoStars = 3,

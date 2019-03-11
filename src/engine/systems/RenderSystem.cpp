@@ -228,7 +228,7 @@ void RenderSystem::renderEntities() {
 
         checkRenderingError(m_engine->actor(e));
     }
-    std::cout << "Draw calls saved by batching: " << numBatched - m_batches.size() << '\n';
+    //std::cout << "Draw calls saved by batching: " << numBatched - m_batches.size() << '\n';
 }
 
 void updateUIRect(Engine& engine, EntityRegistry& registry, Entity e, const glm::vec2& parentSize, const glm::vec2& parentPivot, float scaleFactor) {

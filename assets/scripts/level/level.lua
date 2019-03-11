@@ -58,9 +58,17 @@ function Level:start()
 
 			if gridItem.goal then
 
-                local goal = gridItem.goal
-                goal.actor = Game.makeActor(goal.actor)
-				goal.transform = goal.actor:get("Transform")
+                local goal		= gridItem.goal
+                goal.actor		= Game.makeActor(goal.actor)
+				goal.transform	= goal.actor:get("Transform")
+
+				if goal.light then
+					goal.light					= Game.makeActor(goal.light)
+					goal.lightTransfrom			= goal.light:get("Transform")
+					goal.lightTransfrom.parent	= goal.actor
+				end
+
+
 			end
 
 			if gridItem.button then
@@ -80,12 +88,12 @@ function Level:start()
 				door.actor	   = Game.makeActor(door.actor)
 				door.transform = door.actor:get("Transform")
 
-				door.swingLeft = Game.makeActor(door.swingLeft)
-				door.swingLeftTransform = door.swingLeft:get("Transform")
-				door.swingLeftTransform.parent = door.actor
+				door.swingLeft					= Game.makeActor(door.swingLeft)
+				door.swingLeftTransform			= door.swingLeft:get("Transform")
+				door.swingLeftTransform.parent	= door.actor
 
-				door.swingRight = Game.makeActor(door.swingRight)
-				door.swingRightTransform = door.swingRight:get("Transform")
+				door.swingRight					= Game.makeActor(door.swingRight)
+				door.swingRightTransform		= door.swingRight:get("Transform")
 				door.swingRightTransform.parent = door.actor
 			end
 

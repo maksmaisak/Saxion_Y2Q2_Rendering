@@ -181,6 +181,9 @@ void Material::setBuiltinUniforms(
     if (valid(u.pvm))
         gl::setUniform(u.pvm, perspectiveMatrix * viewMatrix * modelMatrix);
 
+    if (valid(u.modelNormal))
+        gl::setUniform(u.modelNormal, glm::mat3(glm::transpose(glm::inverse(modelMatrix))));
+
     if (valid(u.time))
         gl::setUniform(u.time, GameTime::now().asSeconds());
 
@@ -288,11 +291,12 @@ Material::BuiltinUniformLocations Material::cacheBuiltinUniformLocations() {
 
     BuiltinUniformLocations u;
 
-    u.model      = m_shader->getUniformLocation("matrixModel");
-    u.view       = m_shader->getUniformLocation("matrixView");
-    u.projection = m_shader->getUniformLocation("matrixProjection");
-    u.pvm        = m_shader->getUniformLocation("matrixPVM");
-    u.time       = m_shader->getUniformLocation("time");
+    u.model       = m_shader->getUniformLocation("matrixModel");
+    u.view        = m_shader->getUniformLocation("matrixView");
+    u.projection  = m_shader->getUniformLocation("matrixProjection");
+    u.pvm         = m_shader->getUniformLocation("matrixPVM");
+    u.modelNormal = m_shader->getUniformLocation("matrixModelNormal");
+    u.time        = m_shader->getUniformLocation("time");
     u.viewPosition = m_shader->getUniformLocation("viewPosition");
     u.directionalDepthMaps = m_shader->getUniformLocation("directionalDepthMaps");
     u.depthCubemaps = m_shader->getUniformLocation("depthCubeMaps");

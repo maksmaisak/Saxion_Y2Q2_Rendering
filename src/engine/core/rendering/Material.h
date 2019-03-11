@@ -89,6 +89,7 @@ namespace en {
             GLint view        = -1;
             GLint projection  = -1;
             GLint pvm         = -1;
+            GLint modelNormal = -1;
 
             GLint time = -1;
 

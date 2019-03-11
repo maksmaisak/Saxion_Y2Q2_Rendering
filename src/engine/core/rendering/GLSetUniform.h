@@ -50,6 +50,11 @@ namespace gl {
     inline void setUniform<glm::mat4>(GLint location, const glm::mat4& value) {
         glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(value));
     }
+
+    template<>
+    inline void setUniform<glm::mat3>(GLint location, const glm::mat3& value) {
+        glUniformMatrix3fv(location, 1, GL_FALSE, glm::value_ptr(value));
+    }
 }
 
 #endif //SAXION_Y2Q2_RENDERING_GLSETUNIFORM_H

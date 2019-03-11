@@ -11,6 +11,7 @@ in vec3 bitangent;
 uniform	mat4 matrixProjection;
 uniform	mat4 matrixView;
 uniform	mat4 matrixModel;
+uniform mat3 matrixModelNormal;
 uniform mat4 directionalLightspaceMatrix[NUM_DIRECTIONAL_LIGHTS];
 uniform int numDirectionalLights = 0;
 
@@ -27,10 +28,9 @@ void main(void) {
     worldPosition = vec3(matrixModel * vec4(vertex, 1));
     gl_Position = matrixProjection * matrixView * vec4(worldPosition, 1);
 
-    mat3 normalModelToWorld = mat3(transpose(inverse(matrixModel)));
-    worldNormal    = normalize(normalModelToWorld * normal);
-    worldTangent   = normalize(normalModelToWorld * tangent);
-    worldBitangent = normalize(normalModelToWorld * bitangent);
+    worldNormal    = normalize(matrixModelNormal * normal);
+    worldTangent   = normalize(matrixModelNormal * tangent);
+    worldBitangent = normalize(matrixModelNormal * bitangent);
 
     texCoords = uv;
 

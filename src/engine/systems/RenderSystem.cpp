@@ -203,7 +203,7 @@ void RenderSystem::renderEntities() {
     }
 
     int numBatched = 0;
-    Material* prevMaterial = nullptr;
+    Material* previousMaterial = nullptr;
     for (Entity e : m_registry->with<Transform, RenderInfo>()) {
 
         auto& renderInfo = m_registry->get<RenderInfo>(e);
@@ -216,7 +216,7 @@ void RenderSystem::renderEntities() {
         }
 
         const glm::mat4& matrixModel = m_registry->get<Transform>(e).getWorldTransform();
-        if (renderInfo.material.get() != prevMaterial)
+        if (renderInfo.material.get() != previousMaterial)
             renderInfo.material->use(m_engine, &m_depthMaps, matrixModel, matrixView, matrixProjection);
         else
             renderInfo.material->updateModelMatrix(matrixModel);
@@ -224,7 +224,7 @@ void RenderSystem::renderEntities() {
         for (const Mesh& mesh : renderInfo.model->getMeshes())
             renderInfo.material->setAttributesAndDraw(&mesh);
 
-        prevMaterial = renderInfo.material.get();
+        previousMaterial = renderInfo.material.get();
 
         checkRenderingError(m_engine->actor(e));
     }

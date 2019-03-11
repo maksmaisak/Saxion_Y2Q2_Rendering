@@ -14,6 +14,12 @@ using namespace en;
 
 Mesh::~Mesh() {
 
+	deleteBuffers();
+	glDeleteVertexArrays(1, &m_vao);
+}
+
+void Mesh::deleteBuffers() {
+
 	glDeleteBuffers(1, &m_indexBufferId);
 
 	glDeleteBuffers(1, &m_vertexBufferId);
@@ -21,8 +27,6 @@ Mesh::~Mesh() {
 	glDeleteBuffers(1, &m_uvBufferId);
 	glDeleteBuffers(1, &m_tangentBufferId);
 	glDeleteBuffers(1, &m_bitangentBufferId);
-
-	glDeleteVertexArrays(1, &m_vao);
 }
 
 Mesh::Mesh(Mesh&& other) noexcept :
@@ -111,8 +115,10 @@ void Mesh::buffer() {
 	bufferVector(m_bitangentBufferId, m_bitangents);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-	glGenVertexArrays(1, &m_vao);
-	glCheckError();
+	if (m_vao == 0) {
+		glGenVertexArrays(1, &m_vao);
+		glCheckError();
+	}
 }
 
 void Mesh::render(GLint verticesAttrib, GLint normalsAttrib, GLint uvsAttrib, GLint tangentsAttrib, GLint bitangentsAttrib) const {
@@ -206,4 +212,36 @@ void Mesh::generateTangentsAndBitangents() {
 		m_tangents  [index] = glm::normalize(m_tangents  [index]);
 		m_bitangents[index] = glm::normalize(m_bitangents[index]);
 	}
+}
+
+void Mesh::add(const Mesh& mesh, const glm::mat4& transform) {
+
+	std::transform(mesh.m_indices.begin(), mesh.m_indices.end(), std::back_inserter(m_indices), [offset = static_cast<unsigned int>(m_vertices.size())](unsigned int i){
+		return offset + i;
+	});
+
+	auto transformPoint3D  = [&transform](const glm::vec3& position) {return transform * glm::vec4(position, 1.f);};
+	std::transform(mesh.m_vertices.begin(), mesh.m_vertices.end(), std::back_inserter(m_vertices), transformPoint3D);
+	std::copy(mesh.m_uvs.begin(), mesh.m_uvs.end(), std::back_inserter(m_uvs));
+
+	auto transformNormal = [matrix = glm::mat3(glm::transpose(glm::inverse(transform)))](const glm::vec3& normal) {
+		return matrix * normal;
+	};
+	std::transform(mesh.m_normals   .begin(), mesh.m_normals   .end(), std::back_inserter(m_normals   ), transformNormal);
+	std::transform(mesh.m_tangents  .begin(), mesh.m_tangents  .end(), std::back_inserter(m_tangents  ), transformNormal);
+	std::transform(mesh.m_bitangents.begin(), mesh.m_bitangents.end(), std::back_inserter(m_bitangents), transformNormal);
+
+	m_buffersNeedUpdating = true;
+}
+
+bool Mesh::updateBuffers() {
+
+	if (!m_buffersNeedUpdating)
+		return false;
+
+	deleteBuffers();
+	buffer();
+
+	m_buffersNeedUpdating = false;
+	return true;
 }

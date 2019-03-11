@@ -7,7 +7,6 @@
 #include "Model.h"
 #include "Texture.hpp"
 #include "Resources.h"
-#include "WobblingMaterial.h"
 #include "config.hpp"
 
 #include "components/Transform.h"
@@ -148,7 +147,15 @@ void TestScene::open() {
     floorMaterial->setUniformValue("specularMap", en::Textures::white());
     floorMaterial->setUniformValue("specularColor", glm::vec3(0.04));
 
-    auto wobblingMaterial = en::Resources<WobblingMaterial>::get(config::TEXTURE_PATH + "runicfloor.png");
+    auto wobblingMaterial = en::Resources<en::Material>::get("wobble");
+    wobblingMaterial->setUniformValue("timeScale", 10.f);
+    wobblingMaterial->setUniformValue("phaseOffsetPerUnitDistance", 6.f);
+    wobblingMaterial->setUniformValue("wobbleMultiplierMin", 0.8f);
+    wobblingMaterial->setUniformValue("wobbleMultiplierMax", 1.2f);
+    wobblingMaterial->setUniformValue("transitionWobbleFactorMin", 0.f);
+    wobblingMaterial->setUniformValue("transitionWobbleFactorMax", 1.f);
+    wobblingMaterial->setUniformValue("transitionColor", glm::vec4(0.01f, 0.5f, 1.f, 1.f));
+    wobblingMaterial->setUniformValue("diffuseTexture", en::Resources<Texture>::get(config::TEXTURE_PATH + "runicfloor.png"));
 
     //en::Models::get(config::MODEL_PATH + "sphere3.obj");
     //en::Models::removeUnused();

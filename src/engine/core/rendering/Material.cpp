@@ -11,6 +11,7 @@
 #include "Material.h"
 #include "Resources.h"
 #include "Mesh.hpp"
+#include "DepthMaps.h"
 #include "GLHelpers.h"
 #include "GLSetUniform.h"
 #include "TupleUtils.h"
@@ -153,6 +154,11 @@ void Material::render(
     const glm::mat4& projectionMatrix
 ) {
     use(engine, depthMaps, modelMatrix, viewMatrix, projectionMatrix);
+    setAttributesAndDraw(mesh);
+}
+
+void Material::setAttributesAndDraw(const Mesh* mesh) {
+
     mesh->render(
         m_attributeLocations.vertex,
         m_attributeLocations.normal,
@@ -173,13 +179,16 @@ void Material::setBuiltinUniforms(
 ) {
     const auto& u = m_builtinUniformLocations;
 
+    updateModelMatrix(modelMatrix);
     // glUniform functions do nothing if location is -1, so checks are only necessary for avoiding calculations.
-    gl::setUniform(u.model     , modelMatrix     );
     gl::setUniform(u.view      , viewMatrix      );
     gl::setUniform(u.projection, perspectiveMatrix);
 
     if (valid(u.pvm))
         gl::setUniform(u.pvm, perspectiveMatrix * viewMatrix * modelMatrix);
+
+    if (valid(u.modelNormal))
+        gl::setUniform(u.modelNormal, glm::mat3(glm::transpose(glm::inverse(modelMatrix))));
 
     if (valid(u.time))
         gl::setUniform(u.time, GameTime::now().asSeconds());
@@ -232,6 +241,15 @@ void Material::setBuiltinUniforms(
     gl::setUniform(u.numPointLights, numPointLights);
     gl::setUniform(u.numDirectionalLights, numDirectionalLights);
     gl::setUniform(u.numSpotLights, numSpotLights);
+}
+
+void Material::updateModelMatrix(const glm::mat4& modelMatrix) {
+
+    const auto& u = m_builtinUniformLocations;
+
+    gl::setUniform(u.model, modelMatrix);
+    if (valid(u.modelNormal))
+        gl::setUniform(u.modelNormal, glm::mat3(glm::transpose(glm::inverse(modelMatrix))));
 }
 
 template<typename T>
@@ -288,11 +306,12 @@ Material::BuiltinUniformLocations Material::cacheBuiltinUniformLocations() {
 
     BuiltinUniformLocations u;
 
-    u.model      = m_shader->getUniformLocation("matrixModel");
-    u.view       = m_shader->getUniformLocation("matrixView");
-    u.projection = m_shader->getUniformLocation("matrixProjection");
-    u.pvm        = m_shader->getUniformLocation("matrixPVM");
-    u.time       = m_shader->getUniformLocation("time");
+    u.model       = m_shader->getUniformLocation("matrixModel");
+    u.view        = m_shader->getUniformLocation("matrixView");
+    u.projection  = m_shader->getUniformLocation("matrixProjection");
+    u.pvm         = m_shader->getUniformLocation("matrixPVM");
+    u.modelNormal = m_shader->getUniformLocation("matrixModelNormal");
+    u.time        = m_shader->getUniformLocation("time");
     u.viewPosition = m_shader->getUniformLocation("viewPosition");
     u.directionalDepthMaps = m_shader->getUniformLocation("directionalDepthMaps");
     u.depthCubemaps = m_shader->getUniformLocation("depthCubeMaps");

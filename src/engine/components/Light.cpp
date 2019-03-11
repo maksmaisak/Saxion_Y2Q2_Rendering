@@ -46,6 +46,7 @@ void Light::addFromLua(Actor& actor, LuaState& lua) {
 void Light::initializeMetatable(LuaState& lua) {
 
     lua::addProperty(lua, "intensity"   , property(&Light::intensity   ));
+    lua::addProperty(lua, "range"       , property(&Light::range       ));
     lua::addProperty(lua, "color"       , property(&Light::color       ));
     lua::addProperty(lua, "ambientColor", property(&Light::colorAmbient));
 

@@ -17,6 +17,10 @@ namespace en {
     class SceneManager {
 
     public:
+
+        struct OnSceneClosed {SceneManager* sceneManager;};
+        struct OnSceneOpened {SceneManager* sceneManager;};
+
         explicit SceneManager(Engine* engine) : m_engine(engine) {assert(m_engine);}
 
         inline Scene* getCurrentScene() { return m_currentScene.get(); }

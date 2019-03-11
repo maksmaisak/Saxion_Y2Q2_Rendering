@@ -10,7 +10,6 @@
 #include <unordered_map>
 #include <tuple>
 #include "glm.hpp"
-#include "AbstractMaterial.hpp"
 #include "ShaderProgram.hpp"
 #include "Texture.hpp"
 #include "TupleUtils.h"
@@ -22,12 +21,13 @@
 namespace en {
 
     class LuaState;
+    class DepthMaps;
 
     /// A generic material that works with a given shader.
     /// Automatically sets `built-in` uniforms like transformation matrices, time and lighting data.
     /// Use material.setUniformValue to set material-specific values for uniforms other than the built-in ones.
     /// The material will set those when it's time to render.
-    class Material : public AbstractMaterial {
+    class Material final {
 
     public:
 
@@ -43,6 +43,15 @@ namespace en {
              const glm::mat4& viewMatrix,
              const glm::mat4& projectionMatrix
         );
+
+        void setAttributesAndDraw(const Mesh* mesh);
+
+        /// Sets the built-in uniforms related to the model matrix.
+        /// Useful if you're rendering multiple meshes with the same material and want to avoid unnecessary state changes.
+        /// Only call this if the material is in use.
+        void updateModelMatrix(const glm::mat4& modelMatrix);
+
+        /// A shortcut for `use` followed by `setAttributesAndDraw`
         void render(
             const Mesh* mesh,
             Engine* engine,
@@ -50,7 +59,7 @@ namespace en {
             const glm::mat4& modelMatrix,
             const glm::mat4& viewMatrix,
             const glm::mat4& projectionMatrix
-        ) override;
+        );
 
         template<typename T>
         void setUniformValue(const std::string& name, const T& value);
@@ -89,6 +98,7 @@ namespace en {
             GLint view        = -1;
             GLint projection  = -1;
             GLint pvm         = -1;
+            GLint modelNormal = -1;
 
             GLint time = -1;
 
@@ -164,7 +174,7 @@ namespace en {
         // Values of custom material-specific uniforms.
         // A tuple of maps float location to value.
         // Only types listed here will be supported as custom uniform values,
-        // i.e settable via material.setUniform
+        // i.e settable via material.setUniformValue
         UniformValues<
             GLint, GLuint, GLfloat,
             glm::vec2, glm::vec3, glm::vec4,

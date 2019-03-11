@@ -53,7 +53,7 @@ function PauseMenu:createPanel()
 			anchorMax = {1, 1.5}
 		},
 		Text = {
-			font = "fonts/kenyanCoffee.ttf",
+			font = "fonts/arcadianRunes.ttf",
 			fontSize = 120,
 			color = {0, 0, 1, 1},
 			string = "PAUSED"
@@ -67,7 +67,8 @@ function PauseMenu:createPanel()
 			parent = "PauseMenuPanel"
 		},
 		Text = {
-			font   = "fonts/kenyanCoffee.ttf",
+			font   = "fonts/arcadianRunes.ttf",
+			fontSize = 40,
 			color  = {0, 0, 0, 1},
 			string = "Resume"
         },
@@ -109,7 +110,8 @@ function PauseMenu:createPanel()
 			parent = "PauseMenuPanel"
 		},
 		Text = {
-			font   = "fonts/kenyanCoffee.ttf",
+			font   = "fonts/arcadianRunes.ttf",
+			fontSize = 40,
 			color  = {0, 0, 0, 1},
 			string = "Main Menu"
         },

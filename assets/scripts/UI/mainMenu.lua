@@ -76,8 +76,8 @@ function makeButton(name,parent,textString,anchorMin,anchorMax,textureFilePath)
 			parent = parent
 		},
 		Text = {
-			font   = "fonts/kenyanCoffee.ttf",
-			fontSize = 50,
+			font   = "fonts/arcadianRunes.ttf",
+			fontSize = 40,
 			color  = {1,1,1,1},
 			string = textString
         },
@@ -398,13 +398,24 @@ function scene:start()
 		UIRect = {
 			anchorMin = {0, 0},
 			anchorMax = {1, 1}
+		}
+	}
+
+	Game.makeActor {
+		Name = "CreditsText",
+		Transform = {
+			parent = "CreditsPanel",
+		},
+		UIRect = {
+			anchorMin = {0, 0.1},
+			anchorMax = {1, 1}
 		},
 		Text = {
-			font	= "fonts/kenyanCoffee.ttf",
-			fontSize = 50,
-			color	= {1, 1, 1, 1},
-			string	= "CREDITS"
-        },
+			font   = "fonts/arcadianRunes.ttf",
+			fontSize = 40,
+			color  = {1,1,1,1},
+			string = "Credits"
+		}
 	}
 
 	makeButton("BackButtonCredits","CreditsPanel","Back",{0.5,0.1},{0.5,0.1},"textures/buttonBackground.png")
@@ -435,7 +446,7 @@ function scene:start()
 	chooseLevelPanel:get("UIRect").isEnabled = false
 	arrowLeft:get("UIRect").isEnabled = false
 
-	keepAspectRatio(chooseLevelImage,500)
+	keepAspectRatio(chooseLevelImage,400)
 	keepAspectRatio(arrowLeft,300)
 	keepAspectRatio(arrowRight,300)
 

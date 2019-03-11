@@ -93,7 +93,8 @@ function ResultScreen:createResultPanel()
 			parent = "ResultPanel"
 		},
 		Text = {
-			font   = "fonts/kenyanCoffee.ttf",
+			font   = "fonts/arcadianRunes.ttf",
+			fontSize = 40,
 			color  = {0, 0, 0, 1},
 			string = "Main Menu"
         },
@@ -145,7 +146,8 @@ function ResultScreen:createResultPanel()
 				parent = "ResultPanel"
 			},
 			Text = {
-				font   = "fonts/kenyanCoffee.ttf",
+				font   = "fonts/arcadianRunes.ttf",
+				fontSize = 40,
 				color  = {0, 0, 0, 1},
 				string = "Next Level"
 			},

@@ -146,8 +146,6 @@ namespace en {
                 luaL_error(lua, "Actor %s already has a component of type %s", actor.getName().c_str(), utils::demangle<T>().c_str());
 
             lua_pushvalue(lua, componentDefinitionIndex);
-            auto popDefinition = PopperOnDestruct(lua);
-
             detail::LuaComponentFactoryFunctionOf<T>::get()(actor, lua);
             lua::push(lua, ComponentReference<T>(actor.getEngine().getRegistry(), actor));
         };

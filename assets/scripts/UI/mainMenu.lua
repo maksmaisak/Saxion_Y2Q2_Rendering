@@ -34,6 +34,19 @@ local function playSoundObject(filepath, offset, loop, volume)
     music:play()
 end
 
+local function setWidthBasedOnHeight(uiRect, aspect)
+
+	local width = uiRect.computedSize.y * aspect
+	local scaleFactorCompensator = 1 / Game.getUIScaleFactor()
+
+	local offsetMin = uiRect.offsetMin
+	local offsetMax = uiRect.offsetMax
+	offsetMin.x = -width * 0.5 * scaleFactorCompensator
+	offsetMax.x =  width * 0.5 * scaleFactorCompensator
+	uiRect.offsetMin = offsetMin
+	uiRect.offsetMax = offsetMax
+end
+
 local function keepAspectRatio(actor, theight)
 	
 	local sprite = actor:get("Sprite")
@@ -388,12 +401,15 @@ function scene:start()
 					local level = Game.levels[levelIndex]
 					if level then
 						local imagePath = canPlayLevel(levelIndex) and level.imagePathComplete or level.imagePathUncomplete
-						self.actor:add("Sprite", {
+						local sprite = self.actor:add("Sprite", {
 							material = {
 								shader	= "sprite",
 								texture = imagePath
 							}
 						})
+					
+						local size = sprite.textureSize
+						setWidthBasedOnHeight(self.actor:get("UIRect"), size.x / size.y)
 					end
 
 					local anchorValue = 0.4
@@ -435,6 +451,8 @@ function scene:start()
 		}
 	}
 
+	local text = "        Credits\n\nEngineers\n\nMaks Maisak\nCosmin Bararu\nGeorge Popa\n\nDesigners\n\nKateryna Malyk\nGustav Eckrodt\nEmre Hamazkaya\nLea Kemper\nYuchen Bao"
+
 	Game.makeActor {
 		Name = "CreditsText",
 		Transform = {
@@ -448,7 +466,7 @@ function scene:start()
 			font   = "fonts/arcadianRunes.ttf",
 			fontSize = 30,
 			color = {168/255,130/255,97/255,1},
-			string = "        Credits\n\nEngineers\n\nMaks Maisak\nCosmin Bararu\nGeorge Popa\n\nDesigners\n\nKaterya Malyk\nGustav Eckrodt\nEmre Hamazkaya\nLea Kemper\nYuchen Bao"
+			string = text
 		}
 	}
 
@@ -465,7 +483,7 @@ function scene:start()
 			font   = "fonts/arcadianRunes.ttf",
 			fontSize = 30,
 			color = {25/255,14/255,4/255,0.8},
-			string = "        Credits\n\nEngineers\n\nMaks Maisak\nCosmin Bararu\nGeorge Popa\n\nDesigners\n\nKaterya Malyk\nGustav Eckrodt\nEmre Hamazkaya\nLea Kemper\nYuchen Bao"
+			string = text
 		}
 	}
 
@@ -494,11 +512,7 @@ function scene:start()
 			update = function(self)
 				local textureSize = self.sprite.textureSize
 				local aspect = textureSize.x / textureSize.y
-
-				local width = self.uiRect.computedSize.y * aspect
-				local scaleFactorCompensator = 1 / Game.getUIScaleFactor()
-				self.uiRect.offsetMin = {-width * 0.5 * scaleFactorCompensator, 0}
-				self.uiRect.offsetMax = { width * 0.5 * scaleFactorCompensator, 0}
+				setWidthBasedOnHeight(self.uiRect, aspect)
 			end
 		}
 	}

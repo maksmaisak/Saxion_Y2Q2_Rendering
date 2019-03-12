@@ -8,12 +8,11 @@ function HudArrows:init()
 	self:createArrows()
 end
 
-function createArrow(rotation,offsetMin,offsetMax)
+function createArrow(offsetMin,offsetMax,texture)
 	return Game.makeActor {
 		Name = "Arrow",
 		Transform = {
 			parent = "ArrowsPanel",
-			rotation = rotation
 		},
 		UIRect = {
 			anchorMin = {0,0},
@@ -24,7 +23,7 @@ function createArrow(rotation,offsetMin,offsetMax)
 		Sprite = {
 			material = {
 				shader	= "sprite",
-				texture	= "textures/arrow.png",
+				texture	= texture,
 			}
 		}
 	}
@@ -55,9 +54,9 @@ function HudArrows:createArrows()
 		},
 	}
 
-	self.arrows["up"   ].actor  = createArrow({0,0,0}  ,{-40,0}  ,{40,80})
-	self.arrows["left" ].actor  = createArrow({0,0,90} ,{-80,-40},{0,40} )
-	self.arrows["down" ].actor  = createArrow({0,0,180},{-40,-80},{40,0} )
-	self.arrows["right"].actor  = createArrow({0,0,-90},{0,-40}  ,{80,40})
+	self.arrows["up"   ].actor  = createArrow({-40,0}  ,{40,80}, "textures/keyUp.png")
+	self.arrows["left" ].actor  = createArrow({-120,-40},{-40,40},  "textures/keyLeft.png")
+	self.arrows["down" ].actor  = createArrow({-40,-80},{40,0},  "textures/keyDown.png")
+	self.arrows["right"].actor  = createArrow({40,-40}  ,{120,40}, "textures/keyRight.png")
 
 end

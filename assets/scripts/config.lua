@@ -19,23 +19,3 @@ laser = 'assets/scripts/laser.lua'
 resultScreen = 'assets/scripts/UI/resultScreen.lua'
 saveFile = 'assets/scripts/save.lua'
 levelsDefinition = 'assets/scripts/levelsDefinition.lua'
-
--- old stuff
-bulletSpeed = 30
-levelRestartDelay = 2
-arenaSize = 60
-maxNumActiveBullets = 10
-players = {
-    {
-        color = {1, 0, 0},
-        ai = 'assets/scripts/playerA.lua'
-    },
-    {
-        color = {0, 0, 1},
-        ai = 'assets/scripts/playerA.lua'
-    }
-}
-ai = {
-    maxSteeringForce = 10000,
-    shootCooldown = 2
-}

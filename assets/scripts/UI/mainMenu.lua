@@ -49,6 +49,12 @@ local function keepAspectRatio(actor, theight)
 	actor:get("UIRect").offsetMax = { width / 2, height / 2}
 end
 
+local function canPlayLevel(levelIndex)
+
+	if levelIndex == 1 then return true end
+	return (Game.savedData[levelIndex - 1] or Game.savedData[levelIndex]) ~= nil
+end
+
 local function createStar(aMinX,aMinY,aMaxX,aMaxY)
 	return Game.makeActor{
 		Name = "Star",
@@ -295,131 +301,121 @@ function scene:start()
 				self.isFirstUpdate = true
 			end,
 			update = function(self, dt)
-				if(isChooseLevelOpened) then
-					local isLevelChanged = false
-					
-					if self.isFirstUpdate then
-						self.isFirstUpdate = false
+
+				if not isChooseLevelOpened then return end
+
+				local isLevelChanged = false
+
+				if self.isFirstUpdate then
+					self.isFirstUpdate = false
+					isLevelChanged = true
+				end
+
+				if levelIndex < Game.maxLevel then
+					if Game.keyboard.isDown("right") or (Game.mouse.isDown(1) and arrowRight:get("UIRect").isMouseOver) then
+						print("Is pressed right")
+
+						playSoundObject('audio/UIButtonSound.wav',0,false,60)
+
+						levelIndex = levelIndex + 1
+
+						textActor:get("Text").string = "Level : "..levelIndex
+						textActorBackground:get("Text").string = "Level : "..levelIndex
+
+						if levelIndex > Game.maxLevel then
+							levelIndex = Game.maxLevel
+						end
+
+						if levelIndex >= Game.maxLevel then
+							arrowRight:get("UIRect").isEnabled = false
+						end
+
+						if levelIndex >= 1 then
+							arrowLeft:get("UIRect").isEnabled = true
+						end
+
 						isLevelChanged = true
-					end
-
-					if levelIndex < Game.maxLevel then
-						if Game.keyboard.isDown("right") or (Game.mouse.isDown(1) and arrowRight:get("UIRect").isMouseOver) then
-							print("Is pressed right")
-
-							playSoundObject('audio/UIButtonSound.wav',0,false,60)
-
-							levelIndex = levelIndex + 1
-
-							textActor:get("Text").string = "Level : "..levelIndex
-							textActorBackground:get("Text").string = "Level : "..levelIndex
-						
-							if levelIndex > Game.maxLevel then
-								levelIndex = Game.maxLevel
-							end
-
-							if levelIndex >= Game.maxLevel then
-								arrowRight:get("UIRect").isEnabled = false
-							end
-
-							if levelIndex >= 1 then
-								arrowLeft:get("UIRect").isEnabled = true
-							end
-
-							isLevelChanged = true
-						end
-					end
-					
-					if levelIndex > 1 then
-						if Game.keyboard.isDown("left") or (Game.mouse.isDown(1) and arrowLeft:get("UIRect").isMouseOver) then
-							print("Is pressed left")
-
-							playSoundObject('audio/UIButtonSound.wav',0,false,60)
-
-							levelIndex = levelIndex - 1
-
-							textActor:get("Text").string = "Level : "..levelIndex
-							textActorBackground:get("Text").string = "Level : "..levelIndex
-
-							if levelIndex < 1 then
-								levelIndex = 1
-							end
-
-							if levelIndex <= 1 then
-								arrowLeft:get("UIRect").isEnabled = false
-							end
-
-
-							if levelIndex < Game.maxLevel then
-								arrowRight:get("UIRect").isEnabled = true
-							end
-
-							isLevelChanged = true
-						end
-					end
-
-					if isLevelChanged then
-						isLevelChanged = false
-
-						-- destroy all the stars from previous level before creating
-						-- the new ones
-						for k,v in ipairs(stars) do
-							if v ~= nil then
-								v:remove("Sprite")
-								v = nil
-							end
-						end
-
-						local totalNumberOfStars = 0
-						local savedLevel = Game.savedData[levelIndex]
-
-						if savedLevel ~= nil then
-							totalNumberOfStars = savedLevel.stars
-
-						self.actor:remove("Sprite")
-						self.actor:add("Sprite", {
-							material = {
-								shader	= "sprite",
-								texture = Game.levels[levelIndex].imagePathComplete
-							}				
-						})
-						end
-
-						local anchorValue = 0.4
-						local anchorStep  = 0.1
-
-						if savedLevel == nil then
-							self.actor:remove("Sprite")
-							self.actor:add("Sprite", {
-							material = {
-								shader	= "sprite",
-								texture = Game.levels[levelIndex].imagePathUncomplete
-							}				
-							})
-						end
-
-						for i = 1, totalNumberOfStars do
-							print("Created star")
-							self.starActor = createStar(anchorValue,0.3,anchorValue,0.3)
-							stars[#stars + 1] = self.starActor
-							keepAspectRatio(self.starActor,100)
-							anchorValue = anchorValue + anchorStep
-						end
 					end
 				end
 
+				if levelIndex > 1 then
+					if Game.keyboard.isDown("left") or (Game.mouse.isDown(1) and arrowLeft:get("UIRect").isMouseOver) then
+						print("Is pressed left")
 
-				if Game.keyboard.isDown("enter") or (Game.mouse.isDown(1) and chooseLevelImage:get("UIRect").isMouseOver) then
-					local level = Game.savedData[levelIndex]
-					
-					if level == nil then
-						return
+						playSoundObject('audio/UIButtonSound.wav',0,false,60)
+
+						levelIndex = levelIndex - 1
+
+						textActor:get("Text").string = "Level : "..levelIndex
+						textActorBackground:get("Text").string = "Level : "..levelIndex
+
+						if levelIndex < 1 then
+							levelIndex = 1
+						end
+
+						if levelIndex <= 1 then
+							arrowLeft:get("UIRect").isEnabled = false
+						end
+
+						if levelIndex < Game.maxLevel then
+							arrowRight:get("UIRect").isEnabled = true
+						end
+
+						isLevelChanged = true
+					end
+				end
+
+				if isLevelChanged then
+
+					isLevelChanged = false
+
+					-- destroy all the stars from previous level before creating
+					-- the new ones
+					for k, v in ipairs(stars) do
+						if v ~= nil then
+							v:remove("Sprite")
+							v = nil
+						end
 					end
 
-					playSoundObject('audio/UIButtonSound.wav',0,false,60)
-					Game.loadScene(Game.levels[levelIndex].path)
-					print("Loaded scene : " ..levelIndex)
-					Game.currentLevel = levelIndex
+					local totalNumberOfStars = 0
+					local savedLevelData = Game.savedData[levelIndex]
+					if savedLevelData then
+						totalNumberOfStars = savedLevelData.stars
+					end
+
+					self.actor:remove("Sprite")
+					local level = Game.levels[levelIndex]
+					if level then
+						local imagePath = canPlayLevel(levelIndex) and level.imagePathComplete or level.imagePathUncomplete
+						self.actor:add("Sprite", {
+							material = {
+								shader	= "sprite",
+								texture = imagePath
+							}
+						})
+					end
+
+					local anchorValue = 0.4
+					local anchorStep  = 0.1
+
+					for i = 1, totalNumberOfStars do
+						print("Created star")
+						self.starActor = createStar(anchorValue, 0.3, anchorValue, 0.3)
+						stars[#stars + 1] = self.starActor
+						keepAspectRatio(self.starActor, 100)
+						anchorValue = anchorValue + anchorStep
+					end
+				end
+
+				if Game.keyboard.isDown("enter") or (Game.mouse.isDown(1) and chooseLevelImage:get("UIRect").isMouseOver) then
+
+					if canPlayLevel(levelIndex) then
+						playSoundObject('audio/UIButtonSound.wav',0,false,60)
+						Game.loadScene(Game.levels[levelIndex].path)
+						print("Loaded scene : " ..levelIndex)
+						Game.currentLevel = levelIndex
+					end
 				end
 			end
 		}

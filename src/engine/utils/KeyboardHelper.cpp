@@ -130,7 +130,7 @@ namespace {
     } nameToKey;
 
     auto wasHeldLastUpdate = std::vector<bool>(sf::Keyboard::KeyCount, false);
-    auto isHeldNow = std::vector<bool>(sf::Keyboard::KeyCount, false);
+    auto isHeldNow         = std::vector<bool>(sf::Keyboard::KeyCount, false);
 
     sf::Keyboard::Key getKeyCode(const std::string& keyName) {
 
@@ -143,36 +143,50 @@ namespace {
 
         return it->second;
     }
+
+    bool isValid(sf::Keyboard::Key keyCode) {
+        return keyCode > -1 && keyCode < names.size();
+    }
 }
 
 bool KeyboardHelper::isHeld(const std::string& keyName) {
 
     const sf::Keyboard::Key keyCode = getKeyCode(keyName);
-    return isHeldNow[keyCode];
+    return isValid(keyCode) ? isHeldNow[keyCode] : false;
 }
 
 bool KeyboardHelper::isDown(const std::string& keyName) {
 
     const sf::Keyboard::Key keyCode = getKeyCode(keyName);
+    if (!isValid(keyCode))
+        return false;
+
     return !wasHeldLastUpdate[keyCode] && isHeldNow[keyCode];
 }
 
 bool KeyboardHelper::isUp(const std::string& keyName) {
 
     const sf::Keyboard::Key keyCode = getKeyCode(keyName);
+    if (!isValid(keyCode))
+        return false;
+
     return wasHeldLastUpdate[keyCode] && !isHeldNow[keyCode];
 }
 
 void KeyboardHelper::update() {
-
-    for (int i = 0; i < sf::Keyboard::Key::KeyCount; ++i)
-        wasHeldLastUpdate[i] = isHeldNow[i];
+    std::copy(isHeldNow.begin(), isHeldNow.end(), wasHeldLastUpdate.begin());
 }
 
 void KeyboardHelper::receive(const sf::Event& info) {
 
-    if (info.type == sf::Event::EventType::KeyPressed)
-        isHeldNow[info.key.code] = true;
-    else if (info.type == sf::Event::EventType::KeyReleased)
-        isHeldNow[info.key.code] = false;
+    if (info.type == sf::Event::EventType::KeyPressed) {
+
+        if (isValid(info.key.code))
+            isHeldNow[info.key.code] = true;
+
+    } else if (info.type == sf::Event::EventType::KeyReleased) {
+
+        if (isValid(info.key.code))
+            isHeldNow[info.key.code] = false;
+    }
 }

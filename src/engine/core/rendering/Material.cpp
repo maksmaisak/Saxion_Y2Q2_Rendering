@@ -168,7 +168,19 @@ void Material::setAttributesAndDraw(const Mesh* mesh) {
     );
 }
 
-inline bool valid(GLint location) {return location != -1;}
+namespace {
+
+    inline bool valid(GLint location) { return location != -1; }
+
+    glm::vec3 getAmbientColor(Engine& engine) {
+
+        Scene* scene = engine.getSceneManager().getCurrentScene();
+        if (!scene)
+            return glm::vec3(0.f);
+
+        return scene->getRenderSettings().ambientColor;
+    }
+}
 
 void Material::setBuiltinUniforms(
     Engine* engine,
@@ -195,6 +207,9 @@ void Material::setBuiltinUniforms(
 
     if (valid(u.viewPosition))
         gl::setUniform(u.viewPosition, glm::vec3(glm::inverse(viewMatrix)[3]));
+
+    if (valid(u.ambientColor))
+        gl::setUniform(u.ambientColor, getAmbientColor(*engine));
 
     if (depthMaps && valid(u.directionalDepthMaps))
         setUniformTexture(u.directionalDepthMaps, depthMaps->getDirectionalMapsTextureId(), GL_TEXTURE_2D_ARRAY);
@@ -315,6 +330,7 @@ Material::BuiltinUniformLocations Material::cacheBuiltinUniformLocations() {
     u.viewPosition = m_shader->getUniformLocation("viewPosition");
     u.directionalDepthMaps = m_shader->getUniformLocation("directionalDepthMaps");
     u.depthCubemaps = m_shader->getUniformLocation("depthCubeMaps");
+    u.ambientColor  = m_shader->getUniformLocation("ambientColor");
 
     // Point lights
     u.numPointLights = m_shader->getUniformLocation("numPointLights");

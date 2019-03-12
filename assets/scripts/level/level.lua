@@ -63,12 +63,15 @@ function Level:start()
 				goal.transform	= goal.actor:get("Transform")
 
 				if goal.light then
-					goal.light					= Game.makeActor(goal.light)
-					goal.lightTransfrom			= goal.light:get("Transform")
-					goal.lightTransfrom.parent	= goal.actor
+					local light				= goal.light
+					light.actor				= Game.makeActor(goal.light)
+					light.transform			= light.actor:get("Transform")
+					light.transform.parent	= goal.actor
+					light.initialIntensity  = light.Light.intensity
+					if not goal.startActive then
+						light.actor:get("Light").intensity = 0
+					end
 				end
-
-
 			end
 
 			if gridItem.button then

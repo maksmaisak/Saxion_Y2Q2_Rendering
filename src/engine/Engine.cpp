@@ -275,6 +275,18 @@ void Engine::initializeLua() {
 
         lua.setField("makeMaterial", &makeMaterial);
 
+        // Game.window
+        lua_pushvalue(lua, -1);
+        lua_newtable(lua);
+        {
+            lua.setField("getSize", [&window = m_window]() -> glm::vec2 {
+                auto size = window.getSize();
+                return {size.x, size.y};
+            });
+        }
+        lua_setfield(lua, -2, "window");
+
+        // Game.audio
         lua_pushvalue(lua, -1);
         lua_newtable(lua);
         {

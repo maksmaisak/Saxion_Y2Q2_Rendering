@@ -74,11 +74,19 @@ void RenderSystem::start() {
     m_debugHud = std::make_unique<DebugHud>(&m_engine->getWindow());
 
     auto& lua = m_engine->getLuaState();
-    lua_getglobal(lua, "Config");
-    auto popConfig = lua::PopperOnDestruct(lua);
+    {
+        lua_getglobal(lua, "Config");
+        auto popConfig = lua::PopperOnDestruct(lua);
 
-    m_referenceResolution  = lua.tryGetField<glm::vec2>("referenceResolution").value_or(glm::vec2(1920, 1080));
-    m_enableStaticBatching = lua.tryGetField<bool>("enableStaticBatching").value_or(true);
+        m_referenceResolution  = lua.tryGetField<glm::vec2>("referenceResolution").value_or(glm::vec2(1920, 1080));
+        m_enableStaticBatching = lua.tryGetField<bool>("enableStaticBatching").value_or(true);
+    }
+
+    {
+        lua_getglobal(lua, "Game");
+        auto popGame = lua::PopperOnDestruct(lua);
+        lua.setField("getUIScaleFactor", [this](){return getUIScaleFactor();});
+    }
 }
 
 namespace {

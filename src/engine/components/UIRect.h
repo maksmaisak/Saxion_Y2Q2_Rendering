@@ -27,7 +27,7 @@ namespace en {
         // In normalized coordinates [0..1]
         glm::vec2 pivot = {0.5f, 0.5f};
 
-        bool isEnabled = true;
+        bool isEnabled  = true;
         bool wasEnabled = false;
 
         glm::vec2 computedSize;

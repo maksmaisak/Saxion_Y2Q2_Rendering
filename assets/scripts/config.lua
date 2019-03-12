@@ -10,7 +10,7 @@ startScene = 'assets/scripts/UI/mainMenu.lua'
 --startScene = 'assets/scripts/scenes/level1.lua'
 --startScene = 'assets/scripts/scenes/test/luaScene.lua'
 --startScene = 'assets/scripts/scenes/test/testTweening.lua'
-referenceResolution = {1920, 1080 }
+referenceResolution = {1920, 1080}
 
 -- custom
 player = 'assets/scripts/player.lua'

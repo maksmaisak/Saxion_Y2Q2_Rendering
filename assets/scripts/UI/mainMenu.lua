@@ -407,14 +407,14 @@ function scene:start()
 			parent = "CreditsPanel",
 		},
 		UIRect = {
-			anchorMin = {0, 0.1},
+			anchorMin = {0.01, 0.05},
 			anchorMax = {1, 1}
 		},
 		Text = {
 			font   = "fonts/arcadianRunes.ttf",
-			fontSize = 40,
+			fontSize = 30,
 			color  = {1,1,1,1},
-			string = "Credits\n\nEngineers\n\nMaks Maisak\nCosmin Bararu\nGeorge Antonio Popa\n\nDesigners\n\nKaterya Malyk\nGustav Eckrodt\nEmre Hamazkaya\nLea Kemper\nYucen Bao"
+			string = "        Credits\n\nEngineers\n\nMaks Maisak\nCosmin Bararu\nGeorge Popa\n\nDesigners\n\nKaterya Malyk\nGustav Eckrodt\nEmre Hamazkaya\nLea Kemper\nYucen Bao"
 		}
 	}
 

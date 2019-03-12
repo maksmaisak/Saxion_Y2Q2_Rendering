@@ -166,10 +166,10 @@ function scene:start()
 		}
 	}
 
-	makeButton("StartButton","MainMenuPanel","Start",{0.5,0.8},{0.5,0.8},"textures/buttonBackground.png")
-	makeButton("ChooseLevelButton","MainMenuPanel","Choose Level",{0.5,0.7},{0.5,0.7},"textures/buttonBackground.png")
-	makeButton("CreditsButton","MainMenuPanel","Credits",{0.5,0.6},{0.5,0.6},"textures/buttonBackground.png")
-	makeButton("ExitButton","MainMenuPanel","Exit",{0.5,0.5},{0.5,0.5},"textures/buttonBackground.png")
+	makeButton("StartButton","MainMenuPanel","Start",{0.5,0.7},{0.5,0.7},"textures/buttonBackground.png")
+	makeButton("ChooseLevelButton","MainMenuPanel","Choose Level",{0.5,0.6},{0.5,0.6},"textures/buttonBackground.png")
+	makeButton("CreditsButton","MainMenuPanel","Credits",{0.5,0.5},{0.5,0.5},"textures/buttonBackground.png")
+	makeButton("ExitButton","MainMenuPanel","Exit",{0.5,0.4},{0.5,0.4},"textures/buttonBackground.png")
 --End Main Buttons Panel
 
 --Start ChooseLevel Panel
@@ -414,7 +414,7 @@ function scene:start()
 			font   = "fonts/arcadianRunes.ttf",
 			fontSize = 40,
 			color  = {1,1,1,1},
-			string = "Credits"
+			string = "Credits\n\nEngineers\n\nMaks Maisak\nCosmin Bararu\nGeorge Antonio Popa\n\nDesigners\n\nKaterya Malyk\nGustav Eckrodt\nEmre Hamazkaya\nLea Kemper\nYucen Bao"
 		}
 	}
 
@@ -422,7 +422,7 @@ function scene:start()
 
 --End Credits Panel
 
-	Game.makeActor {
+	menuBackground = Game.makeActor {
 		Name = "MainPanelImage",
 		Transform = {},
 		UIRect = {
@@ -432,7 +432,7 @@ function scene:start()
 		Sprite = {
 			material = {
 				shader	= "sprite",
-				texture	= "textures/menuBackgrond.jpg"
+				texture	= "textures/menuBackground.jpg"
 			}
 		}
 	}

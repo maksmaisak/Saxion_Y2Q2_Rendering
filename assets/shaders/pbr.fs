@@ -132,8 +132,8 @@ void main() {
         color += CalculateSpotLightContribution(i, normal, viewDirection, albedo.rgb, metallic, roughness, ao);
     }
 
-    //color /= color + vec3(1);
-    //color = vec3(1.0) - exp(-color);
+    //float exposure = 2.2f;
+    //color = vec3(1.0) - exp(-color * exposure);
 
 #ifdef RENDER_MODE_FADE
     fragmentColor = vec4(color, albedo.a);

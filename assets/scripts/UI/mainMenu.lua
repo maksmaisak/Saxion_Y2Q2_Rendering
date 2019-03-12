@@ -380,7 +380,7 @@ function scene:start()
 						self.actor:add("Sprite", {
 							material = {
 								shader	= "sprite",
-								texture = "textures/levelCompleted/level"..levelIndex.."Complete.png"
+								texture = Game.levels[levelIndex].imagePathComplete
 							}				
 						})
 						end
@@ -393,7 +393,7 @@ function scene:start()
 							self.actor:add("Sprite", {
 							material = {
 								shader	= "sprite",
-								texture = "textures/levelUncompleted/level"..levelIndex.."Uncomplete.png"
+								texture = Game.levels[levelIndex].imagePathUncomplete
 							}				
 							})
 						end

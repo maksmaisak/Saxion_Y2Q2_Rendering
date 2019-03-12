@@ -378,7 +378,7 @@ function Player:moveToPosition(nextPosition, canRegisterMove, didUsePortal, play
 				self:moveToPosition(lastPosition, false, true, true, currentRotation)
 			end,
 			function()
-				self:moveToPosition(gridPosition, false, true)
+				self:moveToPosition(gridPosition, false)
 			end
 		)
 	end

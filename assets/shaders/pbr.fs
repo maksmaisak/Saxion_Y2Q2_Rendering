@@ -90,6 +90,7 @@ vec3 GetNormal();
 vec3 CookTorranceBRDF(vec3 N, vec3 V, vec3 L, float NdotL, vec3 albedo, float metallic, float roughness);
 float CalculateDirectionalShadowMultiplier(int i, float biasMultiplier);
 float CalculatePointShadowMultiplier(int i, vec3 fromLight, float distance, float biasMultiplier);
+vec3 CalculateAmbientLighting(float NdotV, vec3 albedo, float metallic, float roughness, float ao);
 
 float Pow5(float t) {
     float t2 = t * t;
@@ -117,13 +118,7 @@ void main() {
 
     float NdotV = max(dot(normal, viewDirection), 0.0);
 
-    vec3 kS = FresnelSchlick(NdotV, mix(vec3(0.04f), albedo.xyz, metallic));
-    vec3 kD = 1.0 - kS;
-    kD *= 1.0 - metallic;
-    vec3 irradiance = ambientColor * 0.5f / PI;
-    vec3 diffuse = irradiance * albedo.xyz;
-    vec3 ambient = (kD * diffuse) * ao;
-    vec3 color = ambient;
+    vec3 color = CalculateAmbientLighting(NdotV, albedo.rgb, metallic, roughness, ao);
     
     for (int i = 0; i < numDirectionalLights; ++i) {
         color += CalculateDirectionalLightContribution(i, normal, viewDirection, albedo.rgb, metallic, roughness, ao);
@@ -155,6 +150,17 @@ vec3 GetNormal() {
     vec3 T = normalize(worldTangent);
     vec3 B = normalize(worldBitangent);
     return normalize(mat3(T,B,N) * tangentspaceNormal);
+}
+
+vec3 CalculateAmbientLighting(float NdotV, vec3 albedo, float metallic, float roughness, float ao) {
+
+    vec3 kS = FresnelSchlick(NdotV, mix(vec3(0.04f), albedo.xyz, metallic));
+    vec3 kD = 1.0 - kS;
+    kD *= 1.0 - metallic;
+    vec3 irradiance = ambientColor;
+    vec3 diffuse = irradiance * albedo.xyz / PI;
+
+    return (kD * diffuse) * ao;
 }
 
 vec3 CalculateDirectionalLightContribution(int i, vec3 N, vec3 V, vec3 albedo, float metallic, float roughness, float ao) {

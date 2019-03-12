@@ -132,6 +132,10 @@ function ResultScreen:createResultPanel()
 
 	self:keepAspectRatio(mainMenuButton,64)
 
+	if Game.currentLevel == nil then
+		Game.currentLevel = 0
+	end
+
 	if Game.currentLevel >= Game.maxLevel then
 		local mainMenuButtonUIRect = mainMenuButton:get("UIRect")
 		mainMenuButtonUIRect.anchorMin = {0.5,0.45}

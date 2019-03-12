@@ -9,7 +9,6 @@ return {
 	{ path = 'assets/scripts/scenes/level8.lua' },
 	{ path = 'assets/scripts/scenes/level9.lua' },
 	{ path = 'assets/scripts/scenes/level10.lua' },
-	{ path = 'assets/scripts/scenes/level10.lua' },
 	{ path = 'assets/scripts/scenes/level11.lua' },
 	{ path = 'assets/scripts/scenes/level12.lua' },
 	{ path = 'assets/scripts/scenes/level13.lua' },

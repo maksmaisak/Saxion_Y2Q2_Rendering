@@ -4,4 +4,4 @@ level: level3, stars: 3
 level: level4, stars: 1
 level: level5, stars: 3
 level: level6, stars: 3
-level: level7, stars: 2
+level: level7, stars: 3

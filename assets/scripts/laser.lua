@@ -45,12 +45,14 @@ function Laser:hitDroppedKeys()
 	print("hitting dropped keys")
 
 	local position = {x = self.gridPosition.x, y = self.gridPosition.y}
-	for i = 1, 20 do
+	for i = 0, 20 do
 
 		local gridItem = self.map:getGridAt(position)
-		if doesBlock(gridItem) then
-			self:setBeamLength(i)
-			return
+		if i > 0 then
+			if doesBlock(gridItem) then
+				self:setBeamLength(i)
+				return
+			end
 		end
 
 		for k, v in pairs(self.map:getDroppedKeysGridAt(position).hasKeyDropped) do
@@ -78,9 +80,11 @@ function Laser:updateBeamLength()
 	for i = 0, math.max(self.map.gridSize.x, self.map.gridSize.y) do
 
 		local gridItem = self.map:getGridAt(position)
-		if doesBlock(gridItem) then
-			self:setBeamLength(i)
-			return
+		if i > 0 then
+			if doesBlock(gridItem) then
+				self:setBeamLength(i)
+				return
+			end
 		end
 
 		position.x = position.x + self.direction.x

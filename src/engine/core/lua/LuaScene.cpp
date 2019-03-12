@@ -46,6 +46,13 @@ void LuaScene::open() {
         return;
     auto popTable = PopperOnDestruct(lua);
 
+    {
+        lua_getfield(lua, -1, "ambientLighting");
+        auto popAmbientLighting = PopperOnDestruct(lua);
+        if (!lua_isnil(lua, -1))
+            m_renderSettings.ambientColor = lua.tryGetField<glm::vec3>("color").value_or(glm::vec3(0.f));
+    }
+
     lua_getfield(lua, -1, "update");
     if (lua_isfunction(lua, -1))
         m_update = LuaReference(lua);

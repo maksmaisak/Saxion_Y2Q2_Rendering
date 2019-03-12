@@ -2,6 +2,8 @@ require('assets/scripts/object')
 
 HudArrows = Object:new()
 
+local offset = 40
+
 function HudArrows:init()
 	self.arrows = { up = {}, left = {}, down = { }, right = {}}
 	print("Arrow size"..#self.arrows)
@@ -47,16 +49,16 @@ function HudArrows:createArrows()
 		Name = "ArrowsPanel",
 		Transform = {},
 		UIRect = {
-			anchorMin = {0.1, 0.9},
-			anchorMax = {0.1, 0.9},
+			anchorMin = {0.9, 0.1},
+			anchorMax = {0.9, 0.1},
 			offsetMin = {0.0, -40},
 			offsetMax = {0.0, -40}
 		},
 	}
 
-	self.arrows["up"   ].actor  = createArrow({-40,0}  ,{40,80}, "textures/keyUp.png")
-	self.arrows["left" ].actor  = createArrow({-120,-40},{-40,40},  "textures/keyLeft.png")
-	self.arrows["down" ].actor  = createArrow({-40,-80},{40,0},  "textures/keyDown.png")
-	self.arrows["right"].actor  = createArrow({40,-40}  ,{120,40}, "textures/keyRight.png")
+	self.arrows["up"   ].actor  = createArrow({offset-40,offset+40},{offset+40,offset+120}  ,"textures/keyUp.png")
+	self.arrows["left" ].actor  = createArrow({offset-120,offset-40} ,{offset-40,offset+40} ,"textures/keyLeft.png")
+	self.arrows["down" ].actor  = createArrow({offset-40,offset-40}  ,{offset+40,offset+40} ,"textures/keyDown.png")
+	self.arrows["right"].actor  = createArrow({offset+40,offset-40}  ,{offset+120,offset+40},"textures/keyRight.png")
 
 end

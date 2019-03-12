@@ -74,9 +74,9 @@ local function createStar(aMinX,aMinY,aMaxX,aMaxY)
 	}
 end
 
-function makeButton(name,parent,textString,anchorMin,anchorMax,textureFilePath)
+local function makeButton(name,parent,textString,anchorMin,anchorMax,textureFilePath)
 	
-	buttonActor = Game.makeActor {
+	local buttonActor = Game.makeActor {
 		Name = name,
 		Transform = {
 			parent = parent
@@ -147,7 +147,7 @@ function makeButton(name,parent,textString,anchorMin,anchorMax,textureFilePath)
 		}
 	}
 
-	keepAspectRatio(buttonActor,55)
+	keepAspectRatio(buttonActor, 55)
 end
 
 function scene:start()
@@ -167,8 +167,8 @@ function scene:start()
 		Name = "MainMenuPanel",
 		Transform = {},
 		UIRect = {
-			anchorMin	= {0, 0},
-			anchorMax	= {1, 1}
+			anchorMin = {0, 0},
+			anchorMax = {1, 1}
 		}
 	}
 
@@ -448,7 +448,7 @@ function scene:start()
 			font   = "fonts/arcadianRunes.ttf",
 			fontSize = 30,
 			color = {168/255,130/255,97/255,1},
-			string = "        Credits\n\nEngineers\n\nMaks Maisak\nCosmin Bararu\nGeorge Popa\n\nDesigners\n\nKaterya Malyk\nGustav Eckrodt\nEmre Hamazkaya\nLea Kemper\nYucen Bao"
+			string = "        Credits\n\nEngineers\n\nMaks Maisak\nCosmin Bararu\nGeorge Popa\n\nDesigners\n\nKaterya Malyk\nGustav Eckrodt\nEmre Hamazkaya\nLea Kemper\nYuchen Bao"
 		}
 	}
 
@@ -465,7 +465,7 @@ function scene:start()
 			font   = "fonts/arcadianRunes.ttf",
 			fontSize = 30,
 			color = {25/255,14/255,4/255,0.8},
-			string = "        Credits\n\nEngineers\n\nMaks Maisak\nCosmin Bararu\nGeorge Popa\n\nDesigners\n\nKaterya Malyk\nGustav Eckrodt\nEmre Hamazkaya\nLea Kemper\nYucen Bao"
+			string = "        Credits\n\nEngineers\n\nMaks Maisak\nCosmin Bararu\nGeorge Popa\n\nDesigners\n\nKaterya Malyk\nGustav Eckrodt\nEmre Hamazkaya\nLea Kemper\nYuchen Bao"
 		}
 	}
 
@@ -473,35 +473,48 @@ function scene:start()
 
 --End Credits Panel
 
-	menuBackground = Game.makeActor {
+	local menuBackground = Game.makeActor {
 		Name = "MainPanelImage",
 		Transform = {},
 		UIRect = {
-			anchorMin = {0,0},
-			anchorMax = {1,1}
+			anchorMin = {0.5,0},
+			anchorMax = {0.5,1}
 		},
 		Sprite = {
 			material = {
 				shader	= "sprite",
 				texture	= "textures/menuBackground.jpg"
 			}
+		},
+		LuaBehavior = {
+			start = function(self)
+				self.sprite = self.actor:get("Sprite")
+				self.uiRect = self.actor:get("UIRect")
+			end,
+			update = function(self)
+				local textureSize = self.sprite.textureSize
+				local aspect = textureSize.x / textureSize.y
+
+				local width = self.uiRect.computedSize.y * aspect
+				local scaleFactorCompensator = 1 / Game.getUIScaleFactor()
+				self.uiRect.offsetMin = {-width * 0.5 * scaleFactorCompensator, 0}
+				self.uiRect.offsetMax = { width * 0.5 * scaleFactorCompensator, 0}
+			end
 		}
 	}
 
 	mainMenuPanel = Game.find("MainMenuPanel")
 	chooseLevelPanel = Game.find("ChooseLevelPanel")
-	chooseLevelImage = Game.find("ChooseLevelImage")
-	creditsPanel	 = Game.find("CreditsPanel")
+	local chooseLevelImage = Game.find("ChooseLevelImage")
+	creditsPanel = Game.find("CreditsPanel")
 
-
-	creditsPanel:get("UIRect").isEnabled	 = false
+	creditsPanel:get("UIRect").isEnabled = false
 	chooseLevelPanel:get("UIRect").isEnabled = false
 	arrowLeft:get("UIRect").isEnabled = false
 
-	keepAspectRatio(chooseLevelImage,400)
-	keepAspectRatio(arrowLeft,300)
-	keepAspectRatio(arrowRight,300)
-
+	keepAspectRatio(chooseLevelImage, 400)
+	keepAspectRatio(arrowLeft , 300)
+	keepAspectRatio(arrowRight, 300)
 end
 
 return scene

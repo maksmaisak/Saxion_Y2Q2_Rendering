@@ -15,6 +15,7 @@ void UIRect::initializeMetatable(LuaState& lua) {
     lua::addProperty(lua, "isEnabled", lua::property(&UIRect::isEnabled));
     lua::addProperty(lua, "pivot"    , lua::property(&UIRect::pivot    ));
 
+    lua::addProperty(lua, "computedSize", lua::readonlyProperty(&UIRect::computedSize));
     lua::addProperty(lua, "isMouseOver" , lua::readonlyProperty(&UIRect::isMouseOver ));
     lua::addProperty(lua, "wasMouseOver", lua::readonlyProperty(&UIRect::wasMouseOver));
 }

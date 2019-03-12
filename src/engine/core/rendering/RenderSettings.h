@@ -9,7 +9,7 @@
 
 struct RenderSettings {
 
-    glm::vec3 ambientColor = glm::vec3(1.010478, 1.854524, 2.270603);
+    glm::vec3 ambientColor = {0, 0, 0};
 };
 
 #endif //SAXION_Y2Q2_RENDERING_RENDERSETTINGS_H

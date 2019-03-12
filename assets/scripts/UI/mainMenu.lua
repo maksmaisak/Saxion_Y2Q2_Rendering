@@ -6,6 +6,7 @@ local isBlocked = false
 local isChooseLevelOpened
 local mainMenuPanel
 local chooseLevelPanel
+local chooseLevelImage
 local creditsPanel
 
 local levelIndex = 1
@@ -87,7 +88,7 @@ local function createStar(aMinX,aMinY,aMaxX,aMaxY)
 	}
 end
 
-local function makeButton(name,parent,textString,anchorMin,anchorMax,textureFilePath)
+local function makeButton(name, parent, textString, anchorMin, anchorMax, textureFilePath)
 	
 	local buttonActor = Game.makeActor {
 		Name = name,
@@ -95,10 +96,10 @@ local function makeButton(name,parent,textString,anchorMin,anchorMax,textureFile
 			parent = parent
 		},
 		Text = {
-			font   = "fonts/arcadianRunes.ttf",
+			font     = "fonts/arcadianRunes.ttf",
 			fontSize = 36,
-			color = {0,0,0,1},
-			string = textString
+			color    = {0,0,0,1},
+			string   = textString
         },
 		UIRect = {
 			anchorMin = anchorMin,
@@ -112,8 +113,10 @@ local function makeButton(name,parent,textString,anchorMin,anchorMax,textureFile
 		},
 		LuaBehavior = {
 			onMouseDown = function(self, button)
+
+				-- Jesus why. TODO Just pass the onMouseDown function instead of these horrendous ifs
 				if button == 1 then
-					playSoundObject('audio/UIButtonSound.wav',0,false,60)
+					playSoundObject('audio/UIButtonSound.wav', 0, false, 60)
 					
 					if name == "StartButton" then
 						Game.currentLevel = 1
@@ -122,13 +125,13 @@ local function makeButton(name,parent,textString,anchorMin,anchorMax,textureFile
 
 					if name == "ChooseLevelButton" then
 						isChooseLevelOpened = true
-						chooseLevelPanel:get("UIRect").isEnabled	= true
-						mainMenuPanel:get("UIRect").isEnabled		= false
+						chooseLevelPanel:get("UIRect").isEnabled = true
+						mainMenuPanel:get("UIRect").isEnabled   = false
 					end
 
 					if name == "CreditsButton" then
-						creditsPanel:get("UIRect").isEnabled	= true
-						mainMenuPanel:get("UIRect").isEnabled	= false
+						creditsPanel:get("UIRect").isEnabled  = true
+						mainMenuPanel:get("UIRect").isEnabled = false
 					end
 
 					if name == "ExitButton" then
@@ -137,13 +140,13 @@ local function makeButton(name,parent,textString,anchorMin,anchorMax,textureFile
 
 					if name == "BackButtonChooseLevel" then
 						isChooseLevelOpened = false
-						chooseLevelPanel:get("UIRect").isEnabled	= false
-						mainMenuPanel:get("UIRect").isEnabled	= true
+						chooseLevelPanel:get("UIRect").isEnabled = false
+						mainMenuPanel:get("UIRect").isEnabled	 = true
 					end
 
 					if name == "BackButtonCredits" then
-						creditsPanel:get("UIRect").isEnabled	= false
-						mainMenuPanel:get("UIRect").isEnabled	= true
+						creditsPanel:get("UIRect").isEnabled  = false
+						mainMenuPanel:get("UIRect").isEnabled = true
 					end
 				end
 			end,
@@ -176,7 +179,7 @@ function scene:start()
 	Game.maxLevel = #Game.levels
 
 -- Start Main Buttons Panel
-   	Game.makeActor {
+   	mainMenuPanel = Game.makeActor {
 		Name = "MainMenuPanel",
 		Transform = {},
 		UIRect = {
@@ -192,8 +195,8 @@ function scene:start()
 --End Main Buttons Panel
 
 --Start ChooseLevel Panel
-	
-	Game.makeActor {
+
+	chooseLevelPanel = Game.makeActor {
 		Name = "ChooseLevelPanel",
 		Transform = {},
 		UIRect = {
@@ -294,7 +297,7 @@ function scene:start()
         },
 	}
 
-	Game.makeActor {
+	chooseLevelImage = Game.makeActor {
 		Name = "ChooseLevelImage",
 		Transform = {
 			parent = "ChooseLevelPanel"
@@ -302,7 +305,7 @@ function scene:start()
 		UIRect = {
 			anchorMin = {0.5, 0.55},
 			anchorMax = {0.5, 0.55}
-		},		
+		},
 		Sprite = {
 			material = {
 				shader	= "sprite",
@@ -312,10 +315,13 @@ function scene:start()
 		LuaBehavior = {
 			start = function(self)
 				self.isFirstUpdate = true
+				self.uiRect = self.actor:get("UIRect")
 			end,
 			update = function(self, dt)
 
-				if not isChooseLevelOpened then return end
+				if not isChooseLevelOpened then
+					return
+				end
 
 				local isLevelChanged = false
 
@@ -324,16 +330,21 @@ function scene:start()
 					isLevelChanged = true
 				end
 
+				local function updateTitleText()
+
+					local text = "Level "..levelIndex
+					textActor:get("Text").string = text
+					textActorBackground:get("Text").string = text
+				end
+
 				if levelIndex < Game.maxLevel then
 					if Game.keyboard.isDown("right") or (Game.mouse.isDown(1) and arrowRight:get("UIRect").isMouseOver) then
-						print("Is pressed right")
 
-						playSoundObject('audio/UIButtonSound.wav',0,false,60)
+						playSoundObject('audio/UIButtonSound.wav', 0, false, 60)
 
 						levelIndex = levelIndex + 1
 
-						textActor:get("Text").string = "Level : "..levelIndex
-						textActorBackground:get("Text").string = "Level : "..levelIndex
+						updateTitleText();
 
 						if levelIndex > Game.maxLevel then
 							levelIndex = Game.maxLevel
@@ -353,14 +364,12 @@ function scene:start()
 
 				if levelIndex > 1 then
 					if Game.keyboard.isDown("left") or (Game.mouse.isDown(1) and arrowLeft:get("UIRect").isMouseOver) then
-						print("Is pressed left")
 
-						playSoundObject('audio/UIButtonSound.wav',0,false,60)
+						playSoundObject('audio/UIButtonSound.wav', 0, false, 60)
 
 						levelIndex = levelIndex - 1
 
-						textActor:get("Text").string = "Level : "..levelIndex
-						textActorBackground:get("Text").string = "Level : "..levelIndex
+						updateTitleText();
 
 						if levelIndex < 1 then
 							levelIndex = 1
@@ -407,16 +416,15 @@ function scene:start()
 								texture = imagePath
 							}
 						})
-					
-						local size = sprite.textureSize
-						setWidthBasedOnHeight(self.actor:get("UIRect"), size.x / size.y)
+
+						local textureSize = sprite.textureSize
+						setWidthBasedOnHeight(self.uiRect, textureSize.x / textureSize.y)
 					end
 
 					local anchorValue = 0.4
 					local anchorStep  = 0.1
 
 					for i = 1, totalNumberOfStars do
-						print("Created star")
 						self.starActor = createStar(anchorValue, 0.3, anchorValue, 0.3)
 						stars[#stars + 1] = self.starActor
 						keepAspectRatio(self.starActor, 100)
@@ -424,12 +432,12 @@ function scene:start()
 					end
 				end
 
-				if Game.keyboard.isDown("enter") or (Game.mouse.isDown(1) and chooseLevelImage:get("UIRect").isMouseOver) then
+				if Game.keyboard.isDown("enter") or (Game.mouse.isDown(1) and self.uiRect.isMouseOver) then
 
 					if canPlayLevel(levelIndex) then
 						playSoundObject('audio/UIButtonSound.wav',0,false,60)
 						Game.loadScene(Game.levels[levelIndex].path)
-						print("Loaded scene : " ..levelIndex)
+						print("Loaded scene : "..levelIndex)
 						Game.currentLevel = levelIndex
 					end
 				end
@@ -437,12 +445,12 @@ function scene:start()
 		}
 	}
 
-	makeButton("BackButtonChooseLevel","ChooseLevelPanel","Back",{0.5,0.15},{0.5,0.15},"textures/buttonBackground.png")
+	makeButton("BackButtonChooseLevel", "ChooseLevelPanel", "Back", {0.5, 0.15}, {0.5, 0.15}, "textures/buttonBackground.png")
 --End ChooseLevel Panel
 
 --Start Credits Panel
 
-	Game.makeActor{
+	creditsPanel = Game.makeActor {
 		Name = "CreditsPanel",
 		Transform = {},
 		UIRect = {
@@ -463,9 +471,9 @@ function scene:start()
 			anchorMax = {1, 1}
 		},
 		Text = {
-			font   = "fonts/arcadianRunes.ttf",
+			font = "fonts/arcadianRunes.ttf",
 			fontSize = 30,
-			color = {168/255,130/255,97/255,1},
+			color = {168/255, 130/255, 97/255, 1},
 			string = text
 		}
 	}
@@ -482,12 +490,12 @@ function scene:start()
 		Text = {
 			font   = "fonts/arcadianRunes.ttf",
 			fontSize = 30,
-			color = {25/255,14/255,4/255,0.8},
+			color = {25/255, 14/255, 4/255, 0.8},
 			string = text
 		}
 	}
 
-	makeButton("BackButtonCredits","CreditsPanel","Back",{0.5,0.15},{0.5,0.15},"textures/buttonBackground.png")
+	makeButton("BackButtonCredits", "CreditsPanel","Back",{0.5,0.15},{0.5,0.15},"textures/buttonBackground.png")
 
 --End Credits Panel
 
@@ -495,8 +503,8 @@ function scene:start()
 		Name = "MainPanelImage",
 		Transform = {},
 		UIRect = {
-			anchorMin = {0.5,0},
-			anchorMax = {0.5,1}
+			anchorMin = {0.5, 0},
+			anchorMax = {0.5, 1}
 		},
 		Sprite = {
 			material = {
@@ -517,14 +525,9 @@ function scene:start()
 		}
 	}
 
-	mainMenuPanel = Game.find("MainMenuPanel")
-	chooseLevelPanel = Game.find("ChooseLevelPanel")
-	local chooseLevelImage = Game.find("ChooseLevelImage")
-	creditsPanel = Game.find("CreditsPanel")
-
-	creditsPanel:get("UIRect").isEnabled = false
+	creditsPanel:get("UIRect").isEnabled     = false
 	chooseLevelPanel:get("UIRect").isEnabled = false
-	arrowLeft:get("UIRect").isEnabled = false
+	arrowLeft:get("UIRect").isEnabled        = false
 
 	keepAspectRatio(chooseLevelImage, 400)
 	keepAspectRatio(arrowLeft , 300)

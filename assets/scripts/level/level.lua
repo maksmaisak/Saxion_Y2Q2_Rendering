@@ -123,4 +123,8 @@ function Level:start()
 	if self.extras then
 		Game.makeActors(self.extras)
 	end
+
+	if Game.serializer and Game.currentLevel then
+		Game.serializer:saveNewEntry({level = "level"..Game.currentLevel, stars = 0})
+	end
 end

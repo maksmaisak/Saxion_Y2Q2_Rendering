@@ -241,7 +241,7 @@ function scene:start()
 		}
 	}
 
-	local textActorBackgroud = Game.makeActor {
+	local textActorBackground = Game.makeActor {
 		Name = "ChooseLevelImageTextBackground",
 		Transform = {
 			parent = "ChooseLevelPanel"

@@ -258,8 +258,9 @@ vec3 CalculateAmbientLighting(vec3 N, vec3 V, float NdotV, vec3 albedo, float me
 
     vec3 H = normalize(V + N);
     float NdotH = max(dot(N, H), 0);
+    float HdotV = max(dot(H, V), 0);
 
-    vec3 kS = FresnelSchlickRoughness(NdotV, mix(vec3(0.04f), albedo, metallic), roughness);
+    vec3 kS = FresnelSchlickRoughness(HdotV, mix(vec3(0.04f), albedo, metallic), roughness);
     vec3 kD = 1.0 - kS;
     kD *= 1.0 - metallic;
 

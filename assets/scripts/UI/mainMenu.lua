@@ -77,8 +77,8 @@ function makeButton(name,parent,textString,anchorMin,anchorMax,textureFilePath)
 		},
 		Text = {
 			font   = "fonts/arcadianRunes.ttf",
-			fontSize = 40,
-			color  = {1,1,1,1},
+			fontSize = 36,
+			color = {0,0,0,1},
 			string = textString
         },
 		UIRect = {
@@ -141,7 +141,7 @@ function makeButton(name,parent,textString,anchorMin,anchorMax,textureFilePath)
 		}
 	}
 
-	keepAspectRatio(buttonActor,64)
+	keepAspectRatio(buttonActor,55)
 end
 
 function scene:start()
@@ -166,10 +166,10 @@ function scene:start()
 		}
 	}
 
-	makeButton("StartButton","MainMenuPanel","Start",{0.5,0.8},{0.5,0.8},"textures/buttonBackground.png")
-	makeButton("ChooseLevelButton","MainMenuPanel","Choose Level",{0.5,0.7},{0.5,0.7},"textures/buttonBackground.png")
-	makeButton("CreditsButton","MainMenuPanel","Credits",{0.5,0.6},{0.5,0.6},"textures/buttonBackground.png")
-	makeButton("ExitButton","MainMenuPanel","Exit",{0.5,0.5},{0.5,0.5},"textures/buttonBackground.png")
+	makeButton("StartButton","MainMenuPanel","Start",{0.5,0.7},{0.5,0.7},"textures/buttonBackground.png")
+	makeButton("ChooseLevelButton","MainMenuPanel","Choose Level",{0.5,0.6},{0.5,0.6},"textures/buttonBackground.png")
+	makeButton("CreditsButton","MainMenuPanel","Credits",{0.5,0.5},{0.5,0.5},"textures/buttonBackground.png")
+	makeButton("ExitButton","MainMenuPanel","Exit",{0.5,0.4},{0.5,0.4},"textures/buttonBackground.png")
 --End Main Buttons Panel
 
 --Start ChooseLevel Panel
@@ -241,14 +241,48 @@ function scene:start()
 		}
 	}
 
-	local chooseLevelImage = Game.makeActor {
+	local textActorBackgroud = Game.makeActor {
+		Name = "ChooseLevelImageTextBackground",
+		Transform = {
+			parent = "ChooseLevelPanel"
+		},
+		UIRect = {
+			anchorMin = {0.502, 0.802},
+			anchorMax = {0.502, 0.802}
+		},
+		Text = {
+			font     = "fonts/arcadianRunes.ttf",
+			fontSize = 50,
+			color    = {25/255,14/255,4/255,1},
+			string   = "Level : "..levelIndex
+        },
+	}
+
+	local textActor = Game.makeActor {
+		Name = "ChooseLevelImageText",
+		Transform = {
+			parent = "ChooseLevelPanel"
+		},
+		UIRect = {
+			anchorMin = {0.5, 0.8},
+			anchorMax = {0.5, 0.8}
+		},
+		Text = {
+			font     = "fonts/arcadianRunes.ttf",
+			fontSize = 50,
+			color    = {168/255,130/255,97/255,1},
+			string   = "Level : "..levelIndex
+        },
+	}
+
+	Game.makeActor {
 		Name = "ChooseLevelImage",
 		Transform = {
 			parent = "ChooseLevelPanel"
 		},
 		UIRect = {
-			anchorMin = {0.5, 0.6},
-			anchorMax = {0.5, 0.6}
+			anchorMin = {0.5, 0.55},
+			anchorMax = {0.5, 0.55}
 		},		
 		Sprite = {
 			material = {
@@ -276,6 +310,9 @@ function scene:start()
 							playSoundObject('audio/UIButtonSound.wav',0,false,60)
 
 							levelIndex = levelIndex + 1
+
+							textActor:get("Text").string = "Level : "..levelIndex
+							textActorBackground:get("Text").string = "Level : "..levelIndex
 						
 							if levelIndex > Game.maxLevel then
 								levelIndex = Game.maxLevel
@@ -300,6 +337,9 @@ function scene:start()
 							playSoundObject('audio/UIButtonSound.wav',0,false,60)
 
 							levelIndex = levelIndex - 1
+
+							textActor:get("Text").string = "Level : "..levelIndex
+							textActorBackground:get("Text").string = "Level : "..levelIndex
 
 							if levelIndex < 1 then
 								levelIndex = 1
@@ -340,7 +380,7 @@ function scene:start()
 						self.actor:add("Sprite", {
 							material = {
 								shader	= "sprite",
-								texture = "textures/level" .. levelIndex .. ".jpg"
+								texture = "textures/levelCompleted/level"..levelIndex.."Complete.png"
 							}				
 						})
 						end
@@ -353,8 +393,7 @@ function scene:start()
 							self.actor:add("Sprite", {
 							material = {
 								shader	= "sprite",
-								texture = "textures/black.png"
-								--texture = "textures/levelUncompleted"..levelIndex..".png"
+								texture = "textures/levelUncompleted/level"..levelIndex.."Uncomplete.png"
 							}				
 							})
 						end
@@ -368,10 +407,9 @@ function scene:start()
 						end
 					end
 				end
-			end,
 
-			onMouseDown = function(self, button)
-				if button == 1 then
+
+				if Game.keyboard.isDown("enter") or (Game.mouse.isDown(1) and chooseLevelImage:get("UIRect").isMouseOver) then
 					local level = Game.savedData[levelIndex]
 					
 					if level == nil then
@@ -387,7 +425,7 @@ function scene:start()
 		}
 	}
 
-	makeButton("BackButtonChooseLevel","ChooseLevelPanel","Back",{0.5,0.1},{0.5,0.1},"textures/buttonBackground.png")
+	makeButton("BackButtonChooseLevel","ChooseLevelPanel","Back",{0.5,0.15},{0.5,0.15},"textures/buttonBackground.png")
 --End ChooseLevel Panel
 
 --Start Credits Panel
@@ -407,22 +445,39 @@ function scene:start()
 			parent = "CreditsPanel",
 		},
 		UIRect = {
-			anchorMin = {0, 0.1},
+			anchorMin = {0.01, 0.05},
 			anchorMax = {1, 1}
 		},
 		Text = {
 			font   = "fonts/arcadianRunes.ttf",
-			fontSize = 40,
-			color  = {1,1,1,1},
-			string = "Credits"
+			fontSize = 30,
+			color = {168/255,130/255,97/255,1},
+			string = "        Credits\n\nEngineers\n\nMaks Maisak\nCosmin Bararu\nGeorge Popa\n\nDesigners\n\nKaterya Malyk\nGustav Eckrodt\nEmre Hamazkaya\nLea Kemper\nYucen Bao"
 		}
 	}
 
-	makeButton("BackButtonCredits","CreditsPanel","Back",{0.5,0.1},{0.5,0.1},"textures/buttonBackground.png")
+	Game.makeActor {
+		Name = "CreditsTextBackround",
+		Transform = {
+			parent = "CreditsPanel",
+		},
+		UIRect = {
+			anchorMin = {0.01002, 0.05002},
+			anchorMax = {1.002, 1.002}
+		},
+		Text = {
+			font   = "fonts/arcadianRunes.ttf",
+			fontSize = 30,
+			color = {25/255,14/255,4/255,0.8},
+			string = "        Credits\n\nEngineers\n\nMaks Maisak\nCosmin Bararu\nGeorge Popa\n\nDesigners\n\nKaterya Malyk\nGustav Eckrodt\nEmre Hamazkaya\nLea Kemper\nYucen Bao"
+		}
+	}
+
+	makeButton("BackButtonCredits","CreditsPanel","Back",{0.5,0.15},{0.5,0.15},"textures/buttonBackground.png")
 
 --End Credits Panel
 
-	Game.makeActor {
+	menuBackground = Game.makeActor {
 		Name = "MainPanelImage",
 		Transform = {},
 		UIRect = {
@@ -432,13 +487,14 @@ function scene:start()
 		Sprite = {
 			material = {
 				shader	= "sprite",
-				texture	= "textures/menuBackgrond.jpg"
+				texture	= "textures/menuBackground.jpg"
 			}
 		}
 	}
 
 	mainMenuPanel = Game.find("MainMenuPanel")
 	chooseLevelPanel = Game.find("ChooseLevelPanel")
+	chooseLevelImage = Game.find("ChooseLevelImage")
 	creditsPanel	 = Game.find("CreditsPanel")
 
 

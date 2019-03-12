@@ -21,9 +21,7 @@ function RedoUndoButtons:createButtons()
 
 	self.reduUndoPanel = Game.makeActor {
 		Name = "ReduUndoPanel",
-		Transform = {
-			scale  = {1,1,1}
-		},
+		Transform = {},
 		UIRect = {
 			anchorMin = {0, 0},
 			anchorMax = {1, 1}
@@ -36,10 +34,10 @@ function RedoUndoButtons:createButtons()
 			parent = "ReduUndoPanel"
 		},
 		UIRect = {
-			anchorMin = {0.1, 0.1},
-			anchorMax = {0.1, 0.1},
-			offsetMin = {-40,-40},
-			offsetMax = {40,40}
+			anchorMin = {0, 0.1},
+			anchorMax = {0, 0.1},
+			offsetMin = {40,-40},
+			offsetMax = {120,40}
 		},
 		Sprite = {
 			material = {
@@ -71,10 +69,10 @@ function RedoUndoButtons:createButtons()
 			parent = "ReduUndoPanel"
 		},
 		UIRect = {
-			anchorMin = {0.9, 0.1},
-			anchorMax = {0.9, 0.1},
-			offsetMin = {-40,-40},
-			offsetMax = {40,40}
+			anchorMin = {0, 0.1},
+			anchorMax = {0, 0.1},
+			offsetMin = {120,-40},
+			offsetMax = {200,40}
 		},
 		Sprite = {
 			material = {

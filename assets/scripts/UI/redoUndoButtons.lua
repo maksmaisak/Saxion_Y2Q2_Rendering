@@ -7,18 +7,6 @@ function RedoUndoButtons:init()
 	self:createButtons()
 end
 
-local function keepAspectRatio(actor , theight)
-	local textureSize = actor:get("Sprite").textureSize
-
-	ratio = textureSize.x/textureSize.y
-	local height = theight
-	local width = height * ratio
-	local minWidth = (width / 2) * -1
-	local minHeight =  (height / 2) * -1
-	actor:get("UIRect").offsetMin = { minWidth, minHeight }
-	actor:get("UIRect").offsetMax = { width / 2, height / 2}
-end
-
 local function playSoundObject(filepath, offset, loop, volume)
 	local music = Game.audio.getSound(filepath)
 	music.playingOffset = music.duration * offset
@@ -50,8 +38,8 @@ function RedoUndoButtons:createButtons()
 		UIRect = {
 			anchorMin = {0.1, 0.1},
 			anchorMax = {0.1, 0.1},
-			offsetMin = {-50,-50},
-			offsetMax = {50,50}
+			offsetMin = {-40,-40},
+			offsetMax = {40,40}
 		},
 		Sprite = {
 			material = {
@@ -85,8 +73,8 @@ function RedoUndoButtons:createButtons()
 		UIRect = {
 			anchorMin = {0.9, 0.1},
 			anchorMax = {0.9, 0.1},
-			offsetMin = {-50,-50},
-			offsetMax = {50,50}
+			offsetMin = {-40,-40},
+			offsetMax = {40,40}
 		},
 		Sprite = {
 			material = {

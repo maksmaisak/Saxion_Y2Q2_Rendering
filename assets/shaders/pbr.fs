@@ -268,7 +268,7 @@ vec3 CalculateAmbientLighting(vec3 N, vec3 V, float NdotV, vec3 albedo, float me
     vec3 diffuse = irradiance * albedo.xyz / PI;
 
     float NDF = DistributionGGX(NdotH, roughness);
-    float G   = GeometrySmith(1, NdotV, roughness);
+    float G   = GeometrySmithIBL(1, NdotV, roughness);
     vec3 specular = ambientColor * NDF * G;
 
     return (kD * diffuse + kS * specular) * ao;

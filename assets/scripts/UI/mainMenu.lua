@@ -78,7 +78,7 @@ function makeButton(name,parent,textString,anchorMin,anchorMax,textureFilePath)
 		Text = {
 			font   = "fonts/arcadianRunes.ttf",
 			fontSize = 40,
-			color  = {1,1,1,1},
+			color = {0,0,0,1},
 			string = textString
         },
 		UIRect = {
@@ -413,7 +413,41 @@ function scene:start()
 		Text = {
 			font   = "fonts/arcadianRunes.ttf",
 			fontSize = 30,
-			color  = {1,1,1,1},
+			color = {168/255,130/255,97/255,1},
+			string = "        Credits\n\nEngineers\n\nMaks Maisak\nCosmin Bararu\nGeorge Popa\n\nDesigners\n\nKaterya Malyk\nGustav Eckrodt\nEmre Hamazkaya\nLea Kemper\nYucen Bao"
+		}
+	}
+
+	Game.makeActor {
+		Name = "CreditsText",
+		Transform = {
+			parent = "CreditsPanel",
+		},
+		UIRect = {
+			anchorMin = {0.01, 0.05},
+			anchorMax = {1, 1}
+		},
+		Text = {
+			font   = "fonts/arcadianRunes.ttf",
+			fontSize = 30,
+			color = {168/255,130/255,97/255,1},
+			string = "        Credits\n\nEngineers\n\nMaks Maisak\nCosmin Bararu\nGeorge Popa\n\nDesigners\n\nKaterya Malyk\nGustav Eckrodt\nEmre Hamazkaya\nLea Kemper\nYucen Bao"
+		}
+	}
+
+	Game.makeActor {
+		Name = "CreditsText",
+		Transform = {
+			parent = "CreditsPanel",
+		},
+		UIRect = {
+			anchorMin = {0.01002, 0.05002},
+			anchorMax = {1.002, 1.002}
+		},
+		Text = {
+			font   = "fonts/arcadianRunes.ttf",
+			fontSize = 30,
+			color = {25/255,14/255,4/255,0.8},
 			string = "        Credits\n\nEngineers\n\nMaks Maisak\nCosmin Bararu\nGeorge Popa\n\nDesigners\n\nKaterya Malyk\nGustav Eckrodt\nEmre Hamazkaya\nLea Kemper\nYucen Bao"
 		}
 	}

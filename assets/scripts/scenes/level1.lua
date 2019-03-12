@@ -1482,7 +1482,7 @@ local extras = {
     {
         Name = "Main Camera",
         Transform = {
-            position = {-2.9, 10.72, -1.69},
+            position = {-3.34, 12.55, -3.99},
             rotation = {315, 225, -2.414836E-06},
         },
         Camera = {

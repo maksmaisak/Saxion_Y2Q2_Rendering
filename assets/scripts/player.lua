@@ -96,12 +96,11 @@ function Player:activateGoal(gridPosition)
 		LuaBehavior = Config.resultScreen
 	}
 
-	playSoundObject('audio/doorOpen.wav',0,false,60)
+	playSoundObject('audio/doorOpen.wav', 0, false, 60)
 
-	resultScreen:get("LuaBehavior").level = self.level
-	resultScreen:get("LuaBehavior"):activate()
-	
-	print("activating goal")
+	local resultScreenBehavior = resultScreen:get("LuaBehavior");
+	resultScreenBehavior.level = self.level
+	resultScreenBehavior:activate()
 end
 
 function Player:activateButton(gridPosition)
@@ -146,31 +145,31 @@ function Player:activateButtonTarget(button)
 
 		target.isButtonTargetEnabled = true
 
-		if target.goal ~= nil then
+		if target.goal then
 
 			print("Activating goal")
 			local goal = target.goal
 			if not goal.startActive then
 				local light = goal.light
-				if light ~= nil then
+				if light then
 					light.actor:tweenKill()
 					local lightComponent = light.actor:get("Light")
 					lightComponent:tweenIntensity(light.initialIntensity, 0.8, Ease.inOutQuart)
 				end
 			end
-		elseif target.door ~= nil then
+		elseif target.door then
 
 			print("Activating door")
 			local door = target.door
 
-			playSoundObject('audio/doorOpen.wav',0,false,20)
+			playSoundObject('audio/doorOpen.wav', 0, false, 20)
 			stopSoundObject('audio/doorClose.wav')
 						
-			door.swingLeft:tweenKill()
+			door.swingLeft :tweenKill()
 			door.swingRight:tweenKill()
 
-			door.swingLeftTransform:tweenRotation{ 0, 90, 0}
-			door.swingRightTransform:tweenRotation{0, -90, 0}
+			door.swingLeftTransform :tweenRotation {0,  90, 0}
+			door.swingRightTransform:tweenRotation {0, -90, 0}
 		end
 	end
 end
@@ -183,33 +182,33 @@ function Player:deactivateButtonTarget(button)
 
 		target.isButtonTargetEnabled = false
 
-		if target.goal ~= nil then
+		if target.goal then
 
 			print("Deactivating goal")
 
 			local goal = target.goal
 			if not goal.startActive then
 				local light = goal.light
-				if light ~= nil then
+				if light then
 					light.actor:tweenKill()
 					local lightComponent = light.actor:get("Light")
 					lightComponent:tweenIntensity(0, 0.8, Ease.inOutQuart)
 				end
 			end
-		elseif target.door ~= nil then
+		elseif target.door then
 
 			print("Deactivating door")
 
 			local door = target.door
 
-			playSoundObject('audio/doorClose.wav',0,false,20)
+			playSoundObject('audio/doorClose.wav', 0, false, 20)
 			stopSoundObject('audio/doorOpen.wav')
 
-			door.swingLeft:tweenKill()
+			door.swingLeft :tweenKill()
 			door.swingRight:tweenKill()
 
-			door.swingLeftTransform:tweenRotation {0, 0, 0}
-			door.swingRightTransform:tweenRotation{0, 0, 0}
+			door.swingLeftTransform :tweenRotation {0, 0, 0}
+			door.swingRightTransform:tweenRotation {0, 0, 0}
 		end
 	end
 end
@@ -336,9 +335,10 @@ function Player:moveByInput(input)
 end
 
 function Player:moveToPosition(nextPosition, canRegisterMove, didUsePortal, playBackTween, rotation)
-	local gridItem = self.map:getGridAt(nextPosition);
 
-	if gridItem.obstacle or not gridItem.tile then
+	local gridItem = self.map:getGridAt(nextPosition)
+
+	if not gridItem or gridItem.obstacle or not gridItem.tile then
 		return
 	end
 
@@ -414,7 +414,6 @@ function Player:moveToPosition(nextPosition, canRegisterMove, didUsePortal, play
 		local currentRotation	= self.transform.rotation
 		self.transform.rotation = rotation
 		local rotationTween		= self.transform:tweenRotation(currentRotation, 0.2, Ease.outQuad)
-
 		rotationTween.playsBackward = true
 		rotationTween.progress		= 1
 	end

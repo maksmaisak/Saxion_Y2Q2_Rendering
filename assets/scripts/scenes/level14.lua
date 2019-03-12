@@ -2445,7 +2445,7 @@ grid[3][16].obstacle = {
     },
 }
 
-grid[1][16].goal = {
+grid[2][16].goal = {
     startActive = false,
     light = {
         Name = "Point Light",
@@ -2463,12 +2463,12 @@ grid[1][16].goal = {
     actor = {
         Name = "LevelGoal",
         Transform = {
-            position = {0, 0, 15},
+            position = {1, 0, 15},
             children = {
                 {
                     Name = "ExitFinishModelLow",
                     Transform = {
-                        position = {1, 0, 1},
+                        position = {0, 0, 1},
                         rotation = {0, 179.9997, 0},
                         children = {
                             {
@@ -4708,7 +4708,7 @@ return Level:new {
     map = map,
     extras = extras,
     nextLevelPath = 'assets/scripts/scenes/level15.lua',
-    ambientLighting = {color = {0.7529412, 1.380392, 1.694118, 1}},
+    ambientLighting = {color = {1.010478, 1.854524, 2.270603, 1}},
     maxNumUndos = {
         threeStars = 5,
         twoStars = 7,

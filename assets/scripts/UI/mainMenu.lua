@@ -473,7 +473,7 @@ function scene:start()
 		Text = {
 			font = "fonts/arcadianRunes.ttf",
 			fontSize = 30,
-			color = {168/255, 130/255, 97/255, 1},
+			color = Config.textColors.primary,
 			string = text
 		}
 	}
@@ -490,7 +490,7 @@ function scene:start()
 		Text = {
 			font   = "fonts/arcadianRunes.ttf",
 			fontSize = 30,
-			color = {25/255, 14/255, 4/255, 0.8},
+			color = Config.textColors.backdrop,
 			string = text
 		}
 	}

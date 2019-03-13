@@ -43,3 +43,10 @@ textColors = {
     primary = {168/255, 130/255, 97/255, 1},
     backdrop = {25/255, 14/255, 4/255, 0.8}
 }
+
+audio = {
+    levelExitFire = {
+        ignition = "audio/levelExit/FireStart.wav",
+        continuous = "audio/levelExit/FireLoopable.wav"
+    }
+}

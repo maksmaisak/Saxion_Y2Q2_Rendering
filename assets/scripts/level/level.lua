@@ -60,13 +60,15 @@ function Level:start()
 				goal.transform	= goal.actor:get("Transform")
 
 				if goal.light then
-					local light				= goal.light
-					light.actor				= Game.makeActor(goal.light)
-					light.transform			= light.actor:get("Transform")
+
+					goal.light = {actor = Game.makeActor(goal.light) }
+					local light = goal.light
+					light.transform = goal.light.actor:get("Transform")
 					light.transform.parent	= goal.actor
-					light.initialIntensity  = light.Light.intensity
+					light.light = goal.light.actor:get("Light")
+					light.initialIntensity = goal.light.light.intensity
 					if not goal.startActive then
-						light.actor:get("Light").intensity = 0
+						light.light.intensity = 0
 					end
 				end
 			end

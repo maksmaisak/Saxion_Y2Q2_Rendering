@@ -149,14 +149,12 @@ function Player:activateButtonTarget(button)
 
 			print("Activating goal")
 			local goal = target.goal
-			if not goal.startActive then
-				local light = goal.light
-				if light then
-					light.actor:tweenKill()
-					local lightComponent = light.actor:get("Light")
-					lightComponent:tweenIntensity(light.initialIntensity, 0.8, Ease.inOutQuart)
-				end
+			if not goal.startActive and goal.light then
+
+				goal.light.actor:tweenKill()
+				goal.light.light:tweenIntensity(goal.light.initialIntensity, 0.8, Ease.outQuart)
 			end
+
 		elseif target.door then
 
 			print("Activating door")
@@ -185,16 +183,12 @@ function Player:deactivateButtonTarget(button)
 		if target.goal then
 
 			print("Deactivating goal")
-
 			local goal = target.goal
-			if not goal.startActive then
-				local light = goal.light
-				if light then
-					light.actor:tweenKill()
-					local lightComponent = light.actor:get("Light")
-					lightComponent:tweenIntensity(0, 0.8, Ease.inOutQuart)
-				end
+			if not goal.startActive and goal.light then
+				goal.light.actor:tweenKill()
+				goal.light.light:tweenIntensity(0, 0.8, Ease.outQuart)
 			end
+
 		elseif target.door then
 
 			print("Deactivating door")

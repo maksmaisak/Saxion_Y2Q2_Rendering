@@ -16,7 +16,6 @@
 #include "components/Sprite.h"
 #include "components/Text.h"
 #include "GLHelpers.h"
-#include "Font.h"
 #include "GameTime.h"
 #include "Resources.h"
 #include "Material.h"
@@ -71,7 +70,7 @@ void RenderSystem::start() {
 
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
-    m_debugHud = std::make_unique<DebugHud>(&m_engine->getWindow());
+    m_debugHud = std::make_unique<DebugHud>(*m_engine, m_vertexRenderer);
 
     auto& lua = m_engine->getLuaState();
     {
@@ -80,6 +79,7 @@ void RenderSystem::start() {
 
         m_referenceResolution  = lua.tryGetField<glm::vec2>("referenceResolution").value_or(glm::vec2(1920, 1080));
         m_enableStaticBatching = lua.tryGetField<bool>("enableStaticBatching").value_or(true);
+        m_enableDebugOutput    = lua.tryGetField<bool>("enableDebugOutput").value_or(false);
     }
 
     {
@@ -131,7 +131,9 @@ void RenderSystem::draw() {
     updateDepthMaps();
     renderEntities();
     renderUI();
-    renderDebug();
+
+    if (m_enableDebugOutput)
+        renderDebug();
 }
 
 namespace {
@@ -341,17 +343,8 @@ void RenderSystem::renderUIRect(Entity e, UIRect& rect) {
 
 void RenderSystem::renderDebug() {
 
-    glDisable(GL_DEPTH_TEST);
-
-    std::stringstream s;
-    s << "fps: " << glm::iround(m_engine->getFps()) << " frame: " << m_engine->getFrameTimeMicroseconds() / 1000.0 << "ms";
-    std::string debugInfo = s.str();
-
-    auto font = Resources<Font>::get(config::FONT_PATH + "arial.ttf");
-    auto windowSize = m_engine->getWindow().getSize();
-    font->render(debugInfo, {0.f, 0.f}, 0.5f, glm::ortho(0.f, (float)windowSize.x, 0.f, (float)windowSize.y));
-
-    glEnable(GL_DEPTH_TEST);
+    m_debugHud->setDebugInfo({m_engine->getFps(), m_engine->getFrameTimeMicroseconds()});
+    m_debugHud->draw();
 }
 
 Actor RenderSystem::getMainCamera() {

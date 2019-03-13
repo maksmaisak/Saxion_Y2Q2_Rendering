@@ -60,6 +60,7 @@ namespace en {
         glm::vec2 m_referenceResolution;
 
         bool m_enableStaticBatching = true;
+        bool m_enableDebugOutput    = false;
 
         std::unique_ptr<DebugHud> m_debugHud;
     };

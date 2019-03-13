@@ -44,17 +44,45 @@ textColors = {
     backdrop = {25/255, 14/255, 4/255, 0.8}
 }
 
+local function makeSound(path, volume, loop, offset)
+
+    local sound = Game.audio.makeSound(path)
+    if not sound then return nil end
+
+    sound.volume = volume or 100
+    sound.loop   = loop or false
+    sound.playingOffset = offset and sound.duration * offset or 0
+    return sound
+end
+
+local function makeMusic(path, volume, loop, offset)
+
+    local music = Game.audio.makeMusic(path)
+    if not music then return nil end
+
+    music.volume = volume or 100
+    music.loop   = loop or false
+    music.playingOffset = offset and music.duration * offset or 0
+    return music
+end
+
 audio = {
+    ambience = makeMusic('audio/Ambience.wav'),
     door = {
-        open  = {path = 'audio/doorOpen.wav' , volume = 20},
-        close = {path = 'audio/doorClose.wav', volume = 20},
+        open  = makeSound('audio/doorOpen.wav' , 20),
+        close = makeSound('audio/doorClose.wav', 20),
     },
-    levelFinished = {path = 'audio/doorOpen.wav', volume = 60},
+    levelFinished = makeSound('audio/doorOpen.wav', 60),
     levelExitFire = {
-        ignition   = {path = "audio/levelExit/FireStart.wav"   , volume = 20},
-        continuous = {path = "audio/levelExit/FireLoopable.wav", volume = 20}
+        ignition   = makeSound('audio/levelExit/FireStart.wav'   , 20),
+        continuous = makeMusic('audio/levelExit/FireLoopable.wav', 20, true)
     },
     ui = {
-        buttonPress = {path = 'audio/UIButtonSound.wav', volume = 60}
-    }
+        buttonPress = makeSound('audio/UIButtonSound.wav', 20),
+        stars = {
+            makeSound('audio/stars/1Star.wav'),
+            makeSound('audio/stars/2Star.wav'),
+            makeSound('audio/stars/3Star.wav')
+        }
+    },
 }

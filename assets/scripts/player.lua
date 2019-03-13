@@ -21,37 +21,6 @@ local keyMaterial = Game.makeMaterial {
 	ao     = 'objects/key/KeyTile_AO.png'
 }
 
-local function playSound(fileInfo, loop)
-
-	local sound
-	if type(fileInfo) == "string" then
-		sound = Game.audio.getSound(fileInfo)
-	else
-		sound = Game.audio.getSound(fileInfo.path)
-		sound.playingOffset = sound.duration * (fileInfo.offset or 0)
-		sound.volume        = fileInfo.volume or 100
-	end
-
-    sound.loop = loop or false
-    sound:play()
-
-	return sound
-end
-
-local function stopSound(fileInfo)
-
-	local sound
-	if type(fileInfo) == "string" then
-		sound = Game.audio.getSound(fileInfo)
-	else
-		sound = Game.audio.getSound(fileInfo.path)
-	end
-
-	if sound then
-		sound:stop()
-    end
-end
-
 function Player:getPositionFromGridPosition(gridPosition)
 
 	return Vector:new {
@@ -114,7 +83,7 @@ function Player:activateGoal(gridPosition)
 		LuaBehavior = Config.resultScreen
 	}
 
-	playSound(Config.audio.levelFinished)
+	Config.audio.levelFinished:play()
 
 	local resultScreenBehavior = resultScreen:get("LuaBehavior");
 	resultScreenBehavior.level = self.level
@@ -172,8 +141,8 @@ function Player:activateButtonTarget(button)
 				goal.light.actor:tweenKill()
 				goal.light.light:tweenIntensity(goal.light.initialIntensity, 2, Ease.outExpo)
 
-				playSound(Config.audio.levelExitFire.ignition)
-				playSound(Config.audio.levelExitFire.continuous, true)
+				Config.audio.levelExitFire.ignition:play()
+				Config.audio.levelExitFire.continuous:play()
 			end
 
 		elseif target.door then
@@ -181,8 +150,8 @@ function Player:activateButtonTarget(button)
 			print("Activating door")
 			local door = target.door
 
-			playSound(Config.audio.door.open)
-			stopSound(Config.audio.door.close)
+			Config.audio.door.open:play()
+			Config.audio.door.close:stop()
 
 			door.swingLeft :tweenKill()
 			door.swingRight:tweenKill()
@@ -209,8 +178,8 @@ function Player:deactivateButtonTarget(button)
 				goal.light.actor:tweenKill()
 				goal.light.light:tweenIntensity(0, 0.8, Ease.outExpo)
 
-				stopSound(Config.audio.levelExitFire.ignition)
-				stopSound(Config.audio.levelExitFire.continuous)
+				Config.audio.levelExitFire.ignition:stop()
+				Config.audio.levelExitFire.continuous:stop()
 			end
 
 		elseif target.door then
@@ -219,8 +188,8 @@ function Player:deactivateButtonTarget(button)
 
 			local door = target.door
 
-			playSound(Config.audio.door.close)
-			stopSound(Config.audio.door.open)
+			Config.audio.door.close:play()
+			Config.audio.door.open:stop()
 
 			door.swingLeft :tweenKill()
 			door.swingRight:tweenKill()
@@ -493,7 +462,7 @@ function Player:update()
 
 	if Game.keyboard.isDown("escape") then
 
-		playSound(Config.audio.ui.buttonPress)
+		Config.audio.ui.buttonPress:play()
 		if self.level.isLevelComplete then
 			return
 		end
@@ -513,14 +482,14 @@ function Player:update()
 
 	if Game.keyboard.isDown("e") then
 
-		playSound(Config.audio.ui.buttonPress)
+		Config.audio.ui.buttonPress:play()
 		self:redoMove()
 		return
 	end
 
 	if Game.keyboard.isDown("q") then
 
-        playSound(Config.audio.ui.buttonPress)
+        Config.audio.ui.buttonPress:play()
 		self:undoMove()
 		return
 	end
@@ -545,7 +514,7 @@ function Player:update()
 	local input = {x = 0, y = 0 }
 	for key, value in pairs(inputKeys) do
 		if not disabledKeys[key] and Game.keyboard.isDown(key) then
-            playSound(Config.audio.ui.buttonPress)
+            Config.audio.ui.buttonPress:play()
 			input.x = input.x + value.x
 			input.y = input.y + value.y
 			break;

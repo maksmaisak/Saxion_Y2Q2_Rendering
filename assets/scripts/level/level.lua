@@ -11,6 +11,21 @@ Level = Object:new {
 	nextLevelPath = nil
 }
 
+local function doesAnyGoalStartActive(map)
+
+	for x = 1, map:getGridSize().x do
+		for y = 1, map:getGridSize().y do
+
+			local gridItem = map:getGridAt({x = x, y = y})
+			if gridItem and gridItem.goal and gridItem.goal.startsActive then
+				return true
+			end
+		end
+	end
+
+	return false
+end
+
 function Level:start()
 
 	if not self.map then
@@ -18,11 +33,14 @@ function Level:start()
 		return
 	end
 
-	local music = Game.audio.getMusic('audio/ambiance.wav')
+	if doesAnyGoalStartActive(self.map) then
+		Config.audio.levelExitFire.continuous:play()
+	else
+		Config.audio.levelExitFire.continuous:stop()
+	end
+
+	local music = Config.audio.ambience
 	if music.status ~= "Playing" then
-		print("Music Status", music.status)
-		music.loop	= true
-		music.volume = 100
 		music:play()
 	end
 

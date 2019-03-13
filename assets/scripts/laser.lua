@@ -41,6 +41,9 @@ local function doesBlock(gridItem)
 end
 
 function Laser:hitDroppedKeys()
+	if not self.level.player.canControl then
+		return
+	end
 
 	print("hitting dropped keys")
 

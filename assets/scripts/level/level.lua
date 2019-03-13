@@ -4,6 +4,7 @@ require('assets/scripts/level/map')
 require('assets/scripts/UI/pauseMenu')
 require('assets/scripts/UI/redoUndoButtons')
 require('assets/scripts/UI/hudArrows')
+require('assets/scripts/UI/tutorialScreen')
 
 Level = Object:new {
 	map = nil,
@@ -25,12 +26,8 @@ function Level:start()
 		music:play()
 	end
 
-	self.redoUndoButtons = RedoUndoButtons:new{
-		level = self
-	}
-
+	self.redoUndoButtons = RedoUndoButtons:new {level = self}
 	self.hudArrows = HudArrows:new()
-
 	self.pauseMenu = PauseMenu:new()
 
     for x = 1, self.map:getGridSize().x do
@@ -51,7 +48,7 @@ function Level:start()
 				gridItem.player:add("LuaBehavior", dofile(Config.player) {
 					level = self,
 					map   = self.map,
-					pauseMenu  = self.pauseMenu
+					pauseMenu  = self.pauseMenu,
 				})
 				self.player = gridItem.player:get("LuaBehavior")
 			end
@@ -123,4 +120,6 @@ function Level:start()
 	if self.extras then
 		Game.makeActors(self.extras)
 	end
+
+	self.tutorialScreen = TutorialScreen:new()
 end

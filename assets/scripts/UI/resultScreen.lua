@@ -136,13 +136,16 @@ function ResultScreen:createResultPanel()
 		Game.currentLevel = 0
 	end
 
+	if not Game.maxLevel then
+		Game.levels   = dofile(Config.levelsDefinition)
+		Game.maxLevel = #Game.levels
+	end
+
 	if Game.currentLevel >= Game.maxLevel then
 		local mainMenuButtonUIRect = mainMenuButton:get("UIRect")
 		mainMenuButtonUIRect.anchorMin = {0.5,0.45}
 		mainMenuButtonUIRect.anchorMax = {0.5,0.45}
-	end
-
-	if Game.currentLevel < Game.maxLevel then		
+	elseif Game.currentLevel < Game.maxLevel then		
 		local nextLevelButton = Game.makeActor {
 			Name = "NextLevelButton",
 			Transform = {

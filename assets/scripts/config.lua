@@ -20,3 +20,7 @@ laser = 'assets/scripts/laser.lua'
 resultScreen = 'assets/scripts/UI/resultScreen.lua'
 saveFile = 'assets/scripts/save.lua'
 levelsDefinition = 'assets/scripts/levelsDefinition.lua'
+textColors = {
+    primary = {168/255, 130/255, 97/255, 1},
+    backdrop = {25/255, 14/255, 4/255, 0.8}
+}

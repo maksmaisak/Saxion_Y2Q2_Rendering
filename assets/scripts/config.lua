@@ -67,7 +67,7 @@ local function makeMusic(path, volume, loop, offset)
 end
 
 audio = {
-    ambience = makeMusic('audio/Ambience.wav'),
+    ambience = makeMusic('audio/Ambience.wav', 100, true),
     door = {
         open  = makeSound('audio/doorOpen.wav' , 20),
         close = makeSound('audio/doorClose.wav', 20),

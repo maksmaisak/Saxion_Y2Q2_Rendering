@@ -2453,7 +2453,7 @@ grid[3][16].obstacle = {
 }
 
 grid[2][16].goal = {
-    startActive = false,
+    startActive = true,
     light = {
         Name = "Point Light",
         Transform = {
@@ -2617,6 +2617,7 @@ grid[7][6].button = {
 }
 
 grid[4][9].portal = {
+    teleportPosition = {x = 7, y = 4},
     actor = {
         Name = "Portal (1)",
         Transform = {
@@ -2646,6 +2647,7 @@ grid[4][9].portal = {
 }
 
 grid[7][4].portal = {
+    teleportPosition = {x = 4, y = 9},
     actor = {
         Name = "Portal",
         Transform = {
@@ -2965,7 +2967,7 @@ local extras = {
                 {
                     Name = "vine_03",
                     Transform = {
-                        position = {3.44, -0.184, 8.11},
+                        position = {3.44, -0.104, 8.11},
                         rotation = {0, 270.0002, 0},
                         children = {
                             {
@@ -3002,7 +3004,7 @@ local extras = {
                 {
                     Name = "vine_01 (1)",
                     Transform = {
-                        position = {3.9, -0.18, 6.46},
+                        position = {3.9, -0.076, 6.46},
                         rotation = {0, 179.9996, 0},
                         scale = {0.86536, 0.86536, 0.86536},
                         children = {

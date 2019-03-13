@@ -1576,12 +1576,12 @@ local extras = {
     {
         Name = "Main Camera",
         Transform = {
-            position = {-6, 12.83, -1.5},
+            position = {-4.4, 11.89, -2.43},
             rotation = {315, 225, -2.414836E-06},
         },
         Camera = {
             isOrthographic = true,
-            orthographicHalfSize = 6.4,
+            orthographicHalfSize = 5.6,
             nearPlaneDistance = 0.3,
             farPlaneDistance = 1000
         }

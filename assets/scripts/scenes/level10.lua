@@ -686,6 +686,168 @@ grid[3][10].tile = {
     },
 }
 
+grid[3][12].tile = {
+    Name = "Tile 2 (3)",
+    Transform = {
+        position = {2, 0, 11},
+        children = {
+            {
+                Name = "TerrainBlockV3",
+                Transform = {
+                    position = {0, -1, -0.337},
+                    children = {
+                        {
+                            Name = "TerrainBlockV3LowPoly1",
+                            Transform = {
+                            },
+                            RenderInfo = {
+                                mesh = 'objects/tile/Blocks/TerrainBlockVar3/TerrainBlockV3.obj',
+                                material = materials[7],
+                                isBatchingStatic = true
+                            }
+                        },
+                    }
+                },
+            },
+        }
+    },
+}
+
+grid[3][13].tile = {
+    Name = "Tile 2 (4)",
+    Transform = {
+        position = {2, 0, 12},
+        children = {
+            {
+                Name = "TerrainBlockV3",
+                Transform = {
+                    position = {0, -1, -0.337},
+                    children = {
+                        {
+                            Name = "TerrainBlockV3LowPoly1",
+                            Transform = {
+                            },
+                            RenderInfo = {
+                                mesh = 'objects/tile/Blocks/TerrainBlockVar3/TerrainBlockV3.obj',
+                                material = materials[7],
+                                isBatchingStatic = true
+                            }
+                        },
+                    }
+                },
+            },
+        }
+    },
+}
+
+grid[3][14].tile = {
+    Name = "Tile 2 (5)",
+    Transform = {
+        position = {2, 0, 13},
+        children = {
+            {
+                Name = "TerrainBlockV3",
+                Transform = {
+                    position = {0, -1, -0.337},
+                    children = {
+                        {
+                            Name = "TerrainBlockV3LowPoly1",
+                            Transform = {
+                            },
+                            RenderInfo = {
+                                mesh = 'objects/tile/Blocks/TerrainBlockVar3/TerrainBlockV3.obj',
+                                material = materials[7],
+                                isBatchingStatic = true
+                            }
+                        },
+                    }
+                },
+            },
+        }
+    },
+}
+
+grid[3][15].tile = {
+    Name = "Tile 2 (6)",
+    Transform = {
+        position = {2, 0, 14},
+        children = {
+            {
+                Name = "TerrainBlockV3",
+                Transform = {
+                    position = {0, -1, -0.337},
+                    children = {
+                        {
+                            Name = "TerrainBlockV3LowPoly1",
+                            Transform = {
+                            },
+                            RenderInfo = {
+                                mesh = 'objects/tile/Blocks/TerrainBlockVar3/TerrainBlockV3.obj',
+                                material = materials[7],
+                                isBatchingStatic = true
+                            }
+                        },
+                    }
+                },
+            },
+        }
+    },
+}
+
+grid[3][16].tile = {
+    Name = "Tile 2 (7)",
+    Transform = {
+        position = {2, 0, 15},
+        children = {
+            {
+                Name = "TerrainBlockV3",
+                Transform = {
+                    position = {0, -1, -0.337},
+                    children = {
+                        {
+                            Name = "TerrainBlockV3LowPoly1",
+                            Transform = {
+                            },
+                            RenderInfo = {
+                                mesh = 'objects/tile/Blocks/TerrainBlockVar3/TerrainBlockV3.obj',
+                                material = materials[7],
+                                isBatchingStatic = true
+                            }
+                        },
+                    }
+                },
+            },
+        }
+    },
+}
+
+grid[3][17].tile = {
+    Name = "Tile 2 (8)",
+    Transform = {
+        position = {2, 0, 16},
+        children = {
+            {
+                Name = "TerrainBlockV3",
+                Transform = {
+                    position = {0, -1, -0.337},
+                    children = {
+                        {
+                            Name = "TerrainBlockV3LowPoly1",
+                            Transform = {
+                            },
+                            RenderInfo = {
+                                mesh = 'objects/tile/Blocks/TerrainBlockVar3/TerrainBlockV3.obj',
+                                material = materials[7],
+                                isBatchingStatic = true
+                            }
+                        },
+                    }
+                },
+            },
+        }
+    },
+}
+
 grid[4][2].tile = {
     Name = "Tile (2)",
     Transform = {
@@ -901,6 +1063,33 @@ grid[4][10].tile = {
     Name = "Tile 2",
     Transform = {
         position = {3, 0, 9},
+        children = {
+            {
+                Name = "TerrainBlockV3",
+                Transform = {
+                    position = {0, -1, -0.337},
+                    children = {
+                        {
+                            Name = "TerrainBlockV3LowPoly1",
+                            Transform = {
+                            },
+                            RenderInfo = {
+                                mesh = 'objects/tile/Blocks/TerrainBlockVar3/TerrainBlockV3.obj',
+                                material = materials[7],
+                                isBatchingStatic = true
+                            }
+                        },
+                    }
+                },
+            },
+        }
+    },
+}
+
+grid[4][11].tile = {
+    Name = "Tile 2 (9)",
+    Transform = {
+        position = {3, 0, 10},
         children = {
             {
                 Name = "TerrainBlockV3",
@@ -1356,222 +1545,6 @@ grid[5][17].tile = {
     },
 }
 
-grid[6][10].tile = {
-    Name = "Tile 3 (1)",
-    Transform = {
-        position = {5, 0, 9},
-        children = {
-            {
-                Name = "TerrainBlockV4",
-                Transform = {
-                    position = {0, -1, -0.146},
-                    children = {
-                        {
-                            Name = "TerrainBlockV4LowPoly1",
-                            Transform = {
-                            },
-                            RenderInfo = {
-                                mesh = 'objects/tile/Blocks/TerrainBlockVar4/TerrainBlockV4.obj',
-                                material = materials[11],
-                                isBatchingStatic = true
-                            }
-                        },
-                    }
-                },
-            },
-        }
-    },
-}
-
-grid[6][11].tile = {
-    Name = "Tile 3",
-    Transform = {
-        position = {5, 0, 10},
-        children = {
-            {
-                Name = "TerrainBlockV4",
-                Transform = {
-                    position = {0, -1, -0.146},
-                    children = {
-                        {
-                            Name = "TerrainBlockV4LowPoly1",
-                            Transform = {
-                            },
-                            RenderInfo = {
-                                mesh = 'objects/tile/Blocks/TerrainBlockVar4/TerrainBlockV4.obj',
-                                material = materials[11],
-                                isBatchingStatic = true
-                            }
-                        },
-                    }
-                },
-            },
-        }
-    },
-}
-
-grid[6][12].tile = {
-    Name = "Tile 1",
-    Transform = {
-        position = {5, 0, 11},
-        children = {
-            {
-                Name = "TerrainBlockV2",
-                Transform = {
-                    position = {0, -1, -0.148},
-                    children = {
-                        {
-                            Name = "TerrainBlockV2LowPoly1",
-                            Transform = {
-                            },
-                            RenderInfo = {
-                                mesh = 'objects/tile/Blocks/TerrainBlockVar2/TerrainBlockV2.obj',
-                                material = materials[6],
-                                isBatchingStatic = true
-                            }
-                        },
-                    }
-                },
-            },
-        }
-    },
-}
-
-grid[6][13].tile = {
-    Name = "Tile 2 (2)",
-    Transform = {
-        position = {5, 0, 12},
-        children = {
-            {
-                Name = "TerrainBlockV3",
-                Transform = {
-                    position = {0, -1, -0.337},
-                    children = {
-                        {
-                            Name = "TerrainBlockV3LowPoly1",
-                            Transform = {
-                            },
-                            RenderInfo = {
-                                mesh = 'objects/tile/Blocks/TerrainBlockVar3/TerrainBlockV3.obj',
-                                material = materials[7],
-                                isBatchingStatic = true
-                            }
-                        },
-                    }
-                },
-            },
-        }
-    },
-}
-
-grid[6][14].tile = {
-    Name = "Tile 3",
-    Transform = {
-        position = {5, 0, 13},
-        children = {
-            {
-                Name = "TerrainBlockV4",
-                Transform = {
-                    position = {0, -1, -0.146},
-                    children = {
-                        {
-                            Name = "TerrainBlockV4LowPoly1",
-                            Transform = {
-                            },
-                            RenderInfo = {
-                                mesh = 'objects/tile/Blocks/TerrainBlockVar4/TerrainBlockV4.obj',
-                                material = materials[11],
-                                isBatchingStatic = true
-                            }
-                        },
-                    }
-                },
-            },
-        }
-    },
-}
-
-grid[6][15].tile = {
-    Name = "Tile 3",
-    Transform = {
-        position = {5, 0, 14},
-        children = {
-            {
-                Name = "TerrainBlockV4",
-                Transform = {
-                    position = {0, -1, -0.146},
-                    children = {
-                        {
-                            Name = "TerrainBlockV4LowPoly1",
-                            Transform = {
-                            },
-                            RenderInfo = {
-                                mesh = 'objects/tile/Blocks/TerrainBlockVar4/TerrainBlockV4.obj',
-                                material = materials[11],
-                                isBatchingStatic = true
-                            }
-                        },
-                    }
-                },
-            },
-        }
-    },
-}
-
-grid[6][16].tile = {
-    Name = "Tile 1",
-    Transform = {
-        position = {5, 0, 15},
-        children = {
-            {
-                Name = "TerrainBlockV2",
-                Transform = {
-                    position = {0, -1, -0.148},
-                    children = {
-                        {
-                            Name = "TerrainBlockV2LowPoly1",
-                            Transform = {
-                            },
-                            RenderInfo = {
-                                mesh = 'objects/tile/Blocks/TerrainBlockVar2/TerrainBlockV2.obj',
-                                material = materials[6],
-                                isBatchingStatic = true
-                            }
-                        },
-                    }
-                },
-            },
-        }
-    },
-}
-
-grid[6][17].tile = {
-    Name = "Tile 3",
-    Transform = {
-        position = {5, 0, 16},
-        children = {
-            {
-                Name = "TerrainBlockV4",
-                Transform = {
-                    position = {0, -1, -0.146},
-                    children = {
-                        {
-                            Name = "TerrainBlockV4LowPoly1",
-                            Transform = {
-                            },
-                            RenderInfo = {
-                                mesh = 'objects/tile/Blocks/TerrainBlockVar4/TerrainBlockV4.obj',
-                                material = materials[11],
-                                isBatchingStatic = true
-                            }
-                        },
-                    }
-                },
-            },
-        }
-    },
-}
-
 grid[2][5].obstacle = {
     Name = "PillarRight",
     Transform = {
@@ -1628,6 +1601,67 @@ grid[3][8].obstacle = {
     },
 }
 
+grid[3][12].obstacle = {
+    Name = "PillarRight",
+    Transform = {
+        position = {2, 0, 11},
+        children = {
+            {
+                Name = "DoorPilars_03",
+                Transform = {
+                    position = {1.281, 0, -0.003225},
+                    children = {
+                        {
+                            Name = "DoorPilars_01",
+                            Transform = {
+                                rotation = {0, 89.99983, 0},
+                            },
+                            RenderInfo = {
+                                mesh = 'objects/Door/DoorPilars_03.obj',
+                                material = materials[13],
+                                isBatchingStatic = true
+                            }
+                        },
+                    }
+                },
+            },
+        }
+    },
+}
+
+grid[3][15].obstacle = {
+    Name = "Obstacle",
+    Transform = {
+        position = {2.000006, 0, 13.99999},
+        rotation = {0, 179.9997, 0},
+        children = {
+            {
+                Name = "FoundationBlock",
+                Transform = {
+                    position = {0.006759644, 0.01687413, -0.008},
+                    children = {
+                        {
+                            Name = "TerrainBlockV3",
+                            Transform = {
+                                position = {0, 0, -0.36},
+                                children = {
+                                    {
+                                        Name = "TerrainBlockV3LowPoly1",
+                                        Transform = {
+                                            position = {-0.3820662, 0, 0.3415085},
+                                            rotation = {0, 89.99983, 0},
+                                        },
+                                    },
+                                }
+                            },
+                        },
+                    }
+                },
+            },
+        }
+    },
+}
+
 grid[4][5].obstacle = {
     Name = "PillarLeft",
     Transform = {
@@ -1656,38 +1690,10 @@ grid[4][5].obstacle = {
     },
 }
 
-grid[4][12].obstacle = {
-    Name = "PillarRight",
+grid[4][16].obstacle = {
+    Name = "Obstacle (1)",
     Transform = {
-        position = {3, 0, 11},
-        children = {
-            {
-                Name = "DoorPilars_03",
-                Transform = {
-                    position = {1.281, 0, -0.003225},
-                    children = {
-                        {
-                            Name = "DoorPilars_01",
-                            Transform = {
-                                rotation = {0, 89.99983, 0},
-                            },
-                            RenderInfo = {
-                                mesh = 'objects/Door/DoorPilars_03.obj',
-                                material = materials[13],
-                                isBatchingStatic = true
-                            }
-                        },
-                    }
-                },
-            },
-        }
-    },
-}
-
-grid[4][15].obstacle = {
-    Name = "Obstacle",
-    Transform = {
-        position = {3.000006, 0, 13.99999},
+        position = {3, 0, 15},
         rotation = {0, 179.9997, 0},
         children = {
             {
@@ -1745,43 +1751,10 @@ grid[5][8].obstacle = {
     },
 }
 
-grid[5][16].obstacle = {
-    Name = "Obstacle (1)",
-    Transform = {
-        position = {4, 0, 15},
-        rotation = {0, 179.9997, 0},
-        children = {
-            {
-                Name = "FoundationBlock",
-                Transform = {
-                    position = {0.006759644, 0.01687413, -0.008},
-                    children = {
-                        {
-                            Name = "TerrainBlockV3",
-                            Transform = {
-                                position = {0, 0, -0.36},
-                                children = {
-                                    {
-                                        Name = "TerrainBlockV3LowPoly1",
-                                        Transform = {
-                                            position = {-0.3820662, 0, 0.3415085},
-                                            rotation = {0, 89.99983, 0},
-                                        },
-                                    },
-                                }
-                            },
-                        },
-                    }
-                },
-            },
-        }
-    },
-}
-
-grid[6][12].obstacle = {
+grid[5][12].obstacle = {
     Name = "PillarLeft",
     Transform = {
-        position = {5, 0, 11},
+        position = {4, 0, 11},
         children = {
             {
                 Name = "DoorPilars_02",
@@ -1806,10 +1779,10 @@ grid[6][12].obstacle = {
     },
 }
 
-grid[6][15].obstacle = {
+grid[5][15].obstacle = {
     Name = "Obstacle (2)",
     Transform = {
-        position = {5.000006, 0, 14.00001},
+        position = {4.000006, 0, 14.00001},
         rotation = {0, 179.9997, 0},
         children = {
             {
@@ -1839,7 +1812,7 @@ grid[6][15].obstacle = {
     },
 }
 
-grid[5][15].goal = {
+grid[4][15].goal = {
     startActive = false,
     light = {
         Name = "Point Light",
@@ -1857,7 +1830,7 @@ grid[5][15].goal = {
     actor = {
         Name = "LevelGoal",
         Transform = {
-            position = {4, 0, 14},
+            position = {3, 0, 14},
             children = {
                 {
                     Name = "ExitFinishModelLow",
@@ -1939,7 +1912,7 @@ grid[1][10].button = {
 
 grid[2][1].button = {
     targetPositions = {
-        {x = 5, y = 12},
+        {x = 4, y = 12},
     },
     actor = {
         Name = "Button (2)",
@@ -1972,7 +1945,7 @@ grid[2][1].button = {
 
 grid[4][7].button = {
     targetPositions = {
-        {x = 5, y = 15},
+        {x = 4, y = 15},
         {x = 4, y = 8},
     },
     actor = {
@@ -2189,11 +2162,11 @@ grid[4][8].door = {
     }
 }
 
-grid[5][12].door = {
+grid[4][12].door = {
     actor = {
         Name = "Door",
         Transform = {
-            position = {4, 0, 11},
+            position = {3, 0, 11},
         },
     },
     swingLeft = {
@@ -2336,7 +2309,7 @@ local extras = {
                 {
                     Name = "vine_02",
                     Transform = {
-                        position = {-2.43, 4.65, 17.68},
+                        position = {-3.41, 4.86, 17.68},
                         rotation = {347.8719, 269.9996, 8.514329E-05},
                         scale = {1.225201, 1.2891, 1},
                         children = {
@@ -2441,7 +2414,7 @@ local extras = {
                 {
                     Name = "grass_02 (4)",
                     Transform = {
-                        position = {-0.14, -0.408, 10.69},
+                        position = {3.847, -0.408, 8.637},
                         rotation = {0, 6.011236, 0},
                         children = {
                             {
@@ -2630,25 +2603,6 @@ local extras = {
                     },
                 },
                 {
-                    Name = "MenuFLoor_01 (77)",
-                    Transform = {
-                        position = {-1, -0.5, 11.5},
-                        children = {
-                            {
-                                Name = "Group5936",
-                                Transform = {
-                                    position = {2, 0, 0},
-                                },
-                                RenderInfo = {
-                                    mesh = 'objects/decorations/MenuFloor/MenuFLoor_01.obj',
-                                    material = materials[5],
-                                    isBatchingStatic = true
-                                }
-                            },
-                        }
-                    },
-                },
-                {
                     Name = "MenuFLoor_01 (78)",
                     Transform = {
                         position = {0, -0.5, 12.5},
@@ -2670,7 +2624,7 @@ local extras = {
                 {
                     Name = "MenuFLoor_01 (79)",
                     Transform = {
-                        position = {0, -0.5, 14.5},
+                        position = {-1, -0.5, 14.5},
                         children = {
                             {
                                 Name = "Group5936",
@@ -2689,7 +2643,7 @@ local extras = {
                 {
                     Name = "MenuFLoor_01 (80)",
                     Transform = {
-                        position = {0, -0.5, 16.5},
+                        position = {-1, -0.5, 16.5},
                         children = {
                             {
                                 Name = "Group5936",
@@ -2915,48 +2869,9 @@ local extras = {
                     },
                 },
                 {
-                    Name = "MenuFLoor_01 (53)",
-                    Transform = {
-                        position = {7.5, -0.5, 4},
-                        rotation = {0, 90, 0},
-                        children = {
-                            {
-                                Name = "Group5936",
-                                Transform = {
-                                    position = {-13, 0, -2},
-                                },
-                                RenderInfo = {
-                                    mesh = 'objects/decorations/MenuFloor/MenuFLoor_01.obj',
-                                    material = materials[5],
-                                    isBatchingStatic = true
-                                }
-                            },
-                        }
-                    },
-                },
-                {
-                    Name = "MenuFLoor_01 (88)",
-                    Transform = {
-                        position = {3, -0.5, 6.5},
-                        children = {
-                            {
-                                Name = "Group5936",
-                                Transform = {
-                                    position = {2, 0, 0},
-                                },
-                                RenderInfo = {
-                                    mesh = 'objects/decorations/MenuFloor/MenuFLoor_01.obj',
-                                    material = materials[5],
-                                    isBatchingStatic = true
-                                }
-                            },
-                        }
-                    },
-                },
-                {
                     Name = "MenuFLoor_01 (89)",
                     Transform = {
-                        position = {4, -0.5, 9.5},
+                        position = {3, -0.5, 10.5},
                         children = {
                             {
                                 Name = "Group5936",
@@ -2975,7 +2890,7 @@ local extras = {
                 {
                     Name = "MenuFLoor_01 (90)",
                     Transform = {
-                        position = {4, -0.5, 11.5},
+                        position = {3, -0.5, 12.5},
                         children = {
                             {
                                 Name = "Group5936",
@@ -2994,7 +2909,7 @@ local extras = {
                 {
                     Name = "MenuFLoor_01 (91)",
                     Transform = {
-                        position = {4, -0.5, 13.5},
+                        position = {3, -0.5, 14.5},
                         children = {
                             {
                                 Name = "Group5936",
@@ -3011,9 +2926,48 @@ local extras = {
                     },
                 },
                 {
+                    Name = "MenuFLoor_01 (53)",
+                    Transform = {
+                        position = {7.5, -0.5, -4},
+                        rotation = {0, 90, 0},
+                        children = {
+                            {
+                                Name = "Group5936",
+                                Transform = {
+                                    position = {-13, 0, -2},
+                                },
+                                RenderInfo = {
+                                    mesh = 'objects/decorations/MenuFloor/MenuFLoor_01.obj',
+                                    material = materials[5],
+                                    isBatchingStatic = true
+                                }
+                            },
+                        }
+                    },
+                },
+                {
                     Name = "MenuFLoor_01 (92)",
                     Transform = {
-                        position = {4, -0.5, 15.5},
+                        position = {3, -0.5, 16.5},
+                        children = {
+                            {
+                                Name = "Group5936",
+                                Transform = {
+                                    position = {2, 0, 0},
+                                },
+                                RenderInfo = {
+                                    mesh = 'objects/decorations/MenuFloor/MenuFLoor_01.obj',
+                                    material = materials[5],
+                                    isBatchingStatic = true
+                                }
+                            },
+                        }
+                    },
+                },
+                {
+                    Name = "MenuFLoor_01 (88)",
+                    Transform = {
+                        position = {3, -0.5, 6.5},
                         children = {
                             {
                                 Name = "Group5936",
@@ -3413,37 +3367,9 @@ local extras = {
                     },
                 },
                 {
-                    Name = "FoundationBlock (99)",
-                    Transform = {
-                        position = {1, -1.49, 11},
-                        children = {
-                            {
-                                Name = "TerrainBlockV3",
-                                Transform = {
-                                    position = {0, 0, -0.36},
-                                    children = {
-                                        {
-                                            Name = "TerrainBlockV3LowPoly1",
-                                            Transform = {
-                                                position = {-0.3820662, 0, 0.3415085},
-                                                rotation = {0, 89.99983, 0},
-                                            },
-                                            RenderInfo = {
-                                                mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
-                                                material = materials[3],
-                                                isBatchingStatic = true
-                                            }
-                                        },
-                                    }
-                                },
-                            },
-                        }
-                    },
-                },
-                {
                     Name = "FoundationBlock (100)",
                     Transform = {
-                        position = {1, -1.49, 12},
+                        position = {1, -1.49, 13},
                         children = {
                             {
                                 Name = "TerrainBlockV3",
@@ -3499,7 +3425,7 @@ local extras = {
                 {
                     Name = "FoundationBlock (102)",
                     Transform = {
-                        position = {2, -1.49, 14},
+                        position = {1, -1.49, 14},
                         children = {
                             {
                                 Name = "TerrainBlockV3",
@@ -3527,7 +3453,35 @@ local extras = {
                 {
                     Name = "FoundationBlock (103)",
                     Transform = {
-                        position = {2, -1.49, 15},
+                        position = {1, -1.49, 15},
+                        children = {
+                            {
+                                Name = "TerrainBlockV3",
+                                Transform = {
+                                    position = {0, 0, -0.36},
+                                    children = {
+                                        {
+                                            Name = "TerrainBlockV3LowPoly1",
+                                            Transform = {
+                                                position = {-0.3820662, 0, 0.3415085},
+                                                rotation = {0, 89.99983, 0},
+                                            },
+                                            RenderInfo = {
+                                                mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
+                                                material = materials[3],
+                                                isBatchingStatic = true
+                                            }
+                                        },
+                                    }
+                                },
+                            },
+                        }
+                    },
+                },
+                {
+                    Name = "FoundationBlock (99)",
+                    Transform = {
+                        position = {0, -1.49, 11},
                         children = {
                             {
                                 Name = "TerrainBlockV3",
@@ -3555,7 +3509,7 @@ local extras = {
                 {
                     Name = "FoundationBlock (104)",
                     Transform = {
-                        position = {2, -1.49, 16},
+                        position = {1, -1.49, 16},
                         children = {
                             {
                                 Name = "TerrainBlockV3",
@@ -3583,7 +3537,7 @@ local extras = {
                 {
                     Name = "FoundationBlock (105)",
                     Transform = {
-                        position = {2, -1.49, 17},
+                        position = {1, -1.49, 17},
                         children = {
                             {
                                 Name = "TerrainBlockV3",
@@ -3813,6 +3767,110 @@ local extras = {
                         }
                     },
                 },
+                {
+                    Name = "MenuFLoor_01 (93)",
+                    Transform = {
+                        position = {0, -0.5, 14.5},
+                        children = {
+                            {
+                                Name = "Group5936",
+                                Transform = {
+                                    position = {2, 0, 0},
+                                },
+                                RenderInfo = {
+                                    mesh = 'objects/decorations/MenuFloor/MenuFLoor_01.obj',
+                                    material = materials[5],
+                                    isBatchingStatic = true
+                                }
+                            },
+                        }
+                    },
+                },
+                {
+                    Name = "MenuFLoor_01 (95)",
+                    Transform = {
+                        position = {-1, -0.5, 12.5},
+                        children = {
+                            {
+                                Name = "Group5936",
+                                Transform = {
+                                    position = {2, 0, 0},
+                                },
+                                RenderInfo = {
+                                    mesh = 'objects/decorations/MenuFloor/MenuFLoor_01.obj',
+                                    material = materials[5],
+                                    isBatchingStatic = true
+                                }
+                            },
+                        }
+                    },
+                },
+                {
+                    Name = "MenuFLoor_01 (94)",
+                    Transform = {
+                        position = {0, -0.5, 16.5},
+                        children = {
+                            {
+                                Name = "Group5936",
+                                Transform = {
+                                    position = {2, 0, 0},
+                                },
+                                RenderInfo = {
+                                    mesh = 'objects/decorations/MenuFloor/MenuFLoor_01.obj',
+                                    material = materials[5],
+                                    isBatchingStatic = true
+                                }
+                            },
+                        }
+                    },
+                },
+                {
+                    Name = "MenuFLoor_01 (55)",
+                    Transform = {
+                        position = {0.5, -0.5, 11},
+                        rotation = {0, 90, 0},
+                        children = {
+                            {
+                                Name = "Group5936",
+                                Transform = {
+                                },
+                                RenderInfo = {
+                                    mesh = 'objects/decorations/MenuFloor/MenuFLoor_01.obj',
+                                    material = materials[5],
+                                    isBatchingStatic = true
+                                }
+                            },
+                        }
+                    },
+                },
+                {
+                    Name = "FoundationBlock (112)",
+                    Transform = {
+                        position = {1, -1.49, 12},
+                        children = {
+                            {
+                                Name = "TerrainBlockV3",
+                                Transform = {
+                                    position = {0, 0, -0.36},
+                                    children = {
+                                        {
+                                            Name = "TerrainBlockV3LowPoly1",
+                                            Transform = {
+                                                position = {-0.3820662, 0, 0.3415085},
+                                                rotation = {0, 89.99983, 0},
+                                            },
+                                            RenderInfo = {
+                                                mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
+                                                material = materials[3],
+                                                isBatchingStatic = true
+                                            }
+                                        },
+                                    }
+                                },
+                            },
+                        }
+                    },
+                },
             }
         },
     },
@@ -3835,7 +3893,7 @@ local extras = {
                 {
                     Name = "Door (2)",
                     Transform = {
-                        position = {4, 0, 11},
+                        position = {3, 0, 11},
                     },
                 },
             }

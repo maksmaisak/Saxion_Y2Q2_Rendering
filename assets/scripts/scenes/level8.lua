@@ -1761,7 +1761,7 @@ grid[2][13].goal = {
 
 grid[2][10].button = {
     targetPositions = {
-        {x = 2, y = 11},
+        {x = 3, y = 9},
     },
     actor = {
         Name = "Button (2)",
@@ -1794,7 +1794,7 @@ grid[2][10].button = {
 
 grid[3][6].button = {
     targetPositions = {
-        {x = 3, y = 9},
+        {x = 2, y = 11},
     },
     actor = {
         Name = "Button (1)",

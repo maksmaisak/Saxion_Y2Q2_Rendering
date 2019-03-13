@@ -11,6 +11,13 @@ local materials = {
     },
     Game.makeMaterial {
         shader = 'pbr',
+        albedo = 'objects/ExitFinish/InsideExit_initialShadingGroup_AlbedoTransparency.png',
+        metallicSmoothness = 'objects/ExitFinish/InsideExit_initialShadingGroup_MetallicSmoothness.png',
+        smoothnessMultiplier = 1,
+        aoMultiplier = 1,
+    },
+    Game.makeMaterial {
+        shader = 'pbr',
         albedo = 'objects/tile/Blocks/FoundationBlock/Textures/AlbedoTransparency 1.png',
         metallicSmoothness = 'objects/tile/Blocks/FoundationBlock/Textures/MetallicSmoothness.png',
         ao = 'objects/tile/Blocks/FoundationBlock/Textures/Grayscale.png',
@@ -27,17 +34,17 @@ local materials = {
     },
     Game.makeMaterial {
         shader = 'pbr',
-        albedo = 'objects/tile/ButtonTile/Texture/ButtonTile_AlbedoTransparency.png',
-        metallicSmoothness = 'objects/tile/ButtonTile/Texture/ButtonTile_MetallicSmoothness.png',
-        ao = 'objects/tile/ButtonTile/Texture/ButtonTile_AO.png',
+        albedo = 'objects/tile/Blocks/TerrainBlockVar1/Texture/TerrainBlockV1_AlbedoTransparency.png',
+        metallicSmoothness = 'objects/tile/Blocks/TerrainBlockVar1/Texture/TerrainBlockV1_MetallicSmoothness.png',
+        ao = 'objects/tile/Blocks/TerrainBlockVar1/Texture/TerrainBlockV1_AO.png',
         smoothnessMultiplier = 1,
         aoMultiplier = 1,
     },
     Game.makeMaterial {
         shader = 'pbr',
-        albedo = 'objects/tile/Blocks/TerrainBlockVar1/Texture/TerrainBlockV1_AlbedoTransparency.png',
-        metallicSmoothness = 'objects/tile/Blocks/TerrainBlockVar1/Texture/TerrainBlockV1_MetallicSmoothness.png',
-        ao = 'objects/tile/Blocks/TerrainBlockVar1/Texture/TerrainBlockV1_AO.png',
+        albedo = 'objects/tile/ButtonTile/Texture/ButtonTile_AlbedoTransparency.png',
+        metallicSmoothness = 'objects/tile/ButtonTile/Texture/ButtonTile_MetallicSmoothness.png',
+        ao = 'objects/tile/ButtonTile/Texture/ButtonTile_AO.png',
         smoothnessMultiplier = 1,
         aoMultiplier = 1,
     },
@@ -1162,7 +1169,7 @@ grid[3][6].obstacle = {
                             },
                             RenderInfo = {
                                 mesh = 'objects/Door/DoorPilars_03.obj',
-                                material = materials[9],
+                                material = materials[10],
                                 isBatchingStatic = true
                             }
                         },
@@ -1256,7 +1263,7 @@ grid[5][6].obstacle = {
                             },
                             RenderInfo = {
                                 mesh = 'objects/Door/DoorPilars_02.obj',
-                                material = materials[9],
+                                material = materials[10],
                                 isBatchingStatic = true
                             }
                         },
@@ -1329,10 +1336,31 @@ grid[4][8].goal = {
                             {
                                 Name = "ExitFinishModelLow1",
                                 Transform = {
+                                    children = {
+                                        {
+                                            Name = "InsideExit",
+                                            Transform = {
+                                                position = {-0.005870819, 4.905462E-05, 0},
+                                                rotation = {0, 0, 359.6352},
+                                                children = {
+                                                    {
+                                                        Name = "default",
+                                                        Transform = {
+                                                        },
+                                                        RenderInfo = {
+                                                            mesh = 'objects/ExitFinish/InsideExit.obj',
+                                                            material = materials[2],
+                                                            isBatchingStatic = true
+                                                        }
+                                                    },
+                                                }
+                                            },
+                                        },
+                                    }
                                 },
                                 RenderInfo = {
                                     mesh = 'objects/ExitFinish/ExitFinishModelLow.obj',
-                                    material = materials[3],
+                                    material = materials[4],
                                     isBatchingStatic = true
                                 }
                             },
@@ -1366,7 +1394,7 @@ grid[7][2].button = {
                                 },
                                 RenderInfo = {
                                     mesh = 'objects/tile/ButtonTile/ButtonTile.obj',
-                                    material = materials[4],
+                                    material = materials[6],
                                 }
                             },
                         }
@@ -1402,7 +1430,7 @@ grid[4][6].door = {
                                 },
                                 RenderInfo = {
                                     mesh = 'objects/Door/Door_01.obj',
-                                    material = materials[8],
+                                    material = materials[9],
                                 }
                             },
                         }
@@ -1429,7 +1457,7 @@ grid[4][6].door = {
                                 },
                                 RenderInfo = {
                                     mesh = 'objects/Door/Door_01.obj',
-                                    material = materials[8],
+                                    material = materials[9],
                                 }
                             },
                         }
@@ -1533,7 +1561,7 @@ local extras = {
                                 },
                                 RenderInfo = {
                                     mesh = 'objects/decorations/MenuFloor/MenuFLoor_01.obj',
-                                    material = materials[6],
+                                    material = materials[7],
                                     isBatchingStatic = true
                                 }
                             },
@@ -1558,7 +1586,7 @@ local extras = {
                                             },
                                             RenderInfo = {
                                                 mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
-                                                material = materials[2],
+                                                material = materials[3],
                                                 isBatchingStatic = true
                                             }
                                         },
@@ -1579,7 +1607,7 @@ local extras = {
                                 },
                                 RenderInfo = {
                                     mesh = 'objects/decorations/MenuFloor/MenuFLoor_01.obj',
-                                    material = materials[6],
+                                    material = materials[7],
                                     isBatchingStatic = true
                                 }
                             },
@@ -1598,7 +1626,7 @@ local extras = {
                                 },
                                 RenderInfo = {
                                     mesh = 'objects/decorations/MenuFloor/MenuFLoor_01.obj',
-                                    material = materials[6],
+                                    material = materials[7],
                                     isBatchingStatic = true
                                 }
                             },
@@ -1616,7 +1644,7 @@ local extras = {
                                 },
                                 RenderInfo = {
                                     mesh = 'objects/decorations/MenuFloor/MenuFLoor_01.obj',
-                                    material = materials[6],
+                                    material = materials[7],
                                     isBatchingStatic = true
                                 }
                             },
@@ -1634,7 +1662,7 @@ local extras = {
                                 },
                                 RenderInfo = {
                                     mesh = 'objects/decorations/MenuFloor/MenuFLoor_01.obj',
-                                    material = materials[6],
+                                    material = materials[7],
                                     isBatchingStatic = true
                                 }
                             },
@@ -1652,7 +1680,7 @@ local extras = {
                                 },
                                 RenderInfo = {
                                     mesh = 'objects/decorations/MenuFloor/MenuFLoor_01.obj',
-                                    material = materials[6],
+                                    material = materials[7],
                                     isBatchingStatic = true
                                 }
                             },
@@ -1671,7 +1699,7 @@ local extras = {
                                 },
                                 RenderInfo = {
                                     mesh = 'objects/decorations/MenuFloor/MenuFLoor_01.obj',
-                                    material = materials[6],
+                                    material = materials[7],
                                     isBatchingStatic = true
                                 }
                             },
@@ -1689,7 +1717,7 @@ local extras = {
                                 },
                                 RenderInfo = {
                                     mesh = 'objects/decorations/MenuFloor/MenuFLoor_01.obj',
-                                    material = materials[6],
+                                    material = materials[7],
                                     isBatchingStatic = true
                                 }
                             },
@@ -1708,7 +1736,7 @@ local extras = {
                                 },
                                 RenderInfo = {
                                     mesh = 'objects/decorations/MenuFloor/MenuFLoor_01.obj',
-                                    material = materials[6],
+                                    material = materials[7],
                                     isBatchingStatic = true
                                 }
                             },
@@ -1727,7 +1755,7 @@ local extras = {
                                 },
                                 RenderInfo = {
                                     mesh = 'objects/decorations/MenuFloor/MenuFLoor_01.obj',
-                                    material = materials[6],
+                                    material = materials[7],
                                     isBatchingStatic = true
                                 }
                             },
@@ -1745,7 +1773,7 @@ local extras = {
                                 },
                                 RenderInfo = {
                                     mesh = 'objects/decorations/MenuFloor/MenuFLoor_01.obj',
-                                    material = materials[6],
+                                    material = materials[7],
                                     isBatchingStatic = true
                                 }
                             },
@@ -1763,7 +1791,7 @@ local extras = {
                                 },
                                 RenderInfo = {
                                     mesh = 'objects/decorations/MenuFloor/MenuFLoor_01.obj',
-                                    material = materials[6],
+                                    material = materials[7],
                                     isBatchingStatic = true
                                 }
                             },
@@ -1782,7 +1810,7 @@ local extras = {
                                 },
                                 RenderInfo = {
                                     mesh = 'objects/decorations/MenuFloor/MenuFLoor_01.obj',
-                                    material = materials[6],
+                                    material = materials[7],
                                     isBatchingStatic = true
                                 }
                             },
@@ -1801,7 +1829,7 @@ local extras = {
                                 },
                                 RenderInfo = {
                                     mesh = 'objects/decorations/MenuFloor/MenuFLoor_01.obj',
-                                    material = materials[6],
+                                    material = materials[7],
                                     isBatchingStatic = true
                                 }
                             },
@@ -1819,7 +1847,7 @@ local extras = {
                                 },
                                 RenderInfo = {
                                     mesh = 'objects/decorations/MenuFloor/MenuFLoor_01.obj',
-                                    material = materials[6],
+                                    material = materials[7],
                                     isBatchingStatic = true
                                 }
                             },
@@ -1837,7 +1865,7 @@ local extras = {
                                 },
                                 RenderInfo = {
                                     mesh = 'objects/decorations/MenuFloor/MenuFLoor_01.obj',
-                                    material = materials[6],
+                                    material = materials[7],
                                     isBatchingStatic = true
                                 }
                             },
@@ -1856,7 +1884,7 @@ local extras = {
                                 },
                                 RenderInfo = {
                                     mesh = 'objects/decorations/MenuFloor/MenuFLoor_01.obj',
-                                    material = materials[6],
+                                    material = materials[7],
                                     isBatchingStatic = true
                                 }
                             },
@@ -1875,7 +1903,7 @@ local extras = {
                                 },
                                 RenderInfo = {
                                     mesh = 'objects/decorations/MenuFloor/MenuFLoor_01.obj',
-                                    material = materials[6],
+                                    material = materials[7],
                                     isBatchingStatic = true
                                 }
                             },
@@ -1894,7 +1922,7 @@ local extras = {
                                 },
                                 RenderInfo = {
                                     mesh = 'objects/decorations/MenuFloor/MenuFLoor_01.obj',
-                                    material = materials[6],
+                                    material = materials[7],
                                     isBatchingStatic = true
                                 }
                             },
@@ -1913,7 +1941,7 @@ local extras = {
                                 },
                                 RenderInfo = {
                                     mesh = 'objects/decorations/MenuFloor/MenuFLoor_01.obj',
-                                    material = materials[6],
+                                    material = materials[7],
                                     isBatchingStatic = true
                                 }
                             },
@@ -1931,7 +1959,7 @@ local extras = {
                                 },
                                 RenderInfo = {
                                     mesh = 'objects/decorations/MenuFloor/MenuFLoor_01.obj',
-                                    material = materials[6],
+                                    material = materials[7],
                                     isBatchingStatic = true
                                 }
                             },
@@ -1950,7 +1978,7 @@ local extras = {
                                 },
                                 RenderInfo = {
                                     mesh = 'objects/decorations/MenuFloor/MenuFLoor_01.obj',
-                                    material = materials[6],
+                                    material = materials[7],
                                     isBatchingStatic = true
                                 }
                             },
@@ -1968,7 +1996,7 @@ local extras = {
                                 },
                                 RenderInfo = {
                                     mesh = 'objects/decorations/MenuFloor/MenuFLoor_01.obj',
-                                    material = materials[6],
+                                    material = materials[7],
                                     isBatchingStatic = true
                                 }
                             },
@@ -1987,7 +2015,7 @@ local extras = {
                                 },
                                 RenderInfo = {
                                     mesh = 'objects/decorations/MenuFloor/MenuFLoor_01.obj',
-                                    material = materials[6],
+                                    material = materials[7],
                                     isBatchingStatic = true
                                 }
                             },
@@ -2005,7 +2033,7 @@ local extras = {
                                 },
                                 RenderInfo = {
                                     mesh = 'objects/decorations/MenuFloor/MenuFLoor_01.obj',
-                                    material = materials[6],
+                                    material = materials[7],
                                     isBatchingStatic = true
                                 }
                             },
@@ -2023,7 +2051,7 @@ local extras = {
                                 },
                                 RenderInfo = {
                                     mesh = 'objects/decorations/MenuFloor/MenuFLoor_01.obj',
-                                    material = materials[6],
+                                    material = materials[7],
                                     isBatchingStatic = true
                                 }
                             },
@@ -2041,7 +2069,7 @@ local extras = {
                                 },
                                 RenderInfo = {
                                     mesh = 'objects/decorations/MenuFloor/MenuFLoor_01.obj',
-                                    material = materials[6],
+                                    material = materials[7],
                                     isBatchingStatic = true
                                 }
                             },
@@ -2060,7 +2088,7 @@ local extras = {
                                 },
                                 RenderInfo = {
                                     mesh = 'objects/decorations/MenuFloor/MenuFLoor_01.obj',
-                                    material = materials[6],
+                                    material = materials[7],
                                     isBatchingStatic = true
                                 }
                             },
@@ -2085,7 +2113,7 @@ local extras = {
                                             },
                                             RenderInfo = {
                                                 mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
-                                                material = materials[2],
+                                                material = materials[3],
                                                 isBatchingStatic = true
                                             }
                                         },
@@ -2113,7 +2141,7 @@ local extras = {
                                             },
                                             RenderInfo = {
                                                 mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
-                                                material = materials[2],
+                                                material = materials[3],
                                                 isBatchingStatic = true
                                             }
                                         },
@@ -2141,7 +2169,7 @@ local extras = {
                                             },
                                             RenderInfo = {
                                                 mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
-                                                material = materials[2],
+                                                material = materials[3],
                                                 isBatchingStatic = true
                                             }
                                         },
@@ -2169,7 +2197,7 @@ local extras = {
                                             },
                                             RenderInfo = {
                                                 mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
-                                                material = materials[2],
+                                                material = materials[3],
                                                 isBatchingStatic = true
                                             }
                                         },
@@ -2197,7 +2225,7 @@ local extras = {
                                             },
                                             RenderInfo = {
                                                 mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
-                                                material = materials[2],
+                                                material = materials[3],
                                                 isBatchingStatic = true
                                             }
                                         },
@@ -2225,7 +2253,7 @@ local extras = {
                                             },
                                             RenderInfo = {
                                                 mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
-                                                material = materials[2],
+                                                material = materials[3],
                                                 isBatchingStatic = true
                                             }
                                         },
@@ -2253,7 +2281,7 @@ local extras = {
                                             },
                                             RenderInfo = {
                                                 mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
-                                                material = materials[2],
+                                                material = materials[3],
                                                 isBatchingStatic = true
                                             }
                                         },
@@ -2281,7 +2309,7 @@ local extras = {
                                             },
                                             RenderInfo = {
                                                 mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
-                                                material = materials[2],
+                                                material = materials[3],
                                                 isBatchingStatic = true
                                             }
                                         },
@@ -2309,7 +2337,7 @@ local extras = {
                                             },
                                             RenderInfo = {
                                                 mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
-                                                material = materials[2],
+                                                material = materials[3],
                                                 isBatchingStatic = true
                                             }
                                         },
@@ -2337,7 +2365,7 @@ local extras = {
                                             },
                                             RenderInfo = {
                                                 mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
-                                                material = materials[2],
+                                                material = materials[3],
                                                 isBatchingStatic = true
                                             }
                                         },
@@ -2365,7 +2393,7 @@ local extras = {
                                             },
                                             RenderInfo = {
                                                 mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
-                                                material = materials[2],
+                                                material = materials[3],
                                                 isBatchingStatic = true
                                             }
                                         },
@@ -2393,7 +2421,7 @@ local extras = {
                                             },
                                             RenderInfo = {
                                                 mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
-                                                material = materials[2],
+                                                material = materials[3],
                                                 isBatchingStatic = true
                                             }
                                         },
@@ -2421,7 +2449,7 @@ local extras = {
                                             },
                                             RenderInfo = {
                                                 mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
-                                                material = materials[2],
+                                                material = materials[3],
                                                 isBatchingStatic = true
                                             }
                                         },
@@ -2449,7 +2477,7 @@ local extras = {
                                             },
                                             RenderInfo = {
                                                 mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
-                                                material = materials[2],
+                                                material = materials[3],
                                                 isBatchingStatic = true
                                             }
                                         },
@@ -2477,7 +2505,7 @@ local extras = {
                                             },
                                             RenderInfo = {
                                                 mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
-                                                material = materials[2],
+                                                material = materials[3],
                                                 isBatchingStatic = true
                                             }
                                         },
@@ -2505,7 +2533,7 @@ local extras = {
                                             },
                                             RenderInfo = {
                                                 mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
-                                                material = materials[2],
+                                                material = materials[3],
                                                 isBatchingStatic = true
                                             }
                                         },
@@ -2533,7 +2561,7 @@ local extras = {
                                             },
                                             RenderInfo = {
                                                 mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
-                                                material = materials[2],
+                                                material = materials[3],
                                                 isBatchingStatic = true
                                             }
                                         },
@@ -2561,7 +2589,7 @@ local extras = {
                                             },
                                             RenderInfo = {
                                                 mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
-                                                material = materials[2],
+                                                material = materials[3],
                                                 isBatchingStatic = true
                                             }
                                         },
@@ -2589,7 +2617,7 @@ local extras = {
                                             },
                                             RenderInfo = {
                                                 mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
-                                                material = materials[2],
+                                                material = materials[3],
                                                 isBatchingStatic = true
                                             }
                                         },
@@ -2617,7 +2645,7 @@ local extras = {
                                             },
                                             RenderInfo = {
                                                 mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
-                                                material = materials[2],
+                                                material = materials[3],
                                                 isBatchingStatic = true
                                             }
                                         },
@@ -2645,7 +2673,7 @@ local extras = {
                                             },
                                             RenderInfo = {
                                                 mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
-                                                material = materials[2],
+                                                material = materials[3],
                                                 isBatchingStatic = true
                                             }
                                         },
@@ -2668,7 +2696,7 @@ local extras = {
                                 },
                                 RenderInfo = {
                                     mesh = 'objects/decorations/Plants/vine_01.obj',
-                                    material = materials[7],
+                                    material = materials[8],
                                     isBatchingStatic = true
                                 }
                             },
@@ -2686,7 +2714,7 @@ local extras = {
                                 },
                                 RenderInfo = {
                                     mesh = 'objects/decorations/MenuFloor/MenuFLoor_01.obj',
-                                    material = materials[6],
+                                    material = materials[7],
                                     isBatchingStatic = true
                                 }
                             },
@@ -2704,7 +2732,7 @@ local extras = {
                                 },
                                 RenderInfo = {
                                     mesh = 'objects/decorations/MenuFloor/MenuFLoor_01.obj',
-                                    material = materials[6],
+                                    material = materials[7],
                                     isBatchingStatic = true
                                 }
                             },
@@ -2729,7 +2757,7 @@ local extras = {
                                             },
                                             RenderInfo = {
                                                 mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
-                                                material = materials[2],
+                                                material = materials[3],
                                                 isBatchingStatic = true
                                             }
                                         },
@@ -2750,7 +2778,7 @@ local extras = {
                                 },
                                 RenderInfo = {
                                     mesh = 'objects/decorations/MenuFloor/MenuFLoor_01.obj',
-                                    material = materials[6],
+                                    material = materials[7],
                                     isBatchingStatic = true
                                 }
                             },
@@ -2775,7 +2803,7 @@ local extras = {
                                             },
                                             RenderInfo = {
                                                 mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
-                                                material = materials[2],
+                                                material = materials[3],
                                                 isBatchingStatic = true
                                             }
                                         },
@@ -2796,7 +2824,7 @@ local extras = {
                                 },
                                 RenderInfo = {
                                     mesh = 'objects/decorations/Plants/grass_02.obj',
-                                    material = materials[7],
+                                    material = materials[8],
                                     isBatchingStatic = true
                                 }
                             },
@@ -2815,7 +2843,7 @@ local extras = {
                                 },
                                 RenderInfo = {
                                     mesh = 'objects/decorations/Plants/grass_02.obj',
-                                    material = materials[7],
+                                    material = materials[8],
                                     isBatchingStatic = true
                                 }
                             },
@@ -2834,7 +2862,7 @@ local extras = {
                                 },
                                 RenderInfo = {
                                     mesh = 'objects/decorations/Plants/Flower_01.obj',
-                                    material = materials[7],
+                                    material = materials[8],
                                     isBatchingStatic = true
                                 }
                             },
@@ -2853,7 +2881,7 @@ local extras = {
                                 },
                                 RenderInfo = {
                                     mesh = 'objects/decorations/Plants/vine_03.obj',
-                                    material = materials[7],
+                                    material = materials[8],
                                     isBatchingStatic = true
                                 }
                             },
@@ -2878,7 +2906,7 @@ local extras = {
                                             },
                                             RenderInfo = {
                                                 mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
-                                                material = materials[2],
+                                                material = materials[3],
                                                 isBatchingStatic = true
                                             }
                                         },
@@ -2906,7 +2934,7 @@ local extras = {
                                             },
                                             RenderInfo = {
                                                 mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
-                                                material = materials[2],
+                                                material = materials[3],
                                                 isBatchingStatic = true
                                             }
                                         },
@@ -2934,7 +2962,7 @@ local extras = {
                                             },
                                             RenderInfo = {
                                                 mesh = 'objects/tile/Blocks/FoundationBlock/TerrainBlockV3.obj',
-                                                material = materials[2],
+                                                material = materials[3],
                                                 isBatchingStatic = true
                                             }
                                         },
@@ -2957,7 +2985,7 @@ local extras = {
                                 },
                                 RenderInfo = {
                                     mesh = 'objects/decorations/Plants/vine_02.obj',
-                                    material = materials[7],
+                                    material = materials[8],
                                     isBatchingStatic = true
                                 }
                             },

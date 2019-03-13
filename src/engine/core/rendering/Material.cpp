@@ -115,6 +115,7 @@ namespace {
             "sprite",
             [](LuaState& lua, Material& m) {
                 m.setUniformValue("spriteTexture", getTextureFromLua(lua, "texture"));
+                m.setUniformValue("spriteColor", lua.tryGetField<glm::vec4>("color").value_or(glm::vec4(1.f)));
             }
         }
     };

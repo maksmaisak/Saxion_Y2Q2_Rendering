@@ -4,6 +4,7 @@ require('assets/scripts/level/map')
 require('assets/scripts/UI/pauseMenu')
 require('assets/scripts/UI/redoUndoButtons')
 require('assets/scripts/UI/hudArrows')
+require('assets/scripts/UI/tutorialScreen')
 
 Level = Object:new {
 	map = nil,
@@ -29,6 +30,9 @@ function Level:start()
 		level = self
 	}
 
+	self.tutorialScreen = TutorialScreen:new()
+
+	print(tutorialScreen)
 	self.hudArrows = HudArrows:new()
 
 	self.pauseMenu = PauseMenu:new()
@@ -51,7 +55,7 @@ function Level:start()
 				gridItem.player:add("LuaBehavior", dofile(Config.player) {
 					level = self,
 					map   = self.map,
-					pauseMenu  = self.pauseMenu
+					pauseMenu  = self.pauseMenu,
 				})
 				self.player = gridItem.player:get("LuaBehavior")
 			end

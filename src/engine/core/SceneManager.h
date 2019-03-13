@@ -22,15 +22,20 @@ namespace en {
         struct OnSceneOpened {SceneManager* sceneManager;};
 
         explicit SceneManager(Engine* engine) : m_engine(engine) {assert(m_engine);}
+        void update(float dt);
 
         inline Scene* getCurrentScene() { return m_currentScene.get(); }
         void setCurrentScene(std::unique_ptr<Scene> scene);
-        void setCurrentScene(Scene* scene);
+        void setCurrentSceneNextUpdate(std::unique_ptr<Scene> scene);
 
         template<typename TScene, typename... Args>
-        inline void setCurrentScene(Args&& ... args) {
-
+        inline void setCurrentScene(Args&&... args) {
             setCurrentScene(std::make_unique<TScene>(std::forward<Args>(args)...));
+        }
+
+        template<typename TScene, typename... Args>
+        inline void setCurrentSceneNextUpdate(Args&&... args) {
+            setCurrentSceneNextUpdate(std::make_unique<TScene>(std::forward<Args>(args)...));
         }
 
     private:
@@ -38,6 +43,7 @@ namespace en {
 
         Engine* m_engine;
         std::unique_ptr<Scene> m_currentScene;
+        std::unique_ptr<Scene> m_openNextUpdateScene;
     };
 }
 

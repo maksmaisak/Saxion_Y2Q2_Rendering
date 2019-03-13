@@ -83,20 +83,20 @@ void Engine::run() {
 
 void Engine::update(float dt) {
 
-    auto* currentScene = m_sceneManager.getCurrentScene();
-    if (currentScene) currentScene->update(dt);
-
-    m_systems.update(dt);
-    m_scheduler.update(dt);
+    m_sceneManager.update(dt);
+    m_systems     .update(dt);
+    m_scheduler   .update(dt);
 
     utils::KeyboardHelper::update();
-    utils::MouseHelper::update();
+    utils::MouseHelper   ::update();
 }
 
 void Engine::draw() {
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
     m_systems.draw();
+
     m_window.display();
 }
 
@@ -127,12 +127,10 @@ void Engine::printGLContextVersionInfo() {
 
     std::cout << "Context info:" << std::endl;
     std::cout << "----------------------------------" << std::endl;
-    //print some debug stats for whoever cares
     const GLubyte* vendor      = glGetString(GL_VENDOR);
     const GLubyte* renderer    = glGetString(GL_RENDERER);
     const GLubyte* version     = glGetString(GL_VERSION);
     const GLubyte* glslVersion = glGetString(GL_SHADING_LANGUAGE_VERSION);
-    //nice consistency here in the way OpenGl retrieves values
     GLint major, minor;
     glGetIntegerv(GL_MAJOR_VERSION, &major);
     glGetIntegerv(GL_MINOR_VERSION, &minor);
@@ -150,95 +148,89 @@ void Engine::initializeGlew() {
 
     std::cout << "Initializing GLEW..." << std::endl;
 
-    GLint glewStatus = glewInit();
-    if (glewStatus == GLEW_OK) {
+    const GLint glewStatus = glewInit();
+    if (glewStatus == GLEW_OK)
         std::cout << "Initialized GLEW: OK" << std::endl;
-    } else {
+    else
         std::cerr << "Initialized GLEW: FAILED" << std::endl;
+}
+
+namespace {
+
+    int makeActors(lua_State* L) {
+
+        luaL_checktype(L, 1, LUA_TTABLE);
+        Engine& engine = *lua::check<Engine*>(L, lua_upvalueindex(1));
+        ComponentsToLua::makeEntities(L, engine, 1);
+
+        return 0;
     }
-}
 
-int makeActors(lua_State* L) {
+    int makeActorFromLua(lua_State* L) {
 
-    luaL_checktype(L, 1, LUA_TTABLE);
-    Engine& engine = *lua::check<Engine*>(L, lua_upvalueindex(1));
-    ComponentsToLua::makeEntities(L, engine, 1);
+        Engine& engine = *lua::check<Engine*>(L, lua_upvalueindex(1));
 
-    return 0;
-}
+        // makeActor(table)
+        if (lua_istable(L, 1)) {
 
-int makeActorFromLua(lua_State* L) {
+            Actor actor = ComponentsToLua::makeEntity(L, engine, 1);
+            ComponentsToLua::addComponents(L, actor, 1);
+            lua::push(L, actor);
 
-    Engine& engine = *lua::check<Engine*>(L, lua_upvalueindex(1));
+            return 1;
+        }
 
-    // makeActor(table)
-    if (lua_istable(L, 1)) {
-
-        Actor actor = ComponentsToLua::makeEntity(L, engine, 1);
-        ComponentsToLua::addComponents(L, actor, 1);
+        // makeActor(name, [table])
+        Actor actor = engine.makeActor(luaL_checkstring(L, 1));
+        if (lua_istable(L, 2))
+            ComponentsToLua::addComponents(L, actor, 2);
         lua::push(L, actor);
-
         return 1;
     }
 
-    // makeActor(name, [table])
-    Actor actor = engine.makeActor(luaL_checkstring(L, 1));
-    if (lua_istable(L, 2))
-        ComponentsToLua::addComponents(L, actor, 2);
-    lua::push(L, actor);
-    return 1;
-}
+    int makeMaterial(lua_State* L) {
 
-int makeMaterial(lua_State* L) {
+        auto lua = LuaState(L);
 
-    auto lua = LuaState(L);
+        std::shared_ptr<Material> material;
+        if (lua.is<std::string>(1)) {
 
-    std::shared_ptr<Material> material;
-    if (lua.is<std::string>(1)) {
-
-        if (lua_isnoneornil(L, 2)) {
-            material = Resources<Material>::get(lua.to<std::string>(1));
+            if (lua_isnoneornil(L, 2)) {
+                material = Resources<Material>::get(lua.to<std::string>(1));
+            } else {
+                lua_pushvalue(L, 2);
+                material = Resources<Material>::get(lua.to<std::string>(1), lua);
+            }
         } else {
-            lua_pushvalue(L, 2);
-            material = Resources<Material>::get(lua.to<std::string>(1), lua);
-        }
-    } else {
 
-        if (lua_isnoneornil(L, 1)) {
-            material = std::make_shared<Material>("lit");
-        } else {
-            material = std::make_shared<Material>(lua);
+            if (lua_isnoneornil(L, 1)) {
+                material = std::make_shared<Material>("lit");
+            } else {
+                material = std::make_shared<Material>(lua);
+            }
         }
+
+        lua.push(std::move(material));
+        return 1;
     }
 
-    lua.push(std::move(material));
-    return 1;
-}
+    int loadScene(lua_State* L) {
 
-int loadScene(lua_State* L) {
+        Engine* engine = lua::check<Engine*>(L, lua_upvalueindex(1));
 
-    Engine* engine = lua::check<Engine*>(L, lua_upvalueindex(1));
+        if (lua::is<std::string>(L, 1)) {
 
-    if (lua::is<std::string>(L, 1)) {
+            std::string path = lua::to<std::string>(L, 1);
+            engine->getSceneManager().setCurrentSceneNextUpdate<LuaScene>(engine->getLuaState(), path);
 
-        std::string path = lua::to<std::string>(L, 1);
-        engine->getScheduler().delay(sf::microseconds(0), [=](){
-            engine->getSceneManager().setCurrentScene<LuaScene>(engine->getLuaState(), path);
-        });
+        } else if (lua_istable(L, 1)) {
 
-    } else if (lua_istable(L, 1)) {
+            lua_pushvalue(L, 1);
+            engine->getSceneManager().setCurrentSceneNextUpdate<LuaScene>(LuaReference(L));
+        }
 
-        lua_pushvalue(L, 1);
-        // Have to make a shared_ptr because LuaReference is non-copyable.
-        // Capturing a non-copyable type would make the lambda non-copyable,
-        // which would make it impossible to make a std::function out of it.
-        auto ref = std::make_shared<LuaReference>(L);
-        engine->getScheduler().delay(sf::microseconds(0), [engine, ref](){
-            engine->getSceneManager().setCurrentScene<LuaScene>(std::move(*ref));
-        });
+        return 0;
     }
-
-    return 0;
 }
 
 void Engine::initializeLua() {
@@ -268,7 +260,7 @@ void Engine::initializeLua() {
         lua_pushcclosure(lua, &loadScene, 1);
         lua_setfield(lua, -2, "loadScene");
 
-        lua.setField("quit", [this](){m_shouldExit = true;});
+        lua.setField("quit", [this]() { m_shouldExit = true; });
 
         // TODO make addProperty work on both tables and their metatables
         //lua::addProperty(lua, "time", lua::Property<float>([](){return GameTime::now().asSeconds();}));
@@ -314,12 +306,12 @@ void Engine::initializeLua() {
 
                 std::size_t count = 0;
 
-                std::for_each(Resources<Sound>::begin(), Resources<Sound>::end(), [&count](const auto& pair){
+                std::for_each(Resources<Sound>::begin(), Resources<Sound>::end(), [&count](const auto& pair) {
                     pair.second->getUnderlyingSound().stop();
                     count += 1;
                 });
 
-                std::for_each(Resources<sf::Music>::begin(), Resources<sf::Music>::end(), [&count](const auto& pair){
+                std::for_each(Resources<sf::Music>::begin(), Resources<sf::Music>::end(), [&count](const auto& pair) {
                     pair.second->stop();
                     count += 1;
                 });

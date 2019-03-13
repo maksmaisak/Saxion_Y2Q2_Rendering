@@ -8,6 +8,15 @@
 
 namespace en {
 
+    void SceneManager::update(float dt) {
+
+        if (m_openNextUpdateScene)
+            setCurrentScene(std::move(m_openNextUpdateScene));
+
+        if (m_currentScene)
+            m_currentScene->update(dt);
+    }
+
     void SceneManager::setCurrentScene(std::unique_ptr<en::Scene> scene) {
 
         closeCurrentScene();
@@ -20,17 +29,18 @@ namespace en {
         }
     }
 
-    void SceneManager::setCurrentScene(Scene* scene) {
-
-        setCurrentScene(std::unique_ptr<Scene>(scene));
-    }
-
     void SceneManager::closeCurrentScene() {
 
-        if (!m_currentScene) return;
+        if (!m_currentScene)
+            return;
 
         m_currentScene->close();
         m_engine->getRegistry().destroyAll();
         Receiver<OnSceneClosed>::broadcast({this});
+    }
+
+    void SceneManager::setCurrentSceneNextUpdate(std::unique_ptr<Scene> scene) {
+
+        m_openNextUpdateScene = std::move(scene);
     }
 }

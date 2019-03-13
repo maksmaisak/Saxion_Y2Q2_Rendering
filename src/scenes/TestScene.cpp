@@ -155,7 +155,7 @@ void TestScene::open() {
     wobblingMaterial->setUniformValue("transitionWobbleFactorMin", 0.f);
     wobblingMaterial->setUniformValue("transitionWobbleFactorMax", 1.f);
     wobblingMaterial->setUniformValue("transitionColor", glm::vec4(0.01f, 0.5f, 1.f, 1.f));
-    wobblingMaterial->setUniformValue("diffuseTexture", en::Resources<Texture>::get(config::TEXTURE_PATH + "runicfloor.png"));
+    wobblingMaterial->setUniformValue("diffuseTexture", en::Resources<en::Texture>::get(config::TEXTURE_PATH + "runicfloor.png"));
 
     //en::Models::get(config::MODEL_PATH + "sphere3.obj");
     //en::Models::removeUnused();

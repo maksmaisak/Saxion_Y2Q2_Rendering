@@ -1,10 +1,8 @@
-#include <cassert>
+
+#include "DebugHud.hpp"
 #include <iostream>
 #include <sstream>
 #include <GL/glew.h>
-#include <SFML/Graphics/Text.hpp>
-#include "DebugHud.hpp"
-#include "config.hpp"
 
 using namespace en;
 

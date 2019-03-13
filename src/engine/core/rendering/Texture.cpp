@@ -62,14 +62,9 @@ Texture::Texture(const std::string& filename, GLint internalFormat) {
 Texture::Texture(const std::array<std::string, 6>& cubeSidePaths, GLint internalFormat) {
 
     std::array<sf::Image, 6> images;
-
-    for (GLuint i = 0; i < images.size(); ++i) {
-
+    for (GLuint i = 0; i < images.size(); ++i)
         if (!images[i].loadFromFile(cubeSidePaths[i]))
             return;
-
-        images[i].flipVertically();
-    }
 
     glGenTextures(1, &m_id);
     glBindTexture(GL_TEXTURE_CUBE_MAP, m_id);
@@ -82,7 +77,7 @@ Texture::Texture(const std::array<std::string, 6>& cubeSidePaths, GLint internal
         for (GLuint i = 0; i < 6; ++i) {
             const sf::Image& image = images[i];
             auto temp = image.getSize();
-            Size size = {temp.x, temp.y};
+            m_size = {temp.x, temp.y};
             glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, internalFormat, m_size.x, m_size.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, image.getPixelsPtr());
         }
 
@@ -110,6 +105,10 @@ GLuint Texture::getId() const {
 
 bool Texture::isValid() const {
     return m_id != 0 && m_kind != Kind::None;
+}
+
+Texture::Kind Texture::getKind() const {
+    return m_kind;
 }
 
 Texture::Size Texture::getSize() const {

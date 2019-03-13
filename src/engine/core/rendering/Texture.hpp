@@ -34,6 +34,7 @@ namespace en {
 
 		GLuint getId() const;
 		bool isValid() const;
+		Kind getKind() const;
 		Size getSize() const;
 
 	private:

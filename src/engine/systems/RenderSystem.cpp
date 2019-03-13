@@ -91,12 +91,12 @@ void RenderSystem::start() {
 
 namespace {
 
-    glm::mat4 getProjectionMatrix(Engine& engine, Camera& camera) {
+    glm::mat4 getProjectionMatrix(Engine& engine, Camera& camera, bool forcePerspective = false) {
 
         auto size = engine.getWindow().getSize();
         float aspectRatio = (float) size.x / size.y;
 
-        if (camera.isOrthographic) {
+        if (camera.isOrthographic && !forcePerspective) {
 
             glm::vec2 halfSize = {
                 camera.orthographicHalfSize * aspectRatio,
@@ -112,7 +112,7 @@ namespace {
 
         return glm::perspective(
             glm::radians(camera.fov),
-            (float) size.x / size.y,
+            (float)size.x / size.y,
             camera.nearPlaneDistance,
             camera.farPlaneDistance
         );
@@ -130,6 +130,7 @@ void RenderSystem::draw() {
 
     updateDepthMaps();
     renderEntities();
+    renderSkybox();
     renderUI();
 
     if (m_enableDebugOutput)
@@ -244,24 +245,46 @@ void RenderSystem::renderEntities() {
     //std::cout << "Draw calls saved by batching: " << numBatched - m_batches.size() << '\n';
 }
 
-void updateUIRect(Engine& engine, EntityRegistry& registry, Entity e, const glm::vec2& parentSize, const glm::vec2& parentPivot, float scaleFactor) {
+void RenderSystem::renderSkybox() {
 
-    auto& rect = registry.get<UIRect>(e);
-    auto* tf = registry.tryGet<Transform>(e);
-    if (!tf)
+    Actor mainCamera = getMainCamera();
+    if (!mainCamera)
         return;
 
-    const glm::vec2 parentMinToLocalMin = parentSize * rect.anchorMin + rect.offsetMin * scaleFactor;
-    const glm::vec2 parentMinToLocalMax = parentSize * rect.anchorMax + rect.offsetMax * scaleFactor;
-    rect.computedSize = parentMinToLocalMax - parentMinToLocalMin;
+    auto* scene = m_engine->getSceneManager().getCurrentScene();
+    if (!scene)
+        return;
 
-    const glm::vec2 parentMinToLocalPivot  = glm::lerp(parentMinToLocalMin, parentMinToLocalMax, rect.pivot);
-    const glm::vec2 parentPivotToParentMin = -parentSize * parentPivot;
-    const glm::vec2 parentPivotToLocalPivot = parentPivotToParentMin + parentMinToLocalPivot;
-    tf->setLocalPosition(glm::vec3(parentPivotToLocalPivot, tf->getLocalPosition().z));
+    auto& skyboxTexture = scene->getRenderSettings().skyboxTexture;
+    if (!skyboxTexture)
+        return;
 
-    for (Entity child : tf->getChildren())
-        updateUIRect(engine, registry, child, rect.computedSize, rect.pivot, scaleFactor);
+    const glm::mat4 matrixView = glm::mat4(glm::inverse(mainCamera.get<Transform>().getWorldRotation()));
+    const glm::mat4 matrixProjection = getProjectionMatrix(*m_engine, mainCamera.get<Camera>(), true);
+    m_skyboxRenderer.draw(*skyboxTexture, matrixProjection * matrixView);
+}
+
+namespace {
+
+    void updateUIRect(Engine& engine, EntityRegistry& registry, Entity e, const glm::vec2& parentSize, const glm::vec2& parentPivot, float scaleFactor) {
+
+        auto& rect = registry.get<UIRect>(e);
+        auto* tf = registry.tryGet<Transform>(e);
+        if (!tf)
+            return;
+
+        const glm::vec2 parentMinToLocalMin = parentSize * rect.anchorMin + rect.offsetMin * scaleFactor;
+        const glm::vec2 parentMinToLocalMax = parentSize * rect.anchorMax + rect.offsetMax * scaleFactor;
+        rect.computedSize = parentMinToLocalMax - parentMinToLocalMin;
+
+        const glm::vec2 parentMinToLocalPivot = glm::lerp(parentMinToLocalMin, parentMinToLocalMax, rect.pivot);
+        const glm::vec2 parentPivotToParentMin = -parentSize * parentPivot;
+        const glm::vec2 parentPivotToLocalPivot = parentPivotToParentMin + parentMinToLocalPivot;
+        tf->setLocalPosition(glm::vec3(parentPivotToLocalPivot, tf->getLocalPosition().z));
+
+        for (Entity child : tf->getChildren())
+            updateUIRect(engine, registry, child, rect.computedSize, rect.pivot, scaleFactor);
+    }
 }
 
 void RenderSystem::renderUI() {

@@ -108,7 +108,7 @@ local scenery = {
             position = { x = 0, y = 5, z = 0 }
         },
         RenderInfo = {
-            mesh = "objects/ExitFinish/InsideExit.obj", --"models/suzanna_flat.obj",
+            mesh = "models/suzanna_flat.obj",
             material = {
                 shader = "pbr",
                 albedo = "textures/bricks.jpg"

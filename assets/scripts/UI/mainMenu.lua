@@ -81,7 +81,7 @@ local function createStar(aMinX,aMinY,aMaxX,aMaxY)
 end
 
 local function makeButton(name, parent, textString, anchorMin, anchorMax, textureFilePath)
-	
+
 	local buttonActor = Game.makeActor {
 		Name = name,
 		Transform = {
@@ -104,9 +104,12 @@ local function makeButton(name, parent, textString, anchorMin, anchorMax, textur
 			}
 		},
 		LuaBehavior = {
+			start = function(self)
+				self.transform = self.actor:get("Transform")
+			end,
 			onMouseDown = function(self, button)
 
-				-- Jesus why. TODO Just pass the onMouseDown function instead of these horrendous ifs
+				-- Jesus why. TODO Just pass a specific handler function instead of these horrendous ifs
 				if button == 1 then
 
 					Config.audio.ui.buttonPress:play()
@@ -146,11 +149,15 @@ local function makeButton(name, parent, textString, anchorMin, anchorMax, textur
 
 			--Mouse Over Start
 			onMouseEnter = function(self, button)
-				self.actor:get("Transform").scale = {1.2,1.2,1.2}
+
+				self.actor:tweenKill()
+				self.transform:tweenScale({1.2, 1.2, 1.2}, 0.05)
 			end,
 
 			onMouseLeave = function(self, button)
-				self.actor:get("Transform").scale = {1,1,1}
+
+				self.actor:tweenKill()
+				self.transform:tweenScale({1,1,1}, 0.05)
 			end
 			--Mouse Over End
 		}

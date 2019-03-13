@@ -130,12 +130,12 @@ void RenderSystem::start() {
 
 namespace {
 
-    glm::mat4 getProjectionMatrix(Engine& engine, Camera& camera, bool forcePerspective = false) {
+    glm::mat4 getProjectionMatrix(Engine& engine, Camera& camera) {
 
-        auto size = engine.getWindow().getSize();
-        float aspectRatio = (float) size.x / size.y;
+        const auto size = engine.getWindow().getSize();
+        const float aspectRatio = (float)size.x / size.y;
 
-        if (camera.isOrthographic && !forcePerspective) {
+        if (camera.isOrthographic) {
 
             glm::vec2 halfSize = {
                 camera.orthographicHalfSize * aspectRatio,
@@ -151,7 +151,7 @@ namespace {
 
         return glm::perspective(
             glm::radians(camera.fov),
-            (float)size.x / size.y,
+            aspectRatio,
             camera.nearPlaneDistance,
             camera.farPlaneDistance
         );
@@ -300,7 +300,16 @@ void RenderSystem::renderSkybox() {
         return;
 
     const glm::mat4 matrixView = glm::mat4(glm::inverse(mainCamera.get<Transform>().getWorldRotation()));
-    const glm::mat4 matrixProjection = getProjectionMatrix(*m_engine, mainCamera.get<Camera>(), true);
+
+    const auto& camera = mainCamera.get<Camera>();
+    const auto size = m_engine->getWindow().getSize();
+    const float aspectRatio = (float) size.x / size.y;
+    const glm::mat4 matrixProjection = glm::perspective(
+        glm::radians(camera.isOrthographic ? 90.f : camera.fov),
+        aspectRatio,
+        camera.nearPlaneDistance,
+        camera.farPlaneDistance
+    );
     m_skyboxRenderer.draw(*skyboxTexture, matrixProjection * matrixView);
 }
 

@@ -40,13 +40,21 @@ resultScreen = 'assets/scripts/UI/resultScreen.lua'
 saveFile = 'assets/scripts/save.lua'
 levelsDefinition = 'assets/scripts/levelsDefinition.lua'
 textColors = {
-    primary = {168/255, 130/255, 97/255, 1},
+    primary  = {168/255, 130/255, 97/255, 1},
     backdrop = {25/255, 14/255, 4/255, 0.8}
 }
 
 audio = {
+    door = {
+        open  = {path = 'audio/doorOpen.wav' , volume = 20},
+        close = {path = 'audio/doorClose.wav', volume = 20},
+    },
+    levelFinished = {path = 'audio/doorOpen.wav', volume = 60},
     levelExitFire = {
-        ignition = "audio/levelExit/FireStart.wav",
-        continuous = "audio/levelExit/FireLoopable.wav"
+        ignition   = {path = "audio/levelExit/FireStart.wav"   , volume = 20},
+        continuous = {path = "audio/levelExit/FireLoopable.wav", volume = 20}
+    },
+    ui = {
+        buttonPress = {path = 'audio/UIButtonSound.wav', volume = 60}
     }
 }

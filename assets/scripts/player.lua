@@ -21,22 +21,34 @@ local keyMaterial = Game.makeMaterial {
 	ao     = 'objects/key/KeyTile_AO.png'
 }
 
-local function playSound(filePath, volume, loop, offset)
+local function playSound(fileInfo, loop)
 
-	local sound = Game.audio.getSound(filePath)
-	sound.playingOffset = sound.duration * (offset or 0)
-    sound.loop   = loop or false
-    sound.volume = volume or 100
+	local sound
+	if type(fileInfo) == "string" then
+		sound = Game.audio.getSound(fileInfo)
+	else
+		sound = Game.audio.getSound(fileInfo.path)
+		sound.playingOffset = sound.duration * (fileInfo.offset or 0)
+		sound.volume        = fileInfo.volume or 100
+	end
+
+    sound.loop = loop or false
     sound:play()
 
 	return sound
 end
 
-local function stopSound(filePath)
+local function stopSound(fileInfo)
 
-	local sound = Game.audio.getSound(filePath)
-    if sound then
-	    sound:stop()
+	local sound
+	if type(fileInfo) == "string" then
+		sound = Game.audio.getSound(fileInfo)
+	else
+		sound = Game.audio.getSound(fileInfo.path)
+	end
+
+	if sound then
+		sound:stop()
     end
 end
 
@@ -102,7 +114,7 @@ function Player:activateGoal(gridPosition)
 		LuaBehavior = Config.resultScreen
 	}
 
-	playSound('audio/doorOpen.wav', 60)
+	playSound(Config.audio.levelFinished)
 
 	local resultScreenBehavior = resultScreen:get("LuaBehavior");
 	resultScreenBehavior.level = self.level
@@ -158,10 +170,10 @@ function Player:activateButtonTarget(button)
 			if not goal.startActive and goal.light then
 
 				goal.light.actor:tweenKill()
-				goal.light.light:tweenIntensity(goal.light.initialIntensity, 0.8, Ease.outQuart)
+				goal.light.light:tweenIntensity(goal.light.initialIntensity, 2, Ease.outExpo)
 
-				playSound(Config.audio.levelExitFire.ignition, 20)
-				playSound(Config.audio.levelExitFire.continuous, 20, true)
+				playSound(Config.audio.levelExitFire.ignition)
+				playSound(Config.audio.levelExitFire.continuous, true)
 			end
 
 		elseif target.door then
@@ -169,9 +181,9 @@ function Player:activateButtonTarget(button)
 			print("Activating door")
 			local door = target.door
 
-			playSound('audio/doorOpen.wav', 20)
-			stopSound('audio/doorClose.wav')
-						
+			playSound(Config.audio.door.open)
+			stopSound(Config.audio.door.close)
+
 			door.swingLeft :tweenKill()
 			door.swingRight:tweenKill()
 
@@ -195,7 +207,7 @@ function Player:deactivateButtonTarget(button)
 			local goal = target.goal
 			if not goal.startActive and goal.light then
 				goal.light.actor:tweenKill()
-				goal.light.light:tweenIntensity(0, 0.8, Ease.outQuart)
+				goal.light.light:tweenIntensity(0, 0.8, Ease.outExpo)
 
 				stopSound(Config.audio.levelExitFire.ignition)
 				stopSound(Config.audio.levelExitFire.continuous)
@@ -207,8 +219,8 @@ function Player:deactivateButtonTarget(button)
 
 			local door = target.door
 
-			playSound('audio/doorClose.wav', 20)
-			stopSound('audio/doorOpen.wav')
+			playSound(Config.audio.door.close)
+			stopSound(Config.audio.door.open)
 
 			door.swingLeft :tweenKill()
 			door.swingRight:tweenKill()
@@ -481,7 +493,7 @@ function Player:update()
 
 	if Game.keyboard.isDown("escape") then
 
-		playSound('audio/UIButtonSound.wav', 60)
+		playSound(Config.audio.ui.buttonPress)
 		if self.level.isLevelComplete then
 			return
 		end
@@ -501,14 +513,14 @@ function Player:update()
 
 	if Game.keyboard.isDown("e") then
 
-		playSound('audio/UIButtonSound.wav', 60)
+		playSound(Config.audio.ui.buttonPress)
 		self:redoMove()
 		return
 	end
 
 	if Game.keyboard.isDown("q") then
 
-        playSound('audio/UIButtonSound.wav', 60)
+        playSound(Config.audio.ui.buttonPress)
 		self:undoMove()
 		return
 	end
@@ -533,7 +545,7 @@ function Player:update()
 	local input = {x = 0, y = 0 }
 	for key, value in pairs(inputKeys) do
 		if not disabledKeys[key] and Game.keyboard.isDown(key) then
-            playSound('audio/UIButtonSound.wav', 60)
+            playSound(Config.audio.ui.buttonPress)
 			input.x = input.x + value.x
 			input.y = input.y + value.y
 			break;

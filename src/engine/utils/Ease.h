@@ -36,6 +36,8 @@ namespace ease {
     float inOutExpo (float t);
     float inOutCirc (float t);
     float inOutSine (float t);
+
+    float fluctuate(float t);
 }
 
 #endif //SAXION_Y2Q2_RENDERING_EASE_H

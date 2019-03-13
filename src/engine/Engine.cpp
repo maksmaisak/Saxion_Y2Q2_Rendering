@@ -376,6 +376,8 @@ void Engine::initializeLua() {
         setFieldAsUserdata("inOutExpo ", ease::inOutExpo );
         setFieldAsUserdata("inOutCirc ", ease::inOutCirc );
         setFieldAsUserdata("inOutSine" , ease::inOutSine );
+
+        setFieldAsUserdata("fluctuate" , ease::fluctuate);
     }
     lua_setglobal(lua, "Ease");
 

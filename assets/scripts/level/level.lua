@@ -11,6 +11,20 @@ Level = Object:new {
 	nextLevelPath = nil
 }
 
+local function doesAnyGoalStartActive(map)
+
+	for x = 1, map:getGridSize().x do
+		for y = 1, map:getGridSize().y do
+			local gridItem = map:getGridAt({x = x, y = y})
+			if gridItem and gridItem.goal and gridItem.goal.startActive then
+				return true
+			end
+		end
+	end
+
+	return false
+end
+
 function Level:start()
 
 	if not self.map then
@@ -18,11 +32,14 @@ function Level:start()
 		return
 	end
 
-	local music = Game.audio.getMusic('audio/ambiance.wav')
+	if doesAnyGoalStartActive(self.map) then
+		Config.audio.levelExitFire.continuous:play()
+	else
+		Config.audio.levelExitFire.continuous:stop()
+	end
+
+	local music = Config.audio.ambience
 	if music.status ~= "Playing" then
-		print("Music Status", music.status)
-		music.loop	= true
-		music.volume = 100
 		music:play()
 	end
 
@@ -60,13 +77,15 @@ function Level:start()
 				goal.transform	= goal.actor:get("Transform")
 
 				if goal.light then
-					local light				= goal.light
-					light.actor				= Game.makeActor(goal.light)
-					light.transform			= light.actor:get("Transform")
+
+					goal.light = {actor = Game.makeActor(goal.light) }
+					local light = goal.light
+					light.transform = goal.light.actor:get("Transform")
 					light.transform.parent	= goal.actor
-					light.initialIntensity  = light.Light.intensity
+					light.light = goal.light.actor:get("Light")
+					light.initialIntensity = goal.light.light.intensity
 					if not goal.startActive then
-						light.actor:get("Light").intensity = 0
+						light.light.intensity = 0
 					end
 				end
 			end

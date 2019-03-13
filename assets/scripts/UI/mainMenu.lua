@@ -27,14 +27,6 @@ local scenery = {
 
 local scene = {}
 
-local function playSoundObject(filepath, offset, loop, volume)
-	local music = Game.audio.getSound(filepath)
-	music.playingOffset = music.duration * offset
-    music.loop = loop
-    music.volume = volume
-    music:play()
-end
-
 local function setWidthBasedOnHeight(uiRect, aspect)
 
 	local width = uiRect.computedSize.y * aspect
@@ -116,7 +108,8 @@ local function makeButton(name, parent, textString, anchorMin, anchorMax, textur
 
 				-- Jesus why. TODO Just pass the onMouseDown function instead of these horrendous ifs
 				if button == 1 then
-					playSoundObject('audio/UIButtonSound.wav', 0, false, 60)
+
+					Config.audio.ui.buttonPress:play()
 
 					if name == "StartButton" then
 						Game.currentLevel = 1
@@ -167,6 +160,9 @@ local function makeButton(name, parent, textString, anchorMin, anchorMax, textur
 end
 
 function scene:start()
+
+    Config.audio.ambience:stop()
+    Config.audio.levelExitFire.continuous:stop()
 
 	Game.makeActors(scenery)
 
@@ -340,7 +336,7 @@ function scene:start()
 				if levelIndex < Game.maxLevel then
 					if Game.keyboard.isDown("right") or (Game.mouse.isDown(1) and arrowRight:get("UIRect").isMouseOver) then
 
-						playSoundObject('audio/UIButtonSound.wav', 0, false, 60)
+						Config.audio.ui.buttonPress:play()
 
 						levelIndex = levelIndex + 1
 
@@ -365,7 +361,7 @@ function scene:start()
 				if levelIndex > 1 then
 					if Game.keyboard.isDown("left") or (Game.mouse.isDown(1) and arrowLeft:get("UIRect").isMouseOver) then
 
-						playSoundObject('audio/UIButtonSound.wav', 0, false, 60)
+						Config.audio.ui.buttonPress:play()
 
 						levelIndex = levelIndex - 1
 
@@ -433,10 +429,9 @@ function scene:start()
 					end
 				end
 
-				if Game.keyboard.isDown("enter") or (Game.mouse.isDown(1) and self.uiRect.isMouseOver) then
-
-					if canPlayLevel(levelIndex) then
-						playSoundObject('audio/UIButtonSound.wav',0,false,60)
+				if canPlayLevel(levelIndex) then
+					if Game.keyboard.isDown("enter") or (Game.mouse.isDown(1) and self.uiRect.isMouseOver) then
+						Config.audio.ui.buttonPress:play()
 						Game.loadScene(Game.levels[levelIndex].path)
 						print("Loaded scene : "..levelIndex)
 						Game.currentLevel = levelIndex

@@ -18,14 +18,6 @@ function ResultScreen:keepAspectRatio(actor , tHeight)
 	actor:get("UIRect").offsetMax = { width / 2, height / 2}
 end
 
-local function playSoundObject(filepath, offset, loop, volume)
-	local music = Game.audio.getSound(filepath)
-	music.playingOffset = music.duration * offset
-    music.loop = loop
-    music.volume = volume
-    music:play()
-end
-
 function ResultScreen:createStar(aMinX,aMinY,aMaxX,aMaxY)
 	
 	local star = Game.makeActor{
@@ -56,8 +48,8 @@ function ResultScreen:animateStar(actor, scaleTarget, rotationTarget, duration)
 
     local tf = actor:get("Transform")
 
-	tf:tweenScale(scaleTarget, duration)
-	tf:tweenRotation(rotationTarget, duration)
+	tf:tweenScale   (scaleTarget   , duration, Ease.outQuart)
+	tf:tweenRotation(rotationTarget, duration, Ease.outQuart)
 end
 
 function ResultScreen:CalculateTotalStars()
@@ -112,7 +104,7 @@ function ResultScreen:createResultPanel()
 			onMouseDown = function(self, button)
 				if button == 1 then
 					if not allowButtonControl then return end
-					playSoundObject('audio/UIButtonSound.wav',0,false,60)
+					Config.audio.ui.buttonPress:play()
 					Game.loadScene(Config.startScene)
 				end
 			end,
@@ -142,10 +134,13 @@ function ResultScreen:createResultPanel()
 	end
 
 	if Game.currentLevel >= Game.maxLevel then
+
 		local mainMenuButtonUIRect = mainMenuButton:get("UIRect")
 		mainMenuButtonUIRect.anchorMin = {0.5,0.45}
 		mainMenuButtonUIRect.anchorMax = {0.5,0.45}
-	elseif Game.currentLevel < Game.maxLevel then		
+
+	elseif Game.currentLevel < Game.maxLevel then
+
 		local nextLevelButton = Game.makeActor {
 			Name = "NextLevelButton",
 			Transform = {
@@ -172,7 +167,7 @@ function ResultScreen:createResultPanel()
 				onMouseDown = function(self, button)
 					if button == 1 then
 						if not allowButtonControl then return end
-						playSoundObject('audio/UIButtonSound.wav',0,false,60)
+						Config.audio.ui.buttonPress:play()
 						Game.currentLevel = Game.currentLevel + 1
 						Game.loadScene(Game.levels[Game.currentLevel].path)
 					end
@@ -198,7 +193,7 @@ function ResultScreen:createResultPanel()
 	self.totalNumberOfStars = self:CalculateTotalStars()
 
 	local anchorValue = 0.4
-	local anchorStep = 0.1
+	local anchorStep  = 0.1
 
 	for i = 1, self.totalNumberOfStars do
 		self:createStar(anchorValue,0.6,anchorValue,0.6)
@@ -207,7 +202,7 @@ function ResultScreen:createResultPanel()
 
 	self.animationTargetScale	 = { x = 1, y = 1, z = 1 }
 	self.animationTargetRotation = { x = 0, y = 0, z = 0 }
-	self.animationDuration		 = 1
+	self.animationDuration		 = 0.75
 	 
 	allowButtonControl	       = false
 	self.animatedStarIndex     = 1
@@ -215,7 +210,7 @@ function ResultScreen:createResultPanel()
 	self.animationTimer		   = 0
 	self.maxAnimationTimer     = self.totalNumberOfStars * self.animationDuration + 0.05
 
-	local entry = { level = "level"..Game.currentLevel, stars = self.totalNumberOfStars}
+	local entry = {level = "level"..Game.currentLevel, stars = self.totalNumberOfStars}
 
 	local serializer = Game.serializer
 	if serializer == nil then
@@ -229,16 +224,17 @@ function ResultScreen:update(dt)
 	self.animationTimer = self.animationTimer + dt
 
 	local totalStars = self.totalNumberOfStars
-	if self.animatedStarIndex <= totalStars and self.animationTimer >= self.nextAnimatedStartTime then	
-		playSoundObject('audio/UIButtonSound.wav',0,false,60) -- TODO: replace this sound with the actual one
+	if self.animatedStarIndex <= totalStars and self.animationTimer >= self.nextAnimatedStartTime then
+
+		Config.audio.ui.stars[self.animatedStarIndex]:play()
 		self:animateStar(stars[self.animatedStarIndex], self.animationTargetScale, self.animationTargetRotation, self.animationDuration)
 		self.animatedStarIndex     = self.animatedStarIndex + 1
 		self.nextAnimatedStartTime = self.nextAnimatedStartTime + self.animationDuration
 	end
 
-	if self.animationTimer >= self.maxAnimationTimer and not allowButtonControl then
+	if not allowButtonControl and self.animationTimer >= self.maxAnimationTimer then
 		if totalStars > 0 then
-			playSoundObject('audio/UIButtonSound.wav',0,false,60) -- TODO: replace this sound with the actual one
+			--Config.audio.ui.stars[1]:play()
 		end
 		allowButtonControl = true
 	end

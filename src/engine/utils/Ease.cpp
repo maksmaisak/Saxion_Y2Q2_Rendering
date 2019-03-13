@@ -15,10 +15,14 @@ namespace {
 
     template<auto in, auto out>
     inline float combinedInOut(float t) {
-
-        const float halfT = t * 2.f;
-        return halfT < 1.f ? 0.5f * in(halfT) : 0.5f + 0.5f * out(halfT - 1.f);
+        return t < 0.5 ? 0.5f * in(t * 2.f) : 0.5f + 0.5f * out(t * 2.f - 1.f);
     }
+
+    template<auto f>
+    inline float inverse(float t) {return 1.f - f(t);}
+
+    template<auto f, auto g>
+    inline float chained(float t) {return t < 0.5f ? f(t * 2.f) : g(t * 2.f - 1.f);}
 }
 
 namespace ease {
@@ -41,13 +45,16 @@ namespace ease {
     float outCirc (float t) { return t -= 1.f, std::sqrtf(1.f - t * t); }
     float outSine (float t) { return std::sinf(t * glm::half_pi<float>()); }
 
-    float inOutQuad (float t) { return combinedInOut<inQuad , outQuad> (t); }
+    float inOutQuad (float t) { return combinedInOut<inQuad, outQuad>(t); }
     float inOutCubic(float t) { return combinedInOut<inCubic, outCubic>(t); }
     float inOutQuart(float t) { return combinedInOut<inQuart, outQuart>(t); }
     float inOutQuint(float t) { return combinedInOut<inQuint, outQuint>(t); }
-    float inOutExpo (float t) { return combinedInOut<inExpo , outExpo> (t); }
-    float inOutCirc (float t) { return combinedInOut<inCirc , outCirc> (t); }
+    float inOutExpo (float t) { return combinedInOut<inExpo, outExpo>(t); }
+    float inOutCirc (float t) { return combinedInOut<inCirc, outCirc>(t); }
     float inOutSine (float t) { return -0.5f * std::cosf(t * glm::pi<float>()) + 0.5f; }
+
+    // From 0 to 1 and then back to 0
+    float punch(float t) {return chained<inQuad, inverse<outQuad>>(t);}
 
     // 1D perlin noise
     float fluctuate(float t) {

@@ -37,6 +37,7 @@ namespace ease {
     float inOutCirc (float t);
     float inOutSine (float t);
 
+    float punch(float t);
     float fluctuate(float t);
 }
 

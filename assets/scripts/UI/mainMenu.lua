@@ -117,7 +117,7 @@ local function makeButton(name, parent, textString, anchorMin, anchorMax, textur
 				-- Jesus why. TODO Just pass the onMouseDown function instead of these horrendous ifs
 				if button == 1 then
 					playSoundObject('audio/UIButtonSound.wav', 0, false, 60)
-					
+
 					if name == "StartButton" then
 						Game.currentLevel = 1
 						Game.loadScene(Config.firstLevelPath)
@@ -409,11 +409,12 @@ function scene:start()
 					self.actor:remove("Sprite")
 					local level = Game.levels[levelIndex]
 					if level then
-						local imagePath = canPlayLevel(levelIndex) and level.imagePathComplete or level.imagePathUncomplete
+						local imagePath = level.thumbnailPath
 						local sprite = self.actor:add("Sprite", {
 							material = {
 								shader	= "sprite",
-								texture = imagePath
+								texture = imagePath,
+								color   = canPlayLevel(levelIndex) and {1,1,1,1} or {0,0,0,1}
 							}
 						})
 

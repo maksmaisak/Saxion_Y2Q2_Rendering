@@ -15,9 +15,8 @@ local function doesAnyGoalStartActive(map)
 
 	for x = 1, map:getGridSize().x do
 		for y = 1, map:getGridSize().y do
-
 			local gridItem = map:getGridAt({x = x, y = y})
-			if gridItem and gridItem.goal and gridItem.goal.startsActive then
+			if gridItem and gridItem.goal and gridItem.goal.startActive then
 				return true
 			end
 		end

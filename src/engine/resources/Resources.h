@@ -51,7 +51,6 @@ namespace en {
 
             std::shared_ptr<TResource> resource;
 
-            // Fall back to constructor if there is no valid loader.
             if constexpr (!std::is_base_of_v<NoLoader, TLoader>) {
 
                 if constexpr (sizeof...(Args) > 0 || canLoadWithNoArgs_v<TLoader>)
@@ -61,6 +60,7 @@ namespace en {
 
             } else {
 
+                // Fall back to constructor if there is no valid loader.
                 if constexpr (std::is_constructible_v<TResource, Args...>)
                     resource = std::make_shared<TResource>(std::forward<Args>(args)...);
                 else

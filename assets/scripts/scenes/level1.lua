@@ -4239,6 +4239,7 @@ return Level:new {
     extras = extras,
     nextLevelPath = 'assets/scripts/scenes/level2.lua',
     ambientLighting = {color = {1.010478, 1.854524, 2.270603, 1}},
+    renderSettings = {},
     maxNumUndos = {
         threeStars = 2,
         twoStars = 3,

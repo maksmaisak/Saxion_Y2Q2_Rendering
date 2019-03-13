@@ -12,12 +12,13 @@
 #include "Entity.h"
 #include "System.h"
 #include "Engine.h"
-#include "DebugHud.hpp"
 #include "DepthMaps.h"
 #include "VertexRenderer.h"
 #include "ComponentPool.h"
 #include "Receiver.h"
 #include "SceneManager.h"
+#include "SkyboxRenderer.h"
+#include "DebugHud.hpp"
 
 namespace en {
 
@@ -25,6 +26,7 @@ namespace en {
     class UIRect;
     class Material;
     class Mesh;
+    class DebugHud;
 
     class RenderSystem : public System, Receiver<SceneManager::OnSceneClosed> {
 
@@ -39,6 +41,7 @@ namespace en {
         void updateBatches();
         void updateDepthMaps();
         void renderEntities();
+        void renderSkybox();
         void renderUI();
         void renderDebug();
 
@@ -54,14 +57,16 @@ namespace en {
         std::shared_ptr<ShaderProgram> m_directionalDepthShader;
         std::shared_ptr<ShaderProgram> m_positionalDepthShader;
 
+        bool m_enableStaticBatching = true;
         std::unordered_map<std::shared_ptr<Material>, Mesh> m_batches;
+        
+        SkyboxRenderer m_skyboxRenderer;
+        std::shared_ptr<Texture> m_defaultSkybox;
 
         VertexRenderer m_vertexRenderer;
         glm::vec2 m_referenceResolution;
 
-        bool m_enableStaticBatching = true;
-        bool m_enableDebugOutput    = false;
-
+        bool m_enableDebugOutput = false;
         std::unique_ptr<DebugHud> m_debugHud;
     };
 }

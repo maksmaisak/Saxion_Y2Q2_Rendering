@@ -59,13 +59,14 @@ namespace en {
 
         bool m_enableStaticBatching = true;
         std::unordered_map<std::shared_ptr<Material>, Mesh> m_batches;
-
+        
         SkyboxRenderer m_skyboxRenderer;
+        std::shared_ptr<Texture> m_defaultSkybox;
 
         VertexRenderer m_vertexRenderer;
         glm::vec2 m_referenceResolution;
 
-        bool m_enableDebugOutput    = false;
+        bool m_enableDebugOutput = false;
         std::unique_ptr<DebugHud> m_debugHud;
     };
 }

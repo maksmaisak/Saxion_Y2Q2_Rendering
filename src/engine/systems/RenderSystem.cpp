@@ -24,14 +24,54 @@
 
 using namespace en;
 
-void checkRenderingError(const Actor& actor) {
 
-    if (glCheckError() == GL_NO_ERROR)
-        return;
+namespace {
 
-    auto* namePtr = actor.tryGet<en::Name>();
-    std::string name = namePtr ? namePtr->value : "unnamed";
-    std::cerr << "Error while rendering " << name << std::endl;
+    void checkRenderingError(const Actor& actor) {
+
+        if (glCheckError() == GL_NO_ERROR)
+            return;
+
+        auto* namePtr = actor.tryGet<en::Name>();
+        std::string name = namePtr ? namePtr->value : "unnamed";
+        std::cerr << "Error while rendering " << name << std::endl;
+    }
+
+    std::shared_ptr<Texture> getDefaultSkybox(LuaState& lua) {
+
+        lua_getglobal(lua, "Config");
+        auto popConfig = PopperOnDestruct(lua);
+        if (lua_isnil(lua, -1))
+            return nullptr;
+
+        lua_getfield(lua, -1, "defaultSkybox");
+        auto popSkybox = PopperOnDestruct(lua);
+        if (lua_isnil(lua, -1))
+            return nullptr;
+
+        static std::string keys[] = {
+            "right",
+            "left",
+            "top",
+            "bottom",
+            "front",
+            "back"
+        };
+
+        std::array<std::string, 6> imagePaths;
+        for (int i = 0; i < 6; ++i) {
+
+            std::optional<std::string> path = lua.tryGetField<std::string>(keys[i]);
+            if (!path)
+                return nullptr;
+
+            imagePaths[i] = "assets/" + *path;
+        }
+
+        return Resources<Texture>::get("defaultSkybox", imagePaths);
+    }
+
+    void enableDebug();
 }
 
 RenderSystem::RenderSystem() :
@@ -40,8 +80,6 @@ RenderSystem::RenderSystem() :
     m_depthMaps(4, {1024, 1024}, 10, {64, 64}),
     m_vertexRenderer(4096)
 {}
-
-void enableDebug();
 
 void RenderSystem::start() {
 
@@ -59,7 +97,7 @@ void RenderSystem::start() {
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     //glClearColor(0, 0, 0, 1);
-    const glm::vec3 color = glm::pow(glm::vec3(62.f / 255, 84.f / 255, 92.f / 255), glm::vec3(2.2f));
+    const glm::vec3 color = glm::pow(glm::vec3(62.f / 255.f, 84.f / 255.f, 92.f / 255.f), glm::vec3(2.2f));
     glClearColor(color.x, color.y, color.z, 1.f);
 
     // Convert output from fragment shaders from linear to sRGB
@@ -80,6 +118,7 @@ void RenderSystem::start() {
         m_referenceResolution  = lua.tryGetField<glm::vec2>("referenceResolution").value_or(glm::vec2(1920, 1080));
         m_enableStaticBatching = lua.tryGetField<bool>("enableStaticBatching").value_or(true);
         m_enableDebugOutput    = lua.tryGetField<bool>("enableDebugOutput").value_or(false);
+        m_defaultSkybox        = getDefaultSkybox(lua);
     }
 
     {
@@ -255,8 +294,9 @@ void RenderSystem::renderSkybox() {
     if (!scene)
         return;
 
-    auto& skyboxTexture = scene->getRenderSettings().skyboxTexture;
-    if (!skyboxTexture)
+    const auto& renderSettings = scene->getRenderSettings();
+    const std::shared_ptr<Texture>& skyboxTexture = renderSettings.skyboxTexture ? renderSettings.skyboxTexture : m_defaultSkybox;
+    if (!skyboxTexture || !skyboxTexture->isValid() || skyboxTexture->getKind() != Texture::Kind::TextureCube)
         return;
 
     const glm::mat4 matrixView = glm::mat4(glm::inverse(mainCamera.get<Transform>().getWorldRotation()));

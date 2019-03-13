@@ -9,21 +9,13 @@
 #include "config.hpp"
 #include "glm.hpp"
 #include "Texture.hpp"
-#include "Resources.h"
 
 namespace en {
 
     struct RenderSettings {
 
         glm::vec3 ambientColor = {0, 0, 0};
-        std::shared_ptr<Texture> skyboxTexture = Resources<Texture>::get("skybox", std::array<std::string, 6> {
-            config::TEXTURE_PATH + "skybox/Right.png" ,
-            config::TEXTURE_PATH + "skybox/Left.png"  ,
-            config::TEXTURE_PATH + "skybox/Top.png"   ,
-            config::TEXTURE_PATH + "skybox/Bottom.png",
-            config::TEXTURE_PATH + "skybox/Front.png" ,
-            config::TEXTURE_PATH + "skybox/Back.png"
-        });
+        std::shared_ptr<Texture> skyboxTexture;
     };
 }
 

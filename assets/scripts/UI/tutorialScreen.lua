@@ -25,11 +25,11 @@ function TutorialScreen:startTutorial()
 			font   = "fonts/arcadianRunes.ttf",
 			fontSize = 40,
 			color  = Config.textColors.primary,
-			string = Game.currentLevel == 1 and "To move press arrow keys" or "To activate button press\nshift + arrow key"
+			string = Game.currentLevel == 1 and "Arrow keys to move" or "Shift + Key\nto drop key"
 		}
 	}
 
-	self.levelTutorial:get("Transform"):tweenScale({1, 1, 1}, 2, Ease.inQuart)
+	self.levelTutorial:get("Transform"):tweenScale({1, 1, 1}, 1, Ease.outQuart)
 end
 
 

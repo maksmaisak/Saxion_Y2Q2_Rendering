@@ -79,6 +79,7 @@ void RenderSystem::start() {
 
         m_referenceResolution  = lua.tryGetField<glm::vec2>("referenceResolution").value_or(glm::vec2(1920, 1080));
         m_enableStaticBatching = lua.tryGetField<bool>("enableStaticBatching").value_or(true);
+        m_enableDebugOutput    = lua.tryGetField<bool>("enableDebugOutput").value_or(false);
     }
 
     {
@@ -130,7 +131,9 @@ void RenderSystem::draw() {
     updateDepthMaps();
     renderEntities();
     renderUI();
-    renderDebug();
+
+    if (m_enableDebugOutput)
+        renderDebug();
 }
 
 namespace {

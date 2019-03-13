@@ -1,51 +1,41 @@
 #include <cassert>
 #include <iostream>
-
+#include <sstream>
 #include <GL/glew.h>
 #include <SFML/Graphics/Text.hpp>
 #include "DebugHud.hpp"
 #include "config.hpp"
 
-DebugHud::DebugHud(sf::RenderWindow* aWindow): _window(aWindow), _debugInfo(), _font(), _debugText() {
+using namespace en;
 
-	assert (_window);
+DebugHud::DebugHud(Engine& engine, VertexRenderer& vertexRenderer) :
+    m_engine(&engine),
+    m_vertexRenderer(&vertexRenderer) {}
 
-    if (!_font.loadFromFile(config::FONT_PATH + "arial.ttf")) {
-        std::cout << "Could not load font, exiting..." << std::endl;
-        return;
-    }
+void DebugHud::setDebugInfo(const Info& info) {
 
-    _createDebugHud();
-}
-
-DebugHud::~DebugHud() {
-	//dtor
-}
-
-void DebugHud::_createDebugHud() {
-    _debugText.setString("");
-    _debugText.setFont(_font);
-	_debugText.setCharacterSize(16);
-	_debugText.setFillColor(sf::Color::White);
-}
-
-void DebugHud::setDebugInfo(std::string pInfo) {
-    _debugText.setString(pInfo);
-	_debugText.setPosition(10, 10);
+    std::stringstream s;
+    s << "fps: " << glm::iround(info.fps) << " frame: " << info.frameTimeMicroseconds / 1000.0 << "ms";
+    m_text.setString(s.str());
 }
 
 void DebugHud::draw() {
-    
-    // Prevent non core-profile code running in a core-profile context.
-	if ((_window->getSettings().attributeFlags & sf::ContextSettings::Core) != 0) {
 
-	    //std::cout << _debugText.getString().toAnsiString();
-	    return;
-	}
+    glDisable(GL_DEPTH_TEST);
 
-    //glDisable( GL_CULL_FACE );
-	glActiveTexture(GL_TEXTURE0);
-    _window->pushGLStates();
-    _window->draw(_debugText);
-	_window->popGLStates();
+    const auto& vertices = m_text.getVertices();
+    const glm::vec2& boundsMin = m_text.getBoundsMin();
+    const glm::vec2& boundsMax = m_text.getBoundsMax();
+
+    auto size = m_engine->getWindow().getSize();
+    m_text.getMaterial()->use(
+        m_engine,
+        nullptr,
+        glm::mat4(1),
+        glm::mat4(1),
+        glm::ortho(0.f, (float)size.x, 0.f, (float)size.y) * glm::translate(glm::vec3(-boundsMin, 0.f))
+    );
+    m_vertexRenderer->renderVertices(vertices);
+
+    glEnable(GL_DEPTH_TEST);
 }

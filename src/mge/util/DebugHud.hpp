@@ -3,32 +3,32 @@
 
 #include <SFML/Graphics.hpp>
 #include <iostream>
+#include "Engine.h"
+#include "Text.h"
+#include "VertexRenderer.h"
 
-/**
- * Very simple class capable of rendering a simple piece of text through SFML.
- */
-class DebugHud {
+namespace en {
+
+	class DebugHud {
 
 	public:
-		DebugHud(sf::RenderWindow* aWindow);
-		virtual ~DebugHud();
-		void draw();
+		struct Info {
+			double fps = 0.0;
+			long frameTimeMicroseconds = 0;
+		};
 
-		void setDebugInfo (std::string pInfo);
+		DebugHud(Engine& engine, VertexRenderer& vertexRenderer);
+		virtual ~DebugHud() = default;
+
+		void draw();
+		void setDebugInfo(const Info& info);
 
 	private:
-		sf::RenderWindow * _window;
+		Engine* m_engine;
+		VertexRenderer* m_vertexRenderer;
 
-        std::string _debugInfo;
-
-        sf::Font _font;
-        sf::Text _debugText;
-
-        void _createDebugHud();
-
-        DebugHud(const DebugHud&);
-        DebugHud& operator=(const DebugHud&);
-
-};
+		en::Text m_text;
+	};
+}
 
 #endif // DEBUGHUD_HPP

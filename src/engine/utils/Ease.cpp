@@ -55,11 +55,13 @@ namespace ease {
 
     // From 0 to 1 and then back to 0
     float punch(float t) {return chained<inQuad, inverse<outQuad>>(t);}
+   
+    namespace {
+        const int NUM_SAMPLES = 10;
+    }
 
     // 1D perlin noise
     float fluctuate(float t) {
-
-        constexpr int NUM_SAMPLES = 10;
 
         const static auto slopeSamples = [](){
 

@@ -199,18 +199,23 @@ void Transform::initializeMetatable(LuaState& lua) {
 
             return std::make_optional(ref->m_engine->actor(ref->m_parent));
         },
-        [](ComponentReference<Transform> ref, std::variant<std::string, Actor> arg) {
+        [](ComponentReference<Transform> ref, std::optional<std::variant<std::string, Actor>> arg) {
 
             Transform& tf = *ref;
 
-            if (auto* parentName = std::get_if<std::string>(&arg)) {
+            if (!arg) {
+                tf.setParent(nullEntity);
+                return;
+            }
+
+            if (auto* parentName = std::get_if<std::string>(&*arg)) {
                 Entity parent = ref->m_engine->findByName(*parentName);
                 tf.setParent(parent);
-            } else if (auto* actor = std::get_if<Actor>(&arg)) {
+            } else if (auto* actor = std::get_if<Actor>(&*arg)) {
                 tf.setParent(*actor);
             }
 
-            return 0;
+            return;
         }
     ));
 

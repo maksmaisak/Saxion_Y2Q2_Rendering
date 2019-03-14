@@ -1,6 +1,5 @@
-require ('assets/scripts/level/level')
-require ('assets/scripts/Utility/gameSerializer')
-
+require('assets/scripts/level/level')
+require('assets/scripts/Utility/gameSerializer')
 
 local isBlocked = false
 local isChooseLevelOpened
@@ -84,9 +83,7 @@ local function makeButton(name, parent, textString, anchorMin, anchorMax, textur
 
 	local buttonActor = Game.makeActor {
 		Name = name,
-		Transform = {
-			parent = parent
-		},
+		Transform = { parent = parent },
 		Text = {
 			font     = "fonts/arcadianRunes.ttf",
 			fontSize = 36,
@@ -135,6 +132,8 @@ local function makeButton(name, parent, textString, anchorMin, anchorMax, textur
 	}
 
 	keepAspectRatio(buttonActor, 55)
+
+	return buttonActor
 end
 
 function scene:start()

@@ -14,21 +14,15 @@ function TutorialScreen:startTutorial()
 
 	self.levelTutorial = Game.makeActor {
 		Name = "LevelTutorial",
-		Transform = {scale = {0,0,0}},
+		Transform = {
+			scale = {1,1,1},
+		},
 		UIRect = {
 			anchorMin = {0, 0},
 			anchorMax = {0, 1},
 			offsetMin = {100,  60},
 			offsetMax = {100, -60},
 			pivot = {0.5, 1}
-		}
-	}
-
-	local textActor = Game.makeActor {
-		Name = "LevelTutorial",
-		Transform = {
-			scale = {1,1,1},
-			parent = self.levelTutorial
 		},
 		Text = {
 			font   = "fonts/arcadianRunes.ttf",
@@ -39,7 +33,7 @@ function TutorialScreen:startTutorial()
 		}
 	}
 
-	textActor:get("Transform"):tweenScale({1.1, 1.1, 1.1}, 0.5, Ease.punch):setLoopBounce()
+	self.levelTutorial:get("Transform"):tweenScale({1.1, 1.1, 1.1}, 0.5, Ease.punch):setLoopBounce()
 end
 
 

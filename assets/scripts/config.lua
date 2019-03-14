@@ -6,21 +6,22 @@ fullscreen = false
 framerateCap = 240
 vsync = false
 enableStaticBatching = true
-enableDebugOutput    = true
+enableDebugOutput    = false
+overlayPhiGrid       = false
 referenceResolution = {1920, 1080}
 startScene = 'assets/scripts/UI/mainMenu.lua'
 --startScene = 'assets/scripts/scenes/level1.lua'
 --startScene = 'assets/scripts/scenes/test/luaScene.lua'
 --startScene = 'assets/scripts/scenes/test/testTweening.lua'
 
---defaultSkybox = {
---    right  = "textures/skybox/Right.png" ,
---    left   = "textures/skybox/Left.png"  ,
---    top    = "textures/skybox/Top.png"   ,
---    bottom = "textures/skybox/Bottom.png",
---    front  = "textures/skybox/Front.png" ,
---    back   = "textures/skybox/Back.png"
---}
+defaultSkybox = {
+    right  = "textures/skybox/SkyboxMap_right.png" ,
+    left   = "textures/skybox/SkyboxMap_left.png"  ,
+    top    = "textures/skybox/SkyboxMap_top.png"   ,
+    bottom = "textures/skybox/SkyboxMap_bottom.png",
+    front  = "textures/skybox/SkyboxMap_front.png" ,
+    back   = "textures/skybox/SkyboxMap_back.png"
+}
 
 -- The test skybox
 --defaultSkybox = {
@@ -80,9 +81,9 @@ audio = {
     ui = {
         buttonPress = makeSound('audio/UIButtonSound.wav', 20),
         stars = {
-            makeSound('audio/stars/1Star.wav'),
-            makeSound('audio/stars/2Star.wav'),
-            makeSound('audio/stars/3Star.wav')
+            makeSound('audio/stars/1Star.wav', 50),
+            makeSound('audio/stars/2Star.wav', 50),
+            makeSound('audio/stars/3Star.wav', 50)
         }
     },
 }

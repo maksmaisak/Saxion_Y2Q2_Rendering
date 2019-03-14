@@ -1,22 +1,10 @@
 require('assets/scripts/object')
+require('assets/scripts/Utility/uiUtilities')
 
 ResultScreen = Object:new()
 
 local stars = {}
 local allowButtonControl = false
-
-function ResultScreen:keepAspectRatio(actor , tHeight)
-
-	local textureSize = actor:get("Sprite").textureSize
-
-	local ratio = textureSize.x / textureSize.y
-	local height = tHeight
-	local width = height * ratio
-	local minWidth = (width / 2) * -1
-	local minHeight =  (height / 2) * -1
-	actor:get("UIRect").offsetMin = { minWidth, minHeight }
-	actor:get("UIRect").offsetMax = { width / 2, height / 2}
-end
 
 function ResultScreen:createStar(aMinX,aMinY,aMaxX,aMaxY)
 	
@@ -39,7 +27,7 @@ function ResultScreen:createStar(aMinX,aMinY,aMaxX,aMaxY)
 		}
 	}
 
-	self:keepAspectRatio(star, 100)
+	UIUtilities.keepAspectRatio(star, 100)
 
 	stars[#stars + 1] = star
 end
@@ -69,60 +57,19 @@ function ResultScreen:createResultPanel()
 
 	self.resultPanel = Game.makeActor{
 		Name = "ResultPanel",
-		Transform = {
-			scale = {1,1,1}
-		},
-		UIRect ={
+		Transform = {},
+		UIRect = {
 			anchorMin = {0, 0},
 			anchorMax = {1, 1}
 		}
 	}
 
-	local mainMenuButton = Game.makeActor {
-		Name = "MainMenuButton",
-		Transform = {
-			scale  = {1,1,1},
-			parent = "ResultPanel"
-		},
-		Text = {
-			font   = "fonts/arcadianRunes.ttf",
-			fontSize = 40,
-			color  = {0, 0, 0, 1},
-			string = "Main Menu"
-        },
-		UIRect = {
-			anchorMin = {0.4, 0.45},
-			anchorMax = {0.4, 0.45}
-		},
-		Sprite = {
-			material = {
-				shader	= "sprite",
-				texture	= "textures/buttonBackground.png",
-			}
-		},
-		LuaBehavior = {
-			onMouseDown = function(self, button)
-				if button == 1 then
-					if not allowButtonControl then return end
-					Config.audio.ui.buttonPress:play()
-					Game.loadScene(Config.startScene)
-				end
-			end,
-
-			--Mouse Over Start
-			onMouseEnter = function(self, button)
-				if not allowButtonControl then return end
-				self.actor:get("Transform").scale = {1.2,1.2,1.2}
-			end,
-
-			onMouseLeave = function(self, button)
-				self.actor:get("Transform").scale = {1,1,1}
-			end
-			--Mouse Over End
-		}
-	}
-
-	self:keepAspectRatio(mainMenuButton,64)
+	local mainMenuButton = UIUtilities.makeButton("MainMenuButton", self.resultPanel, "Main Menu", {0.4, 0.45}, {0.4, 0.45}, "textures/buttonBackground.png", function(self)
+		if not allowButtonControl then return end
+		Config.audio.ui.buttonPress:play()
+		Game.loadScene(Config.startScene)
+	end, function() return allowButtonControl end)
+	UIUtilities.keepAspectRatio(mainMenuButton, 64)
 
 	if Game.currentLevel == nil then
 		Game.currentLevel = 0
@@ -136,58 +83,20 @@ function ResultScreen:createResultPanel()
 	if Game.currentLevel >= Game.maxLevel then
 
 		local mainMenuButtonUIRect = mainMenuButton:get("UIRect")
-		mainMenuButtonUIRect.anchorMin = {0.5,0.45}
-		mainMenuButtonUIRect.anchorMax = {0.5,0.45}
+		mainMenuButtonUIRect.anchorMin = {0.5, 0.45}
+		mainMenuButtonUIRect.anchorMax = {0.5, 0.45}
 
 	elseif Game.currentLevel < Game.maxLevel then
 
-		local nextLevelButton = Game.makeActor {
-			Name = "NextLevelButton",
-			Transform = {
-				scale  = {1,1,1},
-				parent = "ResultPanel"
-			},
-			Text = {
-				font   = "fonts/arcadianRunes.ttf",
-				fontSize = 40,
-				color  = {0, 0, 0, 1},
-				string = "Next Level"
-			},
-			UIRect = {
-				anchorMin = {0.6, 0.45},
-				anchorMax = {0.6, 0.45}
-			},
-			Sprite = {
-				material = {
-					shader	= "sprite",
-					texture	= "textures/buttonBackground.png",
-				}
-			},
-			LuaBehavior = {
-				onMouseDown = function(self, button)
-					if button == 1 then
-						if not allowButtonControl then return end
-						Config.audio.ui.buttonPress:play()
-						Game.currentLevel = Game.currentLevel + 1
-						Game.loadScene(Game.levels[Game.currentLevel].path)
-					end
-				end,
-
-				--Mouse Over Start
-				onMouseEnter = function(self, button)
-					if not allowButtonControl then return end
-					self.actor:get("Transform").scale = {1.2,1.2,1.2}
-				end,
-
-				onMouseLeave = function(self, button)
-					self.actor:get("Transform").scale = {1,1,1}
-				end
-				--Mouse Over End
-			}
-		}
+		local nextLevelButton = UIUtilities.makeButton("NextLevelButton", self.resultPanel, "Next Level", {0.6, 0.45}, {0.6, 0.45}, "textures/buttonBackground.png", function(self)
+			if not allowButtonControl then return end
+			Config.audio.ui.buttonPress:play()
+			Game.currentLevel = Game.currentLevel + 1
+			Game.loadScene(Game.levels[Game.currentLevel].path)
+		end, function() return allowButtonControl end)
 
 		nextLevelButton:get("LuaBehavior").level = self.level
-		self:keepAspectRatio(nextLevelButton,64)
+		UIUtilities.keepAspectRatio(nextLevelButton, 64)
 	end
 
 	self.totalNumberOfStars = self:CalculateTotalStars()
@@ -196,7 +105,7 @@ function ResultScreen:createResultPanel()
 	local anchorStep  = 0.1
 
 	for i = 1, self.totalNumberOfStars do
-		self:createStar(anchorValue,0.6,anchorValue,0.6)
+		self:createStar(anchorValue, 0.6, anchorValue, 0.6)
 		anchorValue = anchorValue + anchorStep
 	end
 

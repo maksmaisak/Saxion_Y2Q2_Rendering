@@ -1,6 +1,6 @@
-require ('assets/scripts/level/level')
-require ('assets/scripts/Utility/gameSerializer')
-
+require('assets/scripts/level/level')
+require('assets/scripts/Utility/gameSerializer')
+require('assets/scripts/Utility/uiUtilities')
 
 local isBlocked = false
 local isChooseLevelOpened
@@ -27,34 +27,6 @@ local scenery = {
 
 local scene = {}
 
-local function setWidthBasedOnHeight(uiRect, aspect)
-
-	local width = uiRect.computedSize.y * aspect
-	local scaleFactorCompensator = 1 / Game.getUIScaleFactor()
-
-	local offsetMin = uiRect.offsetMin
-	local offsetMax = uiRect.offsetMax
-	offsetMin.x = -width * 0.5 * scaleFactorCompensator
-	offsetMax.x =  width * 0.5 * scaleFactorCompensator
-	uiRect.offsetMin = offsetMin
-	uiRect.offsetMax = offsetMax
-end
-
-local function keepAspectRatio(actor, theight)
-	
-	local sprite = actor:get("Sprite")
-	if not sprite then return end
-
-	local textureSize = sprite.textureSize
-	ratio = textureSize.x / textureSize.y
-	local height = theight
-	local width = height * ratio
-	local minWidth  = (width  / 2) * -1
-	local minHeight = (height / 2) * -1
-	actor:get("UIRect").offsetMin = { minWidth, minHeight }
-	actor:get("UIRect").offsetMax = { width / 2, height / 2}
-end
-
 local function canPlayLevel(levelIndex)
 
 	if levelIndex == 1 then return true end
@@ -80,13 +52,11 @@ local function createStar(aMinX,aMinY,aMaxX,aMaxY)
 	}
 end
 
-local function makeButton(name, parent, textString, anchorMin, anchorMax, textureFilePath)
-	
+local function makeButton(name, parent, textString, anchorMin, anchorMax, textureFilePath, onClick)
+
 	local buttonActor = Game.makeActor {
 		Name = name,
-		Transform = {
-			parent = parent
-		},
+		Transform = { parent = parent },
 		Text = {
 			font     = "fonts/arcadianRunes.ttf",
 			fontSize = 36,
@@ -104,65 +74,53 @@ local function makeButton(name, parent, textString, anchorMin, anchorMax, textur
 			}
 		},
 		LuaBehavior = {
+			start = function(self)
+				self.transform = self.actor:get("Transform")
+			end,
 			onMouseDown = function(self, button)
 
-				-- Jesus why. TODO Just pass the onMouseDown function instead of these horrendous ifs
 				if button == 1 then
 
 					Config.audio.ui.buttonPress:play()
-
-					if name == "StartButton" then
-						Game.currentLevel = 1
-						Game.loadScene(Config.firstLevelPath)
-					end
-
-					if name == "ChooseLevelButton" then
-						isChooseLevelOpened = true
-						chooseLevelPanel:get("UIRect").isEnabled = true
-						mainMenuPanel:get("UIRect").isEnabled   = false
-					end
-
-					if name == "CreditsButton" then
-						creditsPanel:get("UIRect").isEnabled  = true
-						mainMenuPanel:get("UIRect").isEnabled = false
-					end
-
-					if name == "ExitButton" then
-						Game.quit()
-					end
-
-					if name == "BackButtonChooseLevel" then
-						isChooseLevelOpened = false
-						chooseLevelPanel:get("UIRect").isEnabled = false
-						mainMenuPanel:get("UIRect").isEnabled	 = true
-					end
-
-					if name == "BackButtonCredits" then
-						creditsPanel:get("UIRect").isEnabled  = false
-						mainMenuPanel:get("UIRect").isEnabled = true
+					if onClick then
+						onClick(self)
 					end
 				end
 			end,
 
 			--Mouse Over Start
 			onMouseEnter = function(self, button)
-				self.actor:get("Transform").scale = {1.2,1.2,1.2}
+
+				self.actor:tweenKill()
+				self.transform:tweenScale({1.2, 1.2, 1.2}, 0.05)
 			end,
 
 			onMouseLeave = function(self, button)
-				self.actor:get("Transform").scale = {1,1,1}
+
+				self.actor:tweenKill()
+				self.transform:tweenScale({1,1,1}, 0.05)
 			end
 			--Mouse Over End
 		}
 	}
 
-	keepAspectRatio(buttonActor, 55)
+	UIUtilities.keepAspectRatio(buttonActor, 55)
+
+	return buttonActor
 end
 
 function scene:start()
 
     Config.audio.ambience:stop()
     Config.audio.levelExitFire.continuous:stop()
+
+	if Config.overlayPhiGrid then
+		Game.makeActor {
+			Transform = {},
+			UIRect = {},
+			Sprite = {material = {shader = "sprite", texture = "textures/phiGrid.png", color = {1,1,1,0.5}}}
+		}
+	end
 
 	Game.makeActors(scenery)
 
@@ -184,10 +142,23 @@ function scene:start()
 		}
 	}
 
-	makeButton("StartButton","MainMenuPanel","Start",{0.5,0.7},{0.5,0.7},"textures/buttonBackground.png")
-	makeButton("ChooseLevelButton","MainMenuPanel","Choose Level",{0.5,0.6},{0.5,0.6},"textures/buttonBackground.png")
-	makeButton("CreditsButton","MainMenuPanel","Credits",{0.5,0.5},{0.5,0.5},"textures/buttonBackground.png")
-	makeButton("ExitButton","MainMenuPanel","Exit",{0.5,0.4},{0.5,0.4},"textures/buttonBackground.png")
+	makeButton("StartButton", "MainMenuPanel", "Start", {0.5,0.7}, {0.5,0.7}, "textures/buttonBackground.png", function(self)
+		Game.currentLevel = 1
+		Game.loadScene(Config.firstLevelPath)
+	end)
+
+	makeButton("ChooseLevelButton", "MainMenuPanel", "Choose Level", {0.5,0.6}, {0.5,0.6}, "textures/buttonBackground.png", function(self)
+		isChooseLevelOpened = true
+		chooseLevelPanel:get("UIRect").isEnabled = true
+		mainMenuPanel   :get("UIRect").isEnabled = false
+	end)
+
+	makeButton("CreditsButton", "MainMenuPanel", "Credits", {0.5,0.5}, {0.5,0.5}, "textures/buttonBackground.png", function(self)
+		creditsPanel :get("UIRect").isEnabled = true
+		mainMenuPanel:get("UIRect").isEnabled = false
+	end)
+
+	makeButton("ExitButton", "MainMenuPanel", "Exit", {0.5,0.4}, {0.5,0.4}, "textures/buttonBackground.png", Game.quit)
 --End Main Buttons Panel
 
 --Start ChooseLevel Panel
@@ -302,12 +273,7 @@ function scene:start()
 			anchorMin = {0.5, 0.55},
 			anchorMax = {0.5, 0.55}
 		},
-		Sprite = {
-			material = {
-				shader	= "sprite",
-				texture = "textures/level" .. levelIndex .. ".jpg"
-			}
-		},
+		Sprite = {material = {shader = "sprite"}},
 		LuaBehavior = {
 			start = function(self)
 				self.isFirstUpdate = true
@@ -415,7 +381,7 @@ function scene:start()
 						})
 
 						local textureSize = sprite.textureSize
-						setWidthBasedOnHeight(self.uiRect, textureSize.x / textureSize.y)
+						UIUtilities.setWidthBasedOnHeight(self.uiRect, textureSize.x / textureSize.y)
 					end
 
 					local anchorValue = 0.4
@@ -424,7 +390,7 @@ function scene:start()
 					for i = 1, totalNumberOfStars do
 						self.starActor = createStar(anchorValue, 0.3, anchorValue, 0.3)
 						stars[#stars + 1] = self.starActor
-						keepAspectRatio(self.starActor, 100)
+						UIUtilities.keepAspectRatio(self.starActor, 100)
 						anchorValue = anchorValue + anchorStep
 					end
 				end
@@ -441,7 +407,12 @@ function scene:start()
 		}
 	}
 
-	makeButton("BackButtonChooseLevel", "ChooseLevelPanel", "Back", {0.5, 0.15}, {0.5, 0.15}, "textures/buttonBackground.png")
+	makeButton("BackButtonChooseLevel", "ChooseLevelPanel", "Back", {0.5, 0.15}, {0.5, 0.15}, "textures/buttonBackground.png", function(self)
+		isChooseLevelOpened = false
+		chooseLevelPanel:get("UIRect").isEnabled = false
+		mainMenuPanel   :get("UIRect").isEnabled = true
+	end)
+
 --End ChooseLevel Panel
 
 --Start Credits Panel
@@ -491,7 +462,10 @@ function scene:start()
 		}
 	}
 
-	makeButton("BackButtonCredits", "CreditsPanel","Back",{0.5,0.15},{0.5,0.15},"textures/buttonBackground.png")
+	makeButton("BackButtonCredits", "CreditsPanel","Back", {0.5,0.15}, {0.5,0.15}, "textures/buttonBackground.png", function(self)
+		creditsPanel :get("UIRect").isEnabled = false
+		mainMenuPanel:get("UIRect").isEnabled = true
+	end)
 
 --End Credits Panel
 
@@ -516,7 +490,7 @@ function scene:start()
 			update = function(self)
 				local textureSize = self.sprite.textureSize
 				local aspect = textureSize.x / textureSize.y
-				setWidthBasedOnHeight(self.uiRect, aspect)
+				UIUtilities.setWidthBasedOnHeight(self.uiRect, aspect)
 			end
 		}
 	}
@@ -525,9 +499,9 @@ function scene:start()
 	chooseLevelPanel:get("UIRect").isEnabled = false
 	arrowLeft:get("UIRect").isEnabled        = false
 
-	keepAspectRatio(chooseLevelImage, 400)
-	keepAspectRatio(arrowLeft , 300)
-	keepAspectRatio(arrowRight, 300)
+	UIUtilities.keepAspectRatio(chooseLevelImage, 400)
+	UIUtilities.keepAspectRatio(arrowLeft , 300)
+	UIUtilities.keepAspectRatio(arrowRight, 300)
 end
 
 return scene

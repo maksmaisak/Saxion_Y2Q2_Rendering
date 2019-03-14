@@ -292,6 +292,7 @@ end
 function Player:moveByKey(keyFound)
 
 	local value = inputKeys[keyFound]
+	self.level.hudArrows:keyPressed(keyFound)
 	self:moveByInput({x = value.x, y = value.y})
 end
 
@@ -480,20 +481,6 @@ function Player:update()
 		return
 	end
 
-	if Game.keyboard.isDown("e") then
-
-		Config.audio.ui.buttonPress:play()
-		self:redoMove()
-		return
-	end
-
-	if Game.keyboard.isDown("q") then
-
-        Config.audio.ui.buttonPress:play()
-		self:undoMove()
-		return
-	end
-
 	if Game.keyboard.isHeld("LShift") or Game.keyboard.isHeld("RShift") then
 		for key, value in pairs(inputKeys) do
 			if Game.keyboard.isDown(key) then
@@ -511,19 +498,13 @@ function Player:update()
 		end
 	end
 
-	local input = {x = 0, y = 0 }
 	for key, value in pairs(inputKeys) do
 		if not disabledKeys[key] and Game.keyboard.isDown(key) then
             Config.audio.ui.buttonPress:play()
-			input.x = input.x + value.x
-			input.y = input.y + value.y
-			break;
+			self:moveByKey(key)
+			break
 		end
 	end
-	if input.x ~= 0 and input.y ~= 0 then
-		input.y = 0
-	end
-	self:moveByInput(input)
 end
 
 return function(o)

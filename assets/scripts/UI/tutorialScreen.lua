@@ -6,6 +6,11 @@ function TutorialScreen:init()
 	self:startTutorial()
 end
 
+function TutorialScreen:hideDuringResultScreen()
+	if self.levelTutorial then
+		self.levelTutorial:get("UIRect").isEnabled = false
+	end
+end
 function TutorialScreen:startTutorial()
 
 	if not Game.currentLevel or Game.currentLevel > 2 then

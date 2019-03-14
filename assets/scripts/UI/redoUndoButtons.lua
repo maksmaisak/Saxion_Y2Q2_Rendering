@@ -8,6 +8,12 @@ function RedoUndoButtons:init()
 	self:createButtons()
 end
 
+function RedoUndoButtons:hideDuringResultScreen()
+	if self.redoUndoPanel then
+		self.redoUndoPanel:get("UIRect").isEnabled = false
+	end
+end
+
 function RedoUndoButtons:createButtons()
 
 	local level = self.level

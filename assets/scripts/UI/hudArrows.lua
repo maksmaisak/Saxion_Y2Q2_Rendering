@@ -11,6 +11,12 @@ end
 local arrowSize = {x = 80, y = 80}
 local arrowHalfSize = {x = arrowSize.x * 0.5, y = arrowSize.y * 0.5}
 
+function HudArrows:hideDuringResultScreen()
+	if self.hudArrowsPanel then
+		self.hudArrowsPanel:get("UIRect").isEnabled = false
+	end
+end
+
 function HudArrows:dropKey(key)
 
 	local actor = self.arrows[key].actor

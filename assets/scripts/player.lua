@@ -85,6 +85,10 @@ function Player:activateGoal(gridPosition)
 
 	Config.audio.levelFinished:play()
 
+	self.level.redoUndoButtons:hideDuringResultScreen()
+	self.level.hudArrows:hideDuringResultScreen()
+	self.level.tutorialScreen:hideDuringResultScreen()
+
 	local resultScreenBehavior = resultScreen:get("LuaBehavior");
 	resultScreenBehavior.level = self.level
 	resultScreenBehavior:activate()

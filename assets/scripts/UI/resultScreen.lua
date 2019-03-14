@@ -82,9 +82,33 @@ function ResultScreen:createResultPanel()
 
 	if Game.currentLevel >= Game.maxLevel then
 
+		local anchor = {0.5,0.5}
+		local offset = {0,300}
+
+	local textActor = Game.makeActor {
+		Name = "FinalText",
+		Transform = {},
+		UIRect = {
+			anchorMin = anchor,
+			anchorMax = anchor,
+			offsetMin = offset,
+			offsetMax = offset,
+			pivot = {1, 1}
+		},
+		Text = {
+			font   = "fonts/arcadianRunes.ttf",
+			fontSize = 50,
+			color  = Config.textColors.primary,
+			alignment = {0.5, 1},
+			string = "Congrats! You finished the game"
+		}
+	}
+
 		local mainMenuButtonUIRect = mainMenuButton:get("UIRect")
 		mainMenuButtonUIRect.anchorMin = {0.5, 0.45}
 		mainMenuButtonUIRect.anchorMax = {0.5, 0.45}
+
+		textActor:get("Transform"):tweenScale({1.1, 1.1, 1.1}, 0.5, Ease.punch):setLoopBounce()
 
 	elseif Game.currentLevel < Game.maxLevel then
 

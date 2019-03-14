@@ -12,16 +12,14 @@ function TutorialScreen:startTutorial()
 		return
 	end
 
-	local position = {40, -100}
-
 	self.levelTutorial = Game.makeActor {
 		Name = "LevelTutorial",
 		Transform = {},
 		UIRect = {
-			anchorMin = {0, 1},
+			anchorMin = {0, 0},
 			anchorMax = {0, 1},
-			offsetMin = position,
-			offsetMax = position
+			offsetMin = {100,  60},
+			offsetMax = {100, -60}
 		}
 	}
 
@@ -32,14 +30,14 @@ function TutorialScreen:startTutorial()
 			parent = self.levelTutorial
 		},
 		UIRect = {
-			offsetMin = {0, 0},
-			offsetMax = {500, 0}
+			offsetMin = {0,0},
+			offsetMax = {0,0}
 		},
 		Text = {
 			font   = "fonts/arcadianRunes.ttf",
 			fontSize = 40,
 			color  = Config.textColors.primary,
-			alignment = {0, 0.5},
+			alignment = {0, 1},
 			string = Game.currentLevel == 1 and "Arrow keys to move" or "Shift + Key\nto drop key"
 		}
 	}

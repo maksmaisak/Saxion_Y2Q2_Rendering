@@ -46,8 +46,8 @@ function RedoUndoButtons:createButtons()
 			Name = name,
 			Transform = { parent = self.redoUndoPanel },
 			UIRect = {
-				anchorMin = {0, 0.1},
-				anchorMax = {0, 0.1},
+				anchorMin = {0, 0},
+				anchorMax = {0, 0},
 				offsetMin = {-buttonHalfSize.x + offset, -buttonHalfSize.y},
 				offsetMax = { buttonHalfSize.x + offset,  buttonHalfSize.y}
 			},

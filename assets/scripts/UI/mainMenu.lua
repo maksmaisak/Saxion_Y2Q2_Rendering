@@ -52,63 +52,6 @@ local function createStar(aMinX,aMinY,aMaxX,aMaxY)
 	}
 end
 
-local function makeButton(name, parent, textString, anchorMin, anchorMax, textureFilePath, onClick)
-
-	local buttonActor = Game.makeActor {
-		Name = name,
-		Transform = { parent = parent },
-		Text = {
-			font     = "fonts/arcadianRunes.ttf",
-			fontSize = 36,
-			color    = {0,0,0,1},
-			string   = textString
-        },
-		UIRect = {
-			anchorMin = anchorMin,
-			anchorMax = anchorMax,
-		},
-		Sprite = {
-			material = {
-				shader	= "sprite",
-				texture = textureFilePath
-			}
-		},
-		LuaBehavior = {
-			start = function(self)
-				self.transform = self.actor:get("Transform")
-			end,
-			onMouseDown = function(self, button)
-
-				if button == 1 then
-
-					Config.audio.ui.buttonPress:play()
-					if onClick then
-						onClick(self)
-					end
-				end
-			end,
-
-			--Mouse Over Start
-			onMouseEnter = function(self, button)
-
-				self.actor:tweenKill()
-				self.transform:tweenScale({1.2, 1.2, 1.2}, 0.05)
-			end,
-
-			onMouseLeave = function(self, button)
-
-				self.actor:tweenKill()
-				self.transform:tweenScale({1,1,1}, 0.05)
-			end
-			--Mouse Over End
-		}
-	}
-
-	UIUtilities.keepAspectRatio(buttonActor, 55)
-
-	return buttonActor
-end
-
 function scene:start()
 
     Config.audio.ambience:stop()
@@ -142,23 +85,23 @@ function scene:start()
 		}
 	}
 
-	makeButton("StartButton", "MainMenuPanel", "Start", {0.5,0.7}, {0.5,0.7}, "textures/buttonBackground.png", function(self)
+	UIUtilities.makeButton("StartButton", "MainMenuPanel", "Start", {0.5,0.7}, {0.5,0.7}, "textures/buttonBackground.png", function(self)
 		Game.currentLevel = 1
 		Game.loadScene(Config.firstLevelPath)
 	end)
 
-	makeButton("ChooseLevelButton", "MainMenuPanel", "Choose Level", {0.5,0.6}, {0.5,0.6}, "textures/buttonBackground.png", function(self)
+	UIUtilities.makeButton("ChooseLevelButton", "MainMenuPanel", "Choose Level", {0.5,0.6}, {0.5,0.6}, "textures/buttonBackground.png", function(self)
 		isChooseLevelOpened = true
 		chooseLevelPanel:get("UIRect").isEnabled = true
 		mainMenuPanel   :get("UIRect").isEnabled = false
 	end)
 
-	makeButton("CreditsButton", "MainMenuPanel", "Credits", {0.5,0.5}, {0.5,0.5}, "textures/buttonBackground.png", function(self)
+	UIUtilities.makeButton("CreditsButton", "MainMenuPanel", "Credits", {0.5,0.5}, {0.5,0.5}, "textures/buttonBackground.png", function(self)
 		creditsPanel :get("UIRect").isEnabled = true
 		mainMenuPanel:get("UIRect").isEnabled = false
 	end)
 
-	makeButton("ExitButton", "MainMenuPanel", "Exit", {0.5,0.4}, {0.5,0.4}, "textures/buttonBackground.png", Game.quit)
+	UIUtilities.makeButton("ExitButton", "MainMenuPanel", "Exit", {0.5,0.4}, {0.5,0.4}, "textures/buttonBackground.png", Game.quit)
 --End Main Buttons Panel
 
 --Start ChooseLevel Panel
@@ -407,7 +350,7 @@ function scene:start()
 		}
 	}
 
-	makeButton("BackButtonChooseLevel", "ChooseLevelPanel", "Back", {0.5, 0.15}, {0.5, 0.15}, "textures/buttonBackground.png", function(self)
+	UIUtilities.makeButton("BackButtonChooseLevel", "ChooseLevelPanel", "Back", {0.5, 0.15}, {0.5, 0.15}, "textures/buttonBackground.png", function(self)
 		isChooseLevelOpened = false
 		chooseLevelPanel:get("UIRect").isEnabled = false
 		mainMenuPanel   :get("UIRect").isEnabled = true
@@ -462,7 +405,7 @@ function scene:start()
 		}
 	}
 
-	makeButton("BackButtonCredits", "CreditsPanel","Back", {0.5,0.15}, {0.5,0.15}, "textures/buttonBackground.png", function(self)
+	UIUtilities.makeButton("BackButtonCredits", "CreditsPanel","Back", {0.5,0.15}, {0.5,0.15}, "textures/buttonBackground.png", function(self)
 		creditsPanel :get("UIRect").isEnabled = false
 		mainMenuPanel:get("UIRect").isEnabled = true
 	end)

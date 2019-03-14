@@ -394,14 +394,14 @@ void RenderSystem::renderUIRect(Entity e, UIRect& rect) {
 
         const std::vector<Vertex>& vertices = text->getVertices();
 
-        const glm::vec2 boundsCenter = (text->getBoundsMin() + text->getBoundsMax()) * 0.5f;
-        const glm::vec2 offset = rect.computedSize * (0.5f - rect.pivot) - boundsCenter;
+        const glm::vec2& alignment = text->getAlignment();
+        const glm::vec2 boundsAlignPoint = glm::lerp(text->getBoundsMin(), text->getBoundsMax(), alignment);
+        const glm::vec2 offsetInRect = rect.computedSize * (alignment - rect.pivot);
 
         // Scale the bounds by the scale factor and bring them to the rect's position.
-        glm::mat4 matrix = glm::translate(glm::vec3(-boundsCenter.x, -boundsCenter.y, 0.f));
+        glm::mat4 matrix = glm::translate(glm::vec3(-boundsAlignPoint, 0.f));
         matrix = glm::scale(glm::vec3(getUIScaleFactor())) * matrix;
-        matrix = glm::translate(glm::vec3(boundsCenter.x, boundsCenter.y, 0.f)) * matrix;
-        matrix = glm::translate(glm::vec3(offset.x, offset.y, 0.f)) * matrix;
+        matrix = glm::translate(glm::vec3(offsetInRect, 0.f)) * matrix;
         matrix = tf->getWorldTransform() * matrix;
 
         text->getMaterial()->use(m_engine, &m_depthMaps, glm::mat4(1), glm::mat4(1), matrixProjection * matrix);

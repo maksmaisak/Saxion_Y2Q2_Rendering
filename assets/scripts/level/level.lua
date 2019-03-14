@@ -52,8 +52,8 @@ function Level:start()
 	end
 
 	self.redoUndoButtons = RedoUndoButtons:new {level = self}
-	self.hudArrows = HudArrows:new()
-	self.pauseMenu = PauseMenu:new()
+	self.hudArrows = HudArrows:new {level = self}
+	self.pauseMenu = PauseMenu:new {level = self}
 
     for x = 1, self.map:getGridSize().x do
         for y = 1, self.map:getGridSize().y do
@@ -148,5 +148,5 @@ function Level:start()
 		Game.makeActors(self.extras)
 	end
 
-	self.tutorialScreen = TutorialScreen:new()
+	self.tutorialScreen = TutorialScreen:new {level = self}
 end

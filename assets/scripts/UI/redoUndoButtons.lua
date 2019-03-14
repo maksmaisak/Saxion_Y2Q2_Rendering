@@ -13,7 +13,7 @@ function RedoUndoButtons:createButtons()
 	local level = self.level
 
     local buttonSize = {x = 80, y = 80}
-    local buttonHalfSize = {x = buttonSize.x * 0.5, y = buttonSize.y * 0.5 }
+    local buttonHalfSize = {x = buttonSize.x * 0.5, y = buttonSize.y * 0.5}
 
 	local panelPosition = {180, 100}
 
@@ -46,8 +46,8 @@ function RedoUndoButtons:createButtons()
 			Name = name,
 			Transform = { parent = self.redoUndoPanel },
 			UIRect = {
-				anchorMin = {0, 0.1},
-				anchorMax = {0, 0.1},
+				anchorMin = {0, 0},
+				anchorMax = {0, 0},
 				offsetMin = {-buttonHalfSize.x + offset, -buttonHalfSize.y},
 				offsetMax = { buttonHalfSize.x + offset,  buttonHalfSize.y}
 			},

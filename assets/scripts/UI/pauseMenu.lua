@@ -61,7 +61,7 @@ function PauseMenu:createPanel()
 
 	self.resumeButton = UIUtilities.makeButton("ResumeButton", self.pauseMenuPanel, "Resume", {0.5, 0.6}, {0.5, 0.6}, "textures/buttonBackground.png", function()
 		self.pauseMenuPanel:get("UIRect").isEnabled = false
-		self.player.canControl = true
+		self.level.player.canControl = true
 	end)
 
 	local mainMenuButton = UIUtilities.makeButton("MainMenuButton", self.pauseMenuPanel, "Main Menu", {0.5, 0.5}, {0.5, 0.5}, "textures/buttonBackground.png", function()

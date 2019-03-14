@@ -39,6 +39,7 @@ function TutorialScreen:startTutorial()
 			font   = "fonts/arcadianRunes.ttf",
 			fontSize = 40,
 			color  = Config.textColors.primary,
+			alignment = {0, 0.5},
 			string = Game.currentLevel == 1 and "Arrow keys to move" or "Shift + Key\nto drop key"
 		}
 	}

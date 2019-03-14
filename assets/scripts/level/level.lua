@@ -32,6 +32,14 @@ function Level:start()
 		return
 	end
 
+	if Config.overlayPhiGrid then
+		Game.makeActor {
+			Transform = {},
+			UIRect = {},
+			Sprite = {material = {shader = "sprite", texture = "textures/phiGrid.png", color = {1,1,1,0.5}}}
+		}
+	end
+
 	if doesAnyGoalStartActive(self.map) then
 		Config.audio.levelExitFire.continuous:play()
 	else

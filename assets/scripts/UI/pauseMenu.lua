@@ -18,7 +18,7 @@ function PauseMenu:createPanel()
 		UIRect = {
 			anchorMin = {0, 0},
 			anchorMax = {1, 1}
-		},
+		}
 	}
 
 	local titleText = "PAUSED"

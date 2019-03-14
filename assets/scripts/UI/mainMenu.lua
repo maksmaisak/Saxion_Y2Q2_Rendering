@@ -114,6 +114,14 @@ function scene:start()
     Config.audio.ambience:stop()
     Config.audio.levelExitFire.continuous:stop()
 
+	if Config.overlayPhiGrid then
+		Game.makeActor {
+			Transform = {},
+			UIRect = {},
+			Sprite = {material = {shader = "sprite", texture = "textures/phiGrid.png", color = {1,1,1,0.5}}}
+		}
+	end
+
 	Game.makeActors(scenery)
 
 	-- load saved data
@@ -265,12 +273,7 @@ function scene:start()
 			anchorMin = {0.5, 0.55},
 			anchorMax = {0.5, 0.55}
 		},
-		Sprite = {
-			material = {
-				shader	= "sprite",
-				texture = "textures/level" .. levelIndex .. ".jpg"
-			}
-		},
+		Sprite = {material = {shader = "sprite"}},
 		LuaBehavior = {
 			start = function(self)
 				self.isFirstUpdate = true

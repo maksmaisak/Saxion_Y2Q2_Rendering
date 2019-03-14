@@ -6,7 +6,8 @@ fullscreen = false
 framerateCap = 240
 vsync = false
 enableStaticBatching = true
-enableDebugOutput    = true
+enableDebugOutput    = false
+overlayPhiGrid       = false
 referenceResolution = {1920, 1080}
 startScene = 'assets/scripts/UI/mainMenu.lua'
 --startScene = 'assets/scripts/scenes/level1.lua'
@@ -14,12 +15,12 @@ startScene = 'assets/scripts/UI/mainMenu.lua'
 --startScene = 'assets/scripts/scenes/test/testTweening.lua'
 
 defaultSkybox = {
-    right  = "textures/skybox/SkyboxMap_Right.png" ,
-    left   = "textures/skybox/SkyboxMap_Left.png"  ,
-    top    = "textures/skybox/SkyboxMap_Top.png"   ,
-    bottom = "textures/skybox/SkyboxMap_Bottom.png",
-    front  = "textures/skybox/SkyboxMap_Front.png" ,
-    back   = "textures/skybox/SkyboxMap_Back.png"
+    right  = "textures/skybox/SkyboxMap_right.png" ,
+    left   = "textures/skybox/SkyboxMap_left.png"  ,
+    top    = "textures/skybox/SkyboxMap_top.png"   ,
+    bottom = "textures/skybox/SkyboxMap_bottom.png",
+    front  = "textures/skybox/SkyboxMap_front.png" ,
+    back   = "textures/skybox/SkyboxMap_back.png"
 }
 
 -- The test skybox

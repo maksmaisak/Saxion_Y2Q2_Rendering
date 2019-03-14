@@ -12,18 +12,23 @@ function RedoUndoButtons:createButtons()
 
 	local level = self.level
 
+    local buttonSize = {x = 80, y = 80}
+    local buttonHalfSize = {x = buttonSize.x * 0.5, y = buttonSize.y * 0.5 }
+
+	local panelPosition = {180, 100}
+
 	self.redoUndoPanel = Game.makeActor {
 		Name = "RedoUndoPanel",
 		Transform = {},
 		UIRect = {
 			anchorMin = {0, 0},
-			anchorMax = {1, 1}
+			anchorMax = {0, 0},
+            offsetMin = panelPosition,
+            offsetMax = panelPosition
 		}
 	}
 
 	local function makeButton(name, texturePath, offset, update)
-
-		local side = 80
 
 		local child = Game.makeActor {
 			Name = name.."_Image",
@@ -43,8 +48,8 @@ function RedoUndoButtons:createButtons()
 			UIRect = {
 				anchorMin = {0, 0.1},
 				anchorMax = {0, 0.1},
-				offsetMin = {-side * 0.5 + offset, -side * 0.5},
-				offsetMax = { side * 0.5 + offset,  side * 0.5}
+				offsetMin = {-buttonHalfSize.x + offset, -buttonHalfSize.y},
+				offsetMax = { buttonHalfSize.x + offset,  buttonHalfSize.y}
 			},
 			LuaBehavior = {
 				start = function(self)
@@ -72,7 +77,7 @@ function RedoUndoButtons:createButtons()
 		return actor
 	end
 
-	self.undoButton = makeButton("UndoButton", "textures/Undo.png", 80, function(self, dt)
+	self.undoButton = makeButton("UndoButton", "textures/Undo.png", -buttonHalfSize.x, function(self, dt)
 
 		if not level.player.canControl then
 			return
@@ -88,7 +93,7 @@ function RedoUndoButtons:createButtons()
 		end
 	end)
 
-	self.redoButton = makeButton("RedoButton", "textures/Redo.png", 160, function(self, dt)
+	self.redoButton = makeButton("RedoButton", "textures/Redo.png", buttonHalfSize.x, function(self, dt)
 
 		if not level.player.canControl then
 			return

@@ -2,35 +2,14 @@ require('assets/scripts/object')
 
 HudArrows = Object:new()
 
-local offset = 40
-
 function HudArrows:init()
 	self.arrows = {up = {}, left = {}, down = {}, right = {}}
 	print("Arrow size"..#self.arrows)
 	self:createArrows()
 end
 
-local function createArrow(offsetMin, offsetMax, texture)
-
-	return Game.makeActor {
-		Name = "Arrow",
-		Transform = {
-			parent = "ArrowsPanel",
-		},
-		UIRect = {
-			anchorMin = {0,0},
-			anchorMax = {0,0},
-			offsetMin = offsetMin,
-			offsetMax = offsetMax,
-		},
-		Sprite = {
-			material = {
-				shader	= "sprite",
-				texture	= texture,
-			}
-		}
-	}
-end
+local arrowSize = {x = 80, y = 80}
+local arrowHalfSize = {x = arrowSize.x * 0.5, y = arrowSize.y * 0.5}
 
 function HudArrows:dropKey(key)
 
@@ -55,19 +34,41 @@ end
 
 function HudArrows:createArrows()
 
-	self.hudArrowsPanel = Game.makeActor {
+	local hudArrowsPanelPosition = {-220, 100}
+
+    self.hudArrowsPanel = Game.makeActor {
 		Name = "ArrowsPanel",
 		Transform = {},
 		UIRect = {
-			anchorMin = {0.9, 0.1},
-			anchorMax = {0.9, 0.1},
-			offsetMin = {0.0, -offset},
-			offsetMax = {0.0, -offset}
+			anchorMin = {1, 0},
+			anchorMax = {1, 0},
+			offsetMin = hudArrowsPanelPosition,
+			offsetMax = hudArrowsPanelPosition
 		},
 	}
 
-	self.arrows["up"   ].actor  = createArrow({offset-40 , offset+40}, {offset+40 , offset+120}, "textures/keyUp.png"   )
-	self.arrows["left" ].actor  = createArrow({offset-120, offset-40}, {offset-40 , offset+40 }, "textures/keyLeft.png" )
-	self.arrows["down" ].actor  = createArrow({offset-40 , offset-40}, {offset+40 , offset+40 }, "textures/keyDown.png" )
-	self.arrows["right"].actor  = createArrow({offset+40 , offset-40}, {offset+120, offset+40 }, "textures/keyRight.png")
+	local function createArrow(position, texture)
+
+		return Game.makeActor {
+			Name = "Arrow",
+			Transform = { parent = self.hudArrowsPanel },
+			UIRect = {
+				anchorMin = {0,0},
+				anchorMax = {0,0},
+				offsetMin = {position.x - arrowHalfSize.x, position.y - arrowHalfSize.y},
+				offsetMax = {position.x + arrowHalfSize.x, position.y + arrowHalfSize.y},
+			},
+			Sprite = {
+				material = {
+					shader	= "sprite",
+					texture	= texture
+				}
+			}
+		}
+	end
+
+	self.arrows["up"   ].actor = createArrow({x = 0, y = arrowSize.y }, "textures/keyUp.png"   )
+	self.arrows["left" ].actor = createArrow({x = -arrowSize.x, y = 0}, "textures/keyLeft.png" )
+	self.arrows["down" ].actor = createArrow({x = 0, y = 0 }          , "textures/keyDown.png" )
+	self.arrows["right"].actor = createArrow({x =  arrowSize.x, y = 0}, "textures/keyRight.png")
 end

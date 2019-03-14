@@ -63,10 +63,16 @@ function RedoUndoButtons:createButtons()
 				end,
 				update = update,
 				onMouseEnter = function(self)
+
+					if not level.player.canControl then return end
+
 					self.imageActor:tweenComplete()
 					self.imageTransform:tweenScale({1.2, 1.2, 1.2}, 0.05)
 				end,
 				onMouseLeave = function(self)
+
+					if not level.player.canControl then return end
+
 					self.imageActor:tweenComplete()
 					self.imageTransform:tweenScale({1,1,1}, 0.05)
 				end
@@ -87,7 +93,6 @@ function RedoUndoButtons:createButtons()
 
 			self.imageActor:tweenComplete()
 			self.imageTransform:tweenScale(Vector.mul(self.imageTransform.scale, 1.2), 0.2, Ease.punch)
-
 			Config.audio.ui.buttonPress:play()
 			level.player:undoMove()
 		end
@@ -103,7 +108,6 @@ function RedoUndoButtons:createButtons()
 
 			self.imageActor:tweenComplete()
 			self.imageTransform:tweenScale(Vector.mul(self.imageTransform.scale, 1.2), 0.2, Ease.punch)
-
 			Config.audio.ui.buttonPress:play()
 			level.player:redoMove()
 		end

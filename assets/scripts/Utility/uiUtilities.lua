@@ -33,7 +33,7 @@ function UIUtilities.keepAspectRatio(actor, theight)
     rect.offsetMax = { width *  0.5, height *  0.5 }
 end
 
-function UIUtilities.makeButton(name, parent, textString, anchorMin, anchorMax, textureFilePath, onClick)
+function UIUtilities.makeButton(name, parent, textString, anchorMin, anchorMax, textureFilePath, onClick, conditionForActive)
 
     local buttonActor = Game.makeActor {
         Name = name,
@@ -72,11 +72,15 @@ function UIUtilities.makeButton(name, parent, textString, anchorMin, anchorMax, 
             --Mouse Over Start
             onMouseEnter = function(self)
 
+                if conditionForActive and not conditionForActive() then return end
+
                 self.actor:tweenKill()
                 self.transform:tweenScale({1.2, 1.2, 1.2}, 0.05)
             end,
 
             onMouseLeave = function(self)
+
+                if conditionForActive and not conditionForActive() then return end
 
                 self.actor:tweenKill()
                 self.transform:tweenScale({1,1,1}, 0.05)

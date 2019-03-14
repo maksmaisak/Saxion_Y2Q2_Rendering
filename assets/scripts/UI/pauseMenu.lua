@@ -27,7 +27,7 @@ function PauseMenu:createPanel()
 		Name = "PauseTextBackdrop",
 		Transform = {
 			scale = {1,1,1},
-			parent = "PauseMenuPanel"
+			parent = self.pauseMenuPanel
 		},
 		UIRect = {
 			anchorMin = {0.002, 0.002},
@@ -45,7 +45,7 @@ function PauseMenu:createPanel()
 		Name = "PauseText",
 		Transform = {
 			scale = {1,1,1},
-			parent = "PauseMenuPanel"
+			parent = self.pauseMenuPanel
 		},
 		UIRect = {
 			anchorMin = {0, 0},
@@ -59,12 +59,12 @@ function PauseMenu:createPanel()
         }
 	}
 
-	self.resumeButton = UIUtilities.makeButton("ResumeButton", "PauseMenuPanel", "Resume", {0.5, 0.6}, {0.5, 0.6}, "textures/buttonBackground.png", function(self)
-		self.puaseMenuPanel:get("UIRect").isEnabled = false
+	self.resumeButton = UIUtilities.makeButton("ResumeButton", self.pauseMenuPanel, "Resume", {0.5, 0.6}, {0.5, 0.6}, "textures/buttonBackground.png", function()
+		self.pauseMenuPanel:get("UIRect").isEnabled = false
 		self.player.canControl = true
 	end)
 
-	local mainMenuButton = UIUtilities.makeButton("MainMenuButton", "PauseMenuPanel", "Main Menu", {0.5, 0.5}, {0.5, 0.5}, "textures/buttonBackground.png", function(self)
+	local mainMenuButton = UIUtilities.makeButton("MainMenuButton", self.pauseMenuPanel, "Main Menu", {0.5, 0.5}, {0.5, 0.5}, "textures/buttonBackground.png", function()
 		Game.loadScene(Config.startScene)
 	end)
 

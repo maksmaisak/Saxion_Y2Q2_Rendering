@@ -57,8 +57,33 @@ function UIUtilities.makeButton(name, parent, textString, anchorMin, anchorMax, 
         LuaBehavior = {
             start = function(self)
                 self.transform = self.actor:get("Transform")
+                self.uiRect    = self.actor:get("UIRect")
+                self.wasActive = not conditionForActive or conditionForActive()
+
+                self.wasMouseOverWhileActive = false
+            end,
+            update = function(self, dt)
+
+                local isActive = not conditionForActive or conditionForActive()
+
+                local isMouseOverWhileActive = isActive and self.uiRect.isMouseOver
+
+                if isMouseOverWhileActive and not self.wasMouseOverWhileActive then
+
+                    self.actor:tweenKill()
+                    self.transform:tweenScale({1.2, 1.2, 1.2}, 0.05)
+
+                elseif not isMouseOverWhileActive and self.wasMouseOverWhileActive then
+
+                    self.actor:tweenKill()
+                    self.transform:tweenScale({1, 1, 1}, 0.05)
+                end
+
+                self.wasMouseOverWhileActive = isMouseOverWhileActive
             end,
             onMouseDown = function(self, button)
+
+                if conditionForActive and not conditionForActive() then return end
 
                 if button == 1 then
 
@@ -68,22 +93,6 @@ function UIUtilities.makeButton(name, parent, textString, anchorMin, anchorMax, 
                     end
                 end
             end,
-
-            onMouseEnter = function(self)
-
-                if conditionForActive and not conditionForActive() then return end
-
-                self.actor:tweenKill()
-                self.transform:tweenScale({1.2, 1.2, 1.2}, 0.05)
-            end,
-
-            onMouseLeave = function(self)
-
-                if conditionForActive and not conditionForActive() then return end
-
-                self.actor:tweenKill()
-                self.transform:tweenScale({1,1,1}, 0.05)
-            end
         }
     }
 

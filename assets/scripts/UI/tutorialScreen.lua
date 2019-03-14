@@ -28,7 +28,7 @@ function TutorialScreen:startTutorial()
 	local textActor = Game.makeActor {
 		Name = "LevelTutorial",
 		Transform = {
-			scale = {0,0,0},
+			scale = {1,1,1},
 			parent = self.levelTutorial
 		},
 		UIRect = {
@@ -43,7 +43,7 @@ function TutorialScreen:startTutorial()
 		}
 	}
 
-	textActor:get("Transform"):tweenScale({1, 1, 1}, 1, Ease.outQuart)
+	textActor:get("Transform"):tweenScale({1.1, 1.1, 1.1}, 0.5, Ease.punch):setLoopBounce()
 end
 
 

@@ -177,17 +177,17 @@ void Transform::initializeMetatable(LuaState& lua) {
 
     lua::addProperty(lua, "position", lua::property(
         [](ComponentReference<Transform> tf) {return tf->getLocalPosition();},
-        [](ComponentReference<Transform> tf, const glm::vec3& pos) {return tf->setLocalPosition(pos), tf;}
+        [](ComponentReference<Transform> tf, const glm::vec3& pos) {tf->setLocalPosition(pos);}
     ));
 
     lua::addProperty(lua, "rotation", lua::property(
         [](ComponentReference<Transform> tf) {return glm::degrees(glm::eulerAngles(tf->getLocalRotation()));},
-        [](ComponentReference<Transform> tf, const glm::vec3& eulerAngles) {return tf->setLocalRotation(glm::radians(eulerAngles)), tf;}
+        [](ComponentReference<Transform> tf, const glm::vec3& eulerAngles) {tf->setLocalRotation(glm::radians(eulerAngles));}
     ));
 
     lua::addProperty(lua, "scale", lua::property(
         [](ComponentReference<Transform> tf) {return tf->getLocalScale();},
-        [](ComponentReference<Transform> tf, const glm::vec3& scale) {return tf->setLocalScale(scale), tf;}
+        [](ComponentReference<Transform> tf, const glm::vec3& scale) {tf->setLocalScale(scale);}
     ));
 
     lua::addProperty(lua, "parent", lua::property(
@@ -214,8 +214,6 @@ void Transform::initializeMetatable(LuaState& lua) {
             } else if (auto* actor = std::get_if<Actor>(&*arg)) {
                 tf.setParent(*actor);
             }
-
-            return;
         }
     ));
 

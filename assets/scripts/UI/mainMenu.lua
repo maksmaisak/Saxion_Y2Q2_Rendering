@@ -1,5 +1,6 @@
 require('assets/scripts/level/level')
 require('assets/scripts/Utility/gameSerializer')
+require('assets/scripts/Utility/uiUtilities')
 
 local isBlocked = false
 local isChooseLevelOpened
@@ -25,34 +26,6 @@ local scenery = {
 }
 
 local scene = {}
-
-local function setWidthBasedOnHeight(uiRect, aspect)
-
-	local width = uiRect.computedSize.y * aspect
-	local scaleFactorCompensator = 1 / Game.getUIScaleFactor()
-
-	local offsetMin = uiRect.offsetMin
-	local offsetMax = uiRect.offsetMax
-	offsetMin.x = -width * 0.5 * scaleFactorCompensator
-	offsetMax.x =  width * 0.5 * scaleFactorCompensator
-	uiRect.offsetMin = offsetMin
-	uiRect.offsetMax = offsetMax
-end
-
-local function keepAspectRatio(actor, theight)
-	
-	local sprite = actor:get("Sprite")
-	if not sprite then return end
-
-	local textureSize = sprite.textureSize
-	ratio = textureSize.x / textureSize.y
-	local height = theight
-	local width = height * ratio
-	local minWidth  = (width  / 2) * -1
-	local minHeight = (height / 2) * -1
-	actor:get("UIRect").offsetMin = { minWidth, minHeight }
-	actor:get("UIRect").offsetMax = { width / 2, height / 2}
-end
 
 local function canPlayLevel(levelIndex)
 
@@ -131,7 +104,7 @@ local function makeButton(name, parent, textString, anchorMin, anchorMax, textur
 		}
 	}
 
-	keepAspectRatio(buttonActor, 55)
+	UIUtilities.keepAspectRatio(buttonActor, 55)
 
 	return buttonActor
 end
@@ -405,7 +378,7 @@ function scene:start()
 						})
 
 						local textureSize = sprite.textureSize
-						setWidthBasedOnHeight(self.uiRect, textureSize.x / textureSize.y)
+						UIUtilities.setWidthBasedOnHeight(self.uiRect, textureSize.x / textureSize.y)
 					end
 
 					local anchorValue = 0.4
@@ -414,7 +387,7 @@ function scene:start()
 					for i = 1, totalNumberOfStars do
 						self.starActor = createStar(anchorValue, 0.3, anchorValue, 0.3)
 						stars[#stars + 1] = self.starActor
-						keepAspectRatio(self.starActor, 100)
+						UIUtilities.keepAspectRatio(self.starActor, 100)
 						anchorValue = anchorValue + anchorStep
 					end
 				end
@@ -514,7 +487,7 @@ function scene:start()
 			update = function(self)
 				local textureSize = self.sprite.textureSize
 				local aspect = textureSize.x / textureSize.y
-				setWidthBasedOnHeight(self.uiRect, aspect)
+				UIUtilities.setWidthBasedOnHeight(self.uiRect, aspect)
 			end
 		}
 	}
@@ -523,9 +496,9 @@ function scene:start()
 	chooseLevelPanel:get("UIRect").isEnabled = false
 	arrowLeft:get("UIRect").isEnabled        = false
 
-	keepAspectRatio(chooseLevelImage, 400)
-	keepAspectRatio(arrowLeft , 300)
-	keepAspectRatio(arrowRight, 300)
+	UIUtilities.keepAspectRatio(chooseLevelImage, 400)
+	UIUtilities.keepAspectRatio(arrowLeft , 300)
+	UIUtilities.keepAspectRatio(arrowRight, 300)
 end
 
 return scene

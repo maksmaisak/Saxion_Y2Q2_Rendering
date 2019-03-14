@@ -380,6 +380,7 @@ function Player:moveToPosition(nextPosition, canRegisterMove, didUsePortal, play
 	end
 
 	if not didUsePortal and gridItem.portal then
+        Config.audio.portal:play()
 		self:moveToPosition(gridItem.portal.teleportPosition, false, true)
 		return
 	end

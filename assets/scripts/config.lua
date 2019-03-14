@@ -73,6 +73,7 @@ audio = {
         open  = makeSound('audio/doorOpen.wav' , 20),
         close = makeSound('audio/doorClose.wav', 20),
     },
+    portal = makeSound('audio/Portal.wav'),
     levelFinished = makeSound('audio/doorOpen.wav', 60),
     levelExitFire = {
         ignition   = makeSound('audio/levelExit/FireStart.wav'   , 20),

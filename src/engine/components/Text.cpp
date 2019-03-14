@@ -101,6 +101,14 @@ void Text::setColor(const glm::vec4& color) {
         m_material->setUniformValue("textColor", color);
 }
 
+const glm::vec2& Text::getAlignment() const {
+    return m_alignment;
+}
+
+void Text::setAlignment(const glm::vec2& alignment) {
+    m_alignment = alignment;
+}
+
 const std::vector<Vertex>& Text::getVertices() const {
 
     // Make it update no matter what since we can't be sure that
@@ -241,5 +249,10 @@ void Text::initializeMetatable(LuaState& lua) {
     lua::addProperty(lua, "color", lua::property(
         [](ComponentReference<Text>& ref) {return ref->getColor();},
         [](ComponentReference<Text>& ref, const glm::vec4& color) {ref->setColor(color);}
+    ));
+
+    lua::addProperty(lua, "alignment", lua::property(
+        [](ComponentReference<Text>& ref) {return ref->getAlignment();},
+        [](ComponentReference<Text>& ref, const glm::vec2& alignment) {ref->setAlignment(alignment);}
     ));
 }

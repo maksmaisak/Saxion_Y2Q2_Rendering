@@ -69,7 +69,6 @@ function UIUtilities.makeButton(name, parent, textString, anchorMin, anchorMax, 
                 end
             end,
 
-            --Mouse Over Start
             onMouseEnter = function(self)
 
                 if conditionForActive and not conditionForActive() then return end
@@ -85,7 +84,6 @@ function UIUtilities.makeButton(name, parent, textString, anchorMin, anchorMax, 
                 self.actor:tweenKill()
                 self.transform:tweenScale({1,1,1}, 0.05)
             end
-            --Mouse Over End
         }
     }
 

@@ -38,6 +38,9 @@ namespace en {
         const glm::vec4& getColor() const;
         void setColor(const glm::vec4& color);
 
+        const glm::vec2& getAlignment() const;
+        void setAlignment(const glm::vec2& alignment);
+
         const std::vector<Vertex>& getVertices() const;
         const glm::vec2& getBoundsMin() const;
         const glm::vec2& getBoundsMax() const;
@@ -51,6 +54,7 @@ namespace en {
         std::shared_ptr<sf::Font> m_font = Resources<sf::Font>::get(config::FONT_PATH + "arial.ttf");
         glm::vec4 m_color = glm::vec4(1);
         unsigned int m_characterSize = 30;
+        glm::vec2 m_alignment = {0.5f, 0.5f};
 
         mutable bool m_needsGeometryUpdate = false;
         mutable std::vector<Vertex> m_vertices;

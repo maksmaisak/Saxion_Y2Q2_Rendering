@@ -40,7 +40,7 @@ function ResultScreen:animateStar(actor, scaleTarget, rotationTarget, duration)
 	tf:tweenRotation(rotationTarget, duration, Ease.outQuart)
 end
 
-function ResultScreen:CalculateTotalStars()
+function ResultScreen:calculateTotalStars()
 
 	local undosUsed = self.level.undoCounts
 
@@ -51,6 +51,29 @@ function ResultScreen:CalculateTotalStars()
 		end
 	end
 	return totalNumberOfStars
+end
+
+function ResultScreen:makeFinalLevelEndText()
+
+	local anchor = {0.5, 0.75 }
+	local text = "Congrats! You finished the game!"
+	local actor = Game.makeActor {
+		Name = "FinalText",
+		Transform = {},
+		UIRect = {
+			anchorMin = anchor,
+			anchorMax = anchor,
+		},
+		Text = {
+			font   = "fonts/arcadianRunes.ttf",
+			fontSize = 55,
+			color  = Config.textColors.primary,
+			alignment = {0.5, 1},
+			string = text
+		}
+	}
+
+	actor:get("Transform"):tweenScale({1.1, 1.1, 1.1}, 0.5, Ease.punch):setLoopRepeat()
 end
 
 function ResultScreen:createResultPanel()
@@ -82,33 +105,11 @@ function ResultScreen:createResultPanel()
 
 	if Game.currentLevel >= Game.maxLevel then
 
-		local anchor = {0.5,0.5}
-		local offset = {0,300}
-
-	local textActor = Game.makeActor {
-		Name = "FinalText",
-		Transform = {},
-		UIRect = {
-			anchorMin = anchor,
-			anchorMax = anchor,
-			offsetMin = offset,
-			offsetMax = offset,
-			pivot = {1, 1}
-		},
-		Text = {
-			font   = "fonts/arcadianRunes.ttf",
-			fontSize = 50,
-			color  = Config.textColors.primary,
-			alignment = {0.5, 1},
-			string = "Congrats! You finished the game"
-		}
-	}
+		self:makeFinalLevelEndText()
 
 		local mainMenuButtonUIRect = mainMenuButton:get("UIRect")
 		mainMenuButtonUIRect.anchorMin = {0.5, 0.45}
 		mainMenuButtonUIRect.anchorMax = {0.5, 0.45}
-
-		textActor:get("Transform"):tweenScale({1.1, 1.1, 1.1}, 0.5, Ease.punch):setLoopBounce()
 
 	elseif Game.currentLevel < Game.maxLevel then
 
@@ -123,7 +124,7 @@ function ResultScreen:createResultPanel()
 		UIUtilities.keepAspectRatio(nextLevelButton, 64)
 	end
 
-	self.totalNumberOfStars = self:CalculateTotalStars()
+	self.totalNumberOfStars = self:calculateTotalStars()
 
 	local anchorValue = 0.4
 	local anchorStep  = 0.1

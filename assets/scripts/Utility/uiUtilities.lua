@@ -70,13 +70,13 @@ function UIUtilities.makeButton(name, parent, textString, anchorMin, anchorMax, 
             end,
 
             --Mouse Over Start
-            onMouseEnter = function(self, button)
+            onMouseEnter = function(self)
 
                 self.actor:tweenKill()
                 self.transform:tweenScale({1.2, 1.2, 1.2}, 0.05)
             end,
 
-            onMouseLeave = function(self, button)
+            onMouseLeave = function(self)
 
                 self.actor:tweenKill()
                 self.transform:tweenScale({1,1,1}, 0.05)

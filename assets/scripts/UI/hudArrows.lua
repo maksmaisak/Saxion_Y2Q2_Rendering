@@ -48,7 +48,6 @@ end
 
 function HudArrows:keyPressed(key)
 
-	print('HudArrows:keyPressed('..key..')')
 	local actor = self.arrows[key].actor
 	actor:tweenComplete()
 	actor:get("Transform"):tweenScale({1.2,1.2,1.2}, 0.2, Ease.punch)

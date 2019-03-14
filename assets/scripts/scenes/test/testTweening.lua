@@ -62,9 +62,9 @@ local scenery = {
     {
         Name = "wallZP",
         Transform = {
-            position = { 0, 10, 10 },
-            scale    = { 10, 10, 10 },
-            rotation = { -90, 0, 0 }
+            position = { 0  , 10, 10 },
+            scale    = { 10 , 10, 10 },
+            rotation = { -90, 0 , 0  }
         },
         RenderInfo = planeRenderInfo
     },
@@ -73,16 +73,16 @@ local scenery = {
         Transform = {
             position = { 0, 10, -10 },
             scale    = { 10, 10, 10 },
-            rotation = { 90, 0, 0 }
+            rotation = { 90,  0,  0 }
         },
         RenderInfo = planeRenderInfo
     },
     {
         Name = "ceiling",
         Transform = {
-            position = { 0, 20, 0 },
-            scale    = { 10, 10, 10 },
-            rotation = { 180, 0, 0 }
+            position = { 0  , 20, 0  },
+            scale    = { 10 , 10, 10 },
+            rotation = { 180, 0 , 0  }
         },
         RenderInfo = planeRenderInfo
     },

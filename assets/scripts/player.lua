@@ -292,6 +292,7 @@ end
 function Player:moveByKey(keyFound)
 
 	local value = inputKeys[keyFound]
+	self.level.hudArrows:keyPressed(keyFound)
 	self:moveByInput({x = value.x, y = value.y})
 end
 
@@ -517,13 +518,14 @@ function Player:update()
             Config.audio.ui.buttonPress:play()
 			input.x = input.x + value.x
 			input.y = input.y + value.y
+			self:moveByKey(key)
 			break;
 		end
 	end
 	if input.x ~= 0 and input.y ~= 0 then
 		input.y = 0
 	end
-	self:moveByInput(input)
+	--self:moveByInput(input)
 end
 
 return function(o)

@@ -2,7 +2,6 @@ require('assets/scripts/object')
 require('assets/scripts/Utility/uiUtilities')
 
 PauseMenu = Object:new()
-local pauseCanvas
 
 function PauseMenu:init()	
 	self:createPanel()
@@ -22,8 +21,10 @@ function PauseMenu:createPanel()
 		},
 	}
 
+	local titleText = "PAUSED"
+
 	Game.makeActor {
-		Name = "PauseText",
+		Name = "PauseTextBackdrop",
 		Transform = {
 			scale = {1,1,1},
 			parent = "PauseMenuPanel"
@@ -35,8 +36,8 @@ function PauseMenu:createPanel()
 		Text = {
 			font = "fonts/arcadianRunes.ttf",
 			fontSize = 120,
-			color = {25/255,14/255,4/255,0.8},
-			string = "PAUSED"
+			color = {25/255, 14/255, 4/255, 0.8},
+			string = titleText
         }
 	}
 
@@ -53,13 +54,13 @@ function PauseMenu:createPanel()
 		Text = {
 			font = "fonts/arcadianRunes.ttf",
 			fontSize = 120,
-			color = {168/255,130/255,97/255,1},
-			string = "PAUSED"
+			color = {168/255, 130/255, 97/255, 1},
+			string = titleText
         }
 	}
 
 	self.resumeButton = UIUtilities.makeButton("ResumeButton", "PauseMenuPanel", "Resume", {0.5, 0.6}, {0.5, 0.6}, "textures/buttonBackground.png", function(self)
-		pauseCanvas:get("UIRect").isEnabled = false
+		self.puaseMenuPanel:get("UIRect").isEnabled = false
 		self.player.canControl = true
 	end)
 
@@ -67,17 +68,12 @@ function PauseMenu:createPanel()
 		Game.loadScene(Config.startScene)
 	end)
 
-	pauseCanvas	= Game.find("PauseMenuPanel")
-
 	UIUtilities.keepAspectRatio(mainMenuButton   , 64)
 	UIUtilities.keepAspectRatio(self.resumeButton, 64)
 end
 
 function PauseMenu:activate()
 
-	if not self.pauseMenuPanel:get("UIRect").isEnabled then
-		self.pauseMenuPanel:get("UIRect").isEnabled = true
-	else
-		self.pauseMenuPanel:get("UIRect").isEnabled = false
-	end
+	local rect = self.pauseMenuPanel:get("UIRect")
+	rect.isEnabled = not rect.isEnabled
 end

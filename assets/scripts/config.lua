@@ -13,14 +13,14 @@ startScene = 'assets/scripts/UI/mainMenu.lua'
 --startScene = 'assets/scripts/scenes/test/luaScene.lua'
 --startScene = 'assets/scripts/scenes/test/testTweening.lua'
 
---defaultSkybox = {
---    right  = "textures/skybox/Right.png" ,
---    left   = "textures/skybox/Left.png"  ,
---    top    = "textures/skybox/Top.png"   ,
---    bottom = "textures/skybox/Bottom.png",
---    front  = "textures/skybox/Front.png" ,
---    back   = "textures/skybox/Back.png"
---}
+defaultSkybox = {
+    right  = "textures/skybox/SkyboxMap_Right.png" ,
+    left   = "textures/skybox/SkyboxMap_Left.png"  ,
+    top    = "textures/skybox/SkyboxMap_Top.png"   ,
+    bottom = "textures/skybox/SkyboxMap_Bottom.png",
+    front  = "textures/skybox/SkyboxMap_Front.png" ,
+    back   = "textures/skybox/SkyboxMap_Back.png"
+}
 
 -- The test skybox
 --defaultSkybox = {

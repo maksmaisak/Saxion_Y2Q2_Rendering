@@ -19,9 +19,7 @@ function TutorialScreen:startTutorial()
 
 	self.levelTutorial = Game.makeActor {
 		Name = "LevelTutorial",
-		Transform = {
-			scale = {1,1,1},
-		},
+		Transform = {},
 		UIRect = {
 			anchorMin = {0, 0},
 			anchorMax = {0, 1},
@@ -38,7 +36,7 @@ function TutorialScreen:startTutorial()
 		}
 	}
 
-	self.levelTutorial:get("Transform"):tweenScale({1.1, 1.1, 1.1}, 0.5, Ease.punch):setLoopBounce()
+	self.levelTutorial:get("Transform"):tweenScale({1.1, 1.1, 1.1}, 0.5, Ease.punch):setLoopRepeat()
 end
 
 

@@ -96,6 +96,10 @@ function Level:start()
 						light.light.intensity = 0
 					end
 				end
+
+				local behavior = goal.actor:add("LuaBehavior", require('assets/scripts/levelGoal'){goal = goal})
+				goal.activateFire   = function() behavior:activateFire()   end
+				goal.deactivateFire = function() behavior:deactivateFire() end
 			end
 
 			if gridItem.button then
@@ -132,7 +136,7 @@ function Level:start()
 				laser.beam  = Game.makeActor(laser.beam)
 				laser.beam:get("Transform").parent = laser.actor
 
-				laser.actor:add("LuaBehavior", dofile(Config.laser) {
+				laser.actor:add("LuaBehavior", require('assets/scripts/laser') {
 					level		 = self,
 					map			 = self.map,
 					direction	 = {x = laser.direction.x, y = laser.direction.y},

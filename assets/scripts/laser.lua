@@ -1,8 +1,8 @@
-require ('math')
-require ('assets/scripts/object')
-require ('assets/scripts/vector')
-require ('assets/scripts/level/map')
-require ('assets/scripts/player')
+require('math')
+require('assets/scripts/object')
+require('assets/scripts/vector')
+require('assets/scripts/level/map')
+require('assets/scripts/player')
 
 Laser = Object:new {
 	level = nil,
@@ -10,6 +10,7 @@ Laser = Object:new {
 }
 
 function Laser:start()
+
 	self.timer		   = 0
 	self.checkInterval = 1
 	self.gridItem	   = self.map:getGridAt(self.gridPosition)

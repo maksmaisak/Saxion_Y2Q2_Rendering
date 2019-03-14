@@ -141,12 +141,7 @@ function Player:activateButtonTarget(button)
 			print("Activating goal")
 			local goal = target.goal
 			if not goal.startActive and goal.light then
-
-				goal.light.actor:tweenKill()
-				goal.light.light:tweenIntensity(goal.light.initialIntensity, 2, Ease.outExpo)
-
-				Config.audio.levelExitFire.ignition:play()
-				Config.audio.levelExitFire.continuous:play()
+				goal:activateFire()
 			end
 
 		elseif target.door then
@@ -179,11 +174,7 @@ function Player:deactivateButtonTarget(button)
 			print("Deactivating goal")
 			local goal = target.goal
 			if not goal.startActive and goal.light then
-				goal.light.actor:tweenKill()
-				goal.light.light:tweenIntensity(0, 0.8, Ease.outExpo)
-
-				Config.audio.levelExitFire.ignition:stop()
-				Config.audio.levelExitFire.continuous:stop()
+				goal:deactivateFire()
 			end
 
 		elseif target.door then

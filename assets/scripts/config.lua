@@ -80,9 +80,9 @@ audio = {
     ui = {
         buttonPress = makeSound('audio/UIButtonSound.wav', 20),
         stars = {
-            makeSound('audio/stars/1Star.wav'),
-            makeSound('audio/stars/2Star.wav'),
-            makeSound('audio/stars/3Star.wav')
+            makeSound('audio/stars/1Star.wav', 50),
+            makeSound('audio/stars/2Star.wav', 50),
+            makeSound('audio/stars/3Star.wav', 50)
         }
     },
 }

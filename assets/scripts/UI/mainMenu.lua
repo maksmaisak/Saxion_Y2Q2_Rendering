@@ -80,7 +80,7 @@ local function createStar(aMinX,aMinY,aMaxX,aMaxY)
 	}
 end
 
-local function makeButton(name, parent, textString, anchorMin, anchorMax, textureFilePath)
+local function makeButton(name, parent, textString, anchorMin, anchorMax, textureFilePath, onClick)
 
 	local buttonActor = Game.makeActor {
 		Name = name,
@@ -109,40 +109,11 @@ local function makeButton(name, parent, textString, anchorMin, anchorMax, textur
 			end,
 			onMouseDown = function(self, button)
 
-				-- Jesus why. TODO Just pass a specific handler function instead of these horrendous ifs
 				if button == 1 then
 
 					Config.audio.ui.buttonPress:play()
-
-					if name == "StartButton" then
-						Game.currentLevel = 1
-						Game.loadScene(Config.firstLevelPath)
-					end
-
-					if name == "ChooseLevelButton" then
-						isChooseLevelOpened = true
-						chooseLevelPanel:get("UIRect").isEnabled = true
-						mainMenuPanel:get("UIRect").isEnabled   = false
-					end
-
-					if name == "CreditsButton" then
-						creditsPanel:get("UIRect").isEnabled  = true
-						mainMenuPanel:get("UIRect").isEnabled = false
-					end
-
-					if name == "ExitButton" then
-						Game.quit()
-					end
-
-					if name == "BackButtonChooseLevel" then
-						isChooseLevelOpened = false
-						chooseLevelPanel:get("UIRect").isEnabled = false
-						mainMenuPanel:get("UIRect").isEnabled	 = true
-					end
-
-					if name == "BackButtonCredits" then
-						creditsPanel:get("UIRect").isEnabled  = false
-						mainMenuPanel:get("UIRect").isEnabled = true
+					if onClick then
+						onClick(self)
 					end
 				end
 			end,
@@ -191,10 +162,23 @@ function scene:start()
 		}
 	}
 
-	makeButton("StartButton","MainMenuPanel","Start",{0.5,0.7},{0.5,0.7},"textures/buttonBackground.png")
-	makeButton("ChooseLevelButton","MainMenuPanel","Choose Level",{0.5,0.6},{0.5,0.6},"textures/buttonBackground.png")
-	makeButton("CreditsButton","MainMenuPanel","Credits",{0.5,0.5},{0.5,0.5},"textures/buttonBackground.png")
-	makeButton("ExitButton","MainMenuPanel","Exit",{0.5,0.4},{0.5,0.4},"textures/buttonBackground.png")
+	makeButton("StartButton", "MainMenuPanel", "Start", {0.5,0.7}, {0.5,0.7}, "textures/buttonBackground.png", function(self)
+		Game.currentLevel = 1
+		Game.loadScene(Config.firstLevelPath)
+	end)
+
+	makeButton("ChooseLevelButton", "MainMenuPanel", "Choose Level", {0.5,0.6}, {0.5,0.6}, "textures/buttonBackground.png", function(self)
+		isChooseLevelOpened = true
+		chooseLevelPanel:get("UIRect").isEnabled = true
+		mainMenuPanel   :get("UIRect").isEnabled = false
+	end)
+
+	makeButton("CreditsButton", "MainMenuPanel", "Credits", {0.5,0.5}, {0.5,0.5}, "textures/buttonBackground.png", function(self)
+		creditsPanel :get("UIRect").isEnabled = true
+		mainMenuPanel:get("UIRect").isEnabled = false
+	end)
+
+	makeButton("ExitButton", "MainMenuPanel", "Exit", {0.5,0.4}, {0.5,0.4}, "textures/buttonBackground.png", Game.quit)
 --End Main Buttons Panel
 
 --Start ChooseLevel Panel
@@ -448,7 +432,12 @@ function scene:start()
 		}
 	}
 
-	makeButton("BackButtonChooseLevel", "ChooseLevelPanel", "Back", {0.5, 0.15}, {0.5, 0.15}, "textures/buttonBackground.png")
+	makeButton("BackButtonChooseLevel", "ChooseLevelPanel", "Back", {0.5, 0.15}, {0.5, 0.15}, "textures/buttonBackground.png", function(self)
+		isChooseLevelOpened = false
+		chooseLevelPanel:get("UIRect").isEnabled = false
+		mainMenuPanel   :get("UIRect").isEnabled = true
+	end)
+
 --End ChooseLevel Panel
 
 --Start Credits Panel
@@ -498,7 +487,10 @@ function scene:start()
 		}
 	}
 
-	makeButton("BackButtonCredits", "CreditsPanel","Back",{0.5,0.15},{0.5,0.15},"textures/buttonBackground.png")
+	makeButton("BackButtonCredits", "CreditsPanel","Back", {0.5,0.15}, {0.5,0.15}, "textures/buttonBackground.png", function(self)
+		creditsPanel :get("UIRect").isEnabled = false
+		mainMenuPanel:get("UIRect").isEnabled = true
+	end)
 
 --End Credits Panel
 

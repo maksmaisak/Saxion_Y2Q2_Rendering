@@ -10,4 +10,4 @@ level: level9, stars: 3
 level: level10, stars: 3
 level: level11, stars: 3
 level: level12, stars: 3
-level: level13, stars: 0
+level: level13, stars: 3

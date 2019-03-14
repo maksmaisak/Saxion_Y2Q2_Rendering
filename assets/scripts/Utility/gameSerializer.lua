@@ -2,7 +2,8 @@ require('assets/scripts/object')
 
 GameSerializer = Object:new()
 
-function GameSerializer:fileExists(file)
+local function fileExists(file)
+
 	local f = io.open(file, "rb")
 	if f then f:close() end
 	return f ~= nil
@@ -11,11 +12,12 @@ end
 -- get all lines from a file, returns an empty 
 -- list/table if the file does not exist
 function GameSerializer:loadLines(file)
-	if not self:fileExists(file) then
+
+	if not fileExists(file) then
 		return
 	end
 
-	lines = {}
+	local lines = {}
 
 	for line in io.lines(file) do 
 	  lines[#lines + 1] = line
@@ -24,7 +26,8 @@ function GameSerializer:loadLines(file)
 	return lines
 end
 
-function GameSerializer:Split(str, delim, maxNb)
+local function split(str, delim, maxNb)
+
 	-- Eliminate bad cases...
 	if string.find(str, delim) == nil then
 	   return { str }
@@ -58,6 +61,7 @@ function GameSerializer:Split(str, delim, maxNb)
 end
 
 function GameSerializer:load(fileName)
+
 	local lines = self:loadLines(fileName)
 
 	if lines == {} then
@@ -69,11 +73,11 @@ function GameSerializer:load(fileName)
 	for i = 1, #lines do
 
 		local line		 = lines[i]
-		local tempArray  = self:Split(line, ", ")
+		local tempArray  = split(line, ", ")
 		local savedEntry = {level = "", stars = 0}
 
 		for i = 1, #tempArray do
-			local valueArray = self:Split(tempArray[i], ": ")
+			local valueArray = split(tempArray[i], ": ")
 			local value		 = valueArray[2]
 
 			if i == 1 then

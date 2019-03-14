@@ -235,7 +235,7 @@ function scene:start()
     makeTweenTestOnWall(Ease.inOutSine )
     skipLine()
     makeTweenTestOnWall(Ease.punch)
-    makeTweenTestOnWall(Ease.fluctuate, 2)
+    makeTweenTestOnWall(Ease.fluctuate, 1)
 end
 
 return scene

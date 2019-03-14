@@ -92,7 +92,6 @@ local materials = {
         metallicMultiplier = 0,
         smoothnessMultiplier = 0.5,
         aoMultiplier = 1,
-        albedoColor = {1, 0.9895964, 0.5707546, 1}
     },
     Game.makeMaterial {
         shader = 'pbr',
@@ -1664,7 +1663,7 @@ grid[3][13].obstacle = {
 grid[4][10].obstacle = {
     Name = "Obstacle",
     Transform = {
-        position = {2.89, 0, 9.1},
+        position = {3, 0, 9},
         rotation = {0, 269.9996, 0},
         children = {
             {
@@ -1926,7 +1925,7 @@ grid[4][10].laser = {
     actor = {
         Name = "Laser",
         Transform = {
-            position = {2.89, 0, 9.1},
+            position = {3, 0, 9},
             rotation = {0, 269.9996, 0},
             children = {
                 {
@@ -1952,14 +1951,14 @@ grid[4][10].laser = {
     beam = {
         Name = "Beam",
         Transform = {
-            position = {0, 0.245, 0},
-            scale = {1, 1, 8.5},
+            position = {0, 0.5, -0.48},
+            scale = {1, 1, 6},
             children = {
                 {
                     Name = "cube_flat",
                     Transform = {
-                        position = {0, 0.26, 0.481},
-                        scale = {0.2, 0.2, 0.5},
+                        position = {0, 0.03, 0.5},
+                        scale = {0.43, 0.4380845, 0.5},
                         children = {
                             {
                                 Name = "default",

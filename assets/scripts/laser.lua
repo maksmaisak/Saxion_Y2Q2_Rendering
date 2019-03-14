@@ -11,7 +11,7 @@ Laser = Object:new {
 
 function Laser:start()
 	self.timer		   = 0
-	self.checkInterval = 0.5
+	self.checkInterval = 1
 	self.gridItem	   = self.map:getGridAt(self.gridPosition)
 	self.transform	   = self.actor:get("Transform")
 
@@ -48,14 +48,12 @@ function Laser:hitDroppedKeys()
 	print("hitting dropped keys")
 
 	local position = {x = self.gridPosition.x, y = self.gridPosition.y}
-	for i = 0, 20 do
+	for i = 0, math.max(self.map.gridSize.x, self.map.gridSize.y) do
 
 		local gridItem = self.map:getGridAt(position)
-		if i > 0 then
-			if doesBlock(gridItem) then
-				self:setBeamLength(i)
-				return
-			end
+		if i > 0 and doesBlock(gridItem) then
+			self:setBeamLength(i)
+			return
 		end
 
 		for k, v in pairs(self.map:getDroppedKeysGridAt(position).hasKeyDropped) do
@@ -83,11 +81,9 @@ function Laser:updateBeamLength()
 	for i = 0, math.max(self.map.gridSize.x, self.map.gridSize.y) do
 
 		local gridItem = self.map:getGridAt(position)
-		if i > 0 then
-			if doesBlock(gridItem) then
-				self:setBeamLength(i)
-				return
-			end
+		if i > 0 and doesBlock(gridItem) then
+			self:setBeamLength(i)
+			return
 		end
 
 		position.x = position.x + self.direction.x
@@ -106,7 +102,7 @@ end
 function Laser:setBeamLength(length)
 
 	local scale = self.beamTransform.scale
-	scale.z = length - 0.5
+	scale.z = length
 	self.beamTransform.scale = scale
 end
 

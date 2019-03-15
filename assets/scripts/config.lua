@@ -2,11 +2,12 @@
 -- engine
 width  = 1920
 height = 1080
+windowTitle = "Sealed"
 fullscreen = false
 framerateCap = 240
 vsync = false
 enableStaticBatching = true
-enableDebugOutput    = true
+enableDebugOutput    = false
 overlayPhiGrid       = false
 referenceResolution = {1920, 1080}
 startScene = 'assets/scripts/UI/mainMenu.lua'

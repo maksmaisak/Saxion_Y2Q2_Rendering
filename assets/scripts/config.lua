@@ -6,7 +6,7 @@ fullscreen = false
 framerateCap = 240
 vsync = false
 enableStaticBatching = true
-enableDebugOutput    = false
+enableDebugOutput    = true
 overlayPhiGrid       = false
 referenceResolution = {1920, 1080}
 startScene = 'assets/scripts/UI/mainMenu.lua'
@@ -36,7 +36,6 @@ defaultSkybox = {
 -- custom
 player = 'assets/scripts/player.lua'
 firstLevelPath = 'assets/scripts/scenes/level1.lua'
-laser = 'assets/scripts/laser.lua'
 resultScreen = 'assets/scripts/UI/resultScreen.lua'
 saveFile = 'assets/scripts/save.lua'
 levelsDefinition = 'assets/scripts/levelsDefinition.lua'

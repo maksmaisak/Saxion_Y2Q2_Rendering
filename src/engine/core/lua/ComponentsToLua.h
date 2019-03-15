@@ -54,7 +54,7 @@ namespace en {
         /// First creates all the entities and assigns their names, if provided.
         /// Then adds all other components to them.
         /// This is necessary to make sure findByName works during component initialization.
-        static void makeEntities(lua_State* L, Engine& engine, int index = -1);
+        static std::vector<Actor> makeEntities(lua_State* L, Engine& engine, int index = -1);
         static Actor makeEntity(lua_State* L, Engine& engine, int index = -1);
         static void addComponents(lua_State* L, Actor& actor, int index = -1);
 
@@ -62,7 +62,9 @@ namespace en {
         static void makeComponent(lua_State* L, Actor& actor, const std::string& componentTypeName, int componentValueIndex = -1);
 
         static void pushComponentReferenceByTypeName(lua_State* L, Actor& actor, const std::string& componentTypeName);
+        static void pushComponentReferenceByTypeNameWithChildren(lua_State* L, Actor& actor, const std::string& componentTypeName);
         static void addComponentByTypeName(lua_State* L, Actor& actor, const std::string& componentTypeName);
+        static void addComponentByTypeName(lua_State* L, Actor& actor, const std::string& componentTypeName, int componentDefinitionIndex);
         static void removeComponentByTypeName(lua_State* L, Actor& actor, const std::string& componentTypeName);
 
         static void printDebugInfo();
@@ -73,6 +75,7 @@ namespace en {
             std::function<void(Actor&, LuaState&)> addFromLua;
             std::function<void(Actor&, LuaState&)> pushFromActor;
             std::function<void(Actor&, LuaState&)> addToActor;
+            std::function<void(Actor&, LuaState&, int)> addToActorFromDefinition;
             std::function<void(Actor&, LuaState&)> removeFromActor;
         };
 
@@ -82,7 +85,7 @@ namespace en {
             return nameToTypeInfoMap;
         }
 
-        static TypeInfo& getTypeInfoByName(const std::string typeName);
+        static TypeInfo& getTypeInfoByName(const std::string& typeName);
     };
 
     template<typename TComponent>
@@ -103,6 +106,7 @@ namespace en {
 
         inline static bool isRegistered = false;
     };
+
 
     template<typename T>
     inline void ComponentsToLua::registerType(const std::string& name) {
@@ -133,6 +137,16 @@ namespace en {
                 luaL_error(lua, "Actor %s already has a component of type %s", actor.getName().c_str(), utils::demangle<T>().c_str());
 
             actor.add<T>();
+            lua::push(lua, ComponentReference<T>(actor.getEngine().getRegistry(), actor));
+        };
+
+        entry.addToActorFromDefinition = [](Actor& actor, LuaState& lua, int componentDefinitionIndex) {
+
+            if (actor.tryGet<T>())
+                luaL_error(lua, "Actor %s already has a component of type %s", actor.getName().c_str(), utils::demangle<T>().c_str());
+
+            lua_pushvalue(lua, componentDefinitionIndex);
+            detail::LuaComponentFactoryFunctionOf<T>::get()(actor, lua);
             lua::push(lua, ComponentReference<T>(actor.getEngine().getRegistry(), actor));
         };
 

@@ -9,11 +9,13 @@
 #include <lua.hpp>
 #include <string>
 #include <optional>
+#include <variant>
 #include <iostream>
 
 #include "Demangle.h"
 #include "Meta.h"
 #include "glm.hpp"
+#include "Exception.h"
 
 namespace lua {
 
@@ -132,10 +134,13 @@ namespace lua {
 
         static std::optional<T> tryGetField(lua_State* L, TKey&& key, int tableIndex = -1) {
 
-            if (!lua_istable(L, tableIndex)) return std::nullopt;
+            if (!lua_istable(L, tableIndex))
+                return std::nullopt;
+
+            tableIndex = lua_absindex(L, tableIndex);
 
             push(L, std::forward<TKey>(key));
-            lua_gettable(L, -2);
+            lua_gettable(L, tableIndex);
             return tryGet<T>(L);
         }
     };
@@ -181,8 +186,8 @@ namespace lua {
         static void push (lua_State* L, T value) { lua_pushnumber(L, value); }
     };
 
-    template<>
-    struct TypeAdapter<std::string> {
+    template<typename T>
+    struct TypeAdapter<T, std::enable_if_t<utils::is_string_v<T>>> {
         static bool        is   (lua_State* L, int index = -1) { return lua_isstring(L, index); }
         static std::string to   (lua_State* L, int index = -1) { return lua_tostring(L, index); }
         static std::string check(lua_State* L, int index = -1) { return luaL_checkstring(L, index); }
@@ -202,14 +207,16 @@ namespace lua {
 
     template<typename T>
     struct TypeAdapter<std::optional<T>> {
+
         static bool is(lua_State* L, int index = -1) {
-            return lua_isnil(L, index) || lua::is<T>(L, index);
+            return lua_isnoneornil(L, index) || lua::is<T>(L, index);
         }
         static std::optional<T> to (lua_State* L, int index = -1) {
-            return lua_isnil(L, index) ? std::nullopt : lua::to<T>(L, index);
+            return lua_isnoneornil(L, index) ? std::nullopt : std::make_optional<T>(lua::to<T>(L, index));
         }
-        static lua_CFunction check(lua_State* L, int index = -1) {
-            if (!is(L, index)) luaL_error(L, "Bad argument #%d, expected %s, got %s", index, utils::demangle<T>().c_str(), luaL_typename(L, index));
+        static std::optional<T> check(lua_State* L, int index = -1) {
+            if (!is(L, index))
+                luaL_error(L, "Bad argument #%d, expected %s or nil, got %s", index, utils::demangle<T>().c_str(), luaL_typename(L, index));
             return to(L, index);
         }
         static void push(lua_State* L, const std::optional<T>& value) {
@@ -220,60 +227,121 @@ namespace lua {
         }
     };
 
-    template<>
-    struct TypeAdapter<glm::vec3> {
+    template<typename... Types>
+    struct TypeAdapter<std::variant<Types...>> {
+
+        using V = std::variant<Types...>;
+        using VSize = std::variant_size<V>;
+
+        static bool is(lua_State* L, int index = -1) {
+            return (lua::is<Types>(L, index) || ...);
+        }
+
+        template <std::size_t I>
+        static V toImpl(std::integral_constant<std::size_t, I>, lua_State* L, int index) {
+
+            using PotentialT = std::variant_alternative_t<I - 1, V>;
+            if (lua::is<PotentialT>(L, index))
+                return V(std::in_place_index<I - 1>, lua::to<PotentialT>(L, index));
+
+            if constexpr (I - 1 > 0)
+                return toImpl(std::integral_constant<std::size_t, I - 1>(), L, index);
+
+            return check(L, index);
+        }
+
+        static V to(lua_State* L, int index = -1) {
+            return toImpl(std::integral_constant<std::size_t, VSize::value>(), L, index);
+        }
+
+        static V check(lua_State* L, int index = -1) {
+            if (!is(L, index))
+                luaL_error(L, "Bad argument #%d, expected one of %s, got %s", index, ((utils::demangle<Types>() + ", ") + ...).c_str(), luaL_typename(L, index));
+            return to(L, index);
+        }
+
+        template <std::size_t I>
+        static void pushImpl(std::integral_constant<std::size_t, I>, lua_State* L, const V& variant) {
+
+            using ValueT = std::variant_alternative_t<I - 1, V>;
+            if (auto* value = std::get_if<ValueT>(variant)) {
+                lua::push<ValueT>(&value);
+                return;
+            }
+
+            if constexpr (I - 1 > 0)
+                pushImpl(std::integral_constant<std::size_t, I - 1>(), L, index);
+        }
+
+        static void push(lua_State* L, const V& variant) {
+            pushImpl(std::integral_constant<std::size_t, VSize::value>(), L, index);
+        }
+    };
+
+    template<glm::length_t Length, typename T, glm::qualifier Q>
+    struct TypeAdapter<glm::vec<Length, T, Q>> {
+
+        using TVec = glm::vec<Length, T, Q>;
+
+        struct Keys {
+            std::string key1;
+            std::string key2;
+            int key3 = 0;
+        };
+
+        inline static const Keys keys[] = {
+            {"x", "r", 1},
+            {"y", "g", 2},
+            {"z", "b", 3},
+            {"w", "a", 4}
+        };
 
         static bool is(lua_State* L, int index = -1) {
             return lua_istable(L, index);
         }
 
-        static glm::vec3 check(lua_State* L, int index = -1) {
+        static TVec check(lua_State* L, int index = -1) {
             if (!is(L, index)) luaL_error(L, "Bad argument #%d, expected %s, got %s", index, utils::demangle<glm::vec3>().c_str(), luaL_typename(L, index));
             return to(L, index);
         }
 
-        static float tryGetValue(lua_State* L, const std::string& key1, const std::string& key2, int key3) {
+        static T tryGetValue(lua_State* L, const Keys& keys, int tableIndex) {
 
-            auto opt1 = lua::tryGetField<float>(L, key1);
+            auto opt1 = lua::tryGetField<T>(L, keys.key1, tableIndex);
             if (opt1)
                 return *opt1;
 
-            auto opt2 = lua::tryGetField<float>(L, key2);
+            auto opt2 = lua::tryGetField<T>(L, keys.key2, tableIndex);
             if (opt2)
                 return *opt2;
 
-            auto opt3 = lua::tryGetField<float>(L, key3);
+            auto opt3 = lua::tryGetField<T>(L, keys.key3, tableIndex);
             if (opt3)
                 return *opt3;
 
-            return 0.f;
+            return static_cast<T>(0);
         }
 
-        static glm::vec3 to(lua_State* L, int index = -1) {
+        static TVec to(lua_State* L, int index = -1) {
 
-            glm::vec3 result = {
-                tryGetValue(L, "x", "r", 1),
-                tryGetValue(L, "y", "g", 2),
-                tryGetValue(L, "z", "b", 3)
-            };
+            TVec vec;
+            for (std::size_t i = 0; i < Length; ++i) {
+                vec[i] = tryGetValue(L, keys[i], index);
+            }
 
             //std::cout << "received: (" << result.x << ", " << result.y << ", " << result.z << ")\n";
 
-            return result;
+            return vec;
         }
 
-        static void push(lua_State* L, const glm::vec3& value) {
+        static void push(lua_State* L, const TVec& value) {
 
-            lua_createtable(L, 0, 3);
+            lua_createtable(L, 0, Length);
 
-            lua::push(L, value.x);
-            lua_setfield(L, -2, "x");
-
-            lua::push(L, value.y);
-            lua_setfield(L, -2, "y");
-
-            lua::push(L, value.z);
-            lua_setfield(L, -2, "z");
+            for (std::size_t i = 0; i < Length; ++i) {
+                lua::push(L, value[i]);
+                lua_setfield(L, -2, keys[i].key1.c_str());
+            }
         }
     };
 }

@@ -4,11 +4,10 @@
 
 #include "TestScene.h"
 #include "Engine.h"
-#include "Mesh.hpp"
+#include "Model.h"
 #include "Texture.hpp"
 #include "Resources.h"
-#include "WobblingMaterial.h"
-#include "mge/config.hpp"
+#include "config.hpp"
 
 #include "components/Transform.h"
 #include "components/Camera.h"
@@ -26,7 +25,7 @@ void makeFloorFromSpheres(en::Engine& engine, float sideLength, int numSpheresPe
     const float diameter = 2.f * sideLength / numSpheresPerSide;
     const float radius = diameter * 0.5f;
 
-    auto mesh = en::Meshes::get(config::MODEL_PATH + "sphere_smooth.obj");
+    auto model = en::Models::get(config::MODEL_PATH + "sphere_smooth.obj");
     auto material = std::make_shared<en::Material>("lit");
     material->setUniformValue("diffuseMap", en::Textures::get(config::TEXTURE_PATH + "bricks.jpg"));
     material->setUniformValue("diffuseColor", glm::vec3(1));
@@ -56,15 +55,15 @@ void makeFloorFromSpheres(en::Engine& engine, float sideLength, int numSpheresPe
             rb.isKinematic = true;
             rb.radius = radius;
 
-            actor.add<en::RenderInfo>(mesh, material);
+            actor.add<en::RenderInfo>(model, material);
         }
     }
 }
 
 void addRingItems(en::Engine& engine, en::Entity parent, std::size_t numItems = 10, float radius = 3.5f) {
 
-    auto cubeMesh       = en::Meshes::get(config::MODEL_PATH + "cube_flat.obj");
-    auto sphereMesh     = en::Meshes::get(config::MODEL_PATH + "sphere_smooth.obj");
+    auto cubeModel       = en::Models::get(config::MODEL_PATH + "cube_flat.obj");
+    auto sphereModel     = en::Models::get(config::MODEL_PATH + "sphere_smooth.obj");
     //auto sphereMaterial = en::Resources<TextureMaterial>::get(config::TEXTURE_PATH + "runicfloor.png");
 
     auto sphereMaterial = std::make_shared<en::Material>("lit");
@@ -112,11 +111,11 @@ void addRingItems(en::Engine& engine, en::Entity parent, std::size_t numItems = 
         if (i % 2 == 0) {
 
             object.add<en::Light>().intensity = 2.f;
-            object.add<en::RenderInfo>(sphereMesh, sphereMaterial);
+            object.add<en::RenderInfo>(sphereModel, sphereMaterial);
 
         } else {
 
-            object.add<en::RenderInfo>(cubeMesh, cubeMaterial);
+            object.add<en::RenderInfo>(cubeModel, cubeMaterial);
             object.get<en::Transform>().scale(glm::vec3(2));
             auto& rb = object.get<en::Rigidbody>();
             rb.radius *= 2.f;
@@ -129,14 +128,14 @@ void TestScene::open() {
 
     en::Engine& engine = getEngine();
 
-    // MESHES
+    // MODELS
 
-    // load a bunch of meshes we will be using throughout this demo
+    // load a bunch of models we will be using throughout this demo
     // F is flat shaded, S is smooth shaded (normals aligned or not), check the models folder!
-    std::shared_ptr<Mesh> planeMeshDefault = en::Meshes::get(config::MODEL_PATH + "plane.obj");
-    std::shared_ptr<Mesh> cubeMeshF        = en::Meshes::get(config::MODEL_PATH + "cube_flat.obj");
-    std::shared_ptr<Mesh> sphereMeshS      = en::Meshes::get(config::MODEL_PATH + "sphere_smooth.obj");
-    std::shared_ptr<Mesh> testObjectMeshS  = en::Meshes::get(config::MODEL_PATH + "sphere2.obj");
+    auto planeModelDefault = en::Models::get(config::MODEL_PATH + "plane.obj");
+    auto cubeModelF        = en::Models::get(config::MODEL_PATH + "cube_flat.obj");
+    auto sphereModelS      = en::Models::get(config::MODEL_PATH + "sphere_smooth.obj");
+    auto testObjectModelS  = en::Models::get(config::MODEL_PATH + "sphere2.obj");
 
     // MATERIALS
     auto runicStoneMaterial = en::Resources<en::Material>::get("runicStoneMaterial", "texture");
@@ -148,10 +147,18 @@ void TestScene::open() {
     floorMaterial->setUniformValue("specularMap", en::Textures::white());
     floorMaterial->setUniformValue("specularColor", glm::vec3(0.04));
 
-    auto wobblingMaterial = en::Resources<WobblingMaterial>::get(config::TEXTURE_PATH + "runicfloor.png");
+    auto wobblingMaterial = en::Resources<en::Material>::get("wobble");
+    wobblingMaterial->setUniformValue("timeScale", 10.f);
+    wobblingMaterial->setUniformValue("phaseOffsetPerUnitDistance", 6.f);
+    wobblingMaterial->setUniformValue("wobbleMultiplierMin", 0.8f);
+    wobblingMaterial->setUniformValue("wobbleMultiplierMax", 1.2f);
+    wobblingMaterial->setUniformValue("transitionWobbleFactorMin", 0.f);
+    wobblingMaterial->setUniformValue("transitionWobbleFactorMax", 1.f);
+    wobblingMaterial->setUniformValue("transitionColor", glm::vec4(0.01f, 0.5f, 1.f, 1.f));
+    wobblingMaterial->setUniformValue("diffuseTexture", en::Resources<en::Texture>::get(config::TEXTURE_PATH + "runicfloor.png"));
 
-    //en::Meshes::get(config::MODEL_PATH + "sphere3.obj");
-    //en::Meshes::removeUnused();
+    //en::Models::get(config::MODEL_PATH + "sphere3.obj");
+    //en::Models::removeUnused();
 
     // SCENE SETUP
 
@@ -173,7 +180,7 @@ void TestScene::open() {
 //    auto& planeTransform = registry.add<en::Transform>(plane);
 //    planeTransform.setLocalPosition({0, -4, 0});
 //    planeTransform.setLocalScale({5, 5, 5});
-//    registry.add<en::RenderInfo>(plane, planeMeshDefault, floorMaterial);
+//    registry.add<en::RenderInfo>(plane, planeModelDefault, floorMaterial);
 
     makeFloorFromSpheres(engine, 30, 20);
 
@@ -203,6 +210,6 @@ void TestScene::open() {
     auto& tf = sphere.add<en::Transform>();
     tf.setParent(ring);
     tf.setLocalScale({2.5f, 2.5f, 2.5f});
-    sphere.add<en::RenderInfo>(testObjectMeshS, wobblingMaterial);
+    sphere.add<en::RenderInfo>(testObjectModelS, wobblingMaterial);
     cameraOrbitBehavior.setTarget(sphere);
 }

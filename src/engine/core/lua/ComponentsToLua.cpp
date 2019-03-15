@@ -7,13 +7,43 @@
 #include <iostream>
 
 #include "Name.h"
+#include "Transform.h"
 
 using namespace en;
+
+namespace {
+
+    bool pushComponentReferenceWithChildren(Actor& actor, LuaState& lua, const std::function<void(Actor& actor, LuaState& lua)>& push) {
+
+        push(actor, lua);
+        if (!lua_isnil(lua, -1))
+            return true;
+
+        if (Transform* tf = actor.tryGet<Transform>()) {
+
+            Engine& engine = actor.getEngine();
+            for (Entity child : tf->getChildren()) {
+                Actor childActor = engine.actor(child);
+                if (pushComponentReferenceWithChildren(childActor, lua, push))
+                    return true;
+            }
+        }
+
+        return false;
+    }
+}
 
 void ComponentsToLua::pushComponentReferenceByTypeName(lua_State* L, Actor& actor, const std::string& componentTypeName) {
 
     auto lua = LuaState(L);
     getTypeInfoByName(componentTypeName).pushFromActor(actor, lua);
+}
+
+void ComponentsToLua::pushComponentReferenceByTypeNameWithChildren(lua_State* L, Actor& actor, const std::string& componentTypeName) {
+
+    auto lua = LuaState(L);
+    const auto& push = getTypeInfoByName(componentTypeName).pushFromActor;
+    pushComponentReferenceWithChildren(actor, lua, push);
 }
 
 void ComponentsToLua::addComponentByTypeName(lua_State* L, Actor& actor, const std::string& componentTypeName) {
@@ -22,13 +52,19 @@ void ComponentsToLua::addComponentByTypeName(lua_State* L, Actor& actor, const s
     getTypeInfoByName(componentTypeName).addToActor(actor, lua);
 }
 
+void ComponentsToLua::addComponentByTypeName(lua_State* L, Actor& actor, const std::string& componentTypeName, int componentDefinitionIndex) {
+
+    auto lua = LuaState(L);
+    getTypeInfoByName(componentTypeName).addToActorFromDefinition(actor, lua, componentDefinitionIndex);
+}
+
 void ComponentsToLua::removeComponentByTypeName(lua_State* L, Actor& actor, const std::string& componentTypeName) {
 
     auto lua = LuaState(L);
     getTypeInfoByName(componentTypeName).removeFromActor(actor, lua);
 }
 
-ComponentsToLua::TypeInfo& ComponentsToLua::getTypeInfoByName(const std::string typeName) {
+ComponentsToLua::TypeInfo& ComponentsToLua::getTypeInfoByName(const std::string& typeName) {
 
     auto& map = getNameToTypeInfoMap();
     auto it = map.find(typeName);
@@ -50,11 +86,12 @@ void ComponentsToLua::printDebugInfo() {
     std::cout << std::endl;
 }
 
-void ComponentsToLua::makeEntities(lua_State* L, Engine& engine, int index) {
+std::vector<Actor> ComponentsToLua::makeEntities(lua_State* L, Engine& engine, int index) {
 
     index = lua_absindex(L, index);
 
-    std::vector<std::tuple<int, en::Actor>> entities;
+    std::vector<Actor> actors;
+    std::vector<int> refs;
 
     // Create entities and assign their names.
     lua_pushnil(L);
@@ -64,27 +101,30 @@ void ComponentsToLua::makeEntities(lua_State* L, Engine& engine, int index) {
         if (!lua_istable(L, -1))
             continue;
 
-        en::Actor actor = makeEntity(L, engine, -1);
         // Save a ref to the entity definition and the actor for adding components later.
+        actors.push_back(makeEntity(L, engine, -1));
         lua_pushvalue(L, -1);
-        entities.emplace_back(luaL_ref(L, LUA_REGISTRYINDEX), actor);
+        refs.push_back(luaL_ref(L, LUA_REGISTRYINDEX));
     }
 
     // Add all other components to the entities.
-    for (auto[ref, actor] : entities) {
+    for (std::size_t i = 0; i < actors.size(); ++i) {
 
         auto pop = lua::PopperOnDestruct(L);
-        lua_rawgeti(L, LUA_REGISTRYINDEX, ref);
+        lua_rawgeti(L, LUA_REGISTRYINDEX, refs[i]);
 
         int oldTop = lua_gettop(L);
-        addComponents(L, actor, -1);
+        addComponents(L, actors[i], -1);
         int newTop = lua_gettop(L);
         assert(oldTop == newTop);
     }
 
     // Release the references
-    for (auto[ref, actor] : entities)
+    for (int ref : refs) {
         luaL_unref(L, LUA_REGISTRYINDEX, ref);
+    }
+
+    return actors;
 }
 
 Actor ComponentsToLua::makeEntity(lua_State* L, Engine& engine, int entityDefinitionIndex) {

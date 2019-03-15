@@ -5,15 +5,14 @@
 #ifndef SAXION_Y2Q1_CPP_ACTOR_H
 #define SAXION_Y2Q1_CPP_ACTOR_H
 
+// The declaration is in ActorDecl.h to make it possible to include only the declaration,
+// in case you need just the non-templated stuff.
+#include "ActorDecl.h"
 #include <memory>
 #include <vector>
 #include <unordered_set>
 #include <SFML/Graphics.hpp>
 #include "Engine.h"
-
-// The declaration is here to make it possible to include only the declaration,
-// in case you need just the non-templated stuff.
-#include "ActorDecl.h"
 
 namespace en {
 

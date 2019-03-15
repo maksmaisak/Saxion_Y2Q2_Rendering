@@ -22,6 +22,12 @@
 #include "Resources.h"
 #include "Material.h"
 
+#include "KeyboardHelper.h"
+#include "MouseHelper.h"
+#include "Sound.h"
+#include "MusicIntegration.h"
+#include "Ease.h"
+
 using namespace en;
 
 const sf::Time TimestepFixed = sf::seconds(0.01f);
@@ -36,18 +42,19 @@ void Engine::initialize() {
     initializeWindow(m_window);
     printGLContextVersionInfo();
     initializeGlew();
+    m_systems.init(*this);
 }
 
 void Engine::run() {
 
+    m_systems.start();
+
+    const float timestepFixedSeconds = TimestepFixed.asSeconds();
     sf::Clock fixedUpdateClock;
     sf::Time fixedUpdateLag = sf::Time::Zero;
 
+    const sf::Time timestepDraw = sf::microseconds((sf::Int64)(1000000.0 / m_framerateCap));
     sf::Clock drawClock;
-    sf::Time timeSinceLastDraw = sf::Time::Zero;
-
-    const float timestepFixedSeconds = TimestepFixed.asSeconds();
-    const sf::Time timestepDraw = sf::seconds(1.f / m_framerateCap);
 
     while (m_window.isOpen()) {
 
@@ -58,10 +65,14 @@ void Engine::run() {
         }
 
         if (drawClock.getElapsedTime() >= timestepDraw) {
-            m_fps = 1.f / drawClock.getElapsedTime().asSeconds();
+
+            m_fps = (float)(1000000.0 / drawClock.restart().asMicroseconds());
+            auto frameClock = sf::Clock();
             draw();
-            drawClock.restart();
+            m_frameTimeMicroseconds = frameClock.getElapsedTime().asMicroseconds();
+
         } else {
+
             do sf::sleep(sf::microseconds(1));
             while (drawClock.getElapsedTime() < timestepDraw && fixedUpdateLag + fixedUpdateClock.getElapsedTime() < TimestepFixed);
         }
@@ -72,20 +83,20 @@ void Engine::run() {
 
 void Engine::update(float dt) {
 
-    auto* currentScene = m_sceneManager.getCurrentScene();
-    if (currentScene) currentScene->update(dt);
+    m_sceneManager.update(dt);
+    m_systems     .update(dt);
+    m_scheduler   .update(dt);
 
-    for (auto& pSystem : m_systems)
-        pSystem->update(dt);
-
-    m_scheduler.update(dt);
+    utils::KeyboardHelper::update();
+    utils::MouseHelper   ::update();
 }
 
 void Engine::draw() {
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    for (auto& pSystem : m_systems)
-        pSystem->draw();
+
+    m_systems.draw();
+
     m_window.display();
 }
 
@@ -95,16 +106,18 @@ void Engine::initializeWindow(sf::RenderWindow& window) {
 
     auto& lua = getLuaState();
     lua_getglobal(lua, "Config");
+    auto popConfig = lua::PopperOnDestruct(lua);
     unsigned int width      = lua.tryGetField<unsigned int>("width").value_or(800);
     unsigned int height     = lua.tryGetField<unsigned int>("height").value_or(600);
     bool vsync              = lua.tryGetField<bool>("vsync").value_or(true);
     bool fullscreen         = lua.tryGetField<bool>("fullscreen").value_or(false);
     std::string windowTitle = lua.tryGetField<std::string>("windowTitle").value_or("Game");
-    lua_pop(lua, 1);
 
     auto contextSettings = sf::ContextSettings(24, 8, 8, 4, 5, sf::ContextSettings::Attribute::Core | sf::ContextSettings::Attribute::Debug);
     window.create(sf::VideoMode(width, height), windowTitle, fullscreen ? sf::Style::Fullscreen : sf::Style::Default, contextSettings);
     window.setVerticalSyncEnabled(vsync);
+    window.setKeyRepeatEnabled(false);
+    window.setFramerateLimit(0);
     window.setActive(true);
 
     std::cout << "Window initialized." << std::endl << std::endl;
@@ -114,12 +127,10 @@ void Engine::printGLContextVersionInfo() {
 
     std::cout << "Context info:" << std::endl;
     std::cout << "----------------------------------" << std::endl;
-    //print some debug stats for whoever cares
     const GLubyte* vendor      = glGetString(GL_VENDOR);
     const GLubyte* renderer    = glGetString(GL_RENDERER);
     const GLubyte* version     = glGetString(GL_VERSION);
     const GLubyte* glslVersion = glGetString(GL_SHADING_LANGUAGE_VERSION);
-    //nice consistency here in the way OpenGl retrieves values
     GLint major, minor;
     glGetIntegerv(GL_MAJOR_VERSION, &major);
     glGetIntegerv(GL_MINOR_VERSION, &minor);
@@ -137,88 +148,97 @@ void Engine::initializeGlew() {
 
     std::cout << "Initializing GLEW..." << std::endl;
 
-    GLint glewStatus = glewInit();
-    if (glewStatus == GLEW_OK) {
+    const GLint glewStatus = glewInit();
+    if (glewStatus == GLEW_OK)
         std::cout << "Initialized GLEW: OK" << std::endl;
-    } else {
+    else
         std::cerr << "Initialized GLEW: FAILED" << std::endl;
+}
+
+namespace {
+
+    int makeActors(lua_State* L) {
+
+        luaL_checktype(L, 1, LUA_TTABLE);
+        Engine& engine = *lua::check<Engine*>(L, lua_upvalueindex(1));
+        ComponentsToLua::makeEntities(L, engine, 1);
+
+        return 0;
     }
-}
 
-std::string testFreeFunction() {
+    int makeActorFromLua(lua_State* L) {
 
-    std::cout << "Free function called from lua" << std::endl;
-    return "Result returned from free function";
-}
+        Engine& engine = *lua::check<Engine*>(L, lua_upvalueindex(1));
 
-int makeActors(lua_State* L) {
+        // makeActor(table)
+        if (lua_istable(L, 1)) {
 
-    luaL_checktype(L, 1, LUA_TTABLE);
-    Engine& engine = *lua::check<Engine*>(L, lua_upvalueindex(1));
-    ComponentsToLua::makeEntities(L, engine, 1);
+            Actor actor = ComponentsToLua::makeEntity(L, engine, 1);
+            ComponentsToLua::addComponents(L, actor, 1);
+            lua::push(L, actor);
 
-    return 0;
-}
+            return 1;
+        }
 
-int makeActorFromLua(lua_State* L) {
-
-    Engine& engine = *lua::check<Engine*>(L, lua_upvalueindex(1));
-
-    // makeActor(table)
-    if (lua_istable(L, 1)) {
-
-        Actor actor = ComponentsToLua::makeEntity(L, engine, 1);
-        ComponentsToLua::addComponents(L, actor, 1);
+        // makeActor(name, [table])
+        Actor actor = engine.makeActor(luaL_checkstring(L, 1));
+        if (lua_istable(L, 2))
+            ComponentsToLua::addComponents(L, actor, 2);
         lua::push(L, actor);
-
         return 1;
     }
 
-    // makeActor(name, [table])
-    Actor actor = engine.makeActor(luaL_checkstring(L, 1));
-    if (lua_istable(L, 2))
-        ComponentsToLua::addComponents(L, actor, 2);
-    lua::push(L, actor);
-    return 1;
-}
+    int makeMaterial(lua_State* L) {
 
-int makeMaterial(lua_State* L) {
+        auto lua = LuaState(L);
 
-    auto lua = LuaState(L);
+        std::shared_ptr<Material> material;
+        if (lua.is<std::string>(1)) {
 
-    std::shared_ptr<Material> material;
-    if (lua.is<std::string>(1)) {
-
-        if (lua_isnoneornil(L, 2)) {
-            material = Resources<Material>::get(lua.to<std::string>(1));
+            if (lua_isnoneornil(L, 2)) {
+                material = Resources<Material>::get(lua.to<std::string>(1));
+            } else {
+                lua_pushvalue(L, 2);
+                material = Resources<Material>::get(lua.to<std::string>(1), lua);
+            }
         } else {
-            lua_pushvalue(L, 2);
-            material = Resources<Material>::get(lua.to<std::string>(1), lua);
-        }
-    } else {
 
-        if (lua_isnoneornil(L, 1)) {
-            material = std::make_shared<Material>("lit");
-        } else {
-            material = std::make_shared<Material>(lua);
+            if (lua_isnoneornil(L, 1)) {
+                material = std::make_shared<Material>("lit");
+            } else {
+                material = std::make_shared<Material>(lua);
+            }
         }
+
+        lua.push(std::move(material));
+        return 1;
     }
 
-    lua.push(std::move(material));
-    return 1;
+    int loadScene(lua_State* L) {
+
+        Engine* engine = lua::check<Engine*>(L, lua_upvalueindex(1));
+
+        if (lua::is<std::string>(L, 1)) {
+
+            std::string path = lua::to<std::string>(L, 1);
+            engine->getSceneManager().setCurrentSceneNextUpdate<LuaScene>(engine->getLuaState(), path);
+
+        } else if (lua_istable(L, 1)) {
+
+            lua_pushvalue(L, 1);
+            engine->getSceneManager().setCurrentSceneNextUpdate<LuaScene>(LuaReference(L));
+        }
+
+        return 0;
+    }
 }
 
 void Engine::initializeLua() {
-
-    LUA_REGISTER_TYPE(Actor);
 
     auto& lua = getLuaState();
 
     lua_newtable(lua);
     {
-        lua.setField("testValue", 3.1415926f);
-        lua.setField("testFreeFunction", &testFreeFunction);
-        lua.setField("testMemberFunction", &Engine::testMemberFunction, this);
         lua.setField("find", [this](const std::string& name) -> std::optional<Actor> {
             Actor actor = findByName(name);
             if (actor)
@@ -235,38 +255,143 @@ void Engine::initializeLua() {
         lua_setfield(lua, -2, "makeActor");
 
         lua.setField("getTime", [](){return GameTime::now().asSeconds();});
-        lua.setField("loadScene", [this](const std::string& path){
-            m_scheduler.delay(sf::microseconds(0), [=](){
-                m_sceneManager.setCurrentScene<LuaScene>(path);
-            });
-        });
+
+        lua.push(this);
+        lua_pushcclosure(lua, &loadScene, 1);
+        lua_setfield(lua, -2, "loadScene");
+
+        lua.setField("quit", [this]() { m_shouldExit = true; });
 
         // TODO make addProperty work on both tables and their metatables
         //lua::addProperty(lua, "time", lua::Property<float>([](){return GameTime::now().asSeconds();}));
 
         lua.setField("makeMaterial", &makeMaterial);
+
+        // Game.window
+        lua_pushvalue(lua, -1);
+        lua_newtable(lua);
+        {
+            lua.setField("getSize", [&window = m_window]() -> glm::vec2 {
+                auto size = window.getSize();
+                return {size.x, size.y};
+            });
+        }
+        lua_setfield(lua, -2, "window");
+
+        // Game.audio
+        lua_pushvalue(lua, -1);
+        lua_newtable(lua);
+        {
+            lua.setField("makeSound", [](const std::string& filepath) {
+                auto sound = std::make_shared<Sound>(config::ASSETS_PATH + filepath);
+                return sound->isValid() ? std::make_optional(sound) : std::nullopt;
+            });
+
+            lua.setField("getSound", [](const std::string& filepath) {
+                auto sound = Resources<Sound>::get(config::ASSETS_PATH + filepath);
+                return sound->isValid() ? std::make_optional(sound) : std::nullopt;
+            });
+
+            lua.setField("makeMusic", [](const std::string& filepath) {
+                auto ptr = ResourceLoader<sf::Music>::load(config::ASSETS_PATH + filepath);
+                return ptr ? std::make_optional(ptr) : std::nullopt;
+            });
+
+            lua.setField("getMusic", [](const std::string& filepath) {
+                auto ptr = Resources<sf::Music>::get(config::ASSETS_PATH + filepath);
+                return ptr ? std::make_optional(ptr) : std::nullopt;
+            });
+
+            lua.setField("stopAll", []() {
+
+                std::size_t count = 0;
+
+                std::for_each(Resources<Sound>::begin(), Resources<Sound>::end(), [&count](const auto& pair) {
+                    pair.second->getUnderlyingSound().stop();
+                    count += 1;
+                });
+
+                std::for_each(Resources<sf::Music>::begin(), Resources<sf::Music>::end(), [&count](const auto& pair) {
+                    pair.second->stop();
+                    count += 1;
+                });
+
+                return count;
+            });
+        }
+        lua_setfield(lua, -2, "audio");
+
+        // Game.keyboard
+        lua_pushvalue(lua, -1);
+        lua_newtable(lua);
+        {
+            lua.setField("isHeld", &utils::KeyboardHelper::isHeld);
+            lua.setField("isDown", &utils::KeyboardHelper::isDown);
+            lua.setField("isUp"  , &utils::KeyboardHelper::isUp);
+        }
+        lua_setfield(lua, -2, "keyboard");
+
+        // Game.mouse
+        lua_pushvalue(lua, -1);
+        lua_newtable(lua);
+        {
+            lua.setField("isHeld", [](int buttonNum){return utils::MouseHelper::isHeld((sf::Mouse::Button)(buttonNum - 1));});
+            lua.setField("isDown", [](int buttonNum){return utils::MouseHelper::isDown((sf::Mouse::Button)(buttonNum - 1));});
+            lua.setField("isUp"  , [](int buttonNum){return utils::MouseHelper::isUp  ((sf::Mouse::Button)(buttonNum - 1));});
+        }
+        lua_setfield(lua, -2, "mouse");
     }
     lua_setglobal(lua, "Game");
 
-    ComponentsToLua::printDebugInfo();
+    lua_pushvalue(lua, -1);
+    lua_newtable(lua);
+    {
+        static auto setFieldAsUserdata = [&lua](const std::string& name, const ease::Ease& ease){
+            lua.push(ease);
+            lua_setfield(lua, -2, name.c_str());
+        };
 
-    if (lua.doFileInNewEnvironment("assets/scripts/config.lua")) {
+        setFieldAsUserdata("linear", ease::linear);
+
+        setFieldAsUserdata("inQuad" , ease::inQuad );
+        setFieldAsUserdata("inCubic", ease::inCubic);
+        setFieldAsUserdata("inQuart", ease::inQuart);
+        setFieldAsUserdata("inQuint", ease::inQuint);
+        setFieldAsUserdata("inExpo" , ease::inExpo );
+        setFieldAsUserdata("inCirc" , ease::inCirc );
+        setFieldAsUserdata("inSine" , ease::inSine );
+
+        setFieldAsUserdata("outQuad" , ease::outQuad );
+        setFieldAsUserdata("outCubic", ease::outCubic);
+        setFieldAsUserdata("outQuart", ease::outQuart);
+        setFieldAsUserdata("outQuint", ease::outQuint);
+        setFieldAsUserdata("outExpo" , ease::outExpo );
+        setFieldAsUserdata("outCirc" , ease::outCirc );
+        setFieldAsUserdata("outSine" , ease::outSine );
+
+        setFieldAsUserdata("inOutQuad ", ease::inOutQuad );
+        setFieldAsUserdata("inOutCubic", ease::inOutCubic);
+        setFieldAsUserdata("inOutQuart", ease::inOutQuart);
+        setFieldAsUserdata("inOutQuint", ease::inOutQuint);
+        setFieldAsUserdata("inOutExpo ", ease::inOutExpo );
+        setFieldAsUserdata("inOutCirc ", ease::inOutCirc );
+        setFieldAsUserdata("inOutSine" , ease::inOutSine );
+
+        setFieldAsUserdata("punch"    , ease::punch);
+        setFieldAsUserdata("fluctuate", ease::fluctuate);
+    }
+    lua_setglobal(lua, "Ease");
+
+    if (lua.doFileInNewEnvironment(config::SCRIPT_PATH + "config.lua")) {
         lua_setglobal(lua, "Config");
     }
 
     lua_getglobal(lua, "Config");
+    auto pop = PopperOnDestruct(lua);
     m_framerateCap = lua.tryGetField<unsigned int>("framerateCap").value_or(m_framerateCap);
-    lua.pop();
-}
-
-void Engine::testMemberFunction() {
-
-    std::cout << "Member function called from lua" << std::endl;
 }
 
 void Engine::processWindowEvents() {
-
-    bool shouldExit = false;
 
     sf::Event event{};
     while (m_window.pollEvent(event)) {
@@ -274,17 +399,12 @@ void Engine::processWindowEvents() {
         switch (event.type) {
 
             case sf::Event::Closed:
-                shouldExit = true;
-                break;
-
-            case sf::Event::KeyPressed:
-                if (event.key.code == sf::Keyboard::Escape)
-                    shouldExit = true;
+                m_shouldExit = true;
                 break;
 
             case sf::Event::Resized:
-                //would be better to move this to the render system
-                //this version implements unconstrained match viewport scaling
+                // TODO move this to the render system
+                // Unconstrained match viewport scaling
                 glViewport(0, 0, event.size.width, event.size.height);
                 break;
 
@@ -295,7 +415,7 @@ void Engine::processWindowEvents() {
         Receiver<sf::Event>::broadcast(event);
     }
 
-    if (shouldExit) {
+    if (m_shouldExit) {
         m_window.close();
     }
 }
@@ -314,4 +434,13 @@ Actor Engine::makeActor(const std::string& name) {
 
 Actor Engine::findByName(const std::string& name) const {
     return actor(m_registry.findByName(name));
+}
+
+Engine::~Engine() {
+
+    // If sf::SoundBuffer is being destroyed when statics are destroyed when the app quits,
+    // that causes OpenAL to throw an error. This prevents that.
+    Resources<Sound>::clear();
+    Resources<sf::SoundBuffer>::clear();
+    Resources<sf::Music>::clear();
 }

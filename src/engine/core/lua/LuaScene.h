@@ -11,23 +11,30 @@
 #include "engine/actor/Actor.h"
 #include "Receiver.h"
 #include "Collision.h"
+#include "LuaReference.h"
 
-class LuaScene : public en::Scene, en::Receiver<en::Collision> {
+namespace en {
 
-public:
-    LuaScene(const std::string& filename);
-    virtual ~LuaScene();
+    class LuaScene : public Scene, Receiver<Collision> {
 
-    void open() override;
-    void update(float dt) override;
+    public:
+        LuaScene(LuaState& lua, const std::string& filename);
+        LuaScene(LuaReference&& table);
+        virtual ~LuaScene() = default;
 
-private:
+        void open() override;
+        void update(float dt) override;
 
-    void receive(const en::Collision& info) override;
+    private:
 
-    std::string m_filename;
-    int m_luaUpdateFunctionRef = LUA_NOREF;
-    int m_luaOnCollisionFunctionRef = LUA_NOREF;
-};
+        void receive(const Collision& info) override;
+
+        bool pushTableOnStack();
+
+        LuaReference m_self;
+        LuaReference m_update;
+        LuaReference m_onCollision;
+    };
+}
 
 #endif //SAXION_Y2Q2_RENDERING_LUASCENE_H

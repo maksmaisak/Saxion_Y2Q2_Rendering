@@ -2,9 +2,7 @@
 
 #version 330 // for glsl version (12 is for older versions , say opengl 2.1
 
-in vec3 vertex;
-in vec3 normal;
-in vec2 uv;
+layout(location = 0) in vec3 vertex;
 
 uniform	mat4 matrixProjection;
 uniform	mat4 matrixView;

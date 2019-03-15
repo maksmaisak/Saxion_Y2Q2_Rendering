@@ -44,7 +44,7 @@ void TerrainScene::open() {
     auto terrain = engine.makeActor("Terrain");
     terrain.add<en::Transform>().scale({3, 3, 3});
     {
-        auto mesh = en::Meshes::get(config::MODEL_PATH + "plane_8192.obj");
+        auto mesh = en::Models::get(config::MODEL_PATH + "plane_8192.obj");
         auto material = std::make_shared<en::Material>("terrain");
         material->setUniformValue("heightmap", en::Textures::get(config::TEXTURE_PATH + "terrain/heightmap.png", GL_RGBA));
         material->setUniformValue("maxHeight", 1.f);

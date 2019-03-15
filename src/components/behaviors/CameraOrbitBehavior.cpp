@@ -59,7 +59,7 @@ void CameraOrbitBehavior::update(float dt) {
 
     glm::vec3 targetPosition = targetTransform.getWorldPosition();
     glm::vec3 offsetDirection = glm::normalize(ownTransform.getLocalPosition() - targetPosition);
-    if (glm::any(glm::isnan(offsetDirection))) offsetDirection = glm::vec3(0, 0, -1);
+    if (glm::any(glm::isnan(offsetDirection))) offsetDirection = glm::vec3(0, 0, 1);
     offsetDirection = glm::rotate(offsetDirection, -input.x * m_rotationSpeed * dt, glm::vec3(0, 1, 0));
 
     glm::vec3 flatOffsetDirection = glm::normalize(glm::vec3(offsetDirection.x, 0, offsetDirection.z));

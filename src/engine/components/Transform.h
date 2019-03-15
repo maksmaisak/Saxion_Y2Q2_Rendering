@@ -10,7 +10,6 @@
 #include <glm/gtc/quaternion.hpp>
 
 #include "Entity.h"
-#include "Behavior.h"
 #include "ComponentsToLua.h"
 #include "LuaStack.h"
 
@@ -19,16 +18,18 @@ namespace en {
     class Engine;
     class EntityRegistry;
     class LuaState;
+    class Actor;
 
     class Transform final {
 
-        LUA_TYPE(Transform)
+        LUA_TYPE(Transform);
 
         friend class TransformHierarchySystem;
 
     public:
 
         static void initializeMetatable(LuaState& lua);
+        static Transform& addFromLua(Actor& actor, LuaState& lua);
 
         Transform() = default;
 
@@ -62,6 +63,7 @@ namespace en {
         void removeChild(Entity child);
 
         EntityRegistry* m_registry = nullptr;
+        Engine* m_engine = nullptr;
         Entity m_entity = en::nullEntity;
         Entity m_parent = en::nullEntity;
         std::vector<Entity> m_children;

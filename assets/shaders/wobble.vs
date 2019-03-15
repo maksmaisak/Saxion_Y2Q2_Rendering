@@ -4,7 +4,7 @@ in vec3 vertex;
 in vec3 normal;
 in vec2 uv;
 
-uniform	mat4 mvpMatrix;
+uniform	mat4 matrixPVM;
 uniform float time;
 
 uniform float timeScale;
@@ -21,6 +21,6 @@ void main() {
     wobbleFactor = sin(time * timeScale + distance * phaseOffsetPerUnitDistance);
 
     vec3 position = vertex * mix(wobbleMultiplierMin, wobbleMultiplierMax, smoothstep(-1, 1, wobbleFactor));
-    gl_Position = mvpMatrix * vec4(position, 1);
+    gl_Position = matrixPVM * vec4(position, 1);
     fUV = uv;
 }

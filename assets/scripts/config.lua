@@ -3,7 +3,7 @@
 width  = 1920
 height = 1080
 windowTitle = "Sealed"
-fullscreen = false
+fullscreen = true
 framerateCap = 240
 vsync = false
 enableStaticBatching = true
@@ -24,19 +24,8 @@ defaultSkybox = {
     back   = "textures/skybox/SkyboxMap_back.png"
 }
 
--- The test skybox
---defaultSkybox = {
---    right  = "textures/skybox/test/right.jpg" ,
---    left   = "textures/skybox/test/left.jpg"  ,
---    top    = "textures/skybox/test/top.jpg"   ,
---    bottom = "textures/skybox/test/bottom.jpg",
---    front  = "textures/skybox/test/front.jpg" ,
---    back   = "textures/skybox/test/back.jpg"
---}
-
 -- custom
 player = 'assets/scripts/player.lua'
-firstLevelPath = 'assets/scripts/scenes/level1.lua'
 resultScreen = 'assets/scripts/UI/resultScreen.lua'
 saveFile = 'assets/scripts/save.lua'
 levelsDefinition = 'assets/scripts/levelsDefinition.lua'

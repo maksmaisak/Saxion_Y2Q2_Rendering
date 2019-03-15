@@ -87,7 +87,7 @@ function scene:start()
 
 	UIUtilities.makeButton("StartButton", "MainMenuPanel", "Start", {0.5,0.7}, {0.5,0.7}, "textures/buttonBackground.png", function(self)
 		Game.currentLevel = 1
-		Game.loadScene(Config.firstLevelPath)
+		Game.loadScene(Game.levels[Game.currentLevel].path)
 	end)
 
 	UIUtilities.makeButton("ChooseLevelButton", "MainMenuPanel", "Choose Level", {0.5,0.6}, {0.5,0.6}, "textures/buttonBackground.png", function(self)

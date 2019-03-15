@@ -74,13 +74,14 @@ namespace ease {
             return values;
         }();
 
+        t = std::clamp(t, 0.f, 1.f);
         const float scaled = t * NUM_SAMPLES;
         const float integerPart = std::floor(scaled);
         const float fractionalPart = scaled - integerPart;
 
-        const int index = std::min(NUM_SAMPLES - 2, (int)integerPart);
-        const float posA = slopeSamples[index] * fractionalPart;
-        const float posB = -slopeSamples[index + 1] * (1.f - fractionalPart);
+        const int index = (int)integerPart;
+        const float posA = slopeSamples[index % NUM_SAMPLES] * fractionalPart;
+        const float posB = -slopeSamples[(index + 1) % NUM_SAMPLES] * (1.f - fractionalPart);
 
         const float smoothRemapped = fractionalPart * fractionalPart * (3.f - 2.f * fractionalPart);
 

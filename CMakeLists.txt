@@ -27,7 +27,7 @@ header_directories(INCLUDES)
 include_directories(${INCLUDES})
 
 if(WIN32)
-	add_executable(Saxion_Y2Q2_Rendering ${SOURCES})
+	add_executable(Saxion_Y2Q2_Rendering WIN32 ${SOURCES})
 else()
 	add_executable(Saxion_Y2Q2_Rendering ${SOURCES})
 endif()

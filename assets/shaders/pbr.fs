@@ -307,7 +307,7 @@ const vec3 sampleOffsetDirections[20] = vec3[]
 float CalculatePointShadowMultiplier(int i, vec3 fromLight, float distance, float biasMultiplier) {
 
     float shadow = 0.0;
-    float bias = max(0.002 * biasMultiplier, 0.001);
+    float bias = max(0.01 * biasMultiplier, 0.001);
     int numSamples = 1;
     float depth = distance / pointLights[i].farPlaneDistance - bias;
     float viewDistance = length(viewPosition - worldPosition);

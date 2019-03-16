@@ -43,7 +43,8 @@ std::shared_ptr<Model> Model::load(const std::string& filepath) {
 
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
 
-        std::cerr << "Could not load model from " << filepath << std::endl;
+        std::cerr << "Could not load model from " << filepath << ":" << std::endl;
+        std::cerr << importer.GetErrorString() << std::endl;
         return nullptr;
     }
 

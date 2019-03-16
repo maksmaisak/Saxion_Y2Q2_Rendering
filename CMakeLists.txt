@@ -19,7 +19,6 @@ project(Saxion_Y2Q2_Rendering)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_compile_definitions(GLM_ENABLE_EXPERIMENTAL)
-add_compile_definitions(GLM_HAS_CONSTEXPR)
 
 file(GLOB_RECURSE SOURCES "src/*.cpp")
 header_directories(INCLUDES)

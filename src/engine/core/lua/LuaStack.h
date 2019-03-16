@@ -173,16 +173,16 @@ namespace lua {
     template<typename T>
     struct TypeAdapter<T, std::enable_if_t<std::is_integral_v<T>>> {
         static bool is   (lua_State* L, int index = -1) { return lua_isinteger(L, index); }
-        static T    to   (lua_State* L, int index = -1) { return lua_tointeger(L, index); }
-        static T    check(lua_State* L, int index = -1) { return luaL_checkinteger(L, index); }
+        static T    to   (lua_State* L, int index = -1) { return static_cast<T>(lua_tointeger(L, index)); }
+        static T    check(lua_State* L, int index = -1) { return static_cast<T>(luaL_checkinteger(L, index)); }
         static void push (lua_State* L, T value) { lua_pushinteger(L, value); }
     };
 
     template<typename T>
     struct TypeAdapter<T, std::enable_if_t<std::is_floating_point_v<T>>> {
         static bool is   (lua_State* L, int index = -1) { return lua_isnumber(L, index); }
-        static T    to   (lua_State* L, int index = -1) { return lua_tonumber(L, index); }
-        static T    check(lua_State* L, int index = -1) { return luaL_checknumber(L, index); }
+        static T    to   (lua_State* L, int index = -1) { return static_cast<T>(lua_tonumber(L, index)); }
+        static T    check(lua_State* L, int index = -1) { return static_cast<T>(luaL_checknumber(L, index)); }
         static void push (lua_State* L, T value) { lua_pushnumber(L, value); }
     };
 

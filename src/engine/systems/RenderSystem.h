@@ -23,10 +23,10 @@
 namespace en {
 
     class ShaderProgram;
-    class UIRect;
     class Material;
     class Mesh;
     class DebugHud;
+	struct UIRect;
 
     class RenderSystem : public System, Receiver<SceneManager::OnSceneClosed> {
 

@@ -6,6 +6,7 @@ local materials = {
         albedo = 'objects/Player/Texture/Main_Character_01_AlbedoTransparency.png',
         metallicSmoothness = 'objects/Player/Texture/Main_Character_01_MetallicSmoothness.png',
         ao = 'objects/Player/Texture/Main_Character_01_AO.png',
+        normal = 'objects/Player/Texture/Main_Character_01_Normal.png',
         smoothnessMultiplier = 1,
         aoMultiplier = 1,
     },
@@ -14,6 +15,7 @@ local materials = {
         albedo = 'objects/tile/Blocks/FoundationBlock/Textures/AlbedoTransparency 1.png',
         metallicSmoothness = 'objects/tile/Blocks/FoundationBlock/Textures/MetallicSmoothness.png',
         ao = 'objects/tile/Blocks/FoundationBlock/Textures/Grayscale.png',
+        normal = 'objects/tile/Blocks/FoundationBlock/Textures/Normal.png',
         smoothnessMultiplier = 1,
         aoMultiplier = 1,
     },
@@ -29,14 +31,7 @@ local materials = {
         albedo = 'objects/ExitFinish/Textures/AlbedoTransparency.png',
         metallicSmoothness = 'objects/ExitFinish/Textures/MetallicSmoothness.png',
         ao = 'objects/ExitFinish/Textures/Grayscale.png',
-        smoothnessMultiplier = 1,
-        aoMultiplier = 1,
-    },
-    Game.makeMaterial {
-        shader = 'pbr',
-        albedo = 'objects/tile/Blocks/TerrainBlockVar1/Texture/TerrainBlockV1_AlbedoTransparency.png',
-        metallicSmoothness = 'objects/tile/Blocks/TerrainBlockVar1/Texture/TerrainBlockV1_MetallicSmoothness.png',
-        ao = 'objects/tile/Blocks/TerrainBlockVar1/Texture/TerrainBlockV1_AO.png',
+        normal = 'objects/ExitFinish/Textures/Normal.png',
         smoothnessMultiplier = 1,
         aoMultiplier = 1,
     },
@@ -45,6 +40,16 @@ local materials = {
         albedo = 'objects/tile/ButtonTile/Texture/ButtonTile_AlbedoTransparency.png',
         metallicSmoothness = 'objects/tile/ButtonTile/Texture/ButtonTile_MetallicSmoothness.png',
         ao = 'objects/tile/ButtonTile/Texture/ButtonTile_AO.png',
+        normal = 'objects/tile/ButtonTile/Texture/ButtonTile_Normal.png',
+        smoothnessMultiplier = 1,
+        aoMultiplier = 1,
+    },
+    Game.makeMaterial {
+        shader = 'pbr',
+        albedo = 'objects/tile/Blocks/TerrainBlockVar1/Texture/TerrainBlockV1_AlbedoTransparency.png',
+        metallicSmoothness = 'objects/tile/Blocks/TerrainBlockVar1/Texture/TerrainBlockV1_MetallicSmoothness.png',
+        ao = 'objects/tile/Blocks/TerrainBlockVar1/Texture/TerrainBlockV1_AO.png',
+        normal = 'objects/tile/Blocks/TerrainBlockVar1/Texture/TerraainBlockV1.png',
         smoothnessMultiplier = 1,
         aoMultiplier = 1,
     },
@@ -52,6 +57,7 @@ local materials = {
         shader = 'pbr',
         albedo = 'objects/decorations/MenuFloor/Texture/UvMappedFlooring_initialShadingGroup_AlbedoTransparency.png',
         metallicSmoothness = 'objects/decorations/MenuFloor/Texture/UvMappedFlooring_initialShadingGroup_MetallicSmoothness.png',
+        normal = 'objects/decorations/MenuFloor/Texture/UvMappedFlooring_initialShadingGroup_Normal.png',
         smoothnessMultiplier = 1,
         aoMultiplier = 1,
     },
@@ -60,6 +66,7 @@ local materials = {
         albedo = 'objects/tile/Blocks/TerrainBlockVar3/Texture/TerrainBlockV3_AlbedoTransparency.png',
         metallicSmoothness = 'objects/tile/Blocks/TerrainBlockVar3/Texture/TerrainBlockV3_MetallicSmoothness.png',
         ao = 'objects/tile/Blocks/TerrainBlockVar3/Texture/TerrainBlockV3_AO.png',
+        normal = 'objects/tile/Blocks/TerrainBlockVar3/Texture/TerraainBlockV3.png',
         smoothnessMultiplier = 1,
         aoMultiplier = 1,
     },
@@ -68,6 +75,7 @@ local materials = {
         albedo = 'objects/tile/Blocks/TerrainBlockVar4/Texture/TerrainBlockV4_AlbedoTransparency.png',
         metallicSmoothness = 'objects/tile/Blocks/TerrainBlockVar4/Texture/TerrainBlockV4_MetallicSmoothness.png',
         ao = 'objects/tile/Blocks/TerrainBlockVar4/Texture/TerrainBlockV4_AO.png',
+        normal = 'objects/tile/Blocks/TerrainBlockVar4/Texture/TerraainBlockV4.png',
         smoothnessMultiplier = 1,
         aoMultiplier = 1,
     },
@@ -83,6 +91,7 @@ local materials = {
         shader = 'pbr',
         renderMode = 'cutout',
         albedo = 'objects/decorations/Plants/Material/Plant_All (3).tga',
+        normal = 'objects/decorations/Plants/Material/Plant_All_NormalMap.png',
         metallicMultiplier = 0,
         smoothnessMultiplier = 0,
         aoMultiplier = 1,
@@ -92,6 +101,7 @@ local materials = {
         albedo = 'objects/Door/Texture/Door_01_AlbedoTransparency 1.png',
         metallicSmoothness = 'objects/Door/Texture/Door_01_MetallicSmoothness.png',
         ao = 'objects/Door/Texture/Door_01_AO.png',
+        normal = 'objects/Door/Texture/Door_01_Normal.png',
         smoothnessMultiplier = 1,
         aoMultiplier = 1,
     },
@@ -100,6 +110,7 @@ local materials = {
         albedo = 'objects/Door/Texture/DoorPilars_01_AlbedoTransparency 1.png',
         metallicSmoothness = 'objects/Door/Texture/DoorPilars_01_MetallicSmoothness.png',
         ao = 'objects/Door/Texture/DoorPilars_01_AO.png',
+        normal = 'objects/Door/Texture/DoorPilars_01_Normal.png',
         smoothnessMultiplier = 1,
         aoMultiplier = 1,
     },
@@ -108,6 +119,7 @@ local materials = {
         albedo = 'objects/decorations/BrokenFloor 1/Texture/Flooring_01_broken_01_Mossy_AlbedoTransparency.png',
         metallicSmoothness = 'objects/decorations/BrokenFloor 1/Texture/Flooring_01_broken_01_Mossy_MetallicSmoothness.png',
         ao = 'objects/decorations/BrokenFloor 1/Texture/Flooring_01_broken_01_Mossy_AO.png',
+        normal = 'objects/decorations/BrokenFloor 1/Texture/Flooring_01_broken_01_Mossy_Normal.png',
         smoothnessMultiplier = 1,
         aoMultiplier = 1,
     },
@@ -292,7 +304,7 @@ grid[2][3].tile = {
                             },
                             RenderInfo = {
                                 mesh = 'objects/tile/Blocks/TerrainBlockVar1/TerrainBlockV1.obj',
-                                material = materials[5],
+                                material = materials[6],
                                 isBatchingStatic = true
                             }
                         },
@@ -584,7 +596,7 @@ grid[3][5].tile = {
                             },
                             RenderInfo = {
                                 mesh = 'objects/tile/Blocks/TerrainBlockVar1/TerrainBlockV1.obj',
-                                material = materials[5],
+                                material = materials[6],
                                 isBatchingStatic = true
                             }
                         },
@@ -611,7 +623,7 @@ grid[3][6].tile = {
                             },
                             RenderInfo = {
                                 mesh = 'objects/tile/Blocks/TerrainBlockVar1/TerrainBlockV1.obj',
-                                material = materials[5],
+                                material = materials[6],
                                 isBatchingStatic = true
                             }
                         },
@@ -638,7 +650,7 @@ grid[3][7].tile = {
                             },
                             RenderInfo = {
                                 mesh = 'objects/tile/Blocks/TerrainBlockVar1/TerrainBlockV1.obj',
-                                material = materials[5],
+                                material = materials[6],
                                 isBatchingStatic = true
                             }
                         },
@@ -854,7 +866,7 @@ grid[5][4].tile = {
                             },
                             RenderInfo = {
                                 mesh = 'objects/tile/Blocks/TerrainBlockVar1/TerrainBlockV1.obj',
-                                material = materials[5],
+                                material = materials[6],
                                 isBatchingStatic = true
                             }
                         },
@@ -908,7 +920,7 @@ grid[5][12].tile = {
                             },
                             RenderInfo = {
                                 mesh = 'objects/tile/Blocks/TerrainBlockVar1/TerrainBlockV1.obj',
-                                material = materials[5],
+                                material = materials[6],
                                 isBatchingStatic = true
                             }
                         },
@@ -935,7 +947,7 @@ grid[5][13].tile = {
                             },
                             RenderInfo = {
                                 mesh = 'objects/tile/Blocks/TerrainBlockVar1/TerrainBlockV1.obj',
-                                material = materials[5],
+                                material = materials[6],
                                 isBatchingStatic = true
                             }
                         },
@@ -1200,7 +1212,7 @@ grid[6][12].tile = {
                             },
                             RenderInfo = {
                                 mesh = 'objects/tile/Blocks/TerrainBlockVar1/TerrainBlockV1.obj',
-                                material = materials[5],
+                                material = materials[6],
                                 isBatchingStatic = true
                             }
                         },
@@ -1227,7 +1239,7 @@ grid[6][13].tile = {
                             },
                             RenderInfo = {
                                 mesh = 'objects/tile/Blocks/TerrainBlockVar1/TerrainBlockV1.obj',
-                                material = materials[5],
+                                material = materials[6],
                                 isBatchingStatic = true
                             }
                         },
@@ -1384,7 +1396,7 @@ grid[7][10].tile = {
                             },
                             RenderInfo = {
                                 mesh = 'objects/tile/Blocks/TerrainBlockVar1/TerrainBlockV1.obj',
-                                material = materials[5],
+                                material = materials[6],
                                 isBatchingStatic = true
                             }
                         },
@@ -1465,7 +1477,7 @@ grid[7][13].tile = {
                             },
                             RenderInfo = {
                                 mesh = 'objects/tile/Blocks/TerrainBlockVar1/TerrainBlockV1.obj',
-                                material = materials[5],
+                                material = materials[6],
                                 isBatchingStatic = true
                             }
                         },
@@ -1855,7 +1867,7 @@ grid[2][4].button = {
                                 },
                                 RenderInfo = {
                                     mesh = 'objects/tile/ButtonTile/ButtonTile.obj',
-                                    material = materials[6],
+                                    material = materials[5],
                                 }
                             },
                         }
@@ -1888,7 +1900,7 @@ grid[6][11].button = {
                                 },
                                 RenderInfo = {
                                     mesh = 'objects/tile/ButtonTile/ButtonTile.obj',
-                                    material = materials[6],
+                                    material = materials[5],
                                 }
                             },
                         }
@@ -1921,7 +1933,7 @@ grid[7][3].button = {
                                 },
                                 RenderInfo = {
                                     mesh = 'objects/tile/ButtonTile/ButtonTile.obj',
-                                    material = materials[6],
+                                    material = materials[5],
                                 }
                             },
                         }

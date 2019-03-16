@@ -15,7 +15,7 @@ namespace en {
     /// A collection of meshes imported from a file.
     class Model {
 
-        friend class ModelImpl;
+        friend struct ModelImpl;
 
     public:
         static std::shared_ptr<Model> load(const std::string& filepath);

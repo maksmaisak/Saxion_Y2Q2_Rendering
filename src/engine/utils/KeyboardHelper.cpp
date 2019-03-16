@@ -145,7 +145,7 @@ namespace {
     }
 
     bool isValid(sf::Keyboard::Key keyCode) {
-        return keyCode > -1 && keyCode < names.size();
+        return keyCode > -1 && keyCode < static_cast<sf::Keyboard::Key>(names.size());
     }
 }
 

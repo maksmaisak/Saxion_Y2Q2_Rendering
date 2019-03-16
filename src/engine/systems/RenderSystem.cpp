@@ -77,7 +77,7 @@ namespace {
 RenderSystem::RenderSystem() :
     m_directionalDepthShader(Resources<ShaderProgram>::get("depthDirectional")),
     m_positionalDepthShader (Resources<ShaderProgram>::get("depthPositional")),
-    m_depthMaps(4, {1024, 1024}, 10, {256, 256}),
+    m_depthMaps(4, {1024, 1024}, 10, {64, 64}),
     m_vertexRenderer(4096)
 {}
 

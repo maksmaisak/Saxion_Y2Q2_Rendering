@@ -14,7 +14,7 @@ startScene = 'assets/scripts/UI/mainMenu.lua'
 --startScene = 'assets/scripts/scenes/level1.lua'
 --startScene = 'assets/scripts/scenes/test/luaScene.lua'
 --startScene = 'assets/scripts/scenes/test/testTweening.lua'
-startScene = 'assets/scripts/scenes/test/renderingShowcase.lua'
+--startScene = 'assets/scripts/scenes/test/renderingShowcase.lua'
 
 defaultSkybox = {
     right  = "textures/skybox/SkyboxMap_right.png" ,

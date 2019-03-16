@@ -78,23 +78,26 @@ function scene:start()
         }
     }
 
-    local rotationCenter = Game.makeActor({Transform = {parent = "head"}})
+    local rotationCenter = Game.makeActor({Transform = {position = {0, 2, 0}}})
     self.rotationCenterTransform = rotationCenter:get("Transform")
 
     Game.makeActor {
         Name = "Light",
         Transform = {
             parent = rotationCenter,
-            position = {5, 0, 0},
+            position = {-3, 0, 0},
             scale = {0.1, 0.1, 0.1},
         },
         RenderInfo = {
             mesh = "models/sphere2.obj",
-            material = defaultMaterial
+            material = Game.makeMaterial {
+                shader = "color",
+                color = {1, 0, 0}
+            }
         },
         Light = {
             color = {1, 0, 0},
-            intensity = 100
+            intensity = 10
         }
     }
 
@@ -106,22 +109,15 @@ function scene:start()
         },
         RenderInfo = {
             mesh = "models/sphere2.obj",
-            material = defaultMaterial
+            material = Game.makeMaterial {
+                shader = "color",
+                color = {0, 1, 0}
+            }
         },
         Light = {
             color = {0, 1, 0},
-			intensity = 40
+			intensity = 10
 		}
-    }
-
-    Game.makeActor {
-        Name = "LightAmbient",
-        Transform = {},
-        Light = {
-            kind = "directional",
-            intensity = 0,
-            ambientColor = {0.02, 0.02, 0.02}
-        }
     }
 
     Game.makeActor {
@@ -131,26 +127,17 @@ function scene:start()
         },
         Light = {
             kind = "directional",
-            intensity = 1
-        }
-    }
-
-    Game.makeActor {
-        Name = "LightDirectional2",
-        Transform = {
-            rotation = {0, 0, 0}
-        },
-        Light = {
-            kind = "directional",
-            intensity = 0.1
+            intensity = 2
         }
     }
 end
 
 function scene:update(dt)
 
-    if Game.keyboard.isHeld("Space") then
-        self.rotationCenterTransform:rotate(45 * dt, 0, 1, 0)
+    if Game.keyboard.isHeld("Left") then
+        self.rotationCenterTransform:rotate(-45 * dt, 0, 1, 0)
+    elseif Game.keyboard.isHeld("Right") then
+        self.rotationCenterTransform:rotate( 45 * dt, 0, 1, 0)
     end
 
     if Game.keyboard.isHeld("Up") then
@@ -160,6 +147,6 @@ function scene:update(dt)
     end
 end
 
-scene.ambientLighting = {color = Vector.from {0.5, 0.93, 1.13}}
+scene.ambientLighting = {color = Vector.from {1.010478, 1.854524, 2.270603} * 0.5}
 
 return scene

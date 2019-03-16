@@ -32,14 +32,14 @@ void LightingScene::open() {
     auto camera = engine.makeActor("Camera");
     camera.add<en::Camera>();
     camera.add<en::Transform>().move({0, 2, 7});
-    camera.add<CameraOrbitBehavior>(7, -45.f, 89.f);
+    camera.add<CameraOrbitBehavior>(7.f, -45.f, 89.f);
 
     auto ambientLight = engine.makeActor("AmbientLight");
     ambientLight.add<en::Transform>();
     {
         auto& l = ambientLight.add<en::Light>();
         l.color = {0,0,0};
-        l.colorAmbient = glm::vec3(0.02);
+        l.colorAmbient = glm::vec3(0.02f);
     }
     if (AnimateLightProperties) ambientLight.add<LightPropertyAnimator>();
 

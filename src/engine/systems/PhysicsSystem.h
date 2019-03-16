@@ -14,7 +14,7 @@
 namespace en {
 
     class Transform;
-    class Rigidbody;
+    struct Rigidbody;
     struct Collision;
 
     class PhysicsSystem : public en::System {

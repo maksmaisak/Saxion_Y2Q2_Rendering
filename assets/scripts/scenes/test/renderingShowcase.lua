@@ -18,8 +18,6 @@ local planeRenderInfo = {
     isBatchingStatic = true
 }
 
-local defaultMaterial = Game.makeMaterial {shader = "pbr"}
-
 local scenery = {
     {
         Name = "plane",
@@ -46,16 +44,16 @@ local scenery = {
             mesh = "objects/Player/Main_Character.obj",
             material = {
                 shader = "pbr",
-                albedo = 'objects/Player/Texture/Main_Character_01_AlbedoTransparency.png',
+                albedo             = 'objects/Player/Texture/Main_Character_01_AlbedoTransparency.png',
                 metallicSmoothness = 'objects/Player/Texture/Main_Character_01_MetallicSmoothness.png',
-                ao = 'objects/Player/Texture/Main_Character_01_AO.png',
-                normal = 'objects/Player/Texture/Main_Character_01_Normal.png',
+                ao                 = 'objects/Player/Texture/Main_Character_01_AO.png',
+                normal             = 'objects/Player/Texture/Main_Character_01_Normal.png',
                 smoothnessMultiplier = 1,
                 aoMultiplier = 1,
             },
             isBatchingStatic = true
         }
-    },
+    }
 }
 
 local scene = {}

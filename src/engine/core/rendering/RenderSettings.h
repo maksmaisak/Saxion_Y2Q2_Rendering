@@ -16,6 +16,7 @@ namespace en {
 
         glm::vec3 ambientColor = {0, 0, 0};
         std::shared_ptr<Texture> skyboxTexture;
+        bool useSkybox = true;
     };
 }
 

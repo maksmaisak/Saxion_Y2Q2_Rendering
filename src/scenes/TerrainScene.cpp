@@ -27,7 +27,7 @@ void TerrainScene::open() {
     auto camera = engine.makeActor("Camera");
     camera.add<en::Camera>();
     camera.add<en::Transform>().move({0, 2, 5});
-    camera.add<CameraOrbitBehavior>(5, -45.f, 89.f);
+    camera.add<CameraOrbitBehavior>(5.f, -45.f, 89.f);
 
     auto directionalLight = engine.makeActor("DirectionalLight");
     directionalLight.add<en::Transform>()
@@ -53,8 +53,8 @@ void TerrainScene::open() {
         material->setUniformValue("diffuse2", en::Textures::get(config::TEXTURE_PATH + "terrain/water/water.jpg"));
         material->setUniformValue("diffuse3", en::Textures::get(config::TEXTURE_PATH + "terrain/diffuse3.jpg"));
         material->setUniformValue("diffuse4", en::Textures::get(config::TEXTURE_PATH + "terrain/diffuse4.jpg"));
-        material->setUniformValue("diffuseColor" , glm::vec3(1));
-        material->setUniformValue("specularColor", glm::vec3(0.02));
+        material->setUniformValue("diffuseColor" , glm::vec3(1.f));
+        material->setUniformValue("specularColor", glm::vec3(0.02f));
         material->setUniformValue("specularMap", en::Textures::white());
         material->setUniformValue("shininess"  , 64.f);
         material->setUniformValue("noise", en::Textures::get(config::TEXTURE_PATH + "terrain/water/noise_c.jpg"));

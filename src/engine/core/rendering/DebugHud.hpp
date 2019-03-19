@@ -3,6 +3,7 @@
 
 #include <SFML/Graphics.hpp>
 #include <iostream>
+#include <utility>
 #include "Engine.h"
 #include "Text.h"
 #include "VertexRenderer.h"
@@ -14,7 +15,7 @@ namespace en {
 	public:
 		struct Info {
 			double fps = 0.0;
-			long frameTimeMicroseconds = 0;
+			std::int64_t frameTimeMicroseconds = 0;
 		};
 
 		DebugHud(Engine& engine, VertexRenderer& vertexRenderer);

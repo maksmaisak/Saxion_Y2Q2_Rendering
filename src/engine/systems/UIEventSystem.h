@@ -11,8 +11,8 @@
 
 namespace en {
 
-    class UIRect;
     class Transform;
+	struct UIRect;
 
     /// Dispatches mouse events to UIRects
     class UIEventSystem : public System {

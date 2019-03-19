@@ -3,6 +3,7 @@
 #include <string>
 #include <fstream>
 #include <assimp/mesh.h>
+#include <assimp/matrix4x4.h>
 #include <functional>
 #include <utils/Meta.h>
 
@@ -71,7 +72,20 @@ Mesh& Mesh::operator=(Mesh&& other) noexcept {
 	return *this;
 }
 
-Mesh::Mesh(const aiMesh* aiMesh) :
+namespace {
+
+	inline glm::mat4 toGlmMat4(const aiMatrix4x4& m) {
+
+		return glm::mat4(
+			m.a1, m.b1, m.c1, m.d1,
+			m.a2, m.b2, m.c2, m.d2,
+			m.a3, m.b3, m.c3, m.d3,
+			m.a4, m.b4, m.c4, m.d4
+		);
+	}
+}
+
+Mesh::Mesh(const aiMesh* aiMesh, const aiMatrix4x4& aiTransform) :
 	m_indices   (aiMesh->mNumFaces * 3),
 	m_vertices  (aiMesh->mNumVertices),
 	m_uvs       (aiMesh->mNumVertices),
@@ -89,21 +103,25 @@ Mesh::Mesh(const aiMesh* aiMesh) :
 		}
 	}
 
-	static const auto toGlmVec3D = [](const aiVector3D& vec) -> glm::vec3 {return {vec.x, vec.y, vec.z};};
-	static const auto toGlmVec2D = [](const aiVector3D& vec) -> glm::vec2 {return {vec.x, vec.y};};
+	const glm::mat4 transform = toGlmMat4(aiTransform);
+	const glm::mat3 normalTransform = glm::mat3(glm::transpose(glm::inverse(transform)));
+
+	const auto toGlmPosition = [&transform](const aiVector3D& vec) {return glm::vec3(transform * glm::vec4(vec.x, vec.y, vec.z, 1.f));};
+	const auto toGlmNormal = [&normalTransform](const aiVector3D& vec) {return normalTransform * glm::vec3(vec.x, vec.y, vec.z);};
+	static const auto toGlmUV = [](const aiVector3D& vec) {return glm::vec2(vec.x, vec.y);};
 
 	if (aiMesh->HasPositions())
-		std::transform(aiMesh->mVertices, aiMesh->mVertices + aiMesh->mNumVertices, m_vertices.begin(), toGlmVec3D);
+		std::transform(aiMesh->mVertices, aiMesh->mVertices + aiMesh->mNumVertices, m_vertices.begin(), toGlmPosition);
 
 	if (aiMesh->HasNormals())
-		std::transform(aiMesh->mNormals , aiMesh->mNormals + aiMesh->mNumVertices , m_normals.begin(), toGlmVec3D);
+		std::transform(aiMesh->mNormals , aiMesh->mNormals + aiMesh->mNumVertices , m_normals.begin(), toGlmNormal);
 
 	if (aiMesh->HasTextureCoords(0))
-		std::transform(aiMesh->mTextureCoords[0], aiMesh->mTextureCoords[0] + aiMesh->mNumVertices, m_uvs.begin(), toGlmVec2D);
+		std::transform(aiMesh->mTextureCoords[0], aiMesh->mTextureCoords[0] + aiMesh->mNumVertices, m_uvs.begin(), toGlmUV);
 
 	if (aiMesh->HasTangentsAndBitangents()) {
-		std::transform(aiMesh->mTangents  , aiMesh->mTangents   + aiMesh->mNumVertices, m_tangents.begin()  , toGlmVec3D);
-		std::transform(aiMesh->mBitangents, aiMesh->mBitangents + aiMesh->mNumVertices, m_bitangents.begin(), toGlmVec3D);
+		std::transform(aiMesh->mTangents  , aiMesh->mTangents   + aiMesh->mNumVertices, m_tangents.begin()  , toGlmNormal);
+		std::transform(aiMesh->mBitangents, aiMesh->mBitangents + aiMesh->mNumVertices, m_bitangents.begin(), toGlmNormal);
 	} else {
 		generateTangentsAndBitangents();
 	}

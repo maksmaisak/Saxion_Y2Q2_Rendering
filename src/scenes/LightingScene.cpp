@@ -24,19 +24,22 @@ constexpr int NumRotatingLights = 2;
 
 void LightingScene::open() {
 
+    m_renderSettings.ambientColor = glm::vec3(1.010478, 1.854524, 2.27060) * 0.5f;
+    //m_renderSettings.useSkybox = false;
+
     en::Engine& engine = getEngine();
 
     auto camera = engine.makeActor("Camera");
     camera.add<en::Camera>();
     camera.add<en::Transform>().move({0, 2, 7});
-    camera.add<CameraOrbitBehavior>(7, -45.f, 89.f);
+    camera.add<CameraOrbitBehavior>(7.f, -45.f, 89.f);
 
     auto ambientLight = engine.makeActor("AmbientLight");
     ambientLight.add<en::Transform>();
     {
         auto& l = ambientLight.add<en::Light>();
         l.color = {0,0,0};
-        l.colorAmbient = glm::vec3(0.02);
+        l.colorAmbient = glm::vec3(0.02f);
     }
     if (AnimateLightProperties) ambientLight.add<LightPropertyAnimator>();
 
@@ -47,7 +50,7 @@ void LightingScene::open() {
         .setLocalRotation(glm::toQuat(glm::orientate4(glm::radians(glm::vec3(45,0,0)))));
     {
         auto& l = directionalLight.add<en::Light>(en::Light::Kind::DIRECTIONAL);
-        l.intensity = 0.2f;
+        l.intensity = 2.21f;
     }
     if (AnimateLightProperties) directionalLight.add<LightPropertyAnimator>();
 
@@ -73,6 +76,7 @@ void LightingScene::open() {
 
         auto& l = spotLight.add<en::Light>(en::Light::Kind::SPOT);
         l.color = spotLightColor;
+        l.intensity = 2.f;
         l.spotlightInnerCutoff = glm::cos(glm::radians(20.f));
         l.spotlightOuterCutoff = glm::cos(glm::radians(45.f));
     }
@@ -83,7 +87,7 @@ void LightingScene::open() {
     rotatingLights.add<en::Transform>();
     rotatingLights.add<RotatingBehavior>(glm::vec3(0,1,0));
 
-    auto lightModel = en::Models::get(config::MODEL_PATH + "cube_flat.obj");
+    auto lightModel = en::Models::get(config::MODEL_PATH + "sphere.obj");
     for (int i = 0; i < NumRotatingLights; ++i) {
 
         auto light = engine.makeActor("Light");
@@ -98,14 +102,16 @@ void LightingScene::open() {
         lightMaterial->setUniformValue("diffuseColor", lightColor);
 
         light.add<en::RenderInfo>(lightModel, lightMaterial);
-        light.add<en::Light>().color = lightColor;
+        auto& l = light.add<en::Light>();
+        l.color = lightColor;
+        l.intensity = 5.f;
         if (AnimateLightProperties) light.add<LightPropertyAnimator>();
     }
 
     auto sphere = engine.makeActor("Sphere");
     sphere.add<en::Transform>().move({0, 0, 0});
     {
-        auto model = en::Models::get(config::MODEL_PATH + "sphere2.obj");
+        auto model = en::Models::get(config::MODEL_PATH + "sphere.obj");
         auto material = std::make_shared<en::Material>("pbr");
         material->setUniformValue("albedoMap", en::Textures::get(config::TEXTURE_PATH + "testPBR/rust/albedo.png"));
         material->setUniformValue("metallicSmoothnessMap", en::Textures::get(config::TEXTURE_PATH + "testPBR/rust/metallic_smoothness.psd", GL_RGBA));

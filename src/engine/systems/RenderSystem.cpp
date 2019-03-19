@@ -250,7 +250,7 @@ void RenderSystem::renderEntities() {
     glm::mat4 matrixView = glm::inverse(mainCamera.get<Transform>().getWorldTransform());
     glm::mat4 matrixProjection = getProjectionMatrix(*m_engine, mainCamera.get<Camera>());
 
-    // Draw batches.
+    // Draw batches
     for (const auto& [material, mesh] : m_batches) {
         material->render(&mesh, m_engine, &m_depthMaps, glm::mat4(1), matrixView, matrixProjection);
     }
@@ -264,7 +264,7 @@ void RenderSystem::renderEntities() {
             continue;
 
         if (renderInfo.isInBatch) {
-            numBatched += 1;
+            numBatched += renderInfo.model->getMeshes().size();
             continue;
         }
 
@@ -281,6 +281,7 @@ void RenderSystem::renderEntities() {
 
         checkRenderingError(m_engine->actor(e));
     }
+
     //std::cout << "Draw calls saved by batching: " << numBatched - m_batches.size() << '\n';
 }
 
@@ -295,6 +296,9 @@ void RenderSystem::renderSkybox() {
         return;
 
     const auto& renderSettings = scene->getRenderSettings();
+    if (!renderSettings.useSkybox)
+        return;
+
     const std::shared_ptr<Texture>& skyboxTexture = renderSettings.skyboxTexture ? renderSettings.skyboxTexture : m_defaultSkybox;
     if (!skyboxTexture || !skyboxTexture->isValid() || skyboxTexture->getKind() != Texture::Kind::TextureCube)
         return;

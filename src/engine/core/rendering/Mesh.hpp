@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <GL/glew.h>
+#include <assimp/matrix4x4.h>
 #include "glm.hpp"
 #include "ResourceLoader.h"
 
@@ -18,7 +19,8 @@ namespace en {
 	public:
 
 		Mesh() = default;
-		Mesh(const aiMesh* aiMesh);
+		Mesh(const aiMesh* aiMesh, const aiMatrix4x4& transform = {});
+
 		Mesh(const Mesh&) = delete;
 		Mesh& operator=(const Mesh&) = delete;
 		Mesh(Mesh&& other) noexcept;

@@ -55,7 +55,7 @@ void makeFloorFromSpheres(en::Engine& engine, float sideLength, int numSpheresPe
             rb.isKinematic = true;
             rb.radius = radius;
 
-            actor.add<en::RenderInfo>(model, material);
+            actor.add<en::RenderInfo>(model, material).isBatchingStatic = true;
         }
     }
 }
@@ -94,14 +94,14 @@ void addRingItems(en::Engine& engine, en::Entity parent, std::size_t numItems = 
 
             auto& tf = object.add<en::Transform>();
 
-            //tf.setParent(parent);
+            tf.setParent(parent);
             tf.setLocalPosition(offset);
             tf.scale(glm::vec3(0.2f));
         }
 
         {
             auto& rb = object.add<en::Rigidbody>();
-            //rb.isKinematic = true;
+            rb.isKinematic = true;
             rb.radius = 0.2f;
             rb.invMass = 1.f / 0.1f;
         }
@@ -110,7 +110,7 @@ void addRingItems(en::Engine& engine, en::Entity parent, std::size_t numItems = 
 
         if (i % 2 == 0) {
 
-            object.add<en::Light>().intensity = 2.f;
+            //object.add<en::Light>().intensity = 2.f;
             object.add<en::RenderInfo>(sphereModel, sphereMaterial);
 
         } else {
@@ -145,7 +145,7 @@ void TestScene::open() {
     floorMaterial->setUniformValue("diffuseMap", en::Textures::get(config::TEXTURE_PATH + "land.jpg"));
     floorMaterial->setUniformValue("diffuseColor", glm::vec3(1));
     floorMaterial->setUniformValue("specularMap", en::Textures::white());
-    floorMaterial->setUniformValue("specularColor", glm::vec3(0.04));
+    floorMaterial->setUniformValue("specularColor", glm::vec3(0.04f));
 
     auto wobblingMaterial = en::Resources<en::Material>::get("wobble");
     wobblingMaterial->setUniformValue("timeScale", 10.f);
@@ -170,7 +170,7 @@ void TestScene::open() {
     en::Actor camera = engine.makeActor("Camera");
     camera.add<en::Camera>();
     camera.add<en::Transform>().move({0, 0, 10});
-    auto& cameraOrbitBehavior = camera.add<CameraOrbitBehavior>(10, -15.f, 60.f);
+    auto& cameraOrbitBehavior = camera.add<CameraOrbitBehavior>(10.f, -15.f, 60.f);
 
     // Add the floor
     // Use en::Registry this time,
@@ -190,8 +190,8 @@ void TestScene::open() {
         .setLocalRotation(glm::toQuat(glm::orientate3(glm::radians(glm::vec3(-45, 0, 90)))));
     {
         auto& l = directionalLight.add<en::Light>(en::Light::Kind::DIRECTIONAL);
-        l.colorAmbient = glm::vec3(0.1);
-        l.color = glm::vec3(0.2);
+        l.colorAmbient = glm::vec3(0.1f);
+        l.color = glm::vec3(0.2f);
     }
 
     // Add an empty rotating object.

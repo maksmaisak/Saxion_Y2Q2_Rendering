@@ -54,7 +54,7 @@ namespace en {
         inline SceneManager& getSceneManager() { return m_sceneManager; }
         inline LuaState& getLuaState()         { return *m_lua; }
         inline double getFps()                 { return m_fps; }
-        inline long getFrameTimeMicroseconds() { return m_frameTimeMicroseconds; }
+        inline std::int64_t getFrameTimeMicroseconds() { return m_frameTimeMicroseconds; }
 
         Actor actor(Entity entity) const;
         Actor makeActor();
@@ -84,9 +84,9 @@ namespace en {
 
         utils::KeyboardHelper m_keyboardHelper;
 
-        unsigned int m_framerateCap = 240;
+        std::uint32_t m_framerateCap = 240;
         double m_fps = 0.f;
-        long m_frameTimeMicroseconds = 0;
+        std::int64_t m_frameTimeMicroseconds = 0;
 
         bool m_shouldExit = false;
 
